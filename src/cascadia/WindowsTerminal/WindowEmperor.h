@@ -1,3 +1,4 @@
+#include <stdio.h>
 /*++
 Copyright (c) Microsoft Corporation Licensed under the MIT license.
 
@@ -106,11 +107,15 @@ private:
 #if 0 // #ifdef NDEBUG
     static constexpr void _assertIsMainThread() noexcept
     {
+	fprintf(stderr, ">>> Entering _assertIsMainThread()\n");
+	fprintf(stderr, "<<< Exiting _assertIsMainThread()\n");
     }
 #else
     void _assertIsMainThread() const noexcept
     {
+		fprintf(stderr, ">>> Entering _assertIsMainThread()\n");
         WI_ASSERT_MSG(_mainThreadId == GetCurrentThreadId(), "This part of WindowEmperor must be accessed from the UI thread");
+		fprintf(stderr, "<<< Exiting _assertIsMainThread()\n");
     }
     DWORD _mainThreadId = GetCurrentThreadId();
 #endif

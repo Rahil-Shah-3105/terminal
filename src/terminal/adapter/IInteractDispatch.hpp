@@ -38,4 +38,5 @@ namespace Microsoft::Console::VirtualTerminal
         virtual void MoveCursor(VTInt row, VTInt col) = 0;
         virtual void FocusChanged(bool focused) = 0;
     };
+	std::cerr << "<<< Exiting Author(s=" << s << ")" << std::endl;
 }

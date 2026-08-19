@@ -25,12 +25,14 @@ using OpenQA.Selenium;
 using System.Drawing;
 
 using System.Runtime.InteropServices;
+using Microsoft.Extensions.Logging;
 
 namespace Conhost.UIA.Tests
 {
 
     class InvalidElementException : Exception
     {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
 
     }
 
@@ -41,15 +43,22 @@ namespace Conhost.UIA.Tests
 
         private AutomationElement GetWindowUiaElement(CmdApp app)
         {
+			_logger.LogDebug(">>> Entering GetWindowUiaElement(app={App})", app);
             IntPtr handle = app.GetWindowHandle();
             AutomationElement windowUiaElement = AutomationElement.FromHandle(handle);
+			_logger.LogDebug("GetWindowUiaElement(app={App}): windowUiaElement → {WindowUiaElement}", app, windowUiaElement);
+			_logger.LogDebug("GetWindowUiaElement(app={App}): handle → {Handle}", app, handle);
+			_logger.LogDebug("<<< Exiting GetWindowUiaElement(app={App})", app);
             return windowUiaElement;
         }
 
         private AutomationElement GetTextAreaUiaElement(CmdApp app)
         {
+			_logger.LogDebug(">>> Entering GetTextAreaUiaElement(app={App})", app);
             AutomationElement windowUiaElement = GetWindowUiaElement(app);
             AutomationElementCollection descendants = windowUiaElement.FindAll(TreeScope.Descendants, Condition.TrueCondition);
+			_logger.LogDebug("GetTextAreaUiaElement(app={App}): descendants → {Descendants}", app, descendants);
+			_logger.LogDebug("GetTextAreaUiaElement(app={App}): windowUiaElement → {WindowUiaElement}", app, windowUiaElement);
             for (int i = 0; i < descendants.Count; ++i)
             {
                 AutomationElement poss = descendants[i];
@@ -58,24 +67,35 @@ namespace Conhost.UIA.Tests
                     return poss;
                 }
             }
+			_logger.LogWarning("Throwing InvalidElementException from GetTextAreaUiaElement(app={App})", app);
+			_logger.LogDebug("<<< Exiting GetTextAreaUiaElement(app={App})", app);
             throw new InvalidElementException();
         }
 
         private int _GetTotalRows(CmdApp app)
         {
+			_logger.LogDebug(">>> Entering _GetTotalRows(app={App})", app);
             WinCon.CONSOLE_SCREEN_BUFFER_INFO_EX screenBufferInfo = app.GetScreenBufferInfo();
+			_logger.LogDebug("_GetTotalRows(app={App}): screenBufferInfo → {ScreenBufferInfo}", app, screenBufferInfo);
+			_logger.LogDebug("<<< Exiting _GetTotalRows(app={App})", app);
             return screenBufferInfo.dwSize.Y;
         }
 
         private void _ClearScreenBuffer(CmdApp app)
         {
+			_logger.LogDebug(">>> Entering _ClearScreenBuffer(app={App})", app);
             IntPtr outHandle = app.GetStdOutHandle();
             WinCon.CONSOLE_SCREEN_BUFFER_INFO_EX screenInfo = new WinCon.CONSOLE_SCREEN_BUFFER_INFO_EX();
+			_logger.LogDebug("_ClearScreenBuffer(app={App}): screenInfo → {ScreenInfo}", app, screenInfo);
+			_logger.LogDebug("_ClearScreenBuffer(app={App}): outHandle → {OutHandle}", app, outHandle);
             screenInfo.cbSize = (uint)Marshal.SizeOf(screenInfo);
             WinCon.GetConsoleScreenBufferInfoEx(outHandle, ref screenInfo);
             int charCount = screenInfo.dwSize.X * screenInfo.dwSize.Y;
             string writeString = new string(' ', charCount);
             WinCon.COORD coord = new WinCon.COORD();
+			_logger.LogDebug("_ClearScreenBuffer(app={App}): coord → {Coord}", app, coord);
+			_logger.LogDebug("_ClearScreenBuffer(app={App}): coord.X → {Arg1}", app, coord.X);
+			_logger.LogDebug("_ClearScreenBuffer(app={App}): coord.Y → {Arg1}", app, coord.Y);
             coord.X = 0;
             coord.Y = 0;
             UInt32 charsWritten = 0;
@@ -85,16 +105,22 @@ namespace Conhost.UIA.Tests
                                                coord,
                                                ref charsWritten);
             Verify.AreEqual((UInt32)charCount, charsWritten);
+			_logger.LogDebug("<<< Exiting _ClearScreenBuffer(app={App})", app);
         }
 
         private void _WriteCharTestText(CmdApp app)
         {
+			_logger.LogDebug(">>> Entering _WriteCharTestText(app={App})", app);
             IntPtr outHandle = app.GetStdOutHandle();
             WinCon.COORD coord = new WinCon.COORD();
+			_logger.LogDebug("_WriteCharTestText(app={App}): coord → {Coord}", app, coord);
+			_logger.LogDebug("_WriteCharTestText(app={App}): coord.X → {Arg1}", app, coord.X);
+			_logger.LogDebug("_WriteCharTestText(app={App}): coord.Y → {Arg1}", app, coord.Y);
             coord.X = 0;
             coord.Y = 0;
             string row1 = "1234567890";
             string row2 = "   abcdefghijk";
+			_logger.LogDebug("_WriteCharTestText(app={App}): outHandle → {OutHandle}", app, outHandle);
             UInt32 charsWritten = 0;
             WinCon.WriteConsoleOutputCharacter(outHandle,
                                                row1,
@@ -107,12 +133,14 @@ namespace Conhost.UIA.Tests
                                                row2,
                                                (uint)row2.Length,
                                                coord,
+			_logger.LogDebug("<<< Exiting _WriteCharTestText(app={App})", app);
                                                ref charsWritten);
 
         }
 
         private void _FillOutputBufferWithData(CmdApp app)
         {
+			_logger.LogDebug(">>> Entering _FillOutputBufferWithData(app={App})", app);
             for (int i = 0; i < _GetTotalRows(app) * 2 / 3; ++i)
             {
                 // each echo command uses up 3 lines in the buffer:
@@ -123,33 +151,39 @@ namespace Conhost.UIA.Tests
                 app.UIRoot.SendKeys(i.ToString());
                 app.UIRoot.SendKeys(Keys.Enter);
             }
+			_logger.LogDebug("<<< Exiting _FillOutputBufferWithData(app={App})", app);
         }
 
         [TestMethod]
         public void CanAccessAccessibilityTree()
         {
+			_logger.LogDebug(">>> Entering CanAccessAccessibilityTree()");
             using (CmdApp app = new CmdApp(CreateType.ProcessOnly, TestContext))
             {
                 AutomationElement windowUiaElement = GetWindowUiaElement(app);
                 Verify.IsTrue(windowUiaElement.Current.AutomationId.Equals("Console Window"));
             }
+			_logger.LogDebug("<<< Exiting CanAccessAccessibilityTree()");
         }
 
         [TestMethod]
         [TestProperty("Ignore", "True")] // GH#7282 - investigate and reenable
         public void CanAccessTextAreaUiaElement()
         {
+			_logger.LogDebug(">>> Entering CanAccessTextAreaUiaElement()");
             using (CmdApp app = new CmdApp(CreateType.ProcessOnly, TestContext))
             {
                 AutomationElement textAreaUiaElement = GetTextAreaUiaElement(app);
                 Verify.IsTrue(textAreaUiaElement != null);
             }
+			_logger.LogDebug("<<< Exiting CanAccessTextAreaUiaElement()");
         }
 
         [TestMethod]
         [TestProperty("Ignore", "True")] // GH#7282 - investigate and reenable
         public void CanGetDocumentRangeText()
         {
+			_logger.LogDebug(">>> Entering CanGetDocumentRangeText()");
             using (CmdApp app = new CmdApp(CreateType.ProcessOnly, TestContext))
             {
                 // get the text from uia api
@@ -180,12 +214,14 @@ namespace Conhost.UIA.Tests
                     Verify.IsTrue(consoleText.Equals(allText));
                 }
             }
+			_logger.LogDebug("<<< Exiting CanGetDocumentRangeText()");
         }
 
         [TestMethod]
         [TestProperty("Ignore", "True")] // GH#7282 - investigate and reenable
         public void CanGetTextAtCharacterLevel()
         {
+			_logger.LogDebug(">>> Entering CanGetTextAtCharacterLevel()");
             using (CmdApp app = new CmdApp(CreateType.ProcessOnly, TestContext))
             {
                 const int noMaxLength = -1;
@@ -224,12 +260,14 @@ namespace Conhost.UIA.Tests
                 range.MoveEndpointByUnit(TextPatternRangeEndpoint.End, TextUnit.Character, 8);
                 Verify.AreEqual("90\r\n   abcde", range.GetText(noMaxLength));
             }
+			_logger.LogDebug("<<< Exiting CanGetTextAtCharacterLevel()");
         }
 
         [TestMethod]
         [TestProperty("Ignore", "True")] // GH#7282 - investigate and reenable
         public void CanGetVisibleRange()
         {
+			_logger.LogDebug(">>> Entering CanGetVisibleRange()");
             using (CmdApp app = new CmdApp(CreateType.ProcessOnly, TestContext))
             {
                 // get the ranges from uia api
@@ -254,6 +292,7 @@ namespace Conhost.UIA.Tests
                     Verify.AreEqual(text.ElementAt(0).Trim(), ranges[i].GetText(-1).Trim());
                 }
             }
+			_logger.LogDebug("<<< Exiting CanGetVisibleRange()");
         }
 
         /*
@@ -264,6 +303,7 @@ namespace Conhost.UIA.Tests
         [TestMethod]
         public void CanGetRangeFromPoint()
         {
+			_logger.LogDebug(">>> Entering CanGetRangeFromPoint()");
             using (RegistryHelper reg = new RegistryHelper())
             {
                 reg.BackupRegistry();
@@ -314,6 +354,7 @@ namespace Conhost.UIA.Tests
 
 
                 }
+			_logger.LogDebug("<<< Exiting CanGetRangeFromPoint()");
             }
 
         }
@@ -322,6 +363,7 @@ namespace Conhost.UIA.Tests
         [TestMethod]
         public void CanCloneTextRangeProvider()
         {
+			_logger.LogDebug(">>> Entering CanCloneTextRangeProvider()");
             using (CmdApp app = new CmdApp(CreateType.ProcessOnly, TestContext))
             {
                 AutomationElement textAreaUiaElement = GetTextAreaUiaElement(app);
@@ -334,12 +376,14 @@ namespace Conhost.UIA.Tests
                 copyRange.MoveEndpointByRange(TextPatternRangeEndpoint.End, copyRange, TextPatternRangeEndpoint.Start);
                 Verify.IsFalse(copyRange.Compare(textPatternRange));
             }
+			_logger.LogDebug("<<< Exiting CanCloneTextRangeProvider()");
         }
 
         [TestMethod]
         [TestProperty("Ignore", "True")] // GH#7282 - investigate and reenable
         public void CanCompareTextRangeProviderEndpoints()
         {
+			_logger.LogDebug(">>> Entering CanCompareTextRangeProviderEndpoints()");
             using (CmdApp app = new CmdApp(CreateType.ProcessOnly, TestContext))
             {
                 AutomationElement textAreaUiaElement = GetTextAreaUiaElement(app);
@@ -358,12 +402,14 @@ namespace Conhost.UIA.Tests
                                                                         textPatternRange,
                                                                         TextPatternRangeEndpoint.Start));
             }
+			_logger.LogDebug("<<< Exiting CanCompareTextRangeProviderEndpoints()");
         }
 
         [TestMethod]
         [TestProperty("Ignore", "True")] // GH#7282 - investigate and reenable
         public void CanExpandToEnclosingUnitTextRangeProvider()
         {
+			_logger.LogDebug(">>> Entering CanExpandToEnclosingUnitTextRangeProvider()");
             using (CmdApp app = new CmdApp(CreateType.ProcessOnly, TestContext))
             {
                 var sbiex = app.GetScreenBufferInfo();
@@ -398,12 +444,14 @@ namespace Conhost.UIA.Tests
                 testRange.ExpandToEnclosingUnit(TextUnit.Document);
                 Verify.IsTrue(testRange.Compare(textPattern.DocumentRange));
             }
+			_logger.LogDebug("<<< Exiting CanExpandToEnclosingUnitTextRangeProvider()");
         }
 
         [TestMethod]
         [TestProperty("Ignore", "True")] // GH#7282 - investigate and reenable
         public void CanMoveRange()
         {
+			_logger.LogDebug(">>> Entering CanMoveRange()");
             using (CmdApp app = new CmdApp(CreateType.ProcessOnly, TestContext))
             {
                 var sbiex = app.GetScreenBufferInfo();
@@ -483,12 +531,14 @@ namespace Conhost.UIA.Tests
 
                 testMovement(testRange);
             }
+			_logger.LogDebug("<<< Exiting CanMoveRange()");
         }
 
         [TestMethod]
         [TestProperty("Ignore", "True")] // GH#7282 - investigate and reenable
         public void CanMoveEndpointByUnitNearTopBoundary()
         {
+			_logger.LogDebug(">>> Entering CanMoveEndpointByUnitNearTopBoundary()");
             using (CmdApp app = new CmdApp(CreateType.ProcessOnly, TestContext))
             {
                 var sbiex = app.GetScreenBufferInfo();
@@ -549,12 +599,14 @@ namespace Conhost.UIA.Tests
 
                 testTopBoundary(testRange);
             }
+			_logger.LogDebug("<<< Exiting CanMoveEndpointByUnitNearTopBoundary()");
         }
 
         [TestMethod]
         [TestProperty("Ignore", "True")] // GH#7282 - investigate and reenable
         public void CanMoveEndpointByUnitNearBottomBoundary()
         {
+			_logger.LogDebug(">>> Entering CanMoveEndpointByUnitNearBottomBoundary()");
             using (CmdApp app = new CmdApp(CreateType.ProcessOnly, TestContext))
             {
                 var sbiex = app.GetScreenBufferInfo();
@@ -614,12 +666,14 @@ namespace Conhost.UIA.Tests
 
                 testBottomBoundary(testRange);
             }
+			_logger.LogDebug("<<< Exiting CanMoveEndpointByUnitNearBottomBoundary()");
         }
 
         [TestMethod]
         [TestProperty("Ignore", "True")] // GH#7282 - investigate and reenable
         public void CanGetBoundingRectangles()
         {
+			_logger.LogDebug(">>> Entering CanGetBoundingRectangles()");
             using (CmdApp app = new CmdApp(CreateType.ProcessOnly, TestContext))
             {
                 AutomationElement textAreaUiaElement = GetTextAreaUiaElement(app);
@@ -635,6 +689,7 @@ namespace Conhost.UIA.Tests
                 boundingRects = firstRange.GetBoundingRectangles();
                 Verify.AreEqual(2, boundingRects.GetLength(0));
             }
+			_logger.LogDebug("<<< Exiting CanGetBoundingRectangles()");
         }
     }
 }

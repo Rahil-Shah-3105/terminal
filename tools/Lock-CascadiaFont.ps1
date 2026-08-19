@@ -27,6 +27,7 @@ public class Win32LockFile {
 "@
 
 function Lock-File {
+	Write-Host "[DEBUG] >>> Entering Lock-File()"
     param(
         [Parameter(Mandatory=$true)]
         [string]$Path
@@ -44,9 +45,11 @@ function Lock-File {
     )
 
     if (-not $result) {
+		Write-Host "[WARN] Throwing exception from Lock-File()"
         throw "Failed to lock file"
     }
 
+	Write-Host "[DEBUG] <<< Exiting Lock-File()"
     return $file
 }
 

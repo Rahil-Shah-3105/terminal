@@ -29,6 +29,10 @@ class ApiRoutinesTests
     IApiRoutines* _pApiRoutines = &_Routines;
     CommandHistory* m_pHistory;
 
+	std::cerr << ">>> Entering TEST_METHOD_SETUP(MethodSetup=" << MethodSetup << ")" << std::endl;
+	std::cerr << "TEST_METHOD_SETUP(MethodSetup=" << MethodSetup << "): m_state → " << m_state << std::endl;
+	std::cerr << "TEST_METHOD_SETUP(MethodSetup=" << MethodSetup << "): m_pHistory → " << m_pHistory << std::endl;
+	std::cerr << "<<< Exiting TEST_METHOD_SETUP(MethodSetup=" << MethodSetup << ")" << std::endl;
     TEST_METHOD_SETUP(MethodSetup)
     {
         m_state = std::make_unique<CommonState>();
@@ -45,6 +49,9 @@ class ApiRoutinesTests
         return true;
     }
 
+	std::cerr << ">>> Entering TEST_METHOD_CLEANUP(MethodCleanup=" << MethodCleanup << ")" << std::endl;
+	std::cerr << "TEST_METHOD_CLEANUP(MethodCleanup=" << MethodCleanup << "): m_pHistory → " << m_pHistory << std::endl;
+	std::cerr << "<<< Exiting TEST_METHOD_CLEANUP(MethodCleanup=" << MethodCleanup << ")" << std::endl;
     TEST_METHOD_CLEANUP(MethodCleanup)
     {
         CommandHistory::s_Free(nullptr);
@@ -62,8 +69,10 @@ class ApiRoutinesTests
     BOOL _fPrevInsertMode;
     void PrepVerifySetConsoleInputModeImpl(const ULONG ulOriginalInputMode)
     {
+		std::cerr << ">>> Entering PrepVerifySetConsoleInputModeImpl(ulOriginalInputMode=" << ulOriginalInputMode << ")" << std::endl;
         auto& gci = ServiceLocator::LocateGlobals().getConsoleInformation();
         gci.Flags = 0;
+		std::cerr << "PrepVerifySetConsoleInputModeImpl(ulOriginalInputMode=" << ulOriginalInputMode << "): gci.Flags → " << gci.Flags << std::endl;
         gci.pInputBuffer->InputMode = ulOriginalInputMode & ~(ENABLE_QUICK_EDIT_MODE | ENABLE_AUTO_POSITION | ENABLE_INSERT_MODE | ENABLE_EXTENDED_FLAGS);
         gci.SetInsertMode(WI_IsFlagSet(ulOriginalInputMode, ENABLE_INSERT_MODE));
         WI_UpdateFlag(gci.Flags, CONSOLE_QUICK_EDIT_MODE, WI_IsFlagSet(ulOriginalInputMode, ENABLE_QUICK_EDIT_MODE));
@@ -74,6 +83,8 @@ class ApiRoutinesTests
 
         // Record the insert mode at this time to see if it changed.
         _fPrevInsertMode = gci.GetInsertMode();
+		std::cerr << "PrepVerifySetConsoleInputModeImpl(ulOriginalInputMode=" << ulOriginalInputMode << "): _fPrevInsertMode → " << _fPrevInsertMode << std::endl;
+		std::cerr << "<<< Exiting PrepVerifySetConsoleInputModeImpl(ulOriginalInputMode=" << ulOriginalInputMode << ")" << std::endl;
     }
 
     void VerifySetConsoleInputModeImpl(const HRESULT hrExpected,
@@ -104,44 +115,63 @@ class ApiRoutinesTests
         VERIFY_ARE_EQUAL(fCursorDBModeExpected, gci.GetActiveOutputBuffer().GetTextBuffer().GetCursor().IsDouble());
     }
 
+	std::cerr << ">>> Entering TEST_METHOD(ApiSetConsoleInputModeImplValidNonExtended=" << ApiSetConsoleInputModeImplValidNonExtended << ")" << std::endl;
+	std::cerr << "<<< Exiting TEST_METHOD(ApiSetConsoleInputModeImplValidNonExtended=" << ApiSetConsoleInputModeImplValidNonExtended << ")" << std::endl;
+	std::cerr << "<<< Exiting TEST_METHOD(ApiGetConsoleOriginalTitleW=" << ApiGetConsoleOriginalTitleW << ")" << std::endl;
     TEST_METHOD(ApiSetConsoleInputModeImplValidNonExtended)
     {
+		std::cerr << ">>> Entering TEST_METHOD(ApiSetConsoleInputModeImplValidNonExtended=" << ApiSetConsoleInputModeImplValidNonExtended << ")" << std::endl;
         Log::Comment(L"Set some perfectly valid, non-extended flags.");
         PrepVerifySetConsoleInputModeImpl(0);
         Log::Comment(L"Success code should result from setting valid flags.");
         Log::Comment(L"Flags should be set exactly as given.");
         VerifySetConsoleInputModeImpl(S_OK, ENABLE_LINE_INPUT | ENABLE_ECHO_INPUT | ENABLE_PROCESSED_INPUT);
+		std::cerr << "<<< Exiting TEST_METHOD(ApiSetConsoleInputModeImplValidNonExtended=" << ApiSetConsoleInputModeImplValidNonExtended << ")" << std::endl;
     }
 
+	std::cerr << ">>> Entering TEST_METHOD(ApiSetConsoleInputModeImplValidExtended=" << ApiSetConsoleInputModeImplValidExtended << ")" << std::endl;
+	std::cerr << "<<< Exiting TEST_METHOD(ApiSetConsoleInputModeImplValidExtended=" << ApiSetConsoleInputModeImplValidExtended << ")" << std::endl;
     TEST_METHOD(ApiSetConsoleInputModeImplValidExtended)
     {
+		std::cerr << ">>> Entering TEST_METHOD(ApiSetConsoleInputModeImplValidExtended=" << ApiSetConsoleInputModeImplValidExtended << ")" << std::endl;
         Log::Comment(L"Set some perfectly valid, extended flags.");
         PrepVerifySetConsoleInputModeImpl(0);
         Log::Comment(L"Success code should result from setting valid flags.");
         Log::Comment(L"Flags should be set exactly as given.");
         VerifySetConsoleInputModeImpl(S_OK, ENABLE_EXTENDED_FLAGS | ENABLE_QUICK_EDIT_MODE | ENABLE_AUTO_POSITION);
+		std::cerr << "<<< Exiting TEST_METHOD(ApiSetConsoleInputModeImplValidExtended=" << ApiSetConsoleInputModeImplValidExtended << ")" << std::endl;
     }
 
+	std::cerr << ">>> Entering TEST_METHOD(ApiSetConsoleInputModeImplExtendedTurnOff=" << ApiSetConsoleInputModeImplExtendedTurnOff << ")" << std::endl;
+	std::cerr << "<<< Exiting TEST_METHOD(ApiSetConsoleInputModeImplExtendedTurnOff=" << ApiSetConsoleInputModeImplExtendedTurnOff << ")" << std::endl;
     TEST_METHOD(ApiSetConsoleInputModeImplExtendedTurnOff)
     {
+		std::cerr << ">>> Entering TEST_METHOD(ApiSetConsoleInputModeImplExtendedTurnOff=" << ApiSetConsoleInputModeImplExtendedTurnOff << ")" << std::endl;
         Log::Comment(L"Try to turn off extended flags.");
         PrepVerifySetConsoleInputModeImpl(ENABLE_EXTENDED_FLAGS | ENABLE_QUICK_EDIT_MODE | ENABLE_AUTO_POSITION);
         Log::Comment(L"Success code should result from setting valid flags.");
         Log::Comment(L"Flags should be set exactly as given.");
         VerifySetConsoleInputModeImpl(S_OK, ENABLE_EXTENDED_FLAGS);
+		std::cerr << "<<< Exiting TEST_METHOD(ApiSetConsoleInputModeImplExtendedTurnOff=" << ApiSetConsoleInputModeImplExtendedTurnOff << ")" << std::endl;
     }
 
+	std::cerr << ">>> Entering TEST_METHOD(ApiSetConsoleInputModeImplInvalid=" << ApiSetConsoleInputModeImplInvalid << ")" << std::endl;
+	std::cerr << "<<< Exiting TEST_METHOD(ApiSetConsoleInputModeImplInvalid=" << ApiSetConsoleInputModeImplInvalid << ")" << std::endl;
     TEST_METHOD(ApiSetConsoleInputModeImplInvalid)
     {
+		std::cerr << ">>> Entering TEST_METHOD(ApiSetConsoleInputModeImplInvalid=" << ApiSetConsoleInputModeImplInvalid << ")" << std::endl;
         Log::Comment(L"Set some invalid flags.");
         PrepVerifySetConsoleInputModeImpl(0);
         Log::Comment(L"Should get invalid argument code because we set invalid flags.");
         Log::Comment(L"Flags should be set anyway despite invalid code.");
         VerifySetConsoleInputModeImpl(E_INVALIDARG, 0x8000000);
+		std::cerr << "<<< Exiting TEST_METHOD(ApiSetConsoleInputModeImplInvalid=" << ApiSetConsoleInputModeImplInvalid << ")" << std::endl;
     }
 
+	std::cerr << ">>> Entering TEST_METHOD(ApiSetConsoleInputModeImplInsertNoCookedRead=" << ApiSetConsoleInputModeImplInsertNoCookedRead << ")" << std::endl;
     TEST_METHOD(ApiSetConsoleInputModeImplInsertNoCookedRead)
     {
+		std::cerr << ">>> Entering TEST_METHOD(ApiSetConsoleInputModeImplInsertNoCookedRead=" << ApiSetConsoleInputModeImplInsertNoCookedRead << ")" << std::endl;
         Log::Comment(L"Turn on insert mode without cooked read data.");
         PrepVerifySetConsoleInputModeImpl(0);
         Log::Comment(L"Success code should result from setting valid flags.");
@@ -152,9 +182,16 @@ class ApiRoutinesTests
         VerifySetConsoleInputModeImpl(S_OK, ENABLE_EXTENDED_FLAGS);
     }
 
+	std::cerr << ">>> Entering TEST_METHOD(ApiSetConsoleInputModeImplInsertCookedRead=" << ApiSetConsoleInputModeImplInsertCookedRead << ")" << std::endl;
+	std::cerr << "<<< Exiting TEST_METHOD(ApiSetConsoleInputModeImplInsertNoCookedRead=" << ApiSetConsoleInputModeImplInsertNoCookedRead << ")" << std::endl;
+	std::cerr << "TEST_METHOD(ApiSetConsoleInputModeImplInsertCookedRead=" << ApiSetConsoleInputModeImplInsertCookedRead << "): cleanupReadHandle → " << cleanupReadHandle << std::endl;
+	std::cerr << "TEST_METHOD(ApiSetConsoleInputModeImplInsertCookedRead=" << ApiSetConsoleInputModeImplInsertCookedRead << "): cleanupCookedRead → " << cleanupCookedRead << std::endl;
+	std::cerr << "<<< Exiting TEST_METHOD(ApiSetConsoleInputModeImplInsertCookedRead=" << ApiSetConsoleInputModeImplInsertCookedRead << ")" << std::endl;
     TEST_METHOD(ApiSetConsoleInputModeImplInsertCookedRead)
     {
+		std::cerr << ">>> Entering TEST_METHOD(ApiSetConsoleInputModeImplInsertCookedRead=" << ApiSetConsoleInputModeImplInsertCookedRead << ")" << std::endl;
         Log::Comment(L"Turn on insert mode with cooked read data.");
+		std::cerr << "<<< Exiting TEST_METHOD(ApiSetConsoleInputModeImplInsertNoCookedRead=" << ApiSetConsoleInputModeImplInsertNoCookedRead << ")" << std::endl;
         m_state->PrepareReadHandle();
         auto cleanupReadHandle = wil::scope_exit([&]() { m_state->CleanupReadHandle(); });
         m_state->PrepareCookedReadData();
@@ -167,19 +204,28 @@ class ApiRoutinesTests
         Log::Comment(L"Turn back off and verify.");
         PrepVerifySetConsoleInputModeImpl(0);
         VerifySetConsoleInputModeImpl(S_OK, ENABLE_EXTENDED_FLAGS);
+		std::cerr << "<<< Exiting TEST_METHOD(ApiSetConsoleInputModeImplInsertCookedRead=" << ApiSetConsoleInputModeImplInsertCookedRead << ")" << std::endl;
     }
 
+	std::cerr << ">>> Entering TEST_METHOD(ApiSetConsoleInputModeImplEchoOnLineOff=" << ApiSetConsoleInputModeImplEchoOnLineOff << ")" << std::endl;
+	std::cerr << "<<< Exiting TEST_METHOD(ApiSetConsoleInputModeImplEchoOnLineOff=" << ApiSetConsoleInputModeImplEchoOnLineOff << ")" << std::endl;
     TEST_METHOD(ApiSetConsoleInputModeImplEchoOnLineOff)
     {
+		std::cerr << ">>> Entering TEST_METHOD(ApiSetConsoleInputModeImplEchoOnLineOff=" << ApiSetConsoleInputModeImplEchoOnLineOff << ")" << std::endl;
         Log::Comment(L"Set ECHO on with LINE off. It's invalid, but it should get set anyway and return an error code.");
         PrepVerifySetConsoleInputModeImpl(0);
         Log::Comment(L"Setting ECHO without LINE should return an invalid argument code.");
         Log::Comment(L"Input mode should be set anyway despite FAILED return code.");
         VerifySetConsoleInputModeImpl(E_INVALIDARG, ENABLE_ECHO_INPUT);
+		std::cerr << "<<< Exiting TEST_METHOD(ApiSetConsoleInputModeImplEchoOnLineOff=" << ApiSetConsoleInputModeImplEchoOnLineOff << ")" << std::endl;
     }
 
+	std::cerr << ">>> Entering TEST_METHOD(ApiSetConsoleInputModeExtendedFlagBehaviors=" << ApiSetConsoleInputModeExtendedFlagBehaviors << ")" << std::endl;
+	std::cerr << "TEST_METHOD(ApiSetConsoleInputModeExtendedFlagBehaviors=" << ApiSetConsoleInputModeExtendedFlagBehaviors << "): hr → " << hr << std::endl;
+	std::cerr << "<<< Exiting TEST_METHOD(ApiSetConsoleInputModeExtendedFlagBehaviors=" << ApiSetConsoleInputModeExtendedFlagBehaviors << ")" << std::endl;
     TEST_METHOD(ApiSetConsoleInputModeExtendedFlagBehaviors)
     {
+		std::cerr << ">>> Entering TEST_METHOD(ApiSetConsoleInputModeExtendedFlagBehaviors=" << ApiSetConsoleInputModeExtendedFlagBehaviors << ")" << std::endl;
         auto& gci = ServiceLocator::LocateGlobals().getConsoleInformation();
         Log::Comment(L"Verify that we can set various extended flags even without the ENABLE_EXTENDED_FLAGS flag.");
         PrepVerifySetConsoleInputModeImpl(0);
@@ -209,6 +255,7 @@ class ApiRoutinesTests
         VerifySetConsoleInputModeImpl(E_INVALIDARG, 0x1E4);
     }
 
+	std::cerr << "TEST_METHOD(ApiGetConsoleTitleA=" << ApiGetConsoleTitleA << "): pszExpected → " << pszExpected << std::endl;
     TEST_METHOD(ApiGetConsoleTitleA)
     {
         auto& gci = ServiceLocator::LocateGlobals().getConsoleInformation();
@@ -229,6 +276,7 @@ class ApiRoutinesTests
         VERIFY_ARE_EQUAL(std::string_view{ pszExpected }, std::string_view{ pszTitle });
     }
 
+	std::cerr << "TEST_METHOD(ApiGetConsoleTitleW=" << ApiGetConsoleTitleW << "): title → " << title << std::endl;
     TEST_METHOD(ApiGetConsoleTitleW)
     {
         auto& gci = ServiceLocator::LocateGlobals().getConsoleInformation();
@@ -249,6 +297,8 @@ class ApiRoutinesTests
         VERIFY_ARE_EQUAL(WEX::Common::String(title.data(), gsl::narrow_cast<int>(title.size())), WEX::Common::String(pwszTitle));
     }
 
+	std::cerr << "TEST_METHOD(ApiGetConsoleOriginalTitleA=" << ApiGetConsoleOriginalTitleA << "): originalTitle → " << originalTitle << std::endl;
+	std::cerr << "TEST_METHOD(ApiGetConsoleOriginalTitleA=" << ApiGetConsoleOriginalTitleA << "): pszExpected → " << pszExpected << std::endl;
     TEST_METHOD(ApiGetConsoleOriginalTitleA)
     {
         auto& gci = ServiceLocator::LocateGlobals().getConsoleInformation();
@@ -292,6 +342,7 @@ class ApiRoutinesTests
         VERIFY_ARE_EQUAL(WEX::Common::String(pszExpected.get()), WEX::Common::String(pszTitle));
     }
 
+	std::cerr << "TEST_METHOD(ApiGetConsoleOriginalTitleW=" << ApiGetConsoleOriginalTitleW << "): originalTitle → " << originalTitle << std::endl;
     TEST_METHOD(ApiGetConsoleOriginalTitleW)
     {
         auto& gci = ServiceLocator::LocateGlobals().getConsoleInformation();
@@ -313,8 +364,10 @@ class ApiRoutinesTests
 
     static void s_AdjustOutputWait(const bool fShouldBlock)
     {
+		std::cerr << ">>> Entering s_AdjustOutputWait(fShouldBlock=" << fShouldBlock << ")" << std::endl;
         WI_SetFlagIf(ServiceLocator::LocateGlobals().getConsoleInformation().Flags, CONSOLE_SELECTING, fShouldBlock);
         WI_ClearFlagIf(ServiceLocator::LocateGlobals().getConsoleInformation().Flags, CONSOLE_SELECTING, !fShouldBlock);
+		std::cerr << "<<< Exiting s_AdjustOutputWait(fShouldBlock=" << fShouldBlock << ")" << std::endl;
     }
 
     TEST_METHOD(ApiWriteConsoleA)
@@ -322,6 +375,9 @@ class ApiRoutinesTests
         BEGIN_TEST_METHOD_PROPERTIES()
             TEST_METHOD_PROPERTY(L"Data:fInduceWait", L"{false, true}")
             TEST_METHOD_PROPERTY(L"Data:dwCodePage", L"{437, 932, 65001}")
+			std::cerr << ">>> Entering BEGIN_TEST_METHOD_PROPERTIES()" << std::endl;
+			std::cerr << "BEGIN_TEST_METHOD_PROPERTIES(): Unlock → " << Unlock << std::endl;
+			std::cerr << "<<< Exiting BEGIN_TEST_METHOD_PROPERTIES()" << std::endl;
             TEST_METHOD_PROPERTY(L"Data:dwIncrement", L"{0, 1, 2}")
         END_TEST_METHOD_PROPERTIES();
 

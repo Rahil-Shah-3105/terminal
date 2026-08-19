@@ -8,4 +8,7 @@
   <!-- This project has no PGO, but the build will fail if the target doesn't exist. -->
   <Target Name="MergePGOCounts" />
 
+  <ItemGroup>
+    <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="8.0.0" />
+  </ItemGroup>
 </Project>

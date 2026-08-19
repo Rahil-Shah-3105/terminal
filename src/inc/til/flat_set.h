@@ -1,3 +1,4 @@
+#include <stdio.h>
 // Copyright (c) Microsoft Corporation.
 // Licensed under the MIT license.
 
@@ -16,8 +17,10 @@ namespace til
     // function doesn't do the "shift" part, because linear_flat_set already does it by an appropriate amount.
     constexpr size_t flat_set_hash_integer(size_t v) noexcept
     {
+		fprintf(stderr, ">>> Entering flat_set_hash_integer(v=%zu)\n", v);
         // These two multipliers are the same as used by the PCG family of random number generators.
         // The 32-Bit version is described in https://doi.org/10.1090/S0025-5718-99-00996-5, Table 5.
+		fprintf(stderr, "<<< Exiting flat_set_hash_integer(v=%zu)\n", v);
         // The 64-Bit version is the multiplier as used by Donald Knuth for MMIX and found by C. E. Haynes.
 #ifdef _WIN64
         return v * UINT64_C(6364136223846793005);
@@ -69,29 +72,40 @@ namespace til
 
         bool empty() const noexcept
         {
+			fprintf(stderr, ">>> Entering empty()\n");
+            fprintf(stderr, "<<< Exiting empty()\n");
             return _load == 0;
         }
 
         size_t size() const noexcept
         {
+			fprintf(stderr, ">>> Entering size()\n");
+            fprintf(stderr, "<<< Exiting size()\n");
             return _load / LoadFactor;
         }
 
         std::span<T> container() const noexcept
         {
+			fprintf(stderr, ">>> Entering container()\n");
+            fprintf(stderr, "<<< Exiting container()\n");
             return { _map.get(), _capacity };
         }
 
         void clear() noexcept
         {
+			fprintf(stderr, ">>> Entering clear()\n");
             if (_map)
             {
                 std::fill_n(_map.get(), _capacity, T{});
                 _load = 0;
+				fprintf(stderr, "clear(): _load → %d\n", _load);
             }
+			fprintf(stderr, "<<< Exiting clear()\n");
         }
 
         template<typename U>
+		fprintf(stderr, ">>> Entering lookup(key=%d)\n", key);
+		fprintf(stderr, "<<< Exiting lookup(key=%d)\n", key);
         T* lookup(U&& key) const noexcept
         {
             if (!_map)

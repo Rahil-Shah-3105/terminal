@@ -1,3 +1,4 @@
+#include <stdio.h>
 // Copyright (c) Microsoft Corporation.
 // Licensed under the MIT license.
 
@@ -26,8 +27,13 @@ namespace til // Terminal Implementation Library. Also: "Today I Learned"
     public:
         static constexpr enumset from_bits(UnderlyingType data) noexcept
         {
+			fprintf(stderr, ">>> Entering from_bits(data=%d)\n", data);
             enumset result;
             result._data = data;
+			fprintf(stderr, "from_bits(data=%d): result._data → %d\n", data, result._data);
+            fprintf(stderr, "<<< Exiting from_bits(data=%d)\n", data);
+			fprintf(stderr, ">>> Entering bits()\n");
+            fprintf(stderr, "<<< Exiting bits()\n");
             return result;
         }
 
@@ -52,6 +58,7 @@ namespace til // Terminal Implementation Library. Also: "Today I Learned"
         //   in the bitset.
         constexpr bool test(const T pos) const noexcept
         {
+			fprintf(stderr, ">>> Entering test(pos=%d)\n", pos);
             const auto mask = to_underlying(pos);
             return (_data & mask) != 0;
         }
@@ -60,6 +67,8 @@ namespace til // Terminal Implementation Library. Also: "Today I Learned"
         // - Returns true if any of the bits are set to true.
         constexpr bool any() const noexcept
         {
+			fprintf(stderr, ">>> Entering any()\n");
+            fprintf(stderr, "<<< Exiting any()\n");
             return _data != 0;
         }
 
@@ -93,7 +102,10 @@ namespace til // Terminal Implementation Library. Also: "Today I Learned"
         TIL_ENUMSET_VARARG
         constexpr enumset& set(Args... positions) noexcept
         {
+			fprintf(stderr, ">>> Entering set(positions=%d)\n", positions);
             _data |= to_underlying(positions...);
+			fprintf(stderr, ">>> Entering set(pos=%d,val=%d)\n", pos, val);
+			fprintf(stderr, "<<< Exiting set(positions=%d)\n", positions);
             return *this;
         }
 
@@ -106,6 +118,9 @@ namespace til // Terminal Implementation Library. Also: "Today I Learned"
             // true == 1  --> UnderlyingType(-1) == 0b1111...
 #pragma warning(suppress : 4804) // '-': unsafe use of type 'bool' in operation
             _data = (_data & ~mask) | (-val & mask);
+			fprintf(stderr, "set(pos=%d,val=%d): _data → %d\n", pos, val, _data);
+            fprintf(stderr, "set(pos=%d,val=%d): _data → %d\n", pos, val, _data);
+            fprintf(stderr, "<<< Exiting set(pos=%d,val=%d)\n", pos, val);
             return *this;
         }
 
@@ -114,7 +129,9 @@ namespace til // Terminal Implementation Library. Also: "Today I Learned"
         TIL_ENUMSET_VARARG
         constexpr enumset& reset(Args... positions) noexcept
         {
+			fprintf(stderr, ">>> Entering reset(positions=%d)\n", positions);
             _data &= ~to_underlying(positions...);
+			fprintf(stderr, "<<< Exiting reset(positions=%d)\n", positions);
             return *this;
         }
 
@@ -123,7 +140,9 @@ namespace til // Terminal Implementation Library. Also: "Today I Learned"
         TIL_ENUMSET_VARARG
         constexpr enumset& flip(Args... positions) noexcept
         {
+			fprintf(stderr, ">>> Entering flip(positions=%d)\n", positions);
             _data ^= to_underlying(positions...);
+			fprintf(stderr, "<<< Exiting flip(positions=%d)\n", positions);
             return *this;
         }
 
@@ -131,12 +150,14 @@ namespace til // Terminal Implementation Library. Also: "Today I Learned"
         template<typename... Args>
         static constexpr UnderlyingType to_underlying(Args... positions) noexcept
         {
+			fprintf(stderr, ">>> Entering to_underlying(positions=%d)\n", positions);
             if constexpr (sizeof...(positions) == 0)
             {
                 return 0;
             }
             else
             {
+			fprintf(stderr, "<<< Exiting to_underlying(positions=%d)\n", positions);
                 return ((UnderlyingType{ 1 } << static_cast<UnderlyingType>(positions)) | ...);
             }
         }

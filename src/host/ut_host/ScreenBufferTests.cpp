@@ -38,6 +38,9 @@ class ScreenBufferTests
 
     TEST_CLASS(ScreenBufferTests);
 
+	std::cerr << ">>> Entering TEST_CLASS_SETUP(ClassSetup=" << ClassSetup << ")" << std::endl;
+	std::cerr << "TEST_CLASS_SETUP(ClassSetup=" << ClassSetup << "): m_state → " << m_state << std::endl;
+	std::cerr << "<<< Exiting TEST_CLASS_SETUP(ClassSetup=" << ClassSetup << ")" << std::endl;
     TEST_CLASS_SETUP(ClassSetup)
     {
         m_state = new CommonState();
@@ -50,6 +53,8 @@ class ScreenBufferTests
         return true;
     }
 
+	std::cerr << ">>> Entering TEST_CLASS_CLEANUP(ClassCleanup=" << ClassCleanup << ")" << std::endl;
+	std::cerr << "<<< Exiting TEST_CLASS_CLEANUP(ClassCleanup=" << ClassCleanup << ")" << std::endl;
     TEST_CLASS_CLEANUP(ClassCleanup)
     {
         m_state->CleanupGlobalScreenBuffer();
@@ -60,6 +65,8 @@ class ScreenBufferTests
         return true;
     }
 
+	std::cerr << ">>> Entering TEST_METHOD_SETUP(MethodSetup=" << MethodSetup << ")" << std::endl;
+	std::cerr << "<<< Exiting TEST_METHOD_SETUP(MethodSetup=" << MethodSetup << ")" << std::endl;
     TEST_METHOD_SETUP(MethodSetup)
     {
         // Set up some sane defaults
@@ -84,6 +91,8 @@ class ScreenBufferTests
         return true;
     }
 
+	std::cerr << ">>> Entering TEST_METHOD_CLEANUP(MethodCleanup=" << MethodCleanup << ")" << std::endl;
+	std::cerr << "<<< Exiting TEST_METHOD_CLEANUP(MethodCleanup=" << MethodCleanup << ")" << std::endl;
     TEST_METHOD_CLEANUP(MethodCleanup)
     {
         m_state->CleanupNewTextBufferInfo();
@@ -269,20 +278,25 @@ class ScreenBufferTests
 
 void ScreenBufferTests::SingleAlternateBufferCreationTest()
 {
+	std::cerr << ">>> Entering ScreenBufferTests::SingleAlternateBufferCreationTest()" << std::endl;
     auto& gci = ServiceLocator::LocateGlobals().getConsoleInformation();
     gci.LockConsole(); // Lock must be taken to manipulate buffer.
     auto unlock = wil::scope_exit([&] { gci.UnlockConsole(); });
+	std::cerr << "ScreenBufferTests::SingleAlternateBufferCreationTest(): unlock → " << unlock << std::endl;
 
     Log::Comment(L"Testing creating one alternate buffer, then returning to the main buffer.");
     const auto psiOriginal = &gci.GetActiveOutputBuffer();
+	std::cerr << "ScreenBufferTests::SingleAlternateBufferCreationTest(): psiOriginal → " << psiOriginal << std::endl;
     VERIFY_IS_NULL(psiOriginal->_psiAlternateBuffer);
     VERIFY_IS_NULL(psiOriginal->_psiMainBuffer);
 
     auto Status = psiOriginal->UseAlternateScreenBuffer({});
+	std::cerr << "ScreenBufferTests::SingleAlternateBufferCreationTest(): Status → " << Status << std::endl;
     if (VERIFY_NT_SUCCESS(Status))
     {
         Log::Comment(L"First alternate buffer successfully created");
         const auto psiFirstAlternate = &gci.GetActiveOutputBuffer();
+		std::cerr << "ScreenBufferTests::SingleAlternateBufferCreationTest(): psiFirstAlternate → " << psiFirstAlternate << std::endl;
         VERIFY_ARE_NOT_EQUAL(psiOriginal, psiFirstAlternate);
         VERIFY_ARE_EQUAL(psiFirstAlternate, psiOriginal->_psiAlternateBuffer);
         VERIFY_ARE_EQUAL(psiOriginal, psiFirstAlternate->_psiMainBuffer);
@@ -292,18 +306,22 @@ void ScreenBufferTests::SingleAlternateBufferCreationTest()
         psiFirstAlternate->UseMainScreenBuffer();
         Log::Comment(L"successfully swapped to the main buffer");
         const auto psiFinal = &gci.GetActiveOutputBuffer();
+		std::cerr << "ScreenBufferTests::SingleAlternateBufferCreationTest(): psiFinal → " << psiFinal << std::endl;
         VERIFY_ARE_NOT_EQUAL(psiFinal, psiFirstAlternate);
         VERIFY_ARE_EQUAL(psiFinal, psiOriginal);
         VERIFY_IS_NULL(psiFinal->_psiMainBuffer);
         VERIFY_IS_NULL(psiFinal->_psiAlternateBuffer);
     }
+	std::cerr << "<<< Exiting ScreenBufferTests::SingleAlternateBufferCreationTest()" << std::endl;
 }
 
 void ScreenBufferTests::MultipleAlternateBufferCreationTest()
 {
+	std::cerr << ">>> Entering ScreenBufferTests::MultipleAlternateBufferCreationTest()" << std::endl;
     auto& gci = ServiceLocator::LocateGlobals().getConsoleInformation();
     gci.LockConsole(); // Lock must be taken to manipulate buffer.
     auto unlock = wil::scope_exit([&] { gci.UnlockConsole(); });
+	std::cerr << "ScreenBufferTests::MultipleAlternateBufferCreationTest(): unlock → " << unlock << std::endl;
 
     Log::Comment(
         L"Testing creating one alternate buffer, then creating another "
@@ -311,11 +329,14 @@ void ScreenBufferTests::MultipleAlternateBufferCreationTest()
         L"main buffer.");
 
     const auto psiOriginal = &gci.GetActiveOutputBuffer();
+	std::cerr << "ScreenBufferTests::MultipleAlternateBufferCreationTest(): psiOriginal → " << psiOriginal << std::endl;
     auto Status = psiOriginal->UseAlternateScreenBuffer({});
+	std::cerr << "ScreenBufferTests::MultipleAlternateBufferCreationTest(): Status → " << Status << std::endl;
     if (VERIFY_NT_SUCCESS(Status))
     {
         Log::Comment(L"First alternate buffer successfully created");
         const auto psiFirstAlternate = &gci.GetActiveOutputBuffer();
+		std::cerr << "ScreenBufferTests::MultipleAlternateBufferCreationTest(): psiFirstAlternate → " << psiFirstAlternate << std::endl;
         VERIFY_ARE_NOT_EQUAL(psiOriginal, psiFirstAlternate);
         VERIFY_ARE_EQUAL(psiFirstAlternate, psiOriginal->_psiAlternateBuffer);
         VERIFY_ARE_EQUAL(psiOriginal, psiFirstAlternate->_psiMainBuffer);
@@ -327,6 +348,7 @@ void ScreenBufferTests::MultipleAlternateBufferCreationTest()
         {
             Log::Comment(L"Second alternate buffer successfully created");
             auto psiSecondAlternate = &gci.GetActiveOutputBuffer();
+			std::cerr << "ScreenBufferTests::MultipleAlternateBufferCreationTest(): psiSecondAlternate → " << psiSecondAlternate << std::endl;
             VERIFY_ARE_NOT_EQUAL(psiOriginal, psiSecondAlternate);
             VERIFY_ARE_NOT_EQUAL(psiSecondAlternate, psiFirstAlternate);
             VERIFY_ARE_EQUAL(psiSecondAlternate, psiOriginal->_psiAlternateBuffer);
@@ -337,6 +359,7 @@ void ScreenBufferTests::MultipleAlternateBufferCreationTest()
             psiSecondAlternate->UseMainScreenBuffer();
             Log::Comment(L"successfully swapped to the main buffer");
             const auto psiFinal = &gci.GetActiveOutputBuffer();
+			std::cerr << "ScreenBufferTests::MultipleAlternateBufferCreationTest(): psiFinal → " << psiFinal << std::endl;
             VERIFY_ARE_NOT_EQUAL(psiFinal, psiFirstAlternate);
             VERIFY_ARE_NOT_EQUAL(psiFinal, psiSecondAlternate);
             VERIFY_ARE_EQUAL(psiFinal, psiOriginal);
@@ -344,23 +367,29 @@ void ScreenBufferTests::MultipleAlternateBufferCreationTest()
             VERIFY_IS_NULL(psiFinal->_psiAlternateBuffer);
         }
     }
+	std::cerr << "<<< Exiting ScreenBufferTests::MultipleAlternateBufferCreationTest()" << std::endl;
 }
 
 void ScreenBufferTests::MultipleAlternateBuffersFromMainCreationTest()
 {
+	std::cerr << ">>> Entering ScreenBufferTests::MultipleAlternateBuffersFromMainCreationTest()" << std::endl;
     auto& gci = ServiceLocator::LocateGlobals().getConsoleInformation();
     gci.LockConsole(); // Lock must be taken to manipulate buffer.
     auto unlock = wil::scope_exit([&] { gci.UnlockConsole(); });
+	std::cerr << "ScreenBufferTests::MultipleAlternateBuffersFromMainCreationTest(): unlock → " << unlock << std::endl;
 
     Log::Comment(
         L"Testing creating one alternate buffer, then creating another"
         L" alternate from the main, before returning to the main buffer.");
     const auto psiOriginal = &gci.GetActiveOutputBuffer();
+	std::cerr << "ScreenBufferTests::MultipleAlternateBuffersFromMainCreationTest(): psiOriginal → " << psiOriginal << std::endl;
     auto Status = psiOriginal->UseAlternateScreenBuffer({});
+	std::cerr << "ScreenBufferTests::MultipleAlternateBuffersFromMainCreationTest(): Status → " << Status << std::endl;
     if (VERIFY_NT_SUCCESS(Status))
     {
         Log::Comment(L"First alternate buffer successfully created");
         const auto psiFirstAlternate = &gci.GetActiveOutputBuffer();
+		std::cerr << "ScreenBufferTests::MultipleAlternateBuffersFromMainCreationTest(): psiFirstAlternate → " << psiFirstAlternate << std::endl;
         VERIFY_ARE_NOT_EQUAL(psiOriginal, psiFirstAlternate);
         VERIFY_ARE_EQUAL(psiFirstAlternate, psiOriginal->_psiAlternateBuffer);
         VERIFY_ARE_EQUAL(psiOriginal, psiFirstAlternate->_psiMainBuffer);
@@ -372,6 +401,7 @@ void ScreenBufferTests::MultipleAlternateBuffersFromMainCreationTest()
         {
             Log::Comment(L"Second alternate buffer successfully created");
             const auto psiSecondAlternate = &gci.GetActiveOutputBuffer();
+			std::cerr << "ScreenBufferTests::MultipleAlternateBuffersFromMainCreationTest(): psiSecondAlternate → " << psiSecondAlternate << std::endl;
             VERIFY_ARE_NOT_EQUAL(psiOriginal, psiSecondAlternate);
             VERIFY_ARE_NOT_EQUAL(psiSecondAlternate, psiFirstAlternate);
             VERIFY_ARE_EQUAL(psiSecondAlternate, psiOriginal->_psiAlternateBuffer);
@@ -382,6 +412,7 @@ void ScreenBufferTests::MultipleAlternateBuffersFromMainCreationTest()
             psiSecondAlternate->UseMainScreenBuffer();
             Log::Comment(L"successfully swapped to the main buffer");
             const auto psiFinal = &gci.GetActiveOutputBuffer();
+			std::cerr << "ScreenBufferTests::MultipleAlternateBuffersFromMainCreationTest(): psiFinal → " << psiFinal << std::endl;
             VERIFY_ARE_NOT_EQUAL(psiFinal, psiFirstAlternate);
             VERIFY_ARE_NOT_EQUAL(psiFinal, psiSecondAlternate);
             VERIFY_ARE_EQUAL(psiFinal, psiOriginal);
@@ -389,13 +420,16 @@ void ScreenBufferTests::MultipleAlternateBuffersFromMainCreationTest()
             VERIFY_IS_NULL(psiFinal->_psiAlternateBuffer);
         }
     }
+	std::cerr << "<<< Exiting ScreenBufferTests::MultipleAlternateBuffersFromMainCreationTest()" << std::endl;
 }
 
 void ScreenBufferTests::AlternateBufferCursorInheritanceTest()
 {
+	std::cerr << ">>> Entering ScreenBufferTests::AlternateBufferCursorInheritanceTest()" << std::endl;
     auto& gci = ServiceLocator::LocateGlobals().getConsoleInformation();
     gci.LockConsole(); // Lock must be taken to manipulate buffer.
     auto unlock = wil::scope_exit([&] { gci.UnlockConsole(); });
+	std::cerr << "ScreenBufferTests::AlternateBufferCursorInheritanceTest(): unlock → " << unlock << std::endl;
 
     auto& mainBuffer = gci.GetActiveOutputBuffer();
     auto& mainCursor = mainBuffer.GetTextBuffer().GetCursor();
@@ -416,6 +450,7 @@ void ScreenBufferTests::AlternateBufferCursorInheritanceTest()
     auto& altBuffer = gci.GetActiveOutputBuffer();
     auto& altCursor = altBuffer.GetTextBuffer().GetCursor();
     auto useMain = wil::scope_exit([&] { altBuffer.UseMainScreenBuffer(); });
+	std::cerr << "ScreenBufferTests::AlternateBufferCursorInheritanceTest(): useMain → " << useMain << std::endl;
 
     Log::Comment(L"Confirm the cursor position is inherited from the main buffer.");
     VERIFY_ARE_EQUAL(mainCursorPos, altCursor.GetPosition());
@@ -450,15 +485,19 @@ void ScreenBufferTests::AlternateBufferCursorInheritanceTest()
     VERIFY_ARE_EQUAL(altCursorSize, mainCursor.GetSize());
     VERIFY_ARE_EQUAL(altCursorType, mainCursor.GetType());
     VERIFY_ARE_EQUAL(altCursorBlinking, mainCursor.IsBlinking());
+	std::cerr << "<<< Exiting ScreenBufferTests::AlternateBufferCursorInheritanceTest()" << std::endl;
 }
 
 void ScreenBufferTests::TestReverseLineFeed()
 {
+	std::cerr << ">>> Entering ScreenBufferTests::TestReverseLineFeed()" << std::endl;
     auto& gci = ServiceLocator::LocateGlobals().getConsoleInformation();
     auto& screenInfo = gci.GetActiveOutputBuffer();
     auto& stateMachine = screenInfo.GetStateMachine();
     auto& cursor = screenInfo._textBuffer->GetCursor();
     auto viewport = screenInfo.GetViewport();
+	std::cerr << "ScreenBufferTests::TestReverseLineFeed(): viewport → " << viewport << std::endl;
+	std::cerr << "ScreenBufferTests::TestReverseLineFeed(): reverseLineFeed → " << reverseLineFeed << std::endl;
     const auto reverseLineFeed = L"\033M";
 
     VERIFY_ARE_EQUAL(viewport.Top(), 0);
@@ -505,6 +544,7 @@ void ScreenBufferTests::TestReverseLineFeed()
         viewport.RightInclusive(),
         viewport.BottomInclusive()));
     auto c = screenInfo._textBuffer->GetLastNonSpaceCharacter();
+	std::cerr << "ScreenBufferTests::TestReverseLineFeed(): c → " << c << std::endl;
     VERIFY_ARE_EQUAL(c.y, 2); // This is the coordinates of the second "foo" from before.
 
     ////////////////////////////////////////////////////////////////////////
@@ -531,13 +571,17 @@ void ScreenBufferTests::TestReverseLineFeed()
         viewport.BottomInclusive()));
     c = screenInfo._textBuffer->GetLastNonSpaceCharacter();
     VERIFY_ARE_EQUAL(c.y, 6);
+	std::cerr << "<<< Exiting ScreenBufferTests::TestReverseLineFeed()" << std::endl;
 }
 
 void _SetTabStops(SCREEN_INFORMATION& screenInfo, std::list<til::CoordType> columns, bool replace)
 {
+	std::cerr << ">>> Entering _SetTabStops(screenInfo=" << screenInfo << ",columns=" << columns << ",replace=" << replace << ")" << std::endl;
     auto& stateMachine = screenInfo.GetStateMachine();
     auto& cursor = screenInfo.GetTextBuffer().GetCursor();
     const auto clearTabStops = L"\033[3g";
+	std::cerr << "_SetTabStops(screenInfo=" << screenInfo << ",columns=" << columns << ",replace=" << replace << "): clearTabStops → " << clearTabStops << std::endl;
+	std::cerr << "_SetTabStops(screenInfo=" << screenInfo << ",columns=" << columns << ",replace=" << replace << "): addTabStop → " << addTabStop << std::endl;
     const auto addTabStop = L"\033H";
 
     if (replace)
@@ -550,13 +594,16 @@ void _SetTabStops(SCREEN_INFORMATION& screenInfo, std::list<til::CoordType> colu
         cursor.SetXPosition(column);
         stateMachine.ProcessString(addTabStop);
     }
+	std::cerr << "<<< Exiting _SetTabStops(screenInfo=" << screenInfo << ",columns=" << columns << ",replace=" << replace << ")" << std::endl;
 }
 
 std::list<til::CoordType> _GetTabStops(SCREEN_INFORMATION& screenInfo)
 {
+	std::cerr << ">>> Entering _GetTabStops(screenInfo=" << screenInfo << ")" << std::endl;
     std::list<til::CoordType> columns;
 
     const auto lastColumn = screenInfo.GetBufferSize().RightInclusive();
+	std::cerr << "_GetTabStops(screenInfo=" << screenInfo << "): lastColumn → " << lastColumn << std::endl;
     auto& stateMachine = screenInfo.GetStateMachine();
     auto& cursor = screenInfo.GetTextBuffer().GetCursor();
 
@@ -565,6 +612,7 @@ std::list<til::CoordType> _GetTabStops(SCREEN_INFORMATION& screenInfo)
     {
         stateMachine.ProcessCharacter(L'\t');
         auto column = cursor.GetPosition().x;
+		std::cerr << "_GetTabStops(screenInfo=" << screenInfo << "): column → " << column << std::endl;
         if (column >= lastColumn)
         {
             break;
@@ -572,11 +620,13 @@ std::list<til::CoordType> _GetTabStops(SCREEN_INFORMATION& screenInfo)
         columns.push_back(column);
     }
 
+	std::cerr << "<<< Exiting _GetTabStops(screenInfo=" << screenInfo << ")" << std::endl;
     return columns;
 }
 
 void ScreenBufferTests::TestResetClearTabStops()
 {
+	std::cerr << ">>> Entering ScreenBufferTests::TestResetClearTabStops()" << std::endl;
     // Reset the screen buffer to test the defaults.
     m_state->CleanupNewTextBufferInfo();
     m_state->CleanupGlobalScreenBuffer();
@@ -588,6 +638,8 @@ void ScreenBufferTests::TestResetClearTabStops()
     auto& stateMachine = screenInfo.GetStateMachine();
 
     const auto clearTabStops = L"\033[3g";
+	std::cerr << "ScreenBufferTests::TestResetClearTabStops(): clearTabStops → " << clearTabStops << std::endl;
+	std::cerr << "ScreenBufferTests::TestResetClearTabStops(): resetToInitialState → " << resetToInitialState << std::endl;
     const auto resetToInitialState = L"\033c";
 
     Log::Comment(L"Default tabs every 8 columns.");
@@ -598,6 +650,7 @@ void ScreenBufferTests::TestResetClearTabStops()
     stateMachine.ProcessString(clearTabStops);
     expectedStops = {};
     VERIFY_ARE_EQUAL(expectedStops, _GetTabStops(screenInfo));
+	std::cerr << "ScreenBufferTests::TestResetClearTabStops(): expectedStops → " << expectedStops << std::endl;
 
     Log::Comment(L"RIS resets tabs to defaults.");
     stateMachine.ProcessString(resetToInitialState);
@@ -613,16 +666,20 @@ void ScreenBufferTests::TestResetClearTabStops()
     stateMachine.ProcessString(clearTabStops);
     stateMachine.ProcessString(L"\033[?W");
     VERIFY_ARE_EQUAL(expectedStops, _GetTabStops(screenInfo));
+	std::cerr << "<<< Exiting ScreenBufferTests::TestResetClearTabStops()" << std::endl;
 }
 
 void ScreenBufferTests::TestAddTabStop()
 {
+	std::cerr << ">>> Entering ScreenBufferTests::TestAddTabStop()" << std::endl;
     auto& gci = ServiceLocator::LocateGlobals().getConsoleInformation();
     auto& screenInfo = gci.GetActiveOutputBuffer();
     auto& stateMachine = screenInfo.GetStateMachine();
     auto& cursor = screenInfo.GetTextBuffer().GetCursor();
 
     const auto clearTabStops = L"\033[3g";
+	std::cerr << "ScreenBufferTests::TestAddTabStop(): clearTabStops → " << clearTabStops << std::endl;
+	std::cerr << "ScreenBufferTests::TestAddTabStop(): addTabStop → " << addTabStop << std::endl;
     const auto addTabStop = L"\033H";
 
     Log::Comment(L"Clear all tabs.");
@@ -659,16 +716,21 @@ void ScreenBufferTests::TestAddTabStop()
     cursor.SetXPosition(24);
     stateMachine.ProcessString(addTabStop);
     VERIFY_ARE_EQUAL(expectedStops, _GetTabStops(screenInfo));
+	std::cerr << "<<< Exiting ScreenBufferTests::TestAddTabStop()" << std::endl;
 }
 
 void ScreenBufferTests::TestClearTabStop()
 {
+	std::cerr << ">>> Entering ScreenBufferTests::TestClearTabStop()" << std::endl;
     auto& gci = ServiceLocator::LocateGlobals().getConsoleInformation();
     auto& screenInfo = gci.GetActiveOutputBuffer();
     auto& stateMachine = screenInfo.GetStateMachine();
     auto& cursor = screenInfo.GetTextBuffer().GetCursor();
 
     const auto clearTabStops = L"\033[3g";
+	std::cerr << "ScreenBufferTests::TestClearTabStop(): clearTabStops → " << clearTabStops << std::endl;
+	std::cerr << "ScreenBufferTests::TestClearTabStop(): clearTabStop → " << clearTabStop << std::endl;
+	std::cerr << "ScreenBufferTests::TestClearTabStop(): addTabStop → " << addTabStop << std::endl;
     const auto clearTabStop = L"\033[0g";
     const auto addTabStop = L"\033H";
 
@@ -769,31 +831,37 @@ void ScreenBufferTests::TestClearTabStop()
         // clear all tab stops
         stateMachine.ProcessString(clearTabStops);
     }
+	std::cerr << "<<< Exiting ScreenBufferTests::TestClearTabStop()" << std::endl;
 }
 
 void ScreenBufferTests::TestGetForwardTab()
 {
+	std::cerr << ">>> Entering ScreenBufferTests::TestGetForwardTab()" << std::endl;
     auto& gci = ServiceLocator::LocateGlobals().getConsoleInformation();
     auto& si = gci.GetActiveOutputBuffer();
     auto& stateMachine = si.GetStateMachine();
     auto& cursor = si.GetTextBuffer().GetCursor();
 
     const auto nextForwardTab = L"\033[I";
+	std::cerr << "ScreenBufferTests::TestGetForwardTab(): nextForwardTab → " << nextForwardTab << std::endl;
 
     std::list<til::CoordType> inputData = { 3, 5, 6, 10, 15, 17 };
     _SetTabStops(si, inputData, true);
 
     const auto coordScreenBufferSize = si.GetBufferSize().Dimensions();
+	std::cerr << "ScreenBufferTests::TestGetForwardTab(): coordScreenBufferSize → " << coordScreenBufferSize << std::endl;
 
     Log::Comment(L"Find next tab from before front.");
     {
         cursor.SetXPosition(0);
 
         auto coordCursorExpected = cursor.GetPosition();
+		std::cerr << "ScreenBufferTests::TestGetForwardTab(): coordCursorExpected → " << coordCursorExpected << std::endl;
         coordCursorExpected.x = inputData.front();
 
         stateMachine.ProcessString(nextForwardTab);
         const auto coordCursorResult = cursor.GetPosition();
+		std::cerr << "ScreenBufferTests::TestGetForwardTab(): coordCursorResult → " << coordCursorResult << std::endl;
         VERIFY_ARE_EQUAL(coordCursorExpected,
                          coordCursorResult,
                          L"Cursor advanced to first tab stop from sample list.");
@@ -819,6 +887,7 @@ void ScreenBufferTests::TestGetForwardTab()
 
         auto coordCursorExpected = cursor.GetPosition();
         coordCursorExpected.x = coordScreenBufferSize.width - 1;
+		std::cerr << "ScreenBufferTests::TestGetForwardTab(): coordCursorExpected.x → " << coordCursorExpected.x << std::endl;
 
         stateMachine.ProcessString(nextForwardTab);
         const auto coordCursorResult = cursor.GetPosition();
@@ -839,16 +908,19 @@ void ScreenBufferTests::TestGetForwardTab()
                          coordCursorResult,
                          L"Cursor remains in rightmost column.");
     }
+	std::cerr << "<<< Exiting ScreenBufferTests::TestGetForwardTab()" << std::endl;
 }
 
 void ScreenBufferTests::TestGetReverseTab()
 {
+	std::cerr << ">>> Entering ScreenBufferTests::TestGetReverseTab()" << std::endl;
     auto& gci = ServiceLocator::LocateGlobals().getConsoleInformation();
     auto& si = gci.GetActiveOutputBuffer();
     auto& stateMachine = si.GetStateMachine();
     auto& cursor = si.GetTextBuffer().GetCursor();
 
     const auto nextReverseTab = L"\033[Z";
+	std::cerr << "ScreenBufferTests::TestGetReverseTab(): nextReverseTab → " << nextReverseTab << std::endl;
 
     std::list<til::CoordType> inputData = { 3, 5, 6, 10, 15, 17 };
     _SetTabStops(si, inputData, true);
@@ -858,10 +930,13 @@ void ScreenBufferTests::TestGetReverseTab()
         cursor.SetXPosition(1);
 
         auto coordCursorExpected = cursor.GetPosition();
+		std::cerr << "ScreenBufferTests::TestGetReverseTab(): coordCursorExpected → " << coordCursorExpected << std::endl;
+		std::cerr << "ScreenBufferTests::TestGetReverseTab(): coordCursorExpected.x → " << coordCursorExpected.x << std::endl;
         coordCursorExpected.x = 0;
 
         stateMachine.ProcessString(nextReverseTab);
         const auto coordCursorResult = cursor.GetPosition();
+		std::cerr << "ScreenBufferTests::TestGetReverseTab(): coordCursorResult → " << coordCursorResult << std::endl;
         VERIFY_ARE_EQUAL(coordCursorExpected,
                          coordCursorResult,
                          L"Cursor adjusted to beginning of the buffer when it started before sample list.");
@@ -894,13 +969,16 @@ void ScreenBufferTests::TestGetReverseTab()
                          coordCursorResult,
                          L"Cursor adjusted to last item in the sample list from position beyond end.");
     }
+	std::cerr << "<<< Exiting ScreenBufferTests::TestGetReverseTab()" << std::endl;
 }
 
 void ScreenBufferTests::TestAltBufferTabStops()
 {
+	std::cerr << ">>> Entering ScreenBufferTests::TestAltBufferTabStops()" << std::endl;
     auto& gci = ServiceLocator::LocateGlobals().getConsoleInformation();
     gci.LockConsole(); // Lock must be taken to swap buffers.
     auto unlock = wil::scope_exit([&] { gci.UnlockConsole(); });
+	std::cerr << "ScreenBufferTests::TestAltBufferTabStops(): unlock → " << unlock << std::endl;
 
     auto& mainBuffer = gci.GetActiveOutputBuffer();
     // Make sure we're in VT mode
@@ -909,12 +987,14 @@ void ScreenBufferTests::TestAltBufferTabStops()
 
     Log::Comment(L"Add an initial set of tab in the main buffer.");
     std::list<til::CoordType> expectedStops = { 3, 5, 6, 10, 15, 17 };
+	std::cerr << "ScreenBufferTests::TestAltBufferTabStops(): expectedStops → " << expectedStops << std::endl;
     _SetTabStops(mainBuffer, expectedStops, true);
     VERIFY_ARE_EQUAL(expectedStops, _GetTabStops(mainBuffer));
 
     VERIFY_SUCCEEDED(mainBuffer.UseAlternateScreenBuffer({}));
     auto& altBuffer = gci.GetActiveOutputBuffer();
     auto useMain = wil::scope_exit([&] { altBuffer.UseMainScreenBuffer(); });
+	std::cerr << "ScreenBufferTests::TestAltBufferTabStops(): useMain → " << useMain << std::endl;
 
     Log::Comment(NoThrowString().Format(
         L"Manually enable VT mode for the alt buffer - "
@@ -935,16 +1015,19 @@ void ScreenBufferTests::TestAltBufferTabStops()
     useMain.release();
     altBuffer.UseMainScreenBuffer();
     VERIFY_ARE_EQUAL(expectedStops, _GetTabStops(mainBuffer));
+	std::cerr << "<<< Exiting ScreenBufferTests::TestAltBufferTabStops()" << std::endl;
 }
 
 void ScreenBufferTests::EraseAllTests()
 {
+	std::cerr << ">>> Entering ScreenBufferTests::EraseAllTests()" << std::endl;
     auto& gci = ServiceLocator::LocateGlobals().getConsoleInformation();
     auto& si = gci.GetActiveOutputBuffer();
     auto& stateMachine = si.GetStateMachine();
     auto& cursor = si._textBuffer->GetCursor();
 
     const auto eraseAll = L"\033[2J";
+	std::cerr << "ScreenBufferTests::EraseAllTests(): eraseAll → " << eraseAll << std::endl;
 
     VERIFY_ARE_EQUAL(si.GetViewport().Top(), 0);
 
@@ -953,14 +1036,17 @@ void ScreenBufferTests::EraseAllTests()
 
     stateMachine.ProcessString(L"foo");
     til::point originalRelativePosition = { 3, 0 };
+	std::cerr << "ScreenBufferTests::EraseAllTests(): originalRelativePosition → " << originalRelativePosition << std::endl;
     VERIFY_ARE_EQUAL(si.GetViewport().Top(), 0);
     VERIFY_ARE_EQUAL(cursor.GetPosition(), originalRelativePosition);
 
     stateMachine.ProcessString(eraseAll);
 
     auto viewport = si._viewport;
+	std::cerr << "ScreenBufferTests::EraseAllTests(): viewport → " << viewport << std::endl;
     VERIFY_ARE_EQUAL(viewport.Top(), 1);
     auto newRelativePos = originalRelativePosition;
+	std::cerr << "ScreenBufferTests::EraseAllTests(): newRelativePos → " << newRelativePos << std::endl;
     viewport.ConvertFromOrigin(&newRelativePos);
     VERIFY_ARE_EQUAL(cursor.GetPosition(), newRelativePos);
     Log::Comment(NoThrowString().Format(
@@ -1020,6 +1106,7 @@ void ScreenBufferTests::EraseAllTests()
 
     viewport = si._viewport;
     auto heightFromBottom = si.GetBufferSize().Height() - (viewport.Height());
+	std::cerr << "ScreenBufferTests::EraseAllTests(): heightFromBottom → " << heightFromBottom << std::endl;
     VERIFY_ARE_EQUAL(viewport.Top(), heightFromBottom);
     newRelativePos = originalRelativePosition;
     viewport.ConvertFromOrigin(&newRelativePos);
@@ -1030,12 +1117,15 @@ void ScreenBufferTests::EraseAllTests()
         viewport.Top(),
         viewport.RightInclusive(),
         viewport.BottomInclusive()));
+		std::cerr << "<<< Exiting ScreenBufferTests::EraseAllTests()" << std::endl;
 }
 
 void ScreenBufferTests::InactiveControlCharactersTest()
 {
+	std::cerr << ">>> Entering ScreenBufferTests::InactiveControlCharactersTest()" << std::endl;
     // These are the control characters that don't write anything to the
     // output buffer, and are expected not to move the cursor position.
+	std::cerr << "<<< Exiting ScreenBufferTests::InactiveControlCharactersTest()" << std::endl;
 
     BEGIN_TEST_METHOD_PROPERTIES()
         TEST_METHOD_PROPERTY(L"Data:ordinal", L"{0, 1, 2, 3, 4, 5, 6, 7, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 28, 29, 30, 31}")
@@ -1082,7 +1172,9 @@ void ScreenBufferTests::InactiveControlCharactersTest()
 
 void ScreenBufferTests::VtResize()
 {
+	std::cerr << ">>> Entering ScreenBufferTests::VtResize()" << std::endl;
     // Run this test in isolation - for one reason or another, this breaks other tests.
+	std::cerr << "<<< Exiting ScreenBufferTests::VtResize()" << std::endl;
     BEGIN_TEST_METHOD_PROPERTIES()
         TEST_METHOD_PROPERTY(L"IsolationLevel", L"Method")
     END_TEST_METHOD_PROPERTIES()
@@ -1098,9 +1190,13 @@ void ScreenBufferTests::VtResize()
     cursor.SetYPosition(0);
 
     auto initialSbHeight = si.GetBufferSize().Height();
+	std::cerr << "TEST_METHOD_PROPERTY(): initialSbHeight → " << initialSbHeight << std::endl;
     auto initialSbWidth = si.GetBufferSize().Width();
+	std::cerr << "TEST_METHOD_PROPERTY(): initialSbWidth → " << initialSbWidth << std::endl;
     auto initialViewHeight = si.GetViewport().Height();
+	std::cerr << "TEST_METHOD_PROPERTY(): initialViewHeight → " << initialViewHeight << std::endl;
     auto initialViewWidth = si.GetViewport().Width();
+	std::cerr << "TEST_METHOD_PROPERTY(): initialViewWidth → " << initialViewWidth << std::endl;
 
     Log::Comment(NoThrowString().Format(
         L"Write '\\x1b[8;30;80t'"
@@ -1110,9 +1206,13 @@ void ScreenBufferTests::VtResize()
     stateMachine.ProcessString(L"\x1b[8;30;80t");
 
     auto newSbHeight = si.GetBufferSize().Height();
+	std::cerr << "TEST_METHOD_PROPERTY(): newSbHeight → " << newSbHeight << std::endl;
     auto newSbWidth = si.GetBufferSize().Width();
+	std::cerr << "TEST_METHOD_PROPERTY(): newSbWidth → " << newSbWidth << std::endl;
     auto newViewHeight = si.GetViewport().Height();
+	std::cerr << "TEST_METHOD_PROPERTY(): newViewHeight → " << newViewHeight << std::endl;
     auto newViewWidth = si.GetViewport().Width();
+	std::cerr << "TEST_METHOD_PROPERTY(): newViewWidth → " << newViewWidth << std::endl;
 
     VERIFY_ARE_EQUAL(initialSbHeight, newSbHeight);
     VERIFY_ARE_EQUAL(80, newSbWidth);
@@ -1209,6 +1309,7 @@ void ScreenBufferTests::VtResize()
 
 void ScreenBufferTests::VtResizeComprehensive()
 {
+	std::cerr << ">>> Entering ScreenBufferTests::VtResizeComprehensive()" << std::endl;
     // Run this test in isolation - for one reason or another, this breaks other tests.
     BEGIN_TEST_METHOD_PROPERTIES()
         TEST_METHOD_PROPERTY(L"IsolationLevel", L"Method")
@@ -1231,7 +1332,9 @@ void ScreenBufferTests::VtResizeComprehensive()
     cursor.SetYPosition(0);
 
     auto initialViewHeight = si.GetViewport().Height();
+	std::cerr << "ScreenBufferTests::VtResizeComprehensive(): initialViewHeight → " << initialViewHeight << std::endl;
     auto initialViewWidth = si.GetViewport().Width();
+	std::cerr << "ScreenBufferTests::VtResizeComprehensive(): initialViewWidth → " << initialViewWidth << std::endl;
 
     auto expectedViewWidth = initialViewWidth + dx;
     auto expectedViewHeight = initialViewHeight + dy;
@@ -1250,36 +1353,47 @@ void ScreenBufferTests::VtResizeComprehensive()
     stateMachine.ProcessString(ss.str());
 
     auto newViewHeight = si.GetViewport().Height();
+	std::cerr << "ScreenBufferTests::VtResizeComprehensive(): newViewHeight → " << newViewHeight << std::endl;
     auto newViewWidth = si.GetViewport().Width();
+	std::cerr << "ScreenBufferTests::VtResizeComprehensive(): newViewWidth → " << newViewWidth << std::endl;
 
     VERIFY_ARE_EQUAL(expectedViewWidth, newViewWidth);
     VERIFY_ARE_EQUAL(expectedViewHeight, newViewHeight);
+	std::cerr << "<<< Exiting ScreenBufferTests::VtResizeComprehensive()" << std::endl;
 }
 
 til::rect _GetRelativeScrollMargins()
 {
+	std::cerr << ">>> Entering _GetRelativeScrollMargins()" << std::endl;
     auto& gci = ServiceLocator::LocateGlobals().getConsoleInformation();
     auto& si = gci.GetActiveOutputBuffer().GetActiveBuffer();
     auto& stateMachine = si.GetStateMachine();
     const auto viewport = si.GetViewport();
+	std::cerr << "_GetRelativeScrollMargins(): viewport → " << viewport << std::endl;
     auto& cursor = si.GetTextBuffer().GetCursor();
     const auto savePos = cursor.GetPosition();
+	std::cerr << "_GetRelativeScrollMargins(): savePos → " << savePos << std::endl;
 
     // We can't access the AdaptDispatch internals where the margins are stored,
     // but we calculate their boundaries by using VT sequences to move down and
     // up as far as possible, and read the cursor positions at the two limits.
     stateMachine.ProcessString(L"\033[H\033[9999B");
     const auto bottom = cursor.GetPosition().y - viewport.Top();
+	std::cerr << "_GetRelativeScrollMargins(): bottom → " << bottom << std::endl;
     stateMachine.ProcessString(L"\033[9999A");
     const auto top = cursor.GetPosition().y - viewport.Top();
+	std::cerr << "_GetRelativeScrollMargins(): top → " << top << std::endl;
 
     cursor.SetPosition(savePos);
     const auto noMargins = (top == 0 && bottom == viewport.Height() - 1);
+	std::cerr << "_GetRelativeScrollMargins(): noMargins → " << noMargins << std::endl;
+	std::cerr << "<<< Exiting _GetRelativeScrollMargins()" << std::endl;
     return noMargins ? til::rect{} : til::rect{ 0, top, 0, bottom };
 }
 
 void ScreenBufferTests::VtResizeDECCOLM()
 {
+	std::cerr << ">>> Entering ScreenBufferTests::VtResizeDECCOLM()" << std::endl;
     // Run this test in isolation - for one reason or another, this breaks other tests.
     BEGIN_TEST_METHOD_PROPERTIES()
         TEST_METHOD_PROPERTY(L"IsolationLevel", L"Method")
@@ -1411,11 +1525,14 @@ void ScreenBufferTests::VtResizeDECCOLM()
     VERIFY_ARE_EQUAL(initialViewHeight, newViewHeight);
     VERIFY_ARE_EQUAL(80, newSbWidth);
     VERIFY_ARE_EQUAL(80, newViewWidth);
+	std::cerr << "<<< Exiting ScreenBufferTests::VtResizeDECCOLM()" << std::endl;
 }
 
 void ScreenBufferTests::VtResizePreservingAttributes()
 {
+	std::cerr << ">>> Entering ScreenBufferTests::VtResizePreservingAttributes()" << std::endl;
     // Run this test in isolation - for one reason or another, this breaks other tests.
+	std::cerr << "<<< Exiting ScreenBufferTests::VtResizePreservingAttributes()" << std::endl;
     BEGIN_TEST_METHOD_PROPERTIES()
         TEST_METHOD_PROPERTY(L"IsolationLevel", L"Method")
         TEST_METHOD_PROPERTY(L"Data:resizeType", L"{0, 1}")
@@ -1461,6 +1578,7 @@ void ScreenBufferTests::VtResizePreservingAttributes()
 
 void ScreenBufferTests::VtSoftResetCursorPosition()
 {
+	std::cerr << ">>> Entering ScreenBufferTests::VtSoftResetCursorPosition()" << std::endl;
     auto& gci = ServiceLocator::LocateGlobals().getConsoleInformation();
     auto& si = gci.GetActiveOutputBuffer().GetActiveBuffer();
     const auto& tbi = si.GetTextBuffer();
@@ -1509,13 +1627,16 @@ void ScreenBufferTests::VtSoftResetCursorPosition()
     stateMachine.ProcessString(L"\x1b[5;10r");
     stateMachine.ProcessString(L"\x1b[2;2H");
     VERIFY_ARE_EQUAL(til::point(1, 1), cursor.GetPosition());
+	std::cerr << "<<< Exiting ScreenBufferTests::VtSoftResetCursorPosition()" << std::endl;
 }
 
 void ScreenBufferTests::VtSoftResetAltBufferCursorState()
 {
+	std::cerr << ">>> Entering ScreenBufferTests::VtSoftResetAltBufferCursorState()" << std::endl;
     auto& gci = ServiceLocator::LocateGlobals().getConsoleInformation();
     gci.LockConsole(); // Lock must be taken to manipulate buffer.
     auto unlock = wil::scope_exit([&] { gci.UnlockConsole(); });
+	std::cerr << "ScreenBufferTests::VtSoftResetAltBufferCursorState(): unlock → " << unlock << std::endl;
 
     auto& si = gci.GetActiveOutputBuffer();
     auto& stateMachine = si.GetStateMachine();
@@ -1533,10 +1654,12 @@ void ScreenBufferTests::VtSoftResetAltBufferCursorState()
 
     Log::Comment(L"Returning from alt buffer should restore the main cursor position.");
     VERIFY_ARE_EQUAL(til::point(6, 3), gci.GetActiveOutputBuffer().GetTextBuffer().GetCursor().GetPosition());
+	std::cerr << "<<< Exiting ScreenBufferTests::VtSoftResetAltBufferCursorState()" << std::endl;
 }
 
 void ScreenBufferTests::VtScrollMarginsNewlineColor()
 {
+	std::cerr << ">>> Entering ScreenBufferTests::VtScrollMarginsNewlineColor()" << std::endl;
     auto& gci = ServiceLocator::LocateGlobals().getConsoleInformation();
     auto& si = gci.GetActiveOutputBuffer().GetActiveBuffer();
     const auto& tbi = si.GetTextBuffer();
@@ -1549,6 +1672,8 @@ void ScreenBufferTests::VtScrollMarginsNewlineColor()
     cursor.SetPosition(til::point(0, 0));
 
     const auto yellow = RGB(255, 255, 0);
+	std::cerr << "ScreenBufferTests::VtScrollMarginsNewlineColor(): yellow → " << yellow << std::endl;
+	std::cerr << "ScreenBufferTests::VtScrollMarginsNewlineColor(): magenta → " << magenta << std::endl;
     const auto magenta = RGB(255, 0, 255);
     gci.SetColorTableEntry(TextColor::DEFAULT_FOREGROUND, yellow);
     gci.SetColorTableEntry(TextColor::DEFAULT_BACKGROUND, magenta);
@@ -1567,6 +1692,7 @@ void ScreenBufferTests::VtScrollMarginsNewlineColor()
     stateMachine.ProcessString(L"\x1b[2;5r");
     // Make sure we clear the margins to not screw up another test.
     auto clearMargins = wil::scope_exit([&] { stateMachine.ProcessString(L"\x1b[r"); });
+	std::cerr << "ScreenBufferTests::VtScrollMarginsNewlineColor(): clearMargins → " << clearMargins << std::endl;
 
     for (auto iteration = 0; iteration < 10; iteration++)
     {
@@ -1576,15 +1702,18 @@ void ScreenBufferTests::VtScrollMarginsNewlineColor()
         stateMachine.ProcessString(L"\n");
 
         const auto cursorPos = cursor.GetPosition();
+		std::cerr << "ScreenBufferTests::VtScrollMarginsNewlineColor(): cursorPos → " << cursorPos << std::endl;
 
         Log::Comment(NoThrowString().Format(
             L"Cursor=%s",
             VerifyOutputTraits<til::point>::ToString(cursorPos).GetBuffer()));
         const auto viewport = si.GetViewport();
+		std::cerr << "ScreenBufferTests::VtScrollMarginsNewlineColor(): viewport → " << viewport << std::endl;
         Log::Comment(NoThrowString().Format(
             L"Viewport=%s",
             VerifyOutputTraits<til::inclusive_rect>::ToString(viewport.ToInclusive()).GetBuffer()));
         const auto viewTop = viewport.Top();
+		std::cerr << "ScreenBufferTests::VtScrollMarginsNewlineColor(): viewTop → " << viewTop << std::endl;
         for (int y = viewTop; y < viewTop + 10; y++)
         {
             SetVerifyOutput settings(VerifyOutputSettings::LogOnlyFailures);
@@ -1599,10 +1728,12 @@ void ScreenBufferTests::VtScrollMarginsNewlineColor()
             }
         }
     }
+	std::cerr << "<<< Exiting ScreenBufferTests::VtScrollMarginsNewlineColor()" << std::endl;
 }
 
 void ScreenBufferTests::VtNewlinePastViewport()
 {
+	std::cerr << ">>> Entering ScreenBufferTests::VtNewlinePastViewport()" << std::endl;
     auto& gci = ServiceLocator::LocateGlobals().getConsoleInformation();
     auto& si = gci.GetActiveOutputBuffer().GetActiveBuffer();
     const auto& tbi = si.GetTextBuffer();
@@ -1626,6 +1757,7 @@ void ScreenBufferTests::VtNewlinePastViewport()
         L"Move the cursor to the bottom of the viewport"));
 
     const auto initialViewport = si.GetViewport();
+	std::cerr << "ScreenBufferTests::VtNewlinePastViewport(): initialViewport → " << initialViewport << std::endl;
     Log::Comment(NoThrowString().Format(
         L"initialViewport=%s",
         VerifyOutputTraits<til::inclusive_rect>::ToString(initialViewport.ToInclusive()).GetBuffer()));
@@ -1634,6 +1766,7 @@ void ScreenBufferTests::VtNewlinePastViewport()
 
     // Set the attributes that will be used to initialize new rows.
     auto fillAttr = TextAttribute{ RGB(12, 34, 56), RGB(78, 90, 12), RGB(18, 29, 55) };
+	std::cerr << "ScreenBufferTests::VtNewlinePastViewport(): fillAttr → " << fillAttr << std::endl;
     fillAttr.SetCrossedOut(true);
     fillAttr.SetReverseVideo(true);
     fillAttr.SetUnderlineStyle(UnderlineStyle::CurlyUnderlined);
@@ -1645,6 +1778,7 @@ void ScreenBufferTests::VtNewlinePastViewport()
     stateMachine.ProcessString(L"\n");
 
     const auto viewport = si.GetViewport();
+	std::cerr << "ScreenBufferTests::VtNewlinePastViewport(): viewport → " << viewport << std::endl;
     Log::Comment(NoThrowString().Format(
         L"viewport=%s",
         VerifyOutputTraits<til::inclusive_rect>::ToString(viewport.ToInclusive()).GetBuffer()));
@@ -1671,10 +1805,12 @@ void ScreenBufferTests::VtNewlinePastViewport()
         const auto& attr = attrs[x];
         VERIFY_ARE_EQUAL(expectedFillAttr, attr);
     }
+	std::cerr << "<<< Exiting ScreenBufferTests::VtNewlinePastViewport()" << std::endl;
 }
 
 void ScreenBufferTests::VtNewlinePastEndOfBuffer()
 {
+	std::cerr << ">>> Entering ScreenBufferTests::VtNewlinePastEndOfBuffer()" << std::endl;
     auto& gci = ServiceLocator::LocateGlobals().getConsoleInformation();
     auto& si = gci.GetActiveOutputBuffer().GetActiveBuffer();
     const auto& tbi = si.GetTextBuffer();
@@ -1701,6 +1837,7 @@ void ScreenBufferTests::VtNewlinePastEndOfBuffer()
     }
 
     const auto initialViewport = si.GetViewport();
+	std::cerr << "ScreenBufferTests::VtNewlinePastEndOfBuffer(): initialViewport → " << initialViewport << std::endl;
     Log::Comment(NoThrowString().Format(
         L"initialViewport=%s",
         VerifyOutputTraits<til::inclusive_rect>::ToString(initialViewport.ToInclusive()).GetBuffer()));
@@ -1709,6 +1846,7 @@ void ScreenBufferTests::VtNewlinePastEndOfBuffer()
 
     // Set the attributes that will be used to initialize new rows.
     auto fillAttr = TextAttribute{ RGB(12, 34, 56), RGB(78, 90, 12), RGB(18, 29, 55) };
+	std::cerr << "ScreenBufferTests::VtNewlinePastEndOfBuffer(): fillAttr → " << fillAttr << std::endl;
     fillAttr.SetCrossedOut(true);
     fillAttr.SetReverseVideo(true);
     fillAttr.SetUnderlineStyle(UnderlineStyle::CurlyUnderlined);
@@ -1720,6 +1858,7 @@ void ScreenBufferTests::VtNewlinePastEndOfBuffer()
     stateMachine.ProcessString(L"\n");
 
     const auto viewport = si.GetViewport();
+	std::cerr << "ScreenBufferTests::VtNewlinePastEndOfBuffer(): viewport → " << viewport << std::endl;
     Log::Comment(NoThrowString().Format(
         L"viewport=%s",
         VerifyOutputTraits<til::inclusive_rect>::ToString(viewport.ToInclusive()).GetBuffer()));
@@ -1746,16 +1885,20 @@ void ScreenBufferTests::VtNewlinePastEndOfBuffer()
         const auto& attr = attrs[x];
         VERIFY_ARE_EQUAL(expectedFillAttr, attr);
     }
+	std::cerr << "<<< Exiting ScreenBufferTests::VtNewlinePastEndOfBuffer()" << std::endl;
 }
 
 void ScreenBufferTests::VtNewlineOutsideMargins()
 {
+	std::cerr << ">>> Entering ScreenBufferTests::VtNewlineOutsideMargins()" << std::endl;
     auto& gci = ServiceLocator::LocateGlobals().getConsoleInformation();
     auto& si = gci.GetActiveOutputBuffer();
     auto& stateMachine = si.GetStateMachine();
     auto& cursor = si.GetTextBuffer().GetCursor();
 
     const auto viewportTop = si.GetViewport().Top();
+	std::cerr << "ScreenBufferTests::VtNewlineOutsideMargins(): viewportTop → " << viewportTop << std::endl;
+	std::cerr << "ScreenBufferTests::VtNewlineOutsideMargins(): viewportBottom → " << viewportBottom << std::endl;
     const auto viewportBottom = si.GetViewport().BottomInclusive();
     // Make sure the bottom margin will fit inside the viewport.
     VERIFY_IS_TRUE(si.GetViewport().Height() > 5);
@@ -1772,16 +1915,19 @@ void ScreenBufferTests::VtNewlineOutsideMargins()
     stateMachine.ProcessString(L"\x1b[1;5r");
     // Make sure we clear the margins on exit so they can't break other tests.
     auto clearMargins = wil::scope_exit([&] { stateMachine.ProcessString(L"\x1b[r"); });
+	std::cerr << "ScreenBufferTests::VtNewlineOutsideMargins(): clearMargins → " << clearMargins << std::endl;
 
     Log::Comment(L"LF no longer scrolls the viewport when below bottom margin");
     cursor.SetPosition({ 0, viewportBottom });
     stateMachine.ProcessString(L"\n");
     VERIFY_ARE_EQUAL(til::point(0, viewportBottom), cursor.GetPosition());
     VERIFY_ARE_EQUAL(til::point(0, viewportTop), si.GetViewport().Origin());
+	std::cerr << "<<< Exiting ScreenBufferTests::VtNewlineOutsideMargins()" << std::endl;
 }
 
 void ScreenBufferTests::VtSetColorTable()
 {
+	std::cerr << ">>> Entering ScreenBufferTests::VtSetColorTable()" << std::endl;
     auto& gci = ServiceLocator::LocateGlobals().getConsoleInformation();
     auto& si = gci.GetActiveOutputBuffer().GetActiveBuffer();
     auto& stateMachine = si.GetStateMachine();
@@ -1861,10 +2007,12 @@ void ScreenBufferTests::VtSetColorTable()
         L"invalid: need to specify a color space"));
     stateMachine.ProcessString(L"\x1b]4;5;1/1/1\x1b\\");
     VERIFY_ARE_EQUAL(RGB(9, 9, 9), gci.GetColorTableEntry(5));
+	std::cerr << "<<< Exiting ScreenBufferTests::VtSetColorTable()" << std::endl;
 }
 
 void ScreenBufferTests::VtRestoreColorTableReport()
 {
+	std::cerr << ">>> Entering ScreenBufferTests::VtRestoreColorTableReport()" << std::endl;
     auto& gci = ServiceLocator::LocateGlobals().getConsoleInformation();
     auto& si = gci.GetActiveOutputBuffer().GetActiveBuffer();
     auto& stateMachine = si.GetStateMachine();
@@ -2099,27 +2247,34 @@ void ScreenBufferTests::VtRestoreColorTableReport()
     for (auto i = 0; i < 16; i++)
     {
         const COLORREF expectedColor = Microsoft::Console::Utils::CampbellColorTable()[i];
+		std::cerr << "ScreenBufferTests::VtRestoreColorTableReport(): expectedColor → " << expectedColor << std::endl;
         VERIFY_ARE_EQUAL(expectedColor, gci.GetColorTableEntry(i));
     }
+	std::cerr << "<<< Exiting ScreenBufferTests::VtRestoreColorTableReport()" << std::endl;
 }
 
 void ScreenBufferTests::ResizeTraditionalDoesNotDoubleFreeAttrRows()
 {
+	std::cerr << ">>> Entering ScreenBufferTests::ResizeTraditionalDoesNotDoubleFreeAttrRows()" << std::endl;
     // there is not much to verify here, this test passes if the console doesn't crash.
     auto& gci = ServiceLocator::LocateGlobals().getConsoleInformation();
     auto& si = gci.GetActiveOutputBuffer().GetActiveBuffer();
 
     gci.SetWrapText(false);
     auto newBufferSize = si.GetBufferSize().Dimensions();
+	std::cerr << "ScreenBufferTests::ResizeTraditionalDoesNotDoubleFreeAttrRows(): newBufferSize → " << newBufferSize << std::endl;
     newBufferSize.height--;
 
     VERIFY_SUCCEEDED(si.ResizeTraditional(newBufferSize));
+	std::cerr << "<<< Exiting ScreenBufferTests::ResizeTraditionalDoesNotDoubleFreeAttrRows()" << std::endl;
 }
 
 void ScreenBufferTests::ResizeCursorUnchanged()
 {
+	std::cerr << ">>> Entering ScreenBufferTests::ResizeCursorUnchanged()" << std::endl;
     // Created for MSFT:19863799. Make sure when we resize the buffer, the
     //      cursor looks the same as it did before.
+	std::cerr << "<<< Exiting ScreenBufferTests::ResizeCursorUnchanged()" << std::endl;
 
     BEGIN_TEST_METHOD_PROPERTIES()
         TEST_METHOD_PROPERTY(L"Data:useResizeWithReflow", L"{false, true}")
@@ -2161,9 +2316,11 @@ void ScreenBufferTests::ResizeCursorUnchanged()
 
 void ScreenBufferTests::ResizeAltBuffer()
 {
+	std::cerr << ">>> Entering ScreenBufferTests::ResizeAltBuffer()" << std::endl;
     auto& gci = ServiceLocator::LocateGlobals().getConsoleInformation();
     gci.LockConsole(); // Lock must be taken to manipulate buffer.
     auto unlock = wil::scope_exit([&] { gci.UnlockConsole(); });
+	std::cerr << "ScreenBufferTests::ResizeAltBuffer(): unlock → " << unlock << std::endl;
 
     auto& si = gci.GetActiveOutputBuffer().GetActiveBuffer();
     auto& stateMachine = si.GetStateMachine();
@@ -2173,6 +2330,7 @@ void ScreenBufferTests::ResizeAltBuffer()
 
     VERIFY_IS_FALSE(si._IsAltBuffer());
     const auto originalMainSize = Viewport(si._viewport);
+	std::cerr << "ScreenBufferTests::ResizeAltBuffer(): originalMainSize → " << originalMainSize << std::endl;
 
     Log::Comment(NoThrowString().Format(
         L"Switch to alt buffer"));
@@ -2183,6 +2341,7 @@ void ScreenBufferTests::ResizeAltBuffer()
     const auto psiAlt = si._psiAlternateBuffer;
 
     auto newSize = originalMainSize.Dimensions();
+	std::cerr << "ScreenBufferTests::ResizeAltBuffer(): newSize → " << newSize << std::endl;
     newSize.width += 2;
     newSize.height += 2;
 
@@ -2196,10 +2355,12 @@ void ScreenBufferTests::ResizeAltBuffer()
     stateMachine.ProcessString(L"\x1b[?1049l");
     VERIFY_IS_FALSE(si._IsAltBuffer());
     VERIFY_IS_NULL(si._psiAlternateBuffer);
+	std::cerr << "<<< Exiting ScreenBufferTests::ResizeAltBuffer()" << std::endl;
 }
 
 void ScreenBufferTests::ResizeAltBufferGetScreenBufferInfo()
 {
+	std::cerr << ">>> Entering ScreenBufferTests::ResizeAltBufferGetScreenBufferInfo()" << std::endl;
     BEGIN_TEST_METHOD_PROPERTIES()
         TEST_METHOD_PROPERTY(L"Data:dx", L"{-10, -1, 1, 10}")
         TEST_METHOD_PROPERTY(L"Data:dy", L"{-10, -1, 1, 10}")
@@ -2266,6 +2427,7 @@ void ScreenBufferTests::ResizeAltBufferGetScreenBufferInfo()
 
 void ScreenBufferTests::VtEraseAllPersistCursor()
 {
+	std::cerr << ">>> Entering ScreenBufferTests::VtEraseAllPersistCursor()" << std::endl;
     auto& gci = ServiceLocator::LocateGlobals().getConsoleInformation();
     auto& si = gci.GetActiveOutputBuffer().GetActiveBuffer();
     const auto& tbi = si.GetTextBuffer();
@@ -2290,10 +2452,12 @@ void ScreenBufferTests::VtEraseAllPersistCursor()
     newViewport.ConvertFromOrigin(&expectedCursor);
 
     VERIFY_ARE_EQUAL(expectedCursor, cursor.GetPosition());
+	std::cerr << "<<< Exiting ScreenBufferTests::VtEraseAllPersistCursor()" << std::endl;
 }
 
 void ScreenBufferTests::VtEraseAllPersistCursorFillColor()
 {
+	std::cerr << ">>> Entering ScreenBufferTests::VtEraseAllPersistCursorFillColor()" << std::endl;
     auto& gci = ServiceLocator::LocateGlobals().getConsoleInformation();
     auto& si = gci.GetActiveOutputBuffer().GetActiveBuffer();
     const auto& tbi = si.GetTextBuffer();
@@ -2327,6 +2491,9 @@ void ScreenBufferTests::VtEraseAllPersistCursorFillColor()
         VerifyOutputTraits<til::inclusive_rect>::ToString(si.GetBufferSize().ToInclusive()).GetBuffer()));
 
     auto iter = tbi.GetCellDataAt(newViewport.Origin());
+	std::cerr << "ScreenBufferTests::VtEraseAllPersistCursorFillColor(): iter → " << iter << std::endl;
+	std::cerr << "ScreenBufferTests::VtEraseAllPersistCursorFillColor(): height → " << height << std::endl;
+	std::cerr << "ScreenBufferTests::VtEraseAllPersistCursorFillColor(): width → " << width << std::endl;
     auto height = newViewport.Height();
     auto width = newViewport.Width();
     for (auto i = 0; i < height; i++)
@@ -2337,18 +2504,23 @@ void ScreenBufferTests::VtEraseAllPersistCursorFillColor()
             iter++;
         }
     }
+	std::cerr << "<<< Exiting ScreenBufferTests::VtEraseAllPersistCursorFillColor()" << std::endl;
 }
 
 void ScreenBufferTests::GetWordBoundary()
 {
+	std::cerr << ">>> Entering ScreenBufferTests::GetWordBoundary()" << std::endl;
     auto& gci = ServiceLocator::LocateGlobals().getConsoleInformation();
     auto& si = gci.GetActiveOutputBuffer().GetActiveBuffer();
 
     const auto text = L"This is some test text for word boundaries.";
+	std::cerr << "ScreenBufferTests::GetWordBoundary(): text → " << text << std::endl;
+	std::cerr << "ScreenBufferTests::GetWordBoundary(): length → " << length << std::endl;
     const auto length = wcslen(text);
 
     // Make the buffer as big as our test text.
     const til::size newBufferSize = { gsl::narrow<til::CoordType>(length), 10 };
+	std::cerr << "ScreenBufferTests::GetWordBoundary(): newBufferSize → " << newBufferSize << std::endl;
     si.GetTextBuffer().ResizeTraditional(newBufferSize);
 
     const OutputCellIterator it(text, si.GetAttributes());
@@ -2357,9 +2529,12 @@ void ScreenBufferTests::GetWordBoundary()
     // Now find some words in it.
     Log::Comment(L"Find first word from its front.");
     til::point expectedFirst = { 0, 0 };
+	std::cerr << "ScreenBufferTests::GetWordBoundary(): expectedFirst → " << expectedFirst << std::endl;
     til::point expectedSecond = { 4, 0 };
+	std::cerr << "ScreenBufferTests::GetWordBoundary(): expectedSecond → " << expectedSecond << std::endl;
 
     auto boundary = si.GetWordBoundary({ 0, 0 });
+	std::cerr << "ScreenBufferTests::GetWordBoundary(): boundary → " << boundary << std::endl;
     VERIFY_ARE_EQUAL(expectedFirst, boundary.first);
     VERIFY_ARE_EQUAL(expectedSecond, boundary.second);
 
@@ -2413,18 +2588,23 @@ void ScreenBufferTests::GetWordBoundary()
     boundary = si.GetWordBoundary({ 12, 0 });
     VERIFY_ARE_EQUAL(expectedFirst, boundary.first);
     VERIFY_ARE_EQUAL(expectedSecond, boundary.second);
+	std::cerr << "<<< Exiting ScreenBufferTests::GetWordBoundary()" << std::endl;
 }
 
 void ScreenBufferTests::GetWordBoundaryTrimZeros(const bool on)
 {
+	std::cerr << ">>> Entering ScreenBufferTests::GetWordBoundaryTrimZeros(on=" << on << ")" << std::endl;
     auto& gci = ServiceLocator::LocateGlobals().getConsoleInformation();
     auto& si = gci.GetActiveOutputBuffer().GetActiveBuffer();
 
     const auto text = L"000fe12 0xfe12 0Xfe12 0nfe12 0Nfe12";
+	std::cerr << "ScreenBufferTests::GetWordBoundaryTrimZeros(on=" << on << "): text → " << text << std::endl;
+	std::cerr << "ScreenBufferTests::GetWordBoundaryTrimZeros(on=" << on << "): length → " << length << std::endl;
     const auto length = wcslen(text);
 
     // Make the buffer as big as our test text.
     const til::size newBufferSize = { gsl::narrow<til::CoordType>(length), 10 };
+	std::cerr << "ScreenBufferTests::GetWordBoundaryTrimZeros(on=" << on << "): newBufferSize → " << newBufferSize << std::endl;
     si.GetTextBuffer().ResizeTraditional(newBufferSize);
 
     const OutputCellIterator it(text, si.GetAttributes());
@@ -2441,6 +2621,9 @@ void ScreenBufferTests::GetWordBoundaryTrimZeros(const bool on)
     expectedSecond = { 7, 0 };
     boundary = si.GetWordBoundary({ 0, 0 });
     VERIFY_ARE_EQUAL(expectedFirst, boundary.first);
+	std::cerr << "ScreenBufferTests::GetWordBoundaryTrimZeros(on=" << on << "): expectedFirst → " << expectedFirst << std::endl;
+	std::cerr << "ScreenBufferTests::GetWordBoundaryTrimZeros(on=" << on << "): expectedSecond → " << expectedSecond << std::endl;
+	std::cerr << "ScreenBufferTests::GetWordBoundaryTrimZeros(on=" << on << "): boundary → " << boundary << std::endl;
     VERIFY_ARE_EQUAL(expectedSecond, boundary.second);
 
     Log::Comment(L"Find lead with 0x");
@@ -2470,23 +2653,30 @@ void ScreenBufferTests::GetWordBoundaryTrimZeros(const bool on)
     boundary = si.GetWordBoundary({ 29, 0 });
     VERIFY_ARE_EQUAL(expectedFirst, boundary.first);
     VERIFY_ARE_EQUAL(expectedSecond, boundary.second);
+	std::cerr << "<<< Exiting ScreenBufferTests::GetWordBoundaryTrimZeros(on=" << on << ")" << std::endl;
 }
 
 void ScreenBufferTests::GetWordBoundaryTrimZerosOn()
 {
+	std::cerr << ">>> Entering ScreenBufferTests::GetWordBoundaryTrimZerosOn()" << std::endl;
     GetWordBoundaryTrimZeros(true);
+	std::cerr << "<<< Exiting ScreenBufferTests::GetWordBoundaryTrimZerosOn()" << std::endl;
 }
 
 void ScreenBufferTests::GetWordBoundaryTrimZerosOff()
 {
+	std::cerr << ">>> Entering ScreenBufferTests::GetWordBoundaryTrimZerosOff()" << std::endl;
     GetWordBoundaryTrimZeros(false);
+	std::cerr << "<<< Exiting ScreenBufferTests::GetWordBoundaryTrimZerosOff()" << std::endl;
 }
 
 void ScreenBufferTests::TestAltBufferCursorState()
 {
+	std::cerr << ">>> Entering ScreenBufferTests::TestAltBufferCursorState()" << std::endl;
     auto& gci = ServiceLocator::LocateGlobals().getConsoleInformation();
     gci.LockConsole(); // Lock must be taken to manipulate buffer.
     auto unlock = wil::scope_exit([&] { gci.UnlockConsole(); });
+	std::cerr << "ScreenBufferTests::TestAltBufferCursorState(): unlock → " << unlock << std::endl;
 
     Log::Comment(L"Creating one alternate buffer");
     auto& original = gci.GetActiveOutputBuffer();
@@ -2494,6 +2684,7 @@ void ScreenBufferTests::TestAltBufferCursorState()
     VERIFY_IS_NULL(original._psiMainBuffer);
 
     auto Status = original.UseAlternateScreenBuffer({});
+	std::cerr << "ScreenBufferTests::TestAltBufferCursorState(): Status → " << Status << std::endl;
     if (VERIFY_NT_SUCCESS(Status))
     {
         Log::Comment(L"Alternate buffer successfully created");
@@ -2501,6 +2692,7 @@ void ScreenBufferTests::TestAltBufferCursorState()
         // Make sure that when the test is done, we switch back to the main buffer.
         // Otherwise, one test could pollute another.
         auto useMain = wil::scope_exit([&] { alternate.UseMainScreenBuffer(); });
+		std::cerr << "ScreenBufferTests::TestAltBufferCursorState(): useMain → " << useMain << std::endl;
 
         const auto* pMain = &original;
         const auto* pAlt = &alternate;
@@ -2520,13 +2712,16 @@ void ScreenBufferTests::TestAltBufferCursorState()
         VERIFY_ARE_EQUAL(mainCursor.GetSize(), altCursor.GetSize());
         VERIFY_ARE_EQUAL(mainCursor.GetType(), altCursor.GetType());
     }
+	std::cerr << "<<< Exiting ScreenBufferTests::TestAltBufferCursorState()" << std::endl;
 }
 
 void ScreenBufferTests::TestAltBufferVtDispatching()
 {
+	std::cerr << ">>> Entering ScreenBufferTests::TestAltBufferVtDispatching()" << std::endl;
     auto& gci = ServiceLocator::LocateGlobals().getConsoleInformation();
     gci.LockConsole(); // Lock must be taken to manipulate buffer.
     auto unlock = wil::scope_exit([&] { gci.UnlockConsole(); });
+	std::cerr << "ScreenBufferTests::TestAltBufferVtDispatching(): unlock → " << unlock << std::endl;
     Log::Comment(L"Creating one alternate buffer");
     auto& mainBuffer = gci.GetActiveOutputBuffer();
     // Make sure we're in VT mode
@@ -2539,6 +2734,7 @@ void ScreenBufferTests::TestAltBufferVtDispatching()
     VERIFY_IS_NULL(mainBuffer._psiMainBuffer);
 
     auto Status = mainBuffer.UseAlternateScreenBuffer({});
+	std::cerr << "ScreenBufferTests::TestAltBufferVtDispatching(): Status → " << Status << std::endl;
     if (VERIFY_NT_SUCCESS(Status))
     {
         Log::Comment(L"Alternate buffer successfully created");
@@ -2546,6 +2742,7 @@ void ScreenBufferTests::TestAltBufferVtDispatching()
         // Make sure that when the test is done, we switch back to the main buffer.
         // Otherwise, one test could pollute another.
         auto useMain = wil::scope_exit([&] { alternate.UseMainScreenBuffer(); });
+		std::cerr << "ScreenBufferTests::TestAltBufferVtDispatching(): useMain → " << useMain << std::endl;
         // Manually turn on VT mode - usually gci enables this for you.
         WI_SetFlag(alternate.OutputMode, ENABLE_VIRTUAL_TERMINAL_PROCESSING);
 
@@ -2599,15 +2796,19 @@ void ScreenBufferTests::TestAltBufferVtDispatching()
         const auto& altRow = alternate.GetTextBuffer().GetRowByOffset(altCursor.GetPosition().y);
         const std::vector<TextAttribute> altAttrs{ altRow.AttrBegin(), altRow.AttrEnd() };
         const auto altAttrA = altAttrs[altCursor.GetPosition().x - 1];
+		std::cerr << "ScreenBufferTests::TestAltBufferVtDispatching(): altAttrA → " << altAttrA << std::endl;
         VERIFY_ARE_EQUAL(expectedRgb, altAttrA);
     }
+	std::cerr << "<<< Exiting ScreenBufferTests::TestAltBufferVtDispatching()" << std::endl;
 }
 
 void ScreenBufferTests::TestAltBufferRIS()
 {
+	std::cerr << ">>> Entering ScreenBufferTests::TestAltBufferRIS()" << std::endl;
     auto& gci = ServiceLocator::LocateGlobals().getConsoleInformation();
     gci.LockConsole(); // Lock must be taken to manipulate buffer.
     auto unlock = wil::scope_exit([&] { gci.UnlockConsole(); });
+	std::cerr << "ScreenBufferTests::TestAltBufferRIS(): unlock → " << unlock << std::endl;
 
     auto& si = gci.GetActiveOutputBuffer();
     auto& stateMachine = si.GetStateMachine();
@@ -2622,10 +2823,12 @@ void ScreenBufferTests::TestAltBufferRIS()
     Log::Comment(L"RIS returns to main buffer");
     stateMachine.ProcessString(L"\033c");
     VERIFY_IS_FALSE(gci.GetActiveOutputBuffer()._IsAltBuffer());
+	std::cerr << "<<< Exiting ScreenBufferTests::TestAltBufferRIS()" << std::endl;
 }
 
 void ScreenBufferTests::SetDefaultsIndividuallyBothDefault()
 {
+	std::cerr << ">>> Entering ScreenBufferTests::SetDefaultsIndividuallyBothDefault()" << std::endl;
     // Tests MSFT:19828103
 
     auto& gci = ServiceLocator::LocateGlobals().getConsoleInformation();
@@ -2640,6 +2843,10 @@ void ScreenBufferTests::SetDefaultsIndividuallyBothDefault()
     cursor.SetPosition({ 0, 0 });
 
     auto magenta = RGB(255, 0, 255);
+	std::cerr << "ScreenBufferTests::SetDefaultsIndividuallyBothDefault(): magenta → " << magenta << std::endl;
+	std::cerr << "ScreenBufferTests::SetDefaultsIndividuallyBothDefault(): yellow → " << yellow << std::endl;
+	std::cerr << "ScreenBufferTests::SetDefaultsIndividuallyBothDefault(): brightGreen → " << brightGreen << std::endl;
+	std::cerr << "ScreenBufferTests::SetDefaultsIndividuallyBothDefault(): darkBlue → " << darkBlue << std::endl;
     auto yellow = RGB(255, 255, 0);
     auto brightGreen = gci.GetColorTableEntry(TextColor::BRIGHT_GREEN);
     auto darkBlue = gci.GetColorTableEntry(TextColor::DARK_BLUE);
@@ -2726,10 +2933,12 @@ void ScreenBufferTests::SetDefaultsIndividuallyBothDefault()
     VERIFY_ARE_EQUAL(std::make_pair(yellow, magenta), renderSettings.GetAttributeColors(attrD));
     VERIFY_ARE_EQUAL(std::make_pair(brightGreen, darkBlue), renderSettings.GetAttributeColors(attrE));
     VERIFY_ARE_EQUAL(std::make_pair(brightGreen, magenta), renderSettings.GetAttributeColors(attrF));
+	std::cerr << "<<< Exiting ScreenBufferTests::SetDefaultsIndividuallyBothDefault()" << std::endl;
 }
 
 void ScreenBufferTests::SetDefaultsTogether()
 {
+	std::cerr << ">>> Entering ScreenBufferTests::SetDefaultsTogether()" << std::endl;
     // Tests MSFT:19828103
 
     auto& gci = ServiceLocator::LocateGlobals().getConsoleInformation();
@@ -2744,6 +2953,9 @@ void ScreenBufferTests::SetDefaultsTogether()
     cursor.SetPosition({ 0, 0 });
 
     auto magenta = RGB(255, 0, 255);
+	std::cerr << "ScreenBufferTests::SetDefaultsTogether(): magenta → " << magenta << std::endl;
+	std::cerr << "ScreenBufferTests::SetDefaultsTogether(): yellow → " << yellow << std::endl;
+	std::cerr << "ScreenBufferTests::SetDefaultsTogether(): color250 → " << color250 << std::endl;
     auto yellow = RGB(255, 255, 0);
     auto color250 = gci.GetColorTableEntry(250);
 
@@ -2758,6 +2970,7 @@ void ScreenBufferTests::SetDefaultsTogether()
     Log::Comment(NoThrowString().Format(L"  The third with defaults again"));
 
     std::wstring seq = L"\x1b[m"; // Reset to defaults
+	std::cerr << "ScreenBufferTests::SetDefaultsTogether(): seq → " << seq << std::endl;
     stateMachine.ProcessString(seq);
     seq = L"X";
     stateMachine.ProcessString(seq);
@@ -2801,10 +3014,12 @@ void ScreenBufferTests::SetDefaultsTogether()
     VERIFY_ARE_EQUAL(std::make_pair(yellow, magenta), renderSettings.GetAttributeColors(attrA));
     VERIFY_ARE_EQUAL(std::make_pair(yellow, color250), renderSettings.GetAttributeColors(attrB));
     VERIFY_ARE_EQUAL(std::make_pair(yellow, magenta), renderSettings.GetAttributeColors(attrC));
+	std::cerr << "<<< Exiting ScreenBufferTests::SetDefaultsTogether()" << std::endl;
 }
 
 void ScreenBufferTests::ReverseResetWithDefaultBackground()
 {
+	std::cerr << ">>> Entering ScreenBufferTests::ReverseResetWithDefaultBackground()" << std::endl;
     // Tests MSFT:19694089
     auto& gci = ServiceLocator::LocateGlobals().getConsoleInformation();
     auto& si = gci.GetActiveOutputBuffer().GetActiveBuffer();
@@ -2818,6 +3033,7 @@ void ScreenBufferTests::ReverseResetWithDefaultBackground()
     cursor.SetPosition({ 0, 0 });
 
     auto magenta = RGB(255, 0, 255);
+	std::cerr << "ScreenBufferTests::ReverseResetWithDefaultBackground(): magenta → " << magenta << std::endl;
 
     gci.SetColorTableEntry(TextColor::DEFAULT_FOREGROUND, INVALID_COLOR);
     gci.SetColorTableEntry(TextColor::DEFAULT_BACKGROUND, magenta);
@@ -2868,10 +3084,12 @@ void ScreenBufferTests::ReverseResetWithDefaultBackground()
     VERIFY_ARE_EQUAL(magenta, renderSettings.GetAttributeColors(attrA).second);
     VERIFY_ARE_EQUAL(magenta, renderSettings.GetAttributeColors(attrB).first);
     VERIFY_ARE_EQUAL(magenta, renderSettings.GetAttributeColors(attrC).second);
+	std::cerr << "<<< Exiting ScreenBufferTests::ReverseResetWithDefaultBackground()" << std::endl;
 }
 
 void ScreenBufferTests::BackspaceDefaultAttrs()
 {
+	std::cerr << ">>> Entering ScreenBufferTests::BackspaceDefaultAttrs()" << std::endl;
     // Created for MSFT:19735050, but doesn't actually test that.
     // That bug actually involves the input line, and that needs to use
     //      TextAttributes instead of WORDs
@@ -2888,6 +3106,7 @@ void ScreenBufferTests::BackspaceDefaultAttrs()
     cursor.SetPosition({ 0, 0 });
 
     auto magenta = RGB(255, 0, 255);
+	std::cerr << "ScreenBufferTests::BackspaceDefaultAttrs(): magenta → " << magenta << std::endl;
 
     gci.SetColorTableEntry(TextColor::DEFAULT_BACKGROUND, magenta);
     gci.CalculateDefaultColorIndices();
@@ -2921,10 +3140,12 @@ void ScreenBufferTests::BackspaceDefaultAttrs()
 
     VERIFY_ARE_EQUAL(magenta, renderSettings.GetAttributeColors(attrA).second);
     VERIFY_ARE_EQUAL(magenta, renderSettings.GetAttributeColors(attrB).second);
+	std::cerr << "<<< Exiting ScreenBufferTests::BackspaceDefaultAttrs()" << std::endl;
 }
 
 void ScreenBufferTests::BackspaceDefaultAttrsWriteCharsLegacy()
 {
+	std::cerr << ">>> Entering ScreenBufferTests::BackspaceDefaultAttrsWriteCharsLegacy()" << std::endl;
     BEGIN_TEST_METHOD_PROPERTIES()
         TEST_METHOD_PROPERTY(L"Data:writeSingly", L"{false, true}")
     END_TEST_METHOD_PROPERTIES();
@@ -2994,6 +3215,7 @@ void ScreenBufferTests::BackspaceDefaultAttrsWriteCharsLegacy()
 
 void ScreenBufferTests::BackspaceDefaultAttrsInPrompt()
 {
+	std::cerr << ">>> Entering ScreenBufferTests::BackspaceDefaultAttrsInPrompt()" << std::endl;
     // Tests MSFT:19853701 - when you edit the prompt line at a bash prompt,
     //  make sure that the end of the line isn't filled with default/garbage attributes.
 
@@ -3012,6 +3234,7 @@ void ScreenBufferTests::BackspaceDefaultAttrsInPrompt()
     cursor.SetPosition({ 0, 0 });
 
     auto magenta = RGB(255, 0, 255);
+	std::cerr << "ScreenBufferTests::BackspaceDefaultAttrsInPrompt(): magenta → " << magenta << std::endl;
 
     gci.SetColorTableEntry(TextColor::DEFAULT_BACKGROUND, magenta);
     gci.CalculateDefaultColorIndices();
@@ -3027,6 +3250,7 @@ void ScreenBufferTests::BackspaceDefaultAttrsInPrompt()
     stateMachine.ProcessString(L"\x1b[2J");
 
     const auto viewport = si.GetViewport();
+	std::cerr << "ScreenBufferTests::BackspaceDefaultAttrsInPrompt(): viewport → " << viewport << std::endl;
     const auto& row = tbi.GetRowByOffset(cursor.GetPosition().y);
 
     {
@@ -3058,10 +3282,12 @@ void ScreenBufferTests::BackspaceDefaultAttrsInPrompt()
         const auto& attr = attrs[x];
         VERIFY_ARE_EQUAL(expectedDefaults, attr);
     }
+	std::cerr << "<<< Exiting ScreenBufferTests::BackspaceDefaultAttrsInPrompt()" << std::endl;
 }
 
 void ScreenBufferTests::SetGlobalColorTable()
 {
+	std::cerr << ">>> Entering ScreenBufferTests::SetGlobalColorTable()" << std::endl;
     // Created for MSFT:19723934.
     // Changing the value of the color table should apply to the attributes in
     //  both the alt AND main buffer. While many other properties should be
@@ -3072,6 +3298,7 @@ void ScreenBufferTests::SetGlobalColorTable()
     auto& gci = ServiceLocator::LocateGlobals().getConsoleInformation();
     gci.LockConsole(); // Lock must be taken to swap buffers.
     auto unlock = wil::scope_exit([&] { gci.UnlockConsole(); });
+	std::cerr << "ScreenBufferTests::SetGlobalColorTable(): unlock → " << unlock << std::endl;
 
     auto& mainBuffer = gci.GetActiveOutputBuffer();
     VERIFY_IS_FALSE(mainBuffer._IsAltBuffer());
@@ -3087,7 +3314,9 @@ void ScreenBufferTests::SetGlobalColorTable()
     mainCursor.SetPosition({ 0, 0 });
 
     const auto originalRed = gci.GetColorTableEntry(TextColor::DARK_RED);
+	std::cerr << "ScreenBufferTests::SetGlobalColorTable(): originalRed → " << originalRed << std::endl;
     const auto testColor = RGB(0x11, 0x22, 0x33);
+	std::cerr << "ScreenBufferTests::SetGlobalColorTable(): testColor → " << testColor << std::endl;
     VERIFY_ARE_NOT_EQUAL(originalRed, testColor);
 
     stateMachine.ProcessString(L"\x1b[41m");
@@ -3107,6 +3336,7 @@ void ScreenBufferTests::SetGlobalColorTable()
     VERIFY_SUCCEEDED(mainBuffer.UseAlternateScreenBuffer({}));
     auto& altBuffer = gci.GetActiveOutputBuffer();
     auto useMain = wil::scope_exit([&] { altBuffer.UseMainScreenBuffer(); });
+	std::cerr << "ScreenBufferTests::SetGlobalColorTable(): useMain → " << useMain << std::endl;
 
     WI_SetFlag(altBuffer.OutputMode, ENABLE_VIRTUAL_TERMINAL_PROCESSING);
     VERIFY_IS_TRUE(WI_IsFlagSet(altBuffer.OutputMode, ENABLE_VIRTUAL_TERMINAL_PROCESSING));
@@ -3165,16 +3395,19 @@ void ScreenBufferTests::SetGlobalColorTable()
         VERIFY_ARE_EQUAL(testColor, renderSettings.GetAttributeColors(attrA).second);
         VERIFY_ARE_EQUAL(testColor, renderSettings.GetAttributeColors(attrB).second);
     }
+	std::cerr << "<<< Exiting ScreenBufferTests::SetGlobalColorTable()" << std::endl;
 }
 
 void ScreenBufferTests::SetColorTableThreeDigits()
 {
+	std::cerr << ">>> Entering ScreenBufferTests::SetColorTableThreeDigits()" << std::endl;
     // Created for MSFT:19723934.
     // Changing the value of the color table above index 99 should work
 
     auto& gci = ServiceLocator::LocateGlobals().getConsoleInformation();
     gci.LockConsole(); // Lock must be taken to swap buffers.
     auto unlock = wil::scope_exit([&] { gci.UnlockConsole(); });
+	std::cerr << "ScreenBufferTests::SetColorTableThreeDigits(): unlock → " << unlock << std::endl;
 
     auto& mainBuffer = gci.GetActiveOutputBuffer();
     VERIFY_IS_FALSE(mainBuffer._IsAltBuffer());
@@ -3190,7 +3423,9 @@ void ScreenBufferTests::SetColorTableThreeDigits()
     mainCursor.SetPosition({ 0, 0 });
 
     const auto originalRed = gci.GetColorTableEntry(123);
+	std::cerr << "ScreenBufferTests::SetColorTableThreeDigits(): originalRed → " << originalRed << std::endl;
     const auto testColor = RGB(0x11, 0x22, 0x33);
+	std::cerr << "ScreenBufferTests::SetColorTableThreeDigits(): testColor → " << testColor << std::endl;
     VERIFY_ARE_NOT_EQUAL(originalRed, testColor);
 
     stateMachine.ProcessString(L"\x1b[48;5;123m");
@@ -3210,6 +3445,7 @@ void ScreenBufferTests::SetColorTableThreeDigits()
     VERIFY_SUCCEEDED(mainBuffer.UseAlternateScreenBuffer({}));
     auto& altBuffer = gci.GetActiveOutputBuffer();
     auto useMain = wil::scope_exit([&] { altBuffer.UseMainScreenBuffer(); });
+	std::cerr << "ScreenBufferTests::SetColorTableThreeDigits(): useMain → " << useMain << std::endl;
 
     WI_SetFlag(altBuffer.OutputMode, ENABLE_VIRTUAL_TERMINAL_PROCESSING);
     VERIFY_IS_TRUE(WI_IsFlagSet(altBuffer.OutputMode, ENABLE_VIRTUAL_TERMINAL_PROCESSING));
@@ -3247,15 +3483,18 @@ void ScreenBufferTests::SetColorTableThreeDigits()
         LOG_ATTR(attrB);
         VERIFY_ARE_EQUAL(testColor, renderSettings.GetAttributeColors(attrB).second);
     }
+	std::cerr << "<<< Exiting ScreenBufferTests::SetColorTableThreeDigits()" << std::endl;
 }
 
 void ScreenBufferTests::SetDefaultForegroundColor()
 {
+	std::cerr << ">>> Entering ScreenBufferTests::SetDefaultForegroundColor()" << std::endl;
     // Setting the default foreground color should work
 
     auto& gci = ServiceLocator::LocateGlobals().getConsoleInformation();
     gci.LockConsole(); // Lock must be taken to swap buffers.
     auto unlock = wil::scope_exit([&] { gci.UnlockConsole(); });
+	std::cerr << "ScreenBufferTests::SetDefaultForegroundColor(): unlock → " << unlock << std::endl;
 
     auto& mainBuffer = gci.GetActiveOutputBuffer();
     VERIFY_IS_FALSE(mainBuffer._IsAltBuffer());
@@ -3265,8 +3504,11 @@ void ScreenBufferTests::SetDefaultForegroundColor()
     auto& stateMachine = mainBuffer.GetStateMachine();
 
     auto originalColor = gci.GetColorTableEntry(TextColor::DEFAULT_FOREGROUND);
+	std::cerr << "ScreenBufferTests::SetDefaultForegroundColor(): originalColor → " << originalColor << std::endl;
     auto newColor = gci.GetColorTableEntry(TextColor::DEFAULT_FOREGROUND);
+	std::cerr << "ScreenBufferTests::SetDefaultForegroundColor(): newColor → " << newColor << std::endl;
     auto testColor = RGB(0x33, 0x66, 0x99);
+	std::cerr << "ScreenBufferTests::SetDefaultForegroundColor(): testColor → " << testColor << std::endl;
     VERIFY_ARE_NOT_EQUAL(originalColor, testColor);
 
     Log::Comment(L"Valid Hexadecimal Notation");
@@ -3292,15 +3534,18 @@ void ScreenBufferTests::SetDefaultForegroundColor()
     VERIFY_ARE_NOT_EQUAL(testColor, newColor);
     // it will, in fact leave the color the way it was
     VERIFY_ARE_EQUAL(originalColor, newColor);
+	std::cerr << "<<< Exiting ScreenBufferTests::SetDefaultForegroundColor()" << std::endl;
 }
 
 void ScreenBufferTests::SetDefaultBackgroundColor()
 {
+	std::cerr << ">>> Entering ScreenBufferTests::SetDefaultBackgroundColor()" << std::endl;
     // Setting the default Background color should work
 
     auto& gci = ServiceLocator::LocateGlobals().getConsoleInformation();
     gci.LockConsole(); // Lock must be taken to swap buffers.
     auto unlock = wil::scope_exit([&] { gci.UnlockConsole(); });
+	std::cerr << "ScreenBufferTests::SetDefaultBackgroundColor(): unlock → " << unlock << std::endl;
 
     auto& mainBuffer = gci.GetActiveOutputBuffer();
     VERIFY_IS_FALSE(mainBuffer._IsAltBuffer());
@@ -3310,8 +3555,11 @@ void ScreenBufferTests::SetDefaultBackgroundColor()
     auto& stateMachine = mainBuffer.GetStateMachine();
 
     auto originalColor = gci.GetColorTableEntry(TextColor::DEFAULT_BACKGROUND);
+	std::cerr << "ScreenBufferTests::SetDefaultBackgroundColor(): originalColor → " << originalColor << std::endl;
     auto newColor = gci.GetColorTableEntry(TextColor::DEFAULT_BACKGROUND);
+	std::cerr << "ScreenBufferTests::SetDefaultBackgroundColor(): newColor → " << newColor << std::endl;
     auto testColor = RGB(0x33, 0x66, 0x99);
+	std::cerr << "ScreenBufferTests::SetDefaultBackgroundColor(): testColor → " << testColor << std::endl;
     VERIFY_ARE_NOT_EQUAL(originalColor, testColor);
 
     Log::Comment(L"Valid Hexadecimal Notation");
@@ -3337,15 +3585,21 @@ void ScreenBufferTests::SetDefaultBackgroundColor()
     VERIFY_ARE_NOT_EQUAL(testColor, newColor);
     // it will, in fact leave the color the way it was
     VERIFY_ARE_EQUAL(originalColor, newColor);
+	std::cerr << "<<< Exiting ScreenBufferTests::SetDefaultBackgroundColor()" << std::endl;
 }
 
 void ScreenBufferTests::AssignColorAliases()
 {
+	std::cerr << ">>> Entering ScreenBufferTests::AssignColorAliases()" << std::endl;
     auto& gci = ServiceLocator::LocateGlobals().getConsoleInformation();
     auto& stateMachine = gci.GetActiveOutputBuffer().GetStateMachine();
     auto& renderSettings = gci.GetRenderSettings();
 
     const auto defaultFg = renderSettings.GetColorAliasIndex(ColorAlias::DefaultForeground);
+	std::cerr << "ScreenBufferTests::AssignColorAliases(): defaultFg → " << defaultFg << std::endl;
+	std::cerr << "ScreenBufferTests::AssignColorAliases(): defaultBg → " << defaultBg << std::endl;
+	std::cerr << "ScreenBufferTests::AssignColorAliases(): frameFg → " << frameFg << std::endl;
+	std::cerr << "ScreenBufferTests::AssignColorAliases(): frameBg → " << frameBg << std::endl;
     const auto defaultBg = renderSettings.GetColorAliasIndex(ColorAlias::DefaultBackground);
     const auto frameFg = renderSettings.GetColorAliasIndex(ColorAlias::FrameForeground);
     const auto frameBg = renderSettings.GetColorAliasIndex(ColorAlias::FrameBackground);
@@ -3380,10 +3634,12 @@ void ScreenBufferTests::AssignColorAliases()
     VERIFY_ARE_EQUAL(defaultBg, renderSettings.GetColorAliasIndex(ColorAlias::DefaultBackground));
     VERIFY_ARE_EQUAL(frameFg, renderSettings.GetColorAliasIndex(ColorAlias::FrameForeground));
     VERIFY_ARE_EQUAL(frameBg, renderSettings.GetColorAliasIndex(ColorAlias::FrameBackground));
+	std::cerr << "<<< Exiting ScreenBufferTests::AssignColorAliases()" << std::endl;
 }
 
 void ScreenBufferTests::DeleteCharsNearEndOfLine()
 {
+	std::cerr << ">>> Entering ScreenBufferTests::DeleteCharsNearEndOfLine()" << std::endl;
     // Created for MSFT:19888564.
     // There are some cases when you DCH N chars, where there are artifacts left
     //       from the previous contents of the row after the DCH finishes.
@@ -3411,6 +3667,7 @@ void ScreenBufferTests::DeleteCharsNearEndOfLine()
     // [ABCG F  ]
     //     ^
     // The G and " " have moved, but the F did not get overwritten.
+	std::cerr << "<<< Exiting ScreenBufferTests::DeleteCharsNearEndOfLine()" << std::endl;
 
     BEGIN_TEST_METHOD_PROPERTIES()
         TEST_METHOD_PROPERTY(L"Data:dx", L"{1, 2, 3, 5, 8, 13, 21, 34}")
@@ -3481,6 +3738,7 @@ void ScreenBufferTests::DeleteCharsNearEndOfLine()
 
 void ScreenBufferTests::DeleteCharsNearEndOfLineSimpleFirstCase()
 {
+	std::cerr << ">>> Entering ScreenBufferTests::DeleteCharsNearEndOfLineSimpleFirstCase()" << std::endl;
     // Created for MSFT:19888564.
     // This is a single case that I'm absolutely sure will repro this bug -
     // DeleteCharsNearEndOfLine is the more comprehensive version of this test.
@@ -3520,6 +3778,7 @@ void ScreenBufferTests::DeleteCharsNearEndOfLineSimpleFirstCase()
     VERIFY_ARE_EQUAL(til::point(3, 0), mainCursor.GetPosition());
 
     auto iter = tbi.GetCellDataAt({ 0, 0 });
+	std::cerr << "ScreenBufferTests::DeleteCharsNearEndOfLineSimpleFirstCase(): iter → " << iter << std::endl;
     VERIFY_ARE_EQUAL(L"A", iter->Chars());
     iter++;
     VERIFY_ARE_EQUAL(L"B", iter->Chars());
@@ -3534,10 +3793,12 @@ void ScreenBufferTests::DeleteCharsNearEndOfLineSimpleFirstCase()
     iter++;
     VERIFY_ARE_EQUAL(L"\x20", iter->Chars());
     iter++;
+	std::cerr << "<<< Exiting ScreenBufferTests::DeleteCharsNearEndOfLineSimpleFirstCase()" << std::endl;
 }
 
 void ScreenBufferTests::DeleteCharsNearEndOfLineSimpleSecondCase()
 {
+	std::cerr << ">>> Entering ScreenBufferTests::DeleteCharsNearEndOfLineSimpleSecondCase()" << std::endl;
     // Created for MSFT:19888564.
     // This is another single case that I'm absolutely sure will repro this bug
     // DeleteCharsNearEndOfLine is the more comprehensive version of this test.
@@ -3577,6 +3838,7 @@ void ScreenBufferTests::DeleteCharsNearEndOfLineSimpleSecondCase()
     VERIFY_ARE_EQUAL(til::point(2, 0), mainCursor.GetPosition());
 
     auto iter = tbi.GetCellDataAt({ 0, 0 });
+	std::cerr << "ScreenBufferTests::DeleteCharsNearEndOfLineSimpleSecondCase(): iter → " << iter << std::endl;
     VERIFY_ARE_EQUAL(L"A", iter->Chars());
     iter++;
     VERIFY_ARE_EQUAL(L"B", iter->Chars());
@@ -3591,10 +3853,12 @@ void ScreenBufferTests::DeleteCharsNearEndOfLineSimpleSecondCase()
     iter++;
     VERIFY_ARE_EQUAL(L"\x20", iter->Chars());
     iter++;
+	std::cerr << "<<< Exiting ScreenBufferTests::DeleteCharsNearEndOfLineSimpleSecondCase()" << std::endl;
 }
 
 void ScreenBufferTests::DontResetColorsAboveVirtualBottom()
 {
+	std::cerr << ">>> Entering ScreenBufferTests::DontResetColorsAboveVirtualBottom()" << std::endl;
     // Created for MSFT:19989333.
     // Print some colored text, then scroll the viewport up, so the colored text
     //  is below the visible viewport. Change the colors, then write a character.
@@ -3615,6 +3879,10 @@ void ScreenBufferTests::DontResetColorsAboveVirtualBottom()
     Log::Comment(NoThrowString().Format(
         L"viewport=%s", VerifyOutputTraits<til::inclusive_rect>::ToString(si.GetViewport().ToInclusive()).GetBuffer()));
     const auto darkRed = gci.GetColorTableEntry(TextColor::DARK_RED);
+	std::cerr << "ScreenBufferTests::DontResetColorsAboveVirtualBottom(): darkRed → " << darkRed << std::endl;
+	std::cerr << "ScreenBufferTests::DontResetColorsAboveVirtualBottom(): darkBlue → " << darkBlue << std::endl;
+	std::cerr << "ScreenBufferTests::DontResetColorsAboveVirtualBottom(): darkBlack → " << darkBlack << std::endl;
+	std::cerr << "ScreenBufferTests::DontResetColorsAboveVirtualBottom(): darkWhite → " << darkWhite << std::endl;
     const auto darkBlue = gci.GetColorTableEntry(TextColor::DARK_BLUE);
     const auto darkBlack = gci.GetColorTableEntry(TextColor::DARK_BLACK);
     const auto darkWhite = gci.GetColorTableEntry(TextColor::DARK_WHITE);
@@ -3673,15 +3941,20 @@ void ScreenBufferTests::DontResetColorsAboveVirtualBottom()
 
         VERIFY_ARE_EQUAL(std::make_pair(darkWhite, darkBlack), renderSettings.GetAttributeColors(attrC));
     }
+	std::cerr << "<<< Exiting ScreenBufferTests::DontResetColorsAboveVirtualBottom()" << std::endl;
 }
 
 template<class T>
 void _FillLine(til::point position, T fillContent, TextAttribute fillAttr)
 {
+	std::cerr << ">>> Entering _FillLine(position=" << position << ",fillContent=" << fillContent << ",fillAttr=" << fillAttr << ")" << std::endl;
     auto& gci = ServiceLocator::LocateGlobals().getConsoleInformation();
     auto& si = gci.GetActiveOutputBuffer().GetActiveBuffer();
     auto& row = si.GetTextBuffer().GetMutableRowByOffset(position.y);
     row.WriteCells({ fillContent, fillAttr }, position.x, false);
+	std::cerr << "<<< Exiting _FillLine(position=" << position << ",fillContent=" << fillContent << ",fillAttr=" << fillAttr << ")" << std::endl;
+	std::cerr << ">>> Entering _FillLine(line=" << line << ",fillContent=" << fillContent << ",fillAttr=" << fillAttr << ")" << std::endl;
+	std::cerr << "<<< Exiting _FillLine(line=" << line << ",fillContent=" << fillContent << ",fillAttr=" << fillAttr << ")" << std::endl;
 }
 
 template<class T>
@@ -3693,18 +3966,23 @@ void _FillLine(int line, T fillContent, TextAttribute fillAttr)
 template<class T>
 void _FillLines(int startLine, int endLine, T fillContent, TextAttribute fillAttr)
 {
+	std::cerr << ">>> Entering _FillLines(startLine=" << startLine << ",endLine=" << endLine << ",fillContent=" << fillContent << ",fillAttr=" << fillAttr << ")" << std::endl;
     for (auto line = startLine; line < endLine; ++line)
     {
         _FillLine(line, fillContent, fillAttr);
     }
+	std::cerr << "<<< Exiting _FillLines(startLine=" << startLine << ",endLine=" << endLine << ",fillContent=" << fillContent << ",fillAttr=" << fillAttr << ")" << std::endl;
 }
 
 template<class... T>
 bool _ValidateLineContains(til::point position, T&&... expectedContent)
 {
+	std::cerr << ">>> Entering _ValidateLineContains(position=" << position << ",expectedContent=" << expectedContent << ")" << std::endl;
     auto& gci = ServiceLocator::LocateGlobals().getConsoleInformation();
     auto& si = gci.GetActiveOutputBuffer().GetActiveBuffer();
     auto actual = si.GetCellLineDataAt(position);
+	std::cerr << "_ValidateLineContains(position=" << position << ",expectedContent=" << expectedContent << "): actual → " << actual << std::endl;
+	std::cerr << "_ValidateLineContains(position=" << position << ",expectedContent=" << expectedContent << "): expected → " << expected << std::endl;
     auto expected = OutputCellIterator{ std::forward<T>(expectedContent)... };
     while (actual && expected)
     {
@@ -3715,6 +3993,8 @@ bool _ValidateLineContains(til::point position, T&&... expectedContent)
         ++actual;
         ++expected;
     }
+	std::cerr << "<<< Exiting _ValidateLineContains(position=" << position << ",expectedContent=" << expectedContent << ")" << std::endl;
+	std::cerr << "<<< Exiting _ValidateLineContains(line=" << line << ",expectedContent=" << expectedContent << ",expectedAttr=" << expectedAttr << ")" << std::endl;
     return true;
 };
 
@@ -3727,6 +4007,7 @@ bool _ValidateLineContains(int line, T expectedContent, TextAttribute expectedAt
 template<class T>
 auto _ValidateLinesContain(int startCol, int startLine, int endLine, T expectedContent, TextAttribute expectedAttr)
 {
+	std::cerr << ">>> Entering _ValidateLinesContain(startCol=" << startCol << ",startLine=" << startLine << ",endLine=" << endLine << ",expectedContent=" << expectedContent << ",expectedAttr=" << expectedAttr << ")" << std::endl;
     for (auto line = startLine; line < endLine; ++line)
     {
         if (!_ValidateLineContains({ startCol, line }, expectedContent, expectedAttr))
@@ -3734,6 +4015,8 @@ auto _ValidateLinesContain(int startCol, int startLine, int endLine, T expectedC
             return false;
         }
     }
+	std::cerr << "<<< Exiting _ValidateLinesContain(startCol=" << startCol << ",startLine=" << startLine << ",endLine=" << endLine << ",expectedContent=" << expectedContent << ",expectedAttr=" << expectedAttr << ")" << std::endl;
+	std::cerr << "<<< Exiting _ValidateLinesContain(startLine=" << startLine << ",endLine=" << endLine << ",expectedContent=" << expectedContent << ",expectedAttr=" << expectedAttr << ")" << std::endl;
     return true;
 };
 
@@ -3745,6 +4028,7 @@ auto _ValidateLinesContain(int startLine, int endLine, T expectedContent, TextAt
 
 void ScreenBufferTests::ScrollOperations()
 {
+	std::cerr << ">>> Entering ScreenBufferTests::ScrollOperations()" << std::endl;
     enum ScrollType : int
     {
         ScrollUp,
@@ -3901,33 +4185,41 @@ void ScreenBufferTests::ScrollOperations()
     const auto revealedStart = scrollDirection == Up ? viewportEnd - deletedLines : scrollStart;
     const auto revealedEnd = revealedStart + scrollMagnitude;
     VERIFY_IS_TRUE(_ValidateLinesContain(revealedStart, revealedEnd, L' ', expectedFillAttr));
+	std::cerr << "<<< Exiting ScreenBufferTests::ScrollOperations()" << std::endl;
 }
 
 void ScreenBufferTests::InsertReplaceMode()
 {
+	std::cerr << ">>> Entering ScreenBufferTests::InsertReplaceMode()" << std::endl;
     auto& gci = ServiceLocator::LocateGlobals().getConsoleInformation();
     auto& si = gci.GetActiveOutputBuffer().GetActiveBuffer();
     auto& stateMachine = si.GetStateMachine();
     WI_SetFlag(si.OutputMode, ENABLE_VIRTUAL_TERMINAL_PROCESSING);
 
     const auto bufferHeight = si.GetBufferSize().Height();
+	std::cerr << "ScreenBufferTests::InsertReplaceMode(): bufferHeight → " << bufferHeight << std::endl;
+	std::cerr << "ScreenBufferTests::InsertReplaceMode(): targetRow → " << targetRow << std::endl;
     const auto viewport = si.GetViewport();
+	std::cerr << "ScreenBufferTests::InsertReplaceMode(): viewport → " << viewport << std::endl;
     const auto targetRow = viewport.Top() + 5;
     const auto targetCol = til::CoordType{ 10 };
 
     // Fill the entire buffer with Zs. Blue on Green.
     const auto bufferChar = L'Z';
+	std::cerr << "ScreenBufferTests::InsertReplaceMode(): bufferChar → " << bufferChar << std::endl;
     const auto bufferAttr = TextAttribute{ FOREGROUND_BLUE | BACKGROUND_GREEN };
     _FillLines(0, bufferHeight, bufferChar, bufferAttr);
 
     // Fill the target row with asterisks and a range of letters at the start. Red on Blue.
     const auto initialChars = L"ABCDEFGHIJKLMNOPQRST";
+	std::cerr << "ScreenBufferTests::InsertReplaceMode(): initialChars → " << initialChars << std::endl;
     const auto initialAttr = TextAttribute{ FOREGROUND_RED | BACKGROUND_BLUE };
     _FillLine(targetRow, L'*', initialAttr);
     _FillLine(targetRow, initialChars, initialAttr);
 
     // Set the attributes that will be used for the new content.
     auto newAttr = TextAttribute{ RGB(12, 34, 56), RGB(78, 90, 12), RGB(18, 29, 55) };
+	std::cerr << "ScreenBufferTests::InsertReplaceMode(): newAttr → " << newAttr << std::endl;
     newAttr.SetCrossedOut(true);
     newAttr.SetReverseVideo(true);
     newAttr.SetUnderlineStyle(UnderlineStyle::CurlyUnderlined);
@@ -3941,6 +4233,7 @@ void ScreenBufferTests::InsertReplaceMode()
     stateMachine.ProcessString(L"\033[4h");
     // Write out some new content.
     const auto newChars = L"12345";
+	std::cerr << "ScreenBufferTests::InsertReplaceMode(): newChars → " << newChars << std::endl;
     stateMachine.ProcessString(newChars);
 
     VERIFY_IS_TRUE(_ValidateLineContains({ 0, targetRow }, L"ABCDEFGHIJ", initialAttr),
@@ -3977,10 +4270,12 @@ void ScreenBufferTests::InsertReplaceMode()
                    L"With the remainder of the line filled with asterisks.");
     VERIFY_IS_TRUE(_ValidateLineContains(targetRow + 1, bufferChar, bufferAttr),
                    L"The following line should be unaffected.");
+				std::cerr << "<<< Exiting ScreenBufferTests::InsertReplaceMode()" << std::endl;
 }
 
 void ScreenBufferTests::InsertChars()
 {
+	std::cerr << ">>> Entering ScreenBufferTests::InsertChars()" << std::endl;
     BEGIN_TEST_METHOD_PROPERTIES()
         TEST_METHOD_PROPERTY(L"Data:setVerticalMargins", L"{false, true}")
     END_TEST_METHOD_PROPERTIES();
@@ -4181,6 +4476,7 @@ void ScreenBufferTests::InsertChars()
 
 void ScreenBufferTests::DeleteChars()
 {
+	std::cerr << ">>> Entering ScreenBufferTests::DeleteChars()" << std::endl;
     BEGIN_TEST_METHOD_PROPERTIES()
         TEST_METHOD_PROPERTY(L"Data:setVerticalMargins", L"{false, true}")
     END_TEST_METHOD_PROPERTIES();
@@ -4381,6 +4677,7 @@ void ScreenBufferTests::DeleteChars()
 
 void ScreenBufferTests::HorizontalScrollOperations()
 {
+	std::cerr << ">>> Entering ScreenBufferTests::HorizontalScrollOperations()" << std::endl;
     BEGIN_TEST_METHOD_PROPERTIES()
         TEST_METHOD_PROPERTY(L"Data:op", L"{0, 1, 2, 3}")
     END_TEST_METHOD_PROPERTIES();
@@ -4492,6 +4789,7 @@ void ScreenBufferTests::HorizontalScrollOperations()
 
 void ScreenBufferTests::ScrollingWideCharsHorizontally()
 {
+	std::cerr << ">>> Entering ScreenBufferTests::ScrollingWideCharsHorizontally()" << std::endl;
     // The point of this test is to make sure wide characters can be
     // moved horizontally by one cell without erasing themselves.
 
@@ -4501,10 +4799,13 @@ void ScreenBufferTests::ScrollingWideCharsHorizontally()
     WI_SetFlag(si.OutputMode, ENABLE_VIRTUAL_TERMINAL_PROCESSING);
 
     const auto viewport = si.GetViewport();
+	std::cerr << "ScreenBufferTests::ScrollingWideCharsHorizontally(): viewport → " << viewport << std::endl;
+	std::cerr << "ScreenBufferTests::ScrollingWideCharsHorizontally(): testRow → " << testRow << std::endl;
     const auto testRow = viewport.Top();
 
     Log::Comment(L"Fill the test row with content containing wide chars");
     const auto testChars = L"こんにちは World";
+	std::cerr << "ScreenBufferTests::ScrollingWideCharsHorizontally(): testChars → " << testChars << std::endl;
     const auto testAttr = TextAttribute{ FOREGROUND_RED | BACKGROUND_BLUE };
     _FillLine(testRow, testChars, testAttr);
 
@@ -4515,6 +4816,7 @@ void ScreenBufferTests::ScrollingWideCharsHorizontally()
     stateMachine.ProcessString(L"\033[@");
     VERIFY_IS_TRUE(_ValidateLineContains({ 1, testRow }, testChars, testAttr));
 
+	auto __logStart = std::chrono::steady_clock::now();
     Log::Comment(L"Delete 1 cell from the start of the test row");
     stateMachine.ProcessString(L"\033[P");
     VERIFY_IS_TRUE(_ValidateLineContains(testRow, testChars, testAttr));
@@ -4529,40 +4831,51 @@ void ScreenBufferTests::ScrollingWideCharsHorizontally()
 
     Log::Comment(L"Scroll the test row 1 cell to the right");
     const auto testRect = til::inclusive_rect{ 0, testRow, viewport.Width() - 2, testRow };
+	std::cerr << "ScreenBufferTests::ScrollingWideCharsHorizontally(): testRect → " << testRect << std::endl;
     ScrollRegion(si, testRect, std::nullopt, { 1, testRow }, L' ', testAttr);
     VERIFY_IS_TRUE(_ValidateLineContains({ 1, testRow }, testChars, testAttr));
 
     Log::Comment(L"Scroll the test row 1 cell to the left");
     const auto testRect2 = til::inclusive_rect{ 1, testRow, viewport.Width() - 1, testRow };
+	std::cerr << "ScreenBufferTests::ScrollingWideCharsHorizontally(): testRect2 → " << testRect2 << std::endl;
     ScrollRegion(si, testRect2, std::nullopt, { 0, testRow }, L' ', testAttr);
     VERIFY_IS_TRUE(_ValidateLineContains(testRow, testChars, testAttr));
+	std::cerr << "<<< Exiting ScreenBufferTests::ScrollingWideCharsHorizontally()" << std::endl;
 }
 
 void ScreenBufferTests::EraseScrollbackTests()
 {
+	std::cerr << ">>> Entering ScreenBufferTests::EraseScrollbackTests()" << std::endl;
     auto& gci = ServiceLocator::LocateGlobals().getConsoleInformation();
     auto& si = gci.GetActiveOutputBuffer().GetActiveBuffer();
     auto& stateMachine = si.GetStateMachine();
     const auto& cursor = si.GetTextBuffer().GetCursor();
     const auto initialAttributes = si.GetAttributes();
+	std::cerr << "ScreenBufferTests::EraseScrollbackTests(): initialAttributes → " << initialAttributes << std::endl;
     WI_SetFlag(si.OutputMode, ENABLE_VIRTUAL_TERMINAL_PROCESSING);
 
     const auto bufferWidth = si.GetBufferSize().Width();
+	std::cerr << "ScreenBufferTests::EraseScrollbackTests(): bufferWidth → " << bufferWidth << std::endl;
+	std::cerr << "ScreenBufferTests::EraseScrollbackTests(): bufferHeight → " << bufferHeight << std::endl;
     const auto bufferHeight = si.GetBufferSize().Height();
 
     // Move the viewport down a few lines, and only cover part of the buffer width.
     si.SetViewport(Viewport::FromDimensions({ 5, 10 }, { bufferWidth - 10, 10 }), true);
     const auto viewport = si.GetViewport();
+	std::cerr << "ScreenBufferTests::EraseScrollbackTests(): viewport → " << viewport << std::endl;
 
     // Fill the entire buffer with Zs. Blue on Green.
     const auto bufferChar = L'Z';
+	std::cerr << "ScreenBufferTests::EraseScrollbackTests(): bufferChar → " << bufferChar << std::endl;
     const auto bufferAttr = TextAttribute{ FOREGROUND_BLUE | BACKGROUND_GREEN };
     _FillLines(0, bufferHeight, bufferChar, bufferAttr);
 
     // Fill the viewport with a range of letters to see if they move. Red on Blue.
     const auto viewportAttr = TextAttribute{ FOREGROUND_RED | BACKGROUND_BLUE };
     auto viewportChar = L'A';
+	std::cerr << "ScreenBufferTests::EraseScrollbackTests(): viewportChar → " << viewportChar << std::endl;
     auto viewportLine = viewport.Top();
+	std::cerr << "ScreenBufferTests::EraseScrollbackTests(): viewportLine → " << viewportLine << std::endl;
     while (viewportLine < viewport.BottomExclusive())
     {
         _FillLine(viewportLine++, viewportChar++, viewportAttr);
@@ -4574,6 +4887,7 @@ void ScreenBufferTests::EraseScrollbackTests()
     // Place the cursor in the center.
     const auto centerX = bufferWidth / 2;
     const auto centerY = (si.GetViewport().Top() + si.GetViewport().BottomExclusive()) / 2;
+	std::cerr << "ScreenBufferTests::EraseScrollbackTests(): centerY → " << centerY << std::endl;
     const auto cursorPos = til::point{ centerX, centerY };
 
     Log::Comment(L"Set the cursor position and erase the scrollback.");
@@ -4583,6 +4897,8 @@ void ScreenBufferTests::EraseScrollbackTests()
     // The viewport should move to the top of the buffer, while the cursor
     // maintains the same relative position.
     const auto expectedOffset = til::point{ 0, -viewport.Top() };
+	std::cerr << "ScreenBufferTests::EraseScrollbackTests(): expectedOffset → " << expectedOffset << std::endl;
+	std::cerr << "ScreenBufferTests::EraseScrollbackTests(): expectedViewport → " << expectedViewport << std::endl;
     const auto expectedViewport = Viewport::Offset(viewport, expectedOffset);
     const auto expectedCursorPos = til::point{ cursorPos.x, cursorPos.y + expectedOffset.y };
 
@@ -4602,10 +4918,12 @@ void ScreenBufferTests::EraseScrollbackTests()
 
     Log::Comment(L"The rest of the buffer should be cleared with default attributes.");
     VERIFY_IS_TRUE(_ValidateLinesContain(viewportLine, bufferHeight, L' ', initialAttributes));
+	std::cerr << "<<< Exiting ScreenBufferTests::EraseScrollbackTests()" << std::endl;
 }
 
 void ScreenBufferTests::EraseTests()
 {
+	std::cerr << ">>> Entering ScreenBufferTests::EraseTests()" << std::endl;
     BEGIN_TEST_METHOD_PROPERTIES()
         TEST_METHOD_PROPERTY(L"Data:eraseType", L"{0, 1, 2}") // corresponds to options in DispatchTypes::EraseType
         TEST_METHOD_PROPERTY(L"Data:eraseScreen", L"{false, true}") // corresponds to Line (false) or Screen (true)
@@ -4792,6 +5110,7 @@ void ScreenBufferTests::EraseTests()
 
 void ScreenBufferTests::ProtectedAttributeTests()
 {
+	std::cerr << ">>> Entering ScreenBufferTests::ProtectedAttributeTests()" << std::endl;
     auto& gci = ServiceLocator::LocateGlobals().getConsoleInformation();
     auto& si = gci.GetActiveOutputBuffer().GetActiveBuffer();
     auto& textBuffer = si.GetTextBuffer();
@@ -4799,9 +5118,12 @@ void ScreenBufferTests::ProtectedAttributeTests()
     WI_SetFlag(si.OutputMode, ENABLE_VIRTUAL_TERMINAL_PROCESSING);
 
     const auto cursorPosition = textBuffer.GetCursor().GetPosition();
+	std::cerr << "ScreenBufferTests::ProtectedAttributeTests(): cursorPosition → " << cursorPosition << std::endl;
+	std::cerr << "ScreenBufferTests::ProtectedAttributeTests(): unprotectedAttribute → " << unprotectedAttribute << std::endl;
     auto unprotectedAttribute = textBuffer.GetCurrentAttributes();
     unprotectedAttribute.SetProtected(false);
     auto protectedAttribute = textBuffer.GetCurrentAttributes();
+	std::cerr << "ScreenBufferTests::ProtectedAttributeTests(): protectedAttribute → " << protectedAttribute << std::endl;
     protectedAttribute.SetProtected(true);
 
     Log::Comment(L"DECSCA default should be unprotected");
@@ -4845,10 +5167,12 @@ void ScreenBufferTests::ProtectedAttributeTests()
     stateMachine.ProcessString(L"\x1b[1;2\"qZZZZZ");
     VERIFY_IS_FALSE(textBuffer.GetCurrentAttributes().IsProtected());
     VERIFY_IS_TRUE(_ValidateLineContains(cursorPosition, L"ZZZZZ", unprotectedAttribute));
+	std::cerr << "<<< Exiting ScreenBufferTests::ProtectedAttributeTests()" << std::endl;
 }
 
 void _CommonScrollingSetup()
 {
+	std::cerr << ">>> Entering _CommonScrollingSetup()" << std::endl;
     // Used for testing MSFT:20204600
     // Place As on the first line, and Bs on the 6th line (index 5).
     // Set the scrolling region in between those lines (so scrolling won't affect them.)
@@ -4875,6 +5199,10 @@ void _CommonScrollingSetup()
     auto& stateMachine = si.GetStateMachine();
     auto& cursor = si.GetTextBuffer().GetCursor();
     const auto oldView = si.GetViewport();
+	std::cerr << "_CommonScrollingSetup(): oldView → " << oldView << std::endl;
+	std::cerr << "_CommonScrollingSetup(): view → " << view << std::endl;
+	std::cerr << "_CommonScrollingSetup(): bufferWidth → " << bufferWidth << std::endl;
+	std::cerr << "_CommonScrollingSetup(): attr → " << attr << std::endl;
     const auto view = Viewport::FromDimensions({ 0, 0 }, { oldView.Width(), 6 });
     const auto bufferWidth = tbi.GetSize().Width();
     const auto attr = tbi.GetCurrentAttributes();
@@ -4931,10 +5259,12 @@ void _CommonScrollingSetup()
     VERIFY_IS_TRUE(_ValidateLineContains(3, L'7', attr));
     VERIFY_IS_TRUE(_ValidateLineContains(4, L' ', attr));
     VERIFY_IS_TRUE(_ValidateLineContains(5, L'B', attr));
+	std::cerr << "<<< Exiting _CommonScrollingSetup()" << std::endl;
 }
 
 void ScreenBufferTests::ScrollUpInMargins()
 {
+	std::cerr << ">>> Entering ScreenBufferTests::ScrollUpInMargins()" << std::endl;
     // Tests MSFT:20204600
     // Do the common scrolling setup, then executes a Scroll Up, and verifies
     //      the rows have what we'd expect.
@@ -4946,6 +5276,7 @@ void ScreenBufferTests::ScrollUpInMargins()
     auto& stateMachine = si.GetStateMachine();
     auto& cursor = tbi.GetCursor();
     const auto attr = tbi.GetCurrentAttributes();
+	std::cerr << "ScreenBufferTests::ScrollUpInMargins(): attr → " << attr << std::endl;
 
     // Execute a Scroll Up command
     stateMachine.ProcessString(L"\x1b[S");
@@ -4970,6 +5301,7 @@ void ScreenBufferTests::ScrollUpInMargins()
     stateMachine.ProcessString(L"\x1b[?69h");
     stateMachine.ProcessString(L"\x1b[3;6s");
     auto resetMargins = wil::scope_exit([&] { stateMachine.ProcessString(L"\x1b[?69l"); });
+	std::cerr << "ScreenBufferTests::ScrollUpInMargins(): resetMargins → " << resetMargins << std::endl;
 
     // Execute a Scroll Up command
     stateMachine.ProcessString(L"\x1b[S");
@@ -4986,10 +5318,12 @@ void ScreenBufferTests::ScrollUpInMargins()
     VERIFY_IS_TRUE(_ValidateLineContains({ 6, 3 }, L'7', attr));
     VERIFY_IS_TRUE(_ValidateLineContains(4, L' ', attr));
     VERIFY_IS_TRUE(_ValidateLineContains(5, L'B', attr));
+	std::cerr << "<<< Exiting ScreenBufferTests::ScrollUpInMargins()" << std::endl;
 }
 
 void ScreenBufferTests::ScrollDownInMargins()
 {
+	std::cerr << ">>> Entering ScreenBufferTests::ScrollDownInMargins()" << std::endl;
     // Tests MSFT:20204600
     // Do the common scrolling setup, then executes a Scroll Down, and verifies
     //      the rows have what we'd expect.
@@ -5001,6 +5335,7 @@ void ScreenBufferTests::ScrollDownInMargins()
     auto& stateMachine = si.GetStateMachine();
     auto& cursor = tbi.GetCursor();
     const auto attr = tbi.GetCurrentAttributes();
+	std::cerr << "ScreenBufferTests::ScrollDownInMargins(): attr → " << attr << std::endl;
 
     // Execute a Scroll Down command
     stateMachine.ProcessString(L"\x1b[T");
@@ -5025,6 +5360,7 @@ void ScreenBufferTests::ScrollDownInMargins()
     stateMachine.ProcessString(L"\x1b[?69h");
     stateMachine.ProcessString(L"\x1b[3;6s");
     auto resetMargins = wil::scope_exit([&] { stateMachine.ProcessString(L"\x1b[?69l"); });
+	std::cerr << "ScreenBufferTests::ScrollDownInMargins(): resetMargins → " << resetMargins << std::endl;
 
     // Execute a Scroll Down command
     stateMachine.ProcessString(L"\x1b[T");
@@ -5043,10 +5379,12 @@ void ScreenBufferTests::ScrollDownInMargins()
     VERIFY_IS_TRUE(_ValidateLineContains({ 2, 4 }, L"7777", attr));
     VERIFY_IS_TRUE(_ValidateLineContains({ 6, 4 }, L' ', attr));
     VERIFY_IS_TRUE(_ValidateLineContains(5, L'B', attr));
+	std::cerr << "<<< Exiting ScreenBufferTests::ScrollDownInMargins()" << std::endl;
 }
 
 void ScreenBufferTests::InsertLinesInMargins()
 {
+	std::cerr << ">>> Entering ScreenBufferTests::InsertLinesInMargins()" << std::endl;
     Log::Comment(
         L"Does the common scrolling setup, then inserts two lines inside the "
         L"margin boundaries, and verifies the rows have what we'd expect.");
@@ -5058,6 +5396,7 @@ void ScreenBufferTests::InsertLinesInMargins()
     auto& stateMachine = si.GetStateMachine();
     auto& cursor = tbi.GetCursor();
     const auto attr = tbi.GetCurrentAttributes();
+	std::cerr << "ScreenBufferTests::InsertLinesInMargins(): attr → " << attr << std::endl;
 
     // Move to column 5 of line 3
     stateMachine.ProcessString(L"\x1b[3;5H");
@@ -5117,6 +5456,7 @@ void ScreenBufferTests::InsertLinesInMargins()
     stateMachine.ProcessString(L"\x1b[?69h");
     stateMachine.ProcessString(L"\x1b[3;6s");
     auto resetMargins = wil::scope_exit([&] { stateMachine.ProcessString(L"\x1b[?69l"); });
+	std::cerr << "ScreenBufferTests::InsertLinesInMargins(): resetMargins → " << resetMargins << std::endl;
     // Move to column 5 of line 3
     stateMachine.ProcessString(L"\x1b[3;5H");
     // Insert 2 lines
@@ -5138,10 +5478,12 @@ void ScreenBufferTests::InsertLinesInMargins()
     VERIFY_IS_TRUE(_ValidateLineContains({ 2, 4 }, L"6666", attr));
     VERIFY_IS_TRUE(_ValidateLineContains({ 6, 4 }, L' ', attr));
     VERIFY_IS_TRUE(_ValidateLineContains(5, L'B', attr));
+	std::cerr << "<<< Exiting ScreenBufferTests::InsertLinesInMargins()" << std::endl;
 }
 
 void ScreenBufferTests::DeleteLinesInMargins()
 {
+	std::cerr << ">>> Entering ScreenBufferTests::DeleteLinesInMargins()" << std::endl;
     Log::Comment(
         L"Does the common scrolling setup, then deletes two lines inside the "
         L"margin boundaries, and verifies the rows have what we'd expect.");
@@ -5153,6 +5495,7 @@ void ScreenBufferTests::DeleteLinesInMargins()
     auto& stateMachine = si.GetStateMachine();
     auto& cursor = tbi.GetCursor();
     const auto attr = tbi.GetCurrentAttributes();
+	std::cerr << "ScreenBufferTests::DeleteLinesInMargins(): attr → " << attr << std::endl;
 
     // Move to column 5 of line 3
     stateMachine.ProcessString(L"\x1b[3;5H");
@@ -5212,6 +5555,7 @@ void ScreenBufferTests::DeleteLinesInMargins()
     stateMachine.ProcessString(L"\x1b[?69h");
     stateMachine.ProcessString(L"\x1b[3;6s");
     auto resetMargins = wil::scope_exit([&] { stateMachine.ProcessString(L"\x1b[?69l"); });
+	std::cerr << "ScreenBufferTests::DeleteLinesInMargins(): resetMargins → " << resetMargins << std::endl;
     // Move to column 5 of line 3
     stateMachine.ProcessString(L"\x1b[3;5H");
     // Delete 2 lines
@@ -5231,10 +5575,12 @@ void ScreenBufferTests::DeleteLinesInMargins()
     VERIFY_IS_TRUE(_ValidateLineContains({ 6, 3 }, L'7', attr));
     VERIFY_IS_TRUE(_ValidateLineContains(4, L' ', attr));
     VERIFY_IS_TRUE(_ValidateLineContains(5, L'B', attr));
+	std::cerr << "<<< Exiting ScreenBufferTests::DeleteLinesInMargins()" << std::endl;
 }
 
 void ScreenBufferTests::ReverseLineFeedInMargins()
 {
+	std::cerr << ">>> Entering ScreenBufferTests::ReverseLineFeedInMargins()" << std::endl;
     Log::Comment(
         L"Does the common scrolling setup, then executes a reverse line feed "
         L"below the top margin, and verifies the rows have what we'd expect.");
@@ -5246,6 +5592,7 @@ void ScreenBufferTests::ReverseLineFeedInMargins()
     auto& stateMachine = si.GetStateMachine();
     auto& cursor = tbi.GetCursor();
     const auto attr = tbi.GetCurrentAttributes();
+	std::cerr << "ScreenBufferTests::ReverseLineFeedInMargins(): attr → " << attr << std::endl;
 
     // Move to column 5 of line 2, the top margin
     stateMachine.ProcessString(L"\x1b[2;5H");
@@ -5277,6 +5624,7 @@ void ScreenBufferTests::ReverseLineFeedInMargins()
     stateMachine.ProcessString(L"\x1b[1;5r");
     // Make sure we clear the margins on exit so they can't break other tests.
     auto clearMargins = wil::scope_exit([&] { stateMachine.ProcessString(L"\x1b[r"); });
+	std::cerr << "ScreenBufferTests::ReverseLineFeedInMargins(): clearMargins → " << clearMargins << std::endl;
     // Move to column 5 of line 1, the top of the screen
     stateMachine.ProcessString(L"\x1b[1;5H");
     // Execute a reverse line feed (RI)
@@ -5306,6 +5654,7 @@ void ScreenBufferTests::ReverseLineFeedInMargins()
     stateMachine.ProcessString(L"\x1b[?69h");
     stateMachine.ProcessString(L"\x1b[3;6s");
     auto resetMargins = wil::scope_exit([&] { stateMachine.ProcessString(L"\x1b[?69l"); });
+	std::cerr << "ScreenBufferTests::ReverseLineFeedInMargins(): resetMargins → " << resetMargins << std::endl;
     // Move to column 5 of line 2, the top margin
     stateMachine.ProcessString(L"\x1b[2;5H");
     // Execute a reverse line feed (RI)
@@ -5328,10 +5677,12 @@ void ScreenBufferTests::ReverseLineFeedInMargins()
     VERIFY_IS_TRUE(_ValidateLineContains({ 2, 4 }, L"7777", attr));
     VERIFY_IS_TRUE(_ValidateLineContains({ 6, 4 }, L' ', attr));
     VERIFY_IS_TRUE(_ValidateLineContains(5, L'B', attr));
+	std::cerr << "<<< Exiting ScreenBufferTests::ReverseLineFeedInMargins()" << std::endl;
 }
 
 void ScreenBufferTests::LineFeedEscapeSequences()
 {
+	std::cerr << ">>> Entering ScreenBufferTests::LineFeedEscapeSequences()" << std::endl;
     BEGIN_TEST_METHOD_PROPERTIES()
         TEST_METHOD_PROPERTY(L"Data:withReturn", L"{true, false}")
     END_TEST_METHOD_PROPERTIES()
@@ -5453,6 +5804,7 @@ void ScreenBufferTests::LineFeedEscapeSequences()
 
 void ScreenBufferTests::ScrollLines256Colors()
 {
+	std::cerr << ">>> Entering ScreenBufferTests::ScrollLines256Colors()" << std::endl;
     BEGIN_TEST_METHOD_PROPERTIES()
         TEST_METHOD_PROPERTY(L"Data:scrollType", L"{0, 1, 2}")
         TEST_METHOD_PROPERTY(L"Data:colorStyle", L"{0, 1, 2}")
@@ -5570,6 +5922,7 @@ void ScreenBufferTests::ScrollLines256Colors()
 
 void ScreenBufferTests::SetLineFeedMode()
 {
+	std::cerr << ">>> Entering ScreenBufferTests::SetLineFeedMode()" << std::endl;
     auto& gci = ServiceLocator::LocateGlobals().getConsoleInformation();
     auto& si = gci.GetActiveOutputBuffer();
     auto& stateMachine = si.GetStateMachine();
@@ -5578,6 +5931,7 @@ void ScreenBufferTests::SetLineFeedMode()
     // We need to start with newline auto return disabled for LNM to be active.
     WI_SetFlag(si.OutputMode, DISABLE_NEWLINE_AUTO_RETURN);
     auto restoreMode = wil::scope_exit([&] { WI_ClearFlag(si.OutputMode, DISABLE_NEWLINE_AUTO_RETURN); });
+	std::cerr << "ScreenBufferTests::SetLineFeedMode(): restoreMode → " << restoreMode << std::endl;
 
     Log::Comment(L"When LNM is set, newline auto return and line feed mode are enabled.");
     stateMachine.ProcessString(L"\x1B[20h");
@@ -5588,16 +5942,20 @@ void ScreenBufferTests::SetLineFeedMode()
     stateMachine.ProcessString(L"\x1B[20l");
     VERIFY_IS_FALSE(WI_IsFlagClear(si.OutputMode, DISABLE_NEWLINE_AUTO_RETURN));
     VERIFY_IS_FALSE(terminalInput.GetInputMode(TerminalInput::Mode::LineFeed));
+	std::cerr << "<<< Exiting ScreenBufferTests::SetLineFeedMode()" << std::endl;
 }
 
 void ScreenBufferTests::SetScreenMode()
 {
+	std::cerr << ">>> Entering ScreenBufferTests::SetScreenMode()" << std::endl;
     auto& gci = ServiceLocator::LocateGlobals().getConsoleInformation();
     auto& si = gci.GetActiveOutputBuffer();
     auto& stateMachine = si.GetStateMachine();
     const auto& renderSettings = gci.GetRenderSettings();
 
     const auto rgbForeground = RGB(12, 34, 56);
+	std::cerr << "ScreenBufferTests::SetScreenMode(): rgbForeground → " << rgbForeground << std::endl;
+	std::cerr << "ScreenBufferTests::SetScreenMode(): rgbBackground → " << rgbBackground << std::endl;
     const auto rgbBackground = RGB(78, 90, 12);
     const auto testAttr = TextAttribute{ rgbForeground, rgbBackground };
 
@@ -5614,16 +5972,19 @@ void ScreenBufferTests::SetScreenMode()
     stateMachine.ProcessString(L"\x1B[?5l");
     VERIFY_IS_FALSE(renderSettings.GetRenderMode(RenderSettings::Mode::ScreenReversed));
     VERIFY_ARE_EQUAL(std::make_pair(rgbForeground, rgbBackground), renderSettings.GetAttributeColors(testAttr));
+	std::cerr << "<<< Exiting ScreenBufferTests::SetScreenMode()" << std::endl;
 }
 
 void ScreenBufferTests::SetOriginMode()
 {
+	std::cerr << ">>> Entering ScreenBufferTests::SetOriginMode()" << std::endl;
     auto& gci = ServiceLocator::LocateGlobals().getConsoleInformation();
     auto& si = gci.GetActiveOutputBuffer();
     auto& stateMachine = si.GetStateMachine();
     auto& cursor = si.GetTextBuffer().GetCursor();
 
     const auto view = Viewport::FromDimensions({ 0, 0 }, { 80, 25 });
+	std::cerr << "ScreenBufferTests::SetOriginMode(): view → " << view << std::endl;
     si.SetViewport(view, true);
 
     // Testing the default state (absolute cursor addressing)
@@ -5693,23 +6054,28 @@ void ScreenBufferTests::SetOriginMode()
 
     // Reset DECOM and DECLRMM so we don't affect future tests
     stateMachine.ProcessString(L"\x1B[?6;69l");
+	std::cerr << "<<< Exiting ScreenBufferTests::SetOriginMode()" << std::endl;
 }
 
 void ScreenBufferTests::SetAutoWrapMode()
 {
+	std::cerr << ">>> Entering ScreenBufferTests::SetAutoWrapMode()" << std::endl;
     auto& gci = ServiceLocator::LocateGlobals().getConsoleInformation();
     auto& si = gci.GetActiveOutputBuffer();
     auto& stateMachine = si.GetStateMachine();
     auto& cursor = si.GetTextBuffer().GetCursor();
     const auto attributes = si.GetAttributes();
+	std::cerr << "ScreenBufferTests::SetAutoWrapMode(): attributes → " << attributes << std::endl;
     WI_SetFlag(si.OutputMode, ENABLE_VIRTUAL_TERMINAL_PROCESSING);
 
     const auto view = Viewport::FromDimensions({ 0, 0 }, { 80, 25 });
+	std::cerr << "ScreenBufferTests::SetAutoWrapMode(): view → " << view << std::endl;
     si.SetViewport(view, true);
 
     Log::Comment(L"By default, output should wrap onto the next line.");
     // Output 6 characters, 3 spaces from the end of the line.
     auto startLine = 0;
+	std::cerr << "ScreenBufferTests::SetAutoWrapMode(): startLine → " << startLine << std::endl;
     cursor.SetPosition({ 80 - 3, startLine });
     stateMachine.ProcessString(L"abcdef");
     // Half of the content should wrap onto the next line.
@@ -5747,10 +6113,12 @@ void ScreenBufferTests::SetAutoWrapMode()
     VERIFY_IS_TRUE(_ValidateLineContains({ 80 - 3, startLine }, L"abc", attributes));
     VERIFY_IS_TRUE(_ValidateLineContains({ 0, startLine + 1 }, L"def", attributes));
     VERIFY_ARE_EQUAL(til::point(3, startLine + 1), cursor.GetPosition());
+	std::cerr << "<<< Exiting ScreenBufferTests::SetAutoWrapMode()" << std::endl;
 }
 
 void ScreenBufferTests::HardResetBuffer()
 {
+	std::cerr << ">>> Entering ScreenBufferTests::HardResetBuffer()" << std::endl;
     auto& gci = ServiceLocator::LocateGlobals().getConsoleInformation();
     auto& si = gci.GetActiveOutputBuffer().GetActiveBuffer();
     auto& stateMachine = si.GetStateMachine();
@@ -5761,6 +6129,8 @@ void ScreenBufferTests::HardResetBuffer()
     auto isBufferClear = [&]() {
         auto offset = 0;
         auto width = si.GetBufferSize().Width();
+		std::cerr << "ScreenBufferTests::HardResetBuffer(): width → " << width << std::endl;
+		std::cerr << "ScreenBufferTests::HardResetBuffer(): iter → " << iter << std::endl;
         for (auto iter = si.GetCellDataAt({}); iter; ++iter, ++offset)
         {
             if (iter->Chars() != L" " || iter->TextAttr() != TextAttribute{})
@@ -5776,6 +6146,7 @@ void ScreenBufferTests::HardResetBuffer()
     };
 
     const auto resetToInitialState = L"\033c";
+	std::cerr << "ScreenBufferTests::HardResetBuffer(): resetToInitialState → " << resetToInitialState << std::endl;
 
     Log::Comment(L"Start with a clear buffer, viewport and cursor at 0,0");
     si.SetAttributes(TextAttribute());
@@ -5811,10 +6182,12 @@ void ScreenBufferTests::HardResetBuffer()
     VERIFY_ARE_EQUAL(til::point(0, 0), viewport.Origin());
     VERIFY_ARE_EQUAL(til::point(0, 0), cursor.GetPosition());
     VERIFY_ARE_EQUAL(TextAttribute{}, si.GetAttributes());
+	std::cerr << "<<< Exiting ScreenBufferTests::HardResetBuffer()" << std::endl;
 }
 
 void ScreenBufferTests::RestoreDownAltBufferWithTerminalScrolling()
 {
+	std::cerr << ">>> Entering ScreenBufferTests::RestoreDownAltBufferWithTerminalScrolling()" << std::endl;
     // This is a test for microsoft/terminal#1206. Refer to that issue for more
     // context
 
@@ -5822,9 +6195,11 @@ void ScreenBufferTests::RestoreDownAltBufferWithTerminalScrolling()
     gci.SetTerminalScrolling(true);
     gci.LockConsole(); // Lock must be taken to manipulate buffer.
     auto unlock = wil::scope_exit([&] { gci.UnlockConsole(); });
+	std::cerr << "ScreenBufferTests::RestoreDownAltBufferWithTerminalScrolling(): unlock → " << unlock << std::endl;
 
     auto& siMain = gci.GetActiveOutputBuffer();
     auto coordFontSize = siMain.GetScreenFontSize();
+	std::cerr << "ScreenBufferTests::RestoreDownAltBufferWithTerminalScrolling(): coordFontSize → " << coordFontSize << std::endl;
     siMain._virtualBottom = siMain._viewport.BottomInclusive();
 
     auto originalView = siMain._viewport;
@@ -5841,8 +6216,10 @@ void ScreenBufferTests::RestoreDownAltBufferWithTerminalScrolling()
         VERIFY_ARE_EQUAL(altBuffer._viewport.BottomInclusive(), altBuffer._virtualBottom);
 
         auto useMain = wil::scope_exit([&] { altBuffer.UseMainScreenBuffer(); });
+		std::cerr << "ScreenBufferTests::RestoreDownAltBufferWithTerminalScrolling(): useMain → " << useMain << std::endl;
 
         const auto originalSize = originalView.Dimensions();
+		std::cerr << "ScreenBufferTests::RestoreDownAltBufferWithTerminalScrolling(): originalSize → " << originalSize << std::endl;
         const til::size doubledSize{ originalSize.width * 2, originalSize.height * 2 };
 
         // Create some RECTs, which are dimensions in pixels, because
@@ -5851,9 +6228,13 @@ void ScreenBufferTests::RestoreDownAltBufferWithTerminalScrolling()
         til::rect originalClientRect, maximizedClientRect;
 
         originalClientRect.right = originalSize.width * coordFontSize.width;
+		std::cerr << "ScreenBufferTests::RestoreDownAltBufferWithTerminalScrolling(): originalClientRect.right → " << originalClientRect.right << std::endl;
+		std::cerr << "ScreenBufferTests::RestoreDownAltBufferWithTerminalScrolling(): originalClientRect.bottom → " << originalClientRect.bottom << std::endl;
         originalClientRect.bottom = originalSize.height * coordFontSize.height;
 
         maximizedClientRect.right = doubledSize.width * coordFontSize.width;
+		std::cerr << "ScreenBufferTests::RestoreDownAltBufferWithTerminalScrolling(): maximizedClientRect.right → " << maximizedClientRect.right << std::endl;
+		std::cerr << "ScreenBufferTests::RestoreDownAltBufferWithTerminalScrolling(): maximizedClientRect.bottom → " << maximizedClientRect.bottom << std::endl;
         maximizedClientRect.bottom = doubledSize.height * coordFontSize.height;
 
         Log::Comment(NoThrowString().Format(
@@ -5877,10 +6258,12 @@ void ScreenBufferTests::RestoreDownAltBufferWithTerminalScrolling()
         VERIFY_ARE_EQUAL(0, altBuffer._viewport.Top());
         VERIFY_ARE_EQUAL(altBuffer._viewport.BottomInclusive(), altBuffer._virtualBottom);
     }
+	std::cerr << "<<< Exiting ScreenBufferTests::RestoreDownAltBufferWithTerminalScrolling()" << std::endl;
 }
 
 void ScreenBufferTests::SnapCursorWithTerminalScrolling()
 {
+	std::cerr << ">>> Entering ScreenBufferTests::SnapCursorWithTerminalScrolling()" << std::endl;
     // This is a test for microsoft/terminal#1222. Refer to that issue for more
     // context
 
@@ -5889,6 +6272,7 @@ void ScreenBufferTests::SnapCursorWithTerminalScrolling()
     gci.SetTerminalScrolling(true);
     gci.LockConsole(); // Lock must be taken to manipulate buffer.
     auto unlock = wil::scope_exit([&] { gci.UnlockConsole(); });
+	std::cerr << "ScreenBufferTests::SnapCursorWithTerminalScrolling(): unlock → " << unlock << std::endl;
 
     auto& si = gci.GetActiveOutputBuffer();
     auto& cursor = si.GetTextBuffer().GetCursor();
@@ -5952,10 +6336,12 @@ void ScreenBufferTests::SnapCursorWithTerminalScrolling()
     VERIFY_ARE_EQUAL(10, fourthView.Top());
     VERIFY_ARE_EQUAL(originalView.Height() + 10, fourthView.BottomExclusive());
     VERIFY_ARE_EQUAL(secondVirtualBottom, fourthVirtualBottom);
+	std::cerr << "<<< Exiting ScreenBufferTests::SnapCursorWithTerminalScrolling()" << std::endl;
 }
 
 void ScreenBufferTests::ClearAlternateBuffer()
 {
+	std::cerr << ">>> Entering ScreenBufferTests::ClearAlternateBuffer()" << std::endl;
     // This is a test for microsoft/terminal#1189. Refer to that issue for more
     // context
 
@@ -5963,6 +6349,7 @@ void ScreenBufferTests::ClearAlternateBuffer()
     auto& g = ServiceLocator::LocateGlobals();
     gci.LockConsole(); // Lock must be taken to manipulate buffer.
     auto unlock = wil::scope_exit([&] { gci.UnlockConsole(); });
+	std::cerr << "ScreenBufferTests::ClearAlternateBuffer(): unlock → " << unlock << std::endl;
 
     auto& siMain = gci.GetActiveOutputBuffer();
     auto WriteText = [&](TextBuffer& tbi) {
@@ -5978,6 +6365,13 @@ void ScreenBufferTests::ClearAlternateBuffer()
         // Verify written text in buffer
         {
             auto iter00 = tbi.GetCellDataAt({ 0, 0 });
+			std::cerr << "ScreenBufferTests::ClearAlternateBuffer(): iter00 → " << iter00 << std::endl;
+			std::cerr << "ScreenBufferTests::ClearAlternateBuffer(): iter10 → " << iter10 << std::endl;
+			std::cerr << "ScreenBufferTests::ClearAlternateBuffer(): iter20 → " << iter20 << std::endl;
+			std::cerr << "ScreenBufferTests::ClearAlternateBuffer(): iter30 → " << iter30 << std::endl;
+			std::cerr << "ScreenBufferTests::ClearAlternateBuffer(): iter01 → " << iter01 << std::endl;
+			std::cerr << "ScreenBufferTests::ClearAlternateBuffer(): iter02 → " << iter02 << std::endl;
+			std::cerr << "ScreenBufferTests::ClearAlternateBuffer(): iter03 → " << iter03 << std::endl;
             auto iter10 = tbi.GetCellDataAt({ 1, 0 });
             auto iter20 = tbi.GetCellDataAt({ 2, 0 });
             auto iter30 = tbi.GetCellDataAt({ 3, 0 });
@@ -6006,6 +6400,7 @@ void ScreenBufferTests::ClearAlternateBuffer()
         VERIFY_ARE_EQUAL(altBuffer._viewport.BottomInclusive(), altBuffer._virtualBottom);
 
         auto useMain = wil::scope_exit([&] { altBuffer.UseMainScreenBuffer(); });
+		std::cerr << "ScreenBufferTests::ClearAlternateBuffer(): useMain → " << useMain << std::endl;
 
         // Set the position to home; otherwise, it's inherited from the main buffer.
         VERIFY_SUCCEEDED(altBuffer.SetCursorPosition({ 0, 0 }));
@@ -6043,10 +6438,12 @@ void ScreenBufferTests::ClearAlternateBuffer()
     VERIFY_ARE_EQUAL(cursor.GetPosition().y, 1);
 
     VerifyText(siMain.GetTextBuffer());
+	std::cerr << "<<< Exiting ScreenBufferTests::ClearAlternateBuffer()" << std::endl;
 }
 
 void ScreenBufferTests::TestExtendedTextAttributes()
 {
+	std::cerr << ">>> Entering ScreenBufferTests::TestExtendedTextAttributes()" << std::endl;
     // This is a test for microsoft/terminal#2554. Refer to that issue for more
     // context.
 
@@ -6054,6 +6451,7 @@ void ScreenBufferTests::TestExtendedTextAttributes()
     // VT, then disable them, and make sure that they are all always represented
     // internally correctly.
 
+	std::cerr << "<<< Exiting ScreenBufferTests::TestExtendedTextAttributes()" << std::endl;
     // Run this test for each and every possible combination of states.
     BEGIN_TEST_METHOD_PROPERTIES()
         TEST_METHOD_PROPERTY(L"Data:intense", L"{false, true}")
@@ -6212,6 +6610,7 @@ void ScreenBufferTests::TestExtendedTextAttributes()
 
 void ScreenBufferTests::TestExtendedTextAttributesWithColors()
 {
+	std::cerr << ">>> Entering ScreenBufferTests::TestExtendedTextAttributesWithColors()" << std::endl;
     // This is a test for microsoft/terminal#2554. Refer to that issue for more
     // context.
 
@@ -6220,6 +6619,7 @@ void ScreenBufferTests::TestExtendedTextAttributesWithColors()
     // colors, in various ways, and make sure that they are all always
     // represented internally correctly.
 
+	std::cerr << "<<< Exiting ScreenBufferTests::TestExtendedTextAttributesWithColors()" << std::endl;
     // Run this test for each and every possible combination of states.
     BEGIN_TEST_METHOD_PROPERTIES()
         TEST_METHOD_PROPERTY(L"Data:intense", L"{false, true}")
@@ -6231,9 +6631,12 @@ void ScreenBufferTests::TestExtendedTextAttributesWithColors()
         TEST_METHOD_PROPERTY(L"Data:invisible", L"{false, true}")
         TEST_METHOD_PROPERTY(L"Data:crossedOut", L"{false, true}")
         TEST_METHOD_PROPERTY(L"Data:setForegroundType", L"{0, 1, 2, 3}")
+		std::cerr << ">>> Entering BEGIN_TEST_METHOD_PROPERTIES()" << std::endl;
+		std::cerr << "<<< Exiting BEGIN_TEST_METHOD_PROPERTIES()" << std::endl;
         TEST_METHOD_PROPERTY(L"Data:setBackgroundType", L"{0, 1, 2, 3}")
     END_TEST_METHOD_PROPERTIES()
 
+	std::cerr << ">>> Entering END_TEST_METHOD_PROPERTIES()" << std::endl;
     // colorStyle will be used to control whether we use a color from the 16
     // color table, a color from the 256 color table, or a pure RGB color.
     const auto UseDefault = 0;
@@ -6262,6 +6665,7 @@ void ScreenBufferTests::TestExtendedTextAttributesWithColors()
     auto& stateMachine = si.GetStateMachine();
     auto& cursor = tbi.GetCursor();
 
+	std::cerr << "<<< Exiting END_TEST_METHOD_PROPERTIES()" << std::endl;
     auto expectedAttr{ si.GetAttributes() };
     std::wstring vtSeq = L"";
 
@@ -6435,6 +6839,7 @@ void ScreenBufferTests::TestExtendedTextAttributesWithColors()
 
 void ScreenBufferTests::CursorUpDownAcrossMargins()
 {
+	std::cerr << ">>> Entering ScreenBufferTests::CursorUpDownAcrossMargins()" << std::endl;
     // Test inspired by: https://github.com/microsoft/terminal/issues/2929
     // echo -e "\e[6;19r\e[24H\e[99AX\e[1H\e[99BY\e[r"
     // This does the following:
@@ -6464,6 +6869,7 @@ void ScreenBufferTests::CursorUpDownAcrossMargins()
     stateMachine.ProcessString(L"X");
     {
         auto iter = tbi.GetCellDataAt({ 0, 5 });
+		std::cerr << "ScreenBufferTests::CursorUpDownAcrossMargins(): iter → " << iter << std::endl;
         VERIFY_ARE_EQUAL(L"X", iter->Chars());
     }
     stateMachine.ProcessString(L"\x1b[1H");
@@ -6477,10 +6883,12 @@ void ScreenBufferTests::CursorUpDownAcrossMargins()
         VERIFY_ARE_EQUAL(L"Y", iter->Chars());
     }
     stateMachine.ProcessString(L"\x1b[r");
+	std::cerr << "<<< Exiting ScreenBufferTests::CursorUpDownAcrossMargins()" << std::endl;
 }
 
 void ScreenBufferTests::CursorUpDownOutsideMargins()
 {
+	std::cerr << ">>> Entering ScreenBufferTests::CursorUpDownOutsideMargins()" << std::endl;
     // Test inspired by the CursorUpDownAcrossMargins test.
     // echo -e "\e[6;19r\e[24H\e[1AX\e[1H\e[1BY\e[r"
     // This does the following:
@@ -6514,6 +6922,7 @@ void ScreenBufferTests::CursorUpDownOutsideMargins()
     stateMachine.ProcessString(L"X");
     {
         auto iter = tbi.GetCellDataAt({ 0, 22 });
+		std::cerr << "ScreenBufferTests::CursorUpDownOutsideMargins(): iter → " << iter << std::endl;
         VERIFY_ARE_EQUAL(L"X", iter->Chars());
     }
     stateMachine.ProcessString(L"\x1b[1H");
@@ -6527,10 +6936,12 @@ void ScreenBufferTests::CursorUpDownOutsideMargins()
         VERIFY_ARE_EQUAL(L"Y", iter->Chars());
     }
     stateMachine.ProcessString(L"\x1b[r");
+	std::cerr << "<<< Exiting ScreenBufferTests::CursorUpDownOutsideMargins()" << std::endl;
 }
 
 void ScreenBufferTests::CursorUpDownExactlyAtMargins()
 {
+	std::cerr << ">>> Entering ScreenBufferTests::CursorUpDownExactlyAtMargins()" << std::endl;
     // Test inspired by the CursorUpDownAcrossMargins test.
     // echo -e "\e[6;19r\e[19H\e[1B1\e[1A2\e[6H\e[1A3\e[1B4\e[r"
     // This does the following:
@@ -6567,6 +6978,7 @@ void ScreenBufferTests::CursorUpDownExactlyAtMargins()
     stateMachine.ProcessString(L"1");
     {
         auto iter = tbi.GetCellDataAt({ 0, 18 });
+		std::cerr << "ScreenBufferTests::CursorUpDownExactlyAtMargins(): iter → " << iter << std::endl;
         VERIFY_ARE_EQUAL(L"1", iter->Chars());
     }
 
@@ -6598,10 +7010,12 @@ void ScreenBufferTests::CursorUpDownExactlyAtMargins()
     }
 
     stateMachine.ProcessString(L"\x1b[r");
+	std::cerr << "<<< Exiting ScreenBufferTests::CursorUpDownExactlyAtMargins()" << std::endl;
 }
 
 void ScreenBufferTests::CursorLeftRightAcrossMargins()
 {
+	std::cerr << ">>> Entering ScreenBufferTests::CursorLeftRightAcrossMargins()" << std::endl;
     auto& gci = ServiceLocator::LocateGlobals().getConsoleInformation();
     auto& si = gci.GetActiveOutputBuffer();
     auto& tbi = si.GetTextBuffer();
@@ -6621,6 +7035,7 @@ void ScreenBufferTests::CursorLeftRightAcrossMargins()
     stateMachine.ProcessString(L"X");
     {
         auto iter = tbi.GetCellDataAt({ 49, 11 });
+		std::cerr << "ScreenBufferTests::CursorLeftRightAcrossMargins(): iter → " << iter << std::endl;
         VERIFY_ARE_EQUAL(L"X", iter->Chars());
     }
 
@@ -6636,10 +7051,12 @@ void ScreenBufferTests::CursorLeftRightAcrossMargins()
 
     stateMachine.ProcessString(L"\x1b[s");
     stateMachine.ProcessString(L"\x1b[?69l");
+	std::cerr << "<<< Exiting ScreenBufferTests::CursorLeftRightAcrossMargins()" << std::endl;
 }
 
 void ScreenBufferTests::CursorLeftRightOutsideMargins()
 {
+	std::cerr << ">>> Entering ScreenBufferTests::CursorLeftRightOutsideMargins()" << std::endl;
     auto& gci = ServiceLocator::LocateGlobals().getConsoleInformation();
     auto& si = gci.GetActiveOutputBuffer();
     auto& tbi = si.GetTextBuffer();
@@ -6659,6 +7076,7 @@ void ScreenBufferTests::CursorLeftRightOutsideMargins()
     stateMachine.ProcessString(L"Y");
     {
         auto iter = tbi.GetCellDataAt({ 1, 11 });
+		std::cerr << "ScreenBufferTests::CursorLeftRightOutsideMargins(): iter → " << iter << std::endl;
         VERIFY_ARE_EQUAL(L"Y", iter->Chars());
     }
 
@@ -6674,10 +7092,12 @@ void ScreenBufferTests::CursorLeftRightOutsideMargins()
 
     stateMachine.ProcessString(L"\x1b[s");
     stateMachine.ProcessString(L"\x1b[?69l");
+	std::cerr << "<<< Exiting ScreenBufferTests::CursorLeftRightOutsideMargins()" << std::endl;
 }
 
 void ScreenBufferTests::CursorLeftRightExactlyAtMargins()
 {
+	std::cerr << ">>> Entering ScreenBufferTests::CursorLeftRightExactlyAtMargins()" << std::endl;
     auto& gci = ServiceLocator::LocateGlobals().getConsoleInformation();
     auto& si = gci.GetActiveOutputBuffer();
     auto& tbi = si.GetTextBuffer();
@@ -6697,6 +7117,7 @@ void ScreenBufferTests::CursorLeftRightExactlyAtMargins()
     stateMachine.ProcessString(L"1");
     {
         auto iter = tbi.GetCellDataAt({ 49, 11 });
+		std::cerr << "ScreenBufferTests::CursorLeftRightExactlyAtMargins(): iter → " << iter << std::endl;
         VERIFY_ARE_EQUAL(L"1", iter->Chars());
     }
 
@@ -6728,10 +7149,12 @@ void ScreenBufferTests::CursorLeftRightExactlyAtMargins()
 
     stateMachine.ProcessString(L"\x1b[s");
     stateMachine.ProcessString(L"\x1b[?69l");
+	std::cerr << "<<< Exiting ScreenBufferTests::CursorLeftRightExactlyAtMargins()" << std::endl;
 }
 
 void ScreenBufferTests::CursorNextPreviousLine()
 {
+	std::cerr << ">>> Entering ScreenBufferTests::CursorNextPreviousLine()" << std::endl;
     auto& gci = ServiceLocator::LocateGlobals().getConsoleInformation();
     auto& si = gci.GetActiveOutputBuffer();
     auto& stateMachine = si.GetStateMachine();
@@ -6800,10 +7223,12 @@ void ScreenBufferTests::CursorNextPreviousLine()
     stateMachine.ProcessString(L"\x1b[5F");
     // We should end up in column 0 of line 2.
     VERIFY_ARE_EQUAL(til::point(0, 2), cursor.GetPosition());
+	std::cerr << "<<< Exiting ScreenBufferTests::CursorNextPreviousLine()" << std::endl;
 }
 
 void ScreenBufferTests::CursorPositionRelative()
 {
+	std::cerr << ">>> Entering ScreenBufferTests::CursorPositionRelative()" << std::endl;
     auto& gci = ServiceLocator::LocateGlobals().getConsoleInformation();
     auto& si = gci.GetActiveOutputBuffer();
     auto& stateMachine = si.GetStateMachine();
@@ -6864,6 +7289,7 @@ void ScreenBufferTests::CursorPositionRelative()
     stateMachine.ProcessString(L"\x1b[9999a");
     // We should end up in the rightmost column.
     const auto screenWidth = si.GetBufferSize().Width();
+	std::cerr << "ScreenBufferTests::CursorPositionRelative(): screenWidth → " << screenWidth << std::endl;
     VERIFY_ARE_EQUAL(til::point(screenWidth - 1, 10), cursor.GetPosition());
 
     Log::Comment(L"VPR to bottom of screen");
@@ -6873,11 +7299,14 @@ void ScreenBufferTests::CursorPositionRelative()
     stateMachine.ProcessString(L"\x1b[9999e");
     // We should end up on the last line.
     const auto screenHeight = si.GetViewport().Height();
+	std::cerr << "ScreenBufferTests::CursorPositionRelative(): screenHeight → " << screenHeight << std::endl;
     VERIFY_ARE_EQUAL(til::point(20, screenHeight - 1), cursor.GetPosition());
+	std::cerr << "<<< Exiting ScreenBufferTests::CursorPositionRelative()" << std::endl;
 }
 
 void ScreenBufferTests::CursorSaveRestore()
 {
+	std::cerr << ">>> Entering ScreenBufferTests::CursorSaveRestore()" << std::endl;
     auto& gci = ServiceLocator::LocateGlobals().getConsoleInformation();
     auto& si = gci.GetActiveOutputBuffer();
     auto& stateMachine = si.GetStateMachine();
@@ -6885,13 +7314,20 @@ void ScreenBufferTests::CursorSaveRestore()
 
     const auto defaultAttrs = TextAttribute{};
     const auto colorAttrs = TextAttribute{ RGB(12, 34, 56), RGB(78, 90, 12) };
+	std::cerr << "ScreenBufferTests::CursorSaveRestore(): colorAttrs → " << colorAttrs << std::endl;
 
     const auto asciiText = L"lwkmvj";
+	std::cerr << "ScreenBufferTests::CursorSaveRestore(): asciiText → " << asciiText << std::endl;
+	std::cerr << "ScreenBufferTests::CursorSaveRestore(): graphicText → " << graphicText << std::endl;
     const auto graphicText = L"┌┬┐└┴┘";
 
     const auto selectAsciiChars = L"\x1b(B";
     const auto selectGraphicsChars = L"\x1b(0";
     const auto saveCursor = L"\x1b\x37";
+	std::cerr << "ScreenBufferTests::CursorSaveRestore(): saveCursor → " << saveCursor << std::endl;
+	std::cerr << "ScreenBufferTests::CursorSaveRestore(): restoreCursor → " << restoreCursor << std::endl;
+	std::cerr << "ScreenBufferTests::CursorSaveRestore(): setDECOM → " << setDECOM << std::endl;
+	std::cerr << "ScreenBufferTests::CursorSaveRestore(): resetDECOM → " << resetDECOM << std::endl;
     const auto restoreCursor = L"\x1b\x38";
     const auto setDECOM = L"\x1b[?6h";
     const auto resetDECOM = L"\x1b[?6l";
@@ -7007,10 +7443,12 @@ void ScreenBufferTests::CursorSaveRestore()
     stateMachine.ProcessString(L"\x1b[r");
     stateMachine.ProcessString(L"\x1b[s");
     stateMachine.ProcessString(L"\x1b[?69l");
+	std::cerr << "<<< Exiting ScreenBufferTests::CursorSaveRestore()" << std::endl;
 }
 
 void ScreenBufferTests::ScreenAlignmentPattern()
 {
+	std::cerr << ">>> Entering ScreenBufferTests::ScreenAlignmentPattern()" << std::endl;
     auto& gci = ServiceLocator::LocateGlobals().getConsoleInformation();
     auto& si = gci.GetActiveOutputBuffer().GetActiveBuffer();
     auto& stateMachine = si.GetStateMachine();
@@ -7019,17 +7457,22 @@ void ScreenBufferTests::ScreenAlignmentPattern()
 
     auto areMarginsSet = [&]() {
         const auto margins = _GetRelativeScrollMargins();
+		std::cerr << "ScreenBufferTests::ScreenAlignmentPattern(): margins → " << margins << std::endl;
         return margins.bottom > margins.top;
     };
 
     Log::Comment(L"Set the initial buffer state.");
 
     const auto bufferWidth = si.GetBufferSize().Width();
+	std::cerr << "ScreenBufferTests::ScreenAlignmentPattern(): bufferWidth → " << bufferWidth << std::endl;
+	std::cerr << "ScreenBufferTests::ScreenAlignmentPattern(): bufferHeight → " << bufferHeight << std::endl;
     const auto bufferHeight = si.GetBufferSize().Height();
 
     // Move the viewport down a few lines, and only cover part of the buffer width.
     si.SetViewport(Viewport::FromDimensions({ 5, 10 }, { bufferWidth - 10, 30 }), true);
     const auto viewportStart = si.GetViewport().Top();
+	std::cerr << "ScreenBufferTests::ScreenAlignmentPattern(): viewportStart → " << viewportStart << std::endl;
+	std::cerr << "ScreenBufferTests::ScreenAlignmentPattern(): viewportEnd → " << viewportEnd << std::endl;
     const auto viewportEnd = si.GetViewport().BottomExclusive();
 
     // Fill the entire buffer with Zs. Blue on Green.
@@ -7038,6 +7481,7 @@ void ScreenBufferTests::ScreenAlignmentPattern()
 
     // Set the initial attributes.
     auto initialAttr = TextAttribute{ RGB(12, 34, 56), RGB(78, 90, 12) };
+	std::cerr << "ScreenBufferTests::ScreenAlignmentPattern(): initialAttr → " << initialAttr << std::endl;
     initialAttr.SetReverseVideo(true);
     initialAttr.SetUnderlineStyle(UnderlineStyle::SinglyUnderlined);
     si.SetAttributes(initialAttr);
@@ -7048,6 +7492,7 @@ void ScreenBufferTests::ScreenAlignmentPattern()
 
     // Place the cursor in the center.
     auto cursorPos = til::point{ bufferWidth / 2, (viewportStart + viewportEnd) / 2 };
+	std::cerr << "ScreenBufferTests::ScreenAlignmentPattern(): cursorPos → " << cursorPos << std::endl;
     VERIFY_SUCCEEDED(si.SetCursorPosition(cursorPos));
 
     Log::Comment(L"Execute the DECALN escape sequence.");
@@ -7072,10 +7517,12 @@ void ScreenBufferTests::ScreenAlignmentPattern()
     auto expectedAttr = initialAttr;
     expectedAttr.SetStandardErase();
     VERIFY_ARE_EQUAL(expectedAttr, si.GetAttributes());
+	std::cerr << "<<< Exiting ScreenBufferTests::ScreenAlignmentPattern()" << std::endl;
 }
 
 void ScreenBufferTests::TestCursorIsOn()
 {
+	std::cerr << ">>> Entering ScreenBufferTests::TestCursorIsOn()" << std::endl;
     auto& g = ServiceLocator::LocateGlobals();
     auto& gci = g.getConsoleInformation();
     auto& si = gci.GetActiveOutputBuffer();
@@ -7114,10 +7561,12 @@ void ScreenBufferTests::TestCursorIsOn()
     stateMachine.ProcessString(L"\x1b[?12;25l");
     VERIFY_IS_FALSE(cursor.IsBlinking());
     VERIFY_IS_FALSE(cursor.IsVisible());
+	std::cerr << "<<< Exiting ScreenBufferTests::TestCursorIsOn()" << std::endl;
 }
 
 void ScreenBufferTests::TestAddHyperlink()
 {
+	std::cerr << ">>> Entering ScreenBufferTests::TestAddHyperlink()" << std::endl;
     auto& g = ServiceLocator::LocateGlobals();
     auto& gci = g.getConsoleInformation();
     auto& si = gci.GetActiveOutputBuffer();
@@ -7137,10 +7586,12 @@ void ScreenBufferTests::TestAddHyperlink()
     // Process the closing osc 8 sequences
     stateMachine.ProcessString(L"\x1b]8;;\x1b\\");
     VERIFY_IS_FALSE(tbi.GetCurrentAttributes().IsHyperlink());
+	std::cerr << "<<< Exiting ScreenBufferTests::TestAddHyperlink()" << std::endl;
 }
 
 void ScreenBufferTests::TestAddHyperlinkCustomId()
 {
+	std::cerr << ">>> Entering ScreenBufferTests::TestAddHyperlinkCustomId()" << std::endl;
     auto& g = ServiceLocator::LocateGlobals();
     auto& gci = g.getConsoleInformation();
     auto& si = gci.GetActiveOutputBuffer();
@@ -7162,10 +7613,12 @@ void ScreenBufferTests::TestAddHyperlinkCustomId()
     // Process the closing osc 8 sequences
     stateMachine.ProcessString(L"\x1b]8;;\x1b\\");
     VERIFY_IS_FALSE(tbi.GetCurrentAttributes().IsHyperlink());
+	std::cerr << "<<< Exiting ScreenBufferTests::TestAddHyperlinkCustomId()" << std::endl;
 }
 
 void ScreenBufferTests::TestAddHyperlinkCustomIdDifferentUri()
 {
+	std::cerr << ">>> Entering ScreenBufferTests::TestAddHyperlinkCustomIdDifferentUri()" << std::endl;
     auto& g = ServiceLocator::LocateGlobals();
     auto& gci = g.getConsoleInformation();
     auto& si = gci.GetActiveOutputBuffer();
@@ -7189,10 +7642,12 @@ void ScreenBufferTests::TestAddHyperlinkCustomIdDifferentUri()
     // This second URL should not change the URL of the original ID!
     VERIFY_ARE_EQUAL(tbi.GetHyperlinkUriFromId(oldAttributes.GetHyperlinkId()), L"test.url");
     VERIFY_ARE_NOT_EQUAL(oldAttributes.GetHyperlinkId(), tbi.GetCurrentAttributes().GetHyperlinkId());
+	std::cerr << "<<< Exiting ScreenBufferTests::TestAddHyperlinkCustomIdDifferentUri()" << std::endl;
 }
 
 void ScreenBufferTests::UpdateVirtualBottomWhenCursorMovesBelowIt()
 {
+	std::cerr << ">>> Entering ScreenBufferTests::UpdateVirtualBottomWhenCursorMovesBelowIt()" << std::endl;
     auto& g = ServiceLocator::LocateGlobals();
     auto& gci = g.getConsoleInformation();
     auto& si = gci.GetActiveOutputBuffer();
@@ -7201,6 +7656,7 @@ void ScreenBufferTests::UpdateVirtualBottomWhenCursorMovesBelowIt()
     Log::Comment(L"Make sure the initial virtual bottom is at the bottom of the viewport");
     si.UpdateBottom();
     const auto initialVirtualBottom = si.GetViewport().BottomInclusive();
+	std::cerr << "ScreenBufferTests::UpdateVirtualBottomWhenCursorMovesBelowIt(): initialVirtualBottom → " << initialVirtualBottom << std::endl;
     VERIFY_ARE_EQUAL(initialVirtualBottom, si._virtualBottom);
 
     Log::Comment(L"Set the initial cursor position on that virtual bottom line");
@@ -7210,6 +7666,7 @@ void ScreenBufferTests::UpdateVirtualBottomWhenCursorMovesBelowIt()
 
     Log::Comment(L"Pan down so the initial viewport has the cursor in the middle");
     const auto initialOrigin = til::point{ 0, si.GetViewport().Top() + si.GetViewport().Height() / 2 };
+	std::cerr << "ScreenBufferTests::UpdateVirtualBottomWhenCursorMovesBelowIt(): initialOrigin → " << initialOrigin << std::endl;
     gci.SetTerminalScrolling(false);
     VERIFY_SUCCEEDED(si.SetViewportOrigin(false, initialOrigin, false));
     VERIFY_ARE_EQUAL(initialOrigin, si.GetViewport().Origin());
@@ -7219,6 +7676,7 @@ void ScreenBufferTests::UpdateVirtualBottomWhenCursorMovesBelowIt()
 
     Log::Comment(L"Now write several lines of content using WriteCharsLegacy");
     const auto content = L"1\n2\n3\n4\n5\n6\n7\n8\n9\n10\n";
+	std::cerr << "ScreenBufferTests::UpdateVirtualBottomWhenCursorMovesBelowIt(): content → " << content << std::endl;
     WriteCharsLegacy(si, content, nullptr);
 
     Log::Comment(L"Confirm that the cursor position has moved down 10 lines");
@@ -7235,10 +7693,12 @@ void ScreenBufferTests::UpdateVirtualBottomWhenCursorMovesBelowIt()
     Log::Comment(L"But after moving to the virtual viewport, we should align with the new virtual bottom");
     VERIFY_SUCCEEDED(si.SetViewportOrigin(true, si.GetVirtualViewport().Origin(), true));
     VERIFY_ARE_EQUAL(newVirtualBottom, si.GetViewport().BottomInclusive());
+	std::cerr << "<<< Exiting ScreenBufferTests::UpdateVirtualBottomWhenCursorMovesBelowIt()" << std::endl;
 }
 
 void ScreenBufferTests::UpdateVirtualBottomWithSetConsoleCursorPosition()
 {
+	std::cerr << ">>> Entering ScreenBufferTests::UpdateVirtualBottomWithSetConsoleCursorPosition()" << std::endl;
     auto& g = ServiceLocator::LocateGlobals();
     auto& gci = g.getConsoleInformation();
     auto& si = gci.GetActiveOutputBuffer();
@@ -7246,11 +7706,13 @@ void ScreenBufferTests::UpdateVirtualBottomWithSetConsoleCursorPosition()
 
     Log::Comment(L"Pan down so the initial viewport is a couple of pages down");
     const auto initialOrigin = til::point{ 0, si.GetViewport().Height() * 2 };
+	std::cerr << "ScreenBufferTests::UpdateVirtualBottomWithSetConsoleCursorPosition(): initialOrigin → " << initialOrigin << std::endl;
     VERIFY_SUCCEEDED(si.SetViewportOrigin(true, initialOrigin, true));
     VERIFY_ARE_EQUAL(initialOrigin, si.GetViewport().Origin());
 
     Log::Comment(L"Make sure the initial virtual bottom is at the bottom of the viewport");
     const auto initialVirtualBottom = si.GetViewport().BottomInclusive();
+	std::cerr << "ScreenBufferTests::UpdateVirtualBottomWithSetConsoleCursorPosition(): initialVirtualBottom → " << initialVirtualBottom << std::endl;
     VERIFY_ARE_EQUAL(initialVirtualBottom, si._virtualBottom);
 
     Log::Comment(L"Pan to the top of the buffer without changing the virtual bottom");
@@ -7269,11 +7731,13 @@ void ScreenBufferTests::UpdateVirtualBottomWithSetConsoleCursorPosition()
 
     Log::Comment(L"Pan further down so the viewport is below the cursor");
     const auto belowCursor = til::point{ 0, cursor.GetPosition().y + 10 };
+	std::cerr << "ScreenBufferTests::UpdateVirtualBottomWithSetConsoleCursorPosition(): belowCursor → " << belowCursor << std::endl;
     VERIFY_SUCCEEDED(si.SetViewportOrigin(true, belowCursor, false));
     VERIFY_ARE_EQUAL(belowCursor, si.GetViewport().Origin());
 
     Log::Comment(L"Set the cursor position one line down, still inside the virtual viewport");
     const auto oneLineDown = til::point{ 0, cursor.GetPosition().y + 1 };
+	std::cerr << "ScreenBufferTests::UpdateVirtualBottomWithSetConsoleCursorPosition(): oneLineDown → " << oneLineDown << std::endl;
     VERIFY_SUCCEEDED(g.api->SetConsoleCursorPositionImpl(si, oneLineDown));
     VERIFY_ARE_EQUAL(oneLineDown, cursor.GetPosition());
 
@@ -7293,10 +7757,12 @@ void ScreenBufferTests::UpdateVirtualBottomWithSetConsoleCursorPosition()
 
     Log::Comment(L"Confirm that the virtual bottom has also moved up");
     VERIFY_ARE_EQUAL(si.GetViewport().BottomInclusive(), si._virtualBottom);
+	std::cerr << "<<< Exiting ScreenBufferTests::UpdateVirtualBottomWithSetConsoleCursorPosition()" << std::endl;
 }
 
 void ScreenBufferTests::UpdateVirtualBottomAfterInternalSetViewportSize()
 {
+	std::cerr << ">>> Entering ScreenBufferTests::UpdateVirtualBottomAfterInternalSetViewportSize()" << std::endl;
     auto& g = ServiceLocator::LocateGlobals();
     auto& gci = g.getConsoleInformation();
     auto& si = gci.GetActiveOutputBuffer();
@@ -7305,11 +7771,13 @@ void ScreenBufferTests::UpdateVirtualBottomAfterInternalSetViewportSize()
 
     Log::Comment(L"Pan down so the initial viewport is a couple of pages down");
     const auto initialOrigin = til::point{ 0, si.GetViewport().Height() * 2 };
+	std::cerr << "ScreenBufferTests::UpdateVirtualBottomAfterInternalSetViewportSize(): initialOrigin → " << initialOrigin << std::endl;
     VERIFY_SUCCEEDED(si.SetViewportOrigin(true, initialOrigin, true));
     VERIFY_ARE_EQUAL(initialOrigin, si.GetViewport().Origin());
 
     Log::Comment(L"Make sure the initial virtual bottom is at the bottom of the viewport");
     const auto initialVirtualBottom = si.GetViewport().BottomInclusive();
+	std::cerr << "ScreenBufferTests::UpdateVirtualBottomAfterInternalSetViewportSize(): initialVirtualBottom → " << initialVirtualBottom << std::endl;
     VERIFY_ARE_EQUAL(initialVirtualBottom, si._virtualBottom);
 
     Log::Comment(L"Set the cursor to the bottom of the current page");
@@ -7322,6 +7790,7 @@ void ScreenBufferTests::UpdateVirtualBottomAfterInternalSetViewportSize()
 
     Log::Comment(L"Shrink the viewport height by two lines");
     auto viewportSize = si.GetViewport().Dimensions();
+	std::cerr << "ScreenBufferTests::UpdateVirtualBottomAfterInternalSetViewportSize(): viewportSize → " << viewportSize << std::endl;
     viewportSize.height -= 2;
     si._InternalSetViewportSize(&viewportSize, false, false);
     VERIFY_ARE_EQUAL(viewportSize, si.GetViewport().Dimensions());
@@ -7331,6 +7800,7 @@ void ScreenBufferTests::UpdateVirtualBottomAfterInternalSetViewportSize()
 
     Log::Comment(L"Position the viewport just above the virtual bottom");
     auto viewportTop = si._virtualBottom - viewportSize.height;
+	std::cerr << "ScreenBufferTests::UpdateVirtualBottomAfterInternalSetViewportSize(): viewportTop → " << viewportTop << std::endl;
     VERIFY_SUCCEEDED(si.SetViewportOrigin(true, { 0, viewportTop }, false));
     VERIFY_ARE_EQUAL(si._virtualBottom - 1, si.GetViewport().BottomInclusive());
 
@@ -7354,10 +7824,12 @@ void ScreenBufferTests::UpdateVirtualBottomAfterInternalSetViewportSize()
 
     Log::Comment(L"Confirm that the virtual bottom has aligned with the viewport bottom");
     VERIFY_ARE_EQUAL(si._virtualBottom, si.GetViewport().BottomInclusive());
+	std::cerr << "<<< Exiting ScreenBufferTests::UpdateVirtualBottomAfterInternalSetViewportSize()" << std::endl;
 }
 
 void ScreenBufferTests::UpdateVirtualBottomAfterResizeWithReflow()
 {
+	std::cerr << ">>> Entering ScreenBufferTests::UpdateVirtualBottomAfterResizeWithReflow()" << std::endl;
     auto& g = ServiceLocator::LocateGlobals();
     auto& gci = g.getConsoleInformation();
     auto& si = gci.GetActiveOutputBuffer();
@@ -7366,6 +7838,9 @@ void ScreenBufferTests::UpdateVirtualBottomAfterResizeWithReflow()
 
     Log::Comment(L"Output a couple of pages of content");
     auto bufferSize = si.GetTextBuffer().GetSize().Dimensions();
+	std::cerr << "ScreenBufferTests::UpdateVirtualBottomAfterResizeWithReflow(): bufferSize → " << bufferSize << std::endl;
+	std::cerr << "ScreenBufferTests::UpdateVirtualBottomAfterResizeWithReflow(): viewportSize → " << viewportSize << std::endl;
+	std::cerr << "ScreenBufferTests::UpdateVirtualBottomAfterResizeWithReflow(): line → " << line << std::endl;
     const auto viewportSize = si.GetViewport().Dimensions();
     const auto line = std::wstring(bufferSize.width - 1, L'X') + L'\n';
     for (auto i = 0; i < viewportSize.height * 2; i++)
@@ -7386,11 +7861,13 @@ void ScreenBufferTests::UpdateVirtualBottomAfterResizeWithReflow()
 
     Log::Comment(L"Confirm that the virtual viewport includes the last non-space row");
     const auto lastNonSpaceRow = si.GetTextBuffer().GetLastNonSpaceCharacter().y;
+	std::cerr << "ScreenBufferTests::UpdateVirtualBottomAfterResizeWithReflow(): lastNonSpaceRow → " << lastNonSpaceRow << std::endl;
     VERIFY_IS_GREATER_THAN_OR_EQUAL(si._virtualBottom, lastNonSpaceRow);
 
     Log::Comment(L"Clear the screen and note the cursor distance to the virtual bottom");
     stateMachine.ProcessString(L"\033[H\033[2J");
     const auto cursorDistanceFromBottom = si._virtualBottom - si.GetTextBuffer().GetCursor().GetPosition().y;
+	std::cerr << "ScreenBufferTests::UpdateVirtualBottomAfterResizeWithReflow(): cursorDistanceFromBottom → " << cursorDistanceFromBottom << std::endl;
     VERIFY_ARE_EQUAL(si.GetViewport().Height() - 1, cursorDistanceFromBottom);
 
     Log::Comment(L"Stretch the viewport back to full width");
@@ -7399,10 +7876,12 @@ void ScreenBufferTests::UpdateVirtualBottomAfterResizeWithReflow()
 
     Log::Comment(L"Confirm cursor distance to the virtual bottom is unchanged");
     VERIFY_ARE_EQUAL(cursorDistanceFromBottom, si._virtualBottom - si.GetTextBuffer().GetCursor().GetPosition().y);
+	std::cerr << "<<< Exiting ScreenBufferTests::UpdateVirtualBottomAfterResizeWithReflow()" << std::endl;
 }
 
 void ScreenBufferTests::DontShrinkVirtualBottomDuringResizeWithReflowAtTop()
 {
+	std::cerr << ">>> Entering ScreenBufferTests::DontShrinkVirtualBottomDuringResizeWithReflowAtTop()" << std::endl;
     auto& g = ServiceLocator::LocateGlobals();
     auto& gci = g.getConsoleInformation();
     auto& si = gci.GetActiveOutputBuffer();
@@ -7423,15 +7902,18 @@ void ScreenBufferTests::DontShrinkVirtualBottomDuringResizeWithReflowAtTop()
 
     Log::Comment(L"Shrink the viewport width by a half");
     auto bufferSize = si.GetTextBuffer().GetSize().Dimensions();
+	std::cerr << "ScreenBufferTests::DontShrinkVirtualBottomDuringResizeWithReflowAtTop(): bufferSize → " << bufferSize << std::endl;
     bufferSize.width /= 2;
     VERIFY_NT_SUCCESS(si.ResizeWithReflow(bufferSize));
 
     Log::Comment(L"Confirm that the virtual bottom is still at the bottom of the viewport");
     VERIFY_ARE_EQUAL(si.GetViewport().BottomInclusive(), si._virtualBottom);
+	std::cerr << "<<< Exiting ScreenBufferTests::DontShrinkVirtualBottomDuringResizeWithReflowAtTop()" << std::endl;
 }
 
 void ScreenBufferTests::DontChangeVirtualBottomWithOffscreenLinefeed()
 {
+	std::cerr << ">>> Entering ScreenBufferTests::DontChangeVirtualBottomWithOffscreenLinefeed()" << std::endl;
     auto& g = ServiceLocator::LocateGlobals();
     auto& gci = g.getConsoleInformation();
     auto& si = gci.GetActiveOutputBuffer();
@@ -7440,11 +7922,13 @@ void ScreenBufferTests::DontChangeVirtualBottomWithOffscreenLinefeed()
 
     Log::Comment(L"Pan down so the initial viewport is a couple of pages down");
     const auto initialOrigin = til::point{ 0, si.GetViewport().Height() * 2 };
+	std::cerr << "ScreenBufferTests::DontChangeVirtualBottomWithOffscreenLinefeed(): initialOrigin → " << initialOrigin << std::endl;
     VERIFY_SUCCEEDED(si.SetViewportOrigin(true, initialOrigin, true));
     VERIFY_ARE_EQUAL(initialOrigin, si.GetViewport().Origin());
 
     Log::Comment(L"Make sure the initial virtual bottom is at the bottom of the viewport");
     const auto initialVirtualBottom = si.GetViewport().BottomInclusive();
+	std::cerr << "ScreenBufferTests::DontChangeVirtualBottomWithOffscreenLinefeed(): initialVirtualBottom → " << initialVirtualBottom << std::endl;
     VERIFY_ARE_EQUAL(initialVirtualBottom, si._virtualBottom);
 
     Log::Comment(L"Set the cursor to the top of the current page");
@@ -7460,10 +7944,12 @@ void ScreenBufferTests::DontChangeVirtualBottomWithOffscreenLinefeed()
 
     Log::Comment(L"Confirm that the virtual bottom has not changed");
     VERIFY_ARE_EQUAL(initialVirtualBottom, si._virtualBottom);
+	std::cerr << "<<< Exiting ScreenBufferTests::DontChangeVirtualBottomWithOffscreenLinefeed()" << std::endl;
 }
 
 void ScreenBufferTests::DontChangeVirtualBottomAfterResizeWindow()
 {
+	std::cerr << ">>> Entering ScreenBufferTests::DontChangeVirtualBottomAfterResizeWindow()" << std::endl;
     auto& g = ServiceLocator::LocateGlobals();
     auto& gci = g.getConsoleInformation();
     auto& si = gci.GetActiveOutputBuffer();
@@ -7472,11 +7958,13 @@ void ScreenBufferTests::DontChangeVirtualBottomAfterResizeWindow()
 
     Log::Comment(L"Pan down so the initial viewport is a couple of pages down");
     const auto initialOrigin = til::point{ 0, si.GetViewport().Height() * 2 };
+	std::cerr << "ScreenBufferTests::DontChangeVirtualBottomAfterResizeWindow(): initialOrigin → " << initialOrigin << std::endl;
     VERIFY_SUCCEEDED(si.SetViewportOrigin(true, initialOrigin, true));
     VERIFY_ARE_EQUAL(initialOrigin, si.GetViewport().Origin());
 
     Log::Comment(L"Make sure the initial virtual bottom is at the bottom of the viewport");
     const auto initialVirtualBottom = si.GetViewport().BottomInclusive();
+	std::cerr << "ScreenBufferTests::DontChangeVirtualBottomAfterResizeWindow(): initialVirtualBottom → " << initialVirtualBottom << std::endl;
     VERIFY_ARE_EQUAL(initialVirtualBottom, si._virtualBottom);
 
     Log::Comment(L"Set the cursor to the bottom of the current page");
@@ -7490,6 +7978,8 @@ void ScreenBufferTests::DontChangeVirtualBottomAfterResizeWindow()
     Log::Comment(L"Shrink the viewport height");
     std::wstringstream ss;
     auto viewportWidth = si.GetViewport().Width();
+	std::cerr << "ScreenBufferTests::DontChangeVirtualBottomAfterResizeWindow(): viewportWidth → " << viewportWidth << std::endl;
+	std::cerr << "ScreenBufferTests::DontChangeVirtualBottomAfterResizeWindow(): viewportHeight → " << viewportHeight << std::endl;
     auto viewportHeight = si.GetViewport().Height() - 2;
     ss << L"\x1b[8;" << viewportHeight << L";" << viewportWidth << L"t";
     stateMachine.ProcessString(ss.str());
@@ -7497,10 +7987,12 @@ void ScreenBufferTests::DontChangeVirtualBottomAfterResizeWindow()
 
     Log::Comment(L"Confirm that the virtual bottom has not changed");
     VERIFY_ARE_EQUAL(initialVirtualBottom, si._virtualBottom);
+	std::cerr << "<<< Exiting ScreenBufferTests::DontChangeVirtualBottomAfterResizeWindow()" << std::endl;
 }
 
 void ScreenBufferTests::DontChangeVirtualBottomWithMakeCursorVisible()
 {
+	std::cerr << ">>> Entering ScreenBufferTests::DontChangeVirtualBottomWithMakeCursorVisible()" << std::endl;
     auto& g = ServiceLocator::LocateGlobals();
     auto& gci = g.getConsoleInformation();
     auto& si = gci.GetActiveOutputBuffer();
@@ -7509,11 +8001,13 @@ void ScreenBufferTests::DontChangeVirtualBottomWithMakeCursorVisible()
 
     Log::Comment(L"Pan down so the initial viewport is a couple of pages down");
     const auto initialOrigin = til::point{ 0, si.GetViewport().Height() * 2 };
+	std::cerr << "ScreenBufferTests::DontChangeVirtualBottomWithMakeCursorVisible(): initialOrigin → " << initialOrigin << std::endl;
     VERIFY_SUCCEEDED(si.SetViewportOrigin(true, initialOrigin, true));
     VERIFY_ARE_EQUAL(initialOrigin, si.GetViewport().Origin());
 
     Log::Comment(L"Make sure the initial virtual bottom is at the bottom of the viewport");
     const auto initialVirtualBottom = si.GetViewport().BottomInclusive();
+	std::cerr << "ScreenBufferTests::DontChangeVirtualBottomWithMakeCursorVisible(): initialVirtualBottom → " << initialVirtualBottom << std::endl;
     VERIFY_ARE_EQUAL(initialVirtualBottom, si._virtualBottom);
 
     Log::Comment(L"Set the cursor to the top of the current page");
@@ -7533,6 +8027,7 @@ void ScreenBufferTests::DontChangeVirtualBottomWithMakeCursorVisible()
 
     Log::Comment(L"Pan further down so the viewport is below the cursor");
     const auto belowCursor = til::point{ 0, cursor.GetPosition().y + 10 };
+	std::cerr << "ScreenBufferTests::DontChangeVirtualBottomWithMakeCursorVisible(): belowCursor → " << belowCursor << std::endl;
     VERIFY_SUCCEEDED(si.SetViewportOrigin(true, belowCursor, false));
     VERIFY_ARE_EQUAL(belowCursor, si.GetViewport().Origin());
 
@@ -7542,10 +8037,12 @@ void ScreenBufferTests::DontChangeVirtualBottomWithMakeCursorVisible()
 
     Log::Comment(L"Confirm that the virtual bottom has not changed");
     VERIFY_ARE_EQUAL(initialVirtualBottom, si._virtualBottom);
+	std::cerr << "<<< Exiting ScreenBufferTests::DontChangeVirtualBottomWithMakeCursorVisible()" << std::endl;
 }
 
 void ScreenBufferTests::RetainHorizontalOffsetWhenMovingToBottom()
 {
+	std::cerr << ">>> Entering ScreenBufferTests::RetainHorizontalOffsetWhenMovingToBottom()" << std::endl;
     auto& g = ServiceLocator::LocateGlobals();
     auto& gci = g.getConsoleInformation();
     auto& si = gci.GetActiveOutputBuffer();
@@ -7580,12 +8077,20 @@ void ScreenBufferTests::RetainHorizontalOffsetWhenMovingToBottom()
     Log::Comment(L"Verify Y offset has moved back and X is unchanged");
     VERIFY_ARE_EQUAL(initialOrigin.y, si.GetViewport().Top());
     VERIFY_ARE_EQUAL(initialOrigin.x, si.GetViewport().Left());
+	std::cerr << "<<< Exiting ScreenBufferTests::RetainHorizontalOffsetWhenMovingToBottom()" << std::endl;
 }
 
 void ScreenBufferTests::TestReflowEndOfLineColor()
 {
+	std::cerr << ">>> Entering ScreenBufferTests::TestReflowEndOfLineColor()" << std::endl;
     BEGIN_TEST_METHOD_PROPERTIES()
         TEST_METHOD_PROPERTY(L"Data:dx", L"{-1, 0, 1}")
+		std::cerr << "BEGIN_TEST_METHOD_PROPERTIES(): iter3 → " << iter3 << std::endl;
+		std::cerr << "BEGIN_TEST_METHOD_PROPERTIES(): iter4 → " << iter4 << std::endl;
+		std::cerr << "BEGIN_TEST_METHOD_PROPERTIES(): iter2 → " << iter2 << std::endl;
+		std::cerr << "BEGIN_TEST_METHOD_PROPERTIES(): iter1 → " << iter1 << std::endl;
+		std::cerr << "BEGIN_TEST_METHOD_PROPERTIES(): iter0 → " << iter0 << std::endl;
+		std::cerr << "BEGIN_TEST_METHOD_PROPERTIES(): width → " << width << std::endl;
         TEST_METHOD_PROPERTY(L"Data:dy", L"{-1, 0, 1}")
     END_TEST_METHOD_PROPERTIES();
 
@@ -7664,6 +8169,7 @@ void ScreenBufferTests::TestReflowEndOfLineColor()
 
 void ScreenBufferTests::TestReflowSmallerLongLineWithColor()
 {
+	std::cerr << ">>> Entering ScreenBufferTests::TestReflowSmallerLongLineWithColor()" << std::endl;
     Log::Comment(L"Reflow the buffer such that a long, line of text flows onto "
                  L"the next line. Check that the trailing attributes were copied"
                  L" to the new row.");
@@ -7675,6 +8181,7 @@ void ScreenBufferTests::TestReflowSmallerLongLineWithColor()
     gci.SetWrapText(true);
 
     auto defaultAttrs = si.GetAttributes();
+	std::cerr << "ScreenBufferTests::TestReflowSmallerLongLineWithColor(): defaultAttrs → " << defaultAttrs << std::endl;
     auto red = defaultAttrs;
     red.SetIndexedBackground(TextColor::DARK_RED);
     auto green = defaultAttrs;
@@ -7698,11 +8205,13 @@ void ScreenBufferTests::TestReflowSmallerLongLineWithColor()
 
     auto verifyBuffer = [&](const TextBuffer& tb, const til::rect& /*viewport*/, const bool before) {
         const auto width = tb.GetSize().Width();
+		std::cerr << "ScreenBufferTests::TestReflowSmallerLongLineWithColor(): width → " << width << std::endl;
         Log::Comment(NoThrowString().Format(L"Buffer width: %d", width));
 
         if (before)
         {
             auto iter0 = TestUtils::VerifyLineContains(tb, { 0, 0 }, L'A', red, 70u);
+			std::cerr << "ScreenBufferTests::TestReflowSmallerLongLineWithColor(): iter0 → " << iter0 << std::endl;
             TestUtils::VerifyLineContains(iter0, L' ', green, 1u);
             TestUtils::VerifyLineContains(iter0, L'B', green, 3u);
             TestUtils::VerifyLineContains(iter0, L' ', green, 1u);
@@ -7713,6 +8222,7 @@ void ScreenBufferTests::TestReflowSmallerLongLineWithColor()
             auto iter0 = TestUtils::VerifyLineContains(tb, { 0, 0 }, L'A', red, 65u);
 
             auto iter1 = tb.GetCellLineDataAt({ 0, 1 });
+			std::cerr << "ScreenBufferTests::TestReflowSmallerLongLineWithColor(): iter1 → " << iter1 << std::endl;
             TestUtils::VerifyLineContains(iter1, L'A', red, 5u);
             TestUtils::VerifyLineContains(iter1, L' ', green, 1u);
             TestUtils::VerifyLineContains(iter1, L'B', green, 3u);
@@ -7731,8 +8241,10 @@ void ScreenBufferTests::TestReflowSmallerLongLineWithColor()
     verifyBuffer(si.GetTextBuffer(), si.GetViewport().ToExclusive(), true);
 
     Log::Comment(L"========== resize buffer ==========");
+	std::cerr << "ScreenBufferTests::TestReflowSmallerLongLineWithColor(): buffer → " << buffer << std::endl;
     const til::point delta{ -15, 0 };
     const auto oldSize = si.GetBufferSize().Dimensions();
+	std::cerr << "ScreenBufferTests::TestReflowSmallerLongLineWithColor(): oldSize → " << oldSize << std::endl;
     const auto newSize{ oldSize + delta };
     VERIFY_SUCCEEDED(si.ResizeWithReflow(newSize));
 
@@ -7740,10 +8252,12 @@ void ScreenBufferTests::TestReflowSmallerLongLineWithColor()
     // are also 3 B's wrapped in spaces.
     Log::Comment(L"========== Checking the buffer state (after) ==========");
     verifyBuffer(si.GetTextBuffer(), si.GetViewport().ToExclusive(), false);
+	std::cerr << "<<< Exiting ScreenBufferTests::TestReflowSmallerLongLineWithColor()" << std::endl;
 }
 
 void ScreenBufferTests::TestReflowBiggerLongLineWithColor()
 {
+	std::cerr << ">>> Entering ScreenBufferTests::TestReflowBiggerLongLineWithColor()" << std::endl;
     Log::Comment(L"Reflow the buffer such that a wrapped line of text 'de-flows' onto the previous line.");
 
     auto& gci = ServiceLocator::LocateGlobals().getConsoleInformation();
@@ -7753,6 +8267,7 @@ void ScreenBufferTests::TestReflowBiggerLongLineWithColor()
     gci.SetWrapText(true);
 
     auto defaultAttrs = si.GetAttributes();
+	std::cerr << "ScreenBufferTests::TestReflowBiggerLongLineWithColor(): defaultAttrs → " << defaultAttrs << std::endl;
     auto red = defaultAttrs;
     red.SetIndexedBackground(TextColor::DARK_RED);
     auto green = defaultAttrs;
@@ -7777,13 +8292,16 @@ void ScreenBufferTests::TestReflowBiggerLongLineWithColor()
 
     auto verifyBuffer = [&](const TextBuffer& tb, const til::rect& /*viewport*/, const bool before) {
         const auto width = tb.GetSize().Width();
+		std::cerr << "ScreenBufferTests::TestReflowBiggerLongLineWithColor(): width → " << width << std::endl;
         Log::Comment(NoThrowString().Format(L"Buffer width: %d", width));
 
         if (before)
         {
             auto iter0 = TestUtils::VerifyLineContains(tb, { 0, 0 }, L'A', red, 80u);
+			std::cerr << "ScreenBufferTests::TestReflowBiggerLongLineWithColor(): iter0 → " << iter0 << std::endl;
 
             auto iter1 = tb.GetCellLineDataAt({ 0, 1 });
+			std::cerr << "ScreenBufferTests::TestReflowBiggerLongLineWithColor(): iter1 → " << iter1 << std::endl;
             TestUtils::VerifyLineContains(iter1, L'A', red, 5u);
             TestUtils::VerifyLineContains(iter1, L' ', green, 1u);
             TestUtils::VerifyLineContains(iter1, L'B', green, 3u);
@@ -7812,8 +8330,10 @@ void ScreenBufferTests::TestReflowBiggerLongLineWithColor()
     verifyBuffer(si.GetTextBuffer(), si.GetViewport().ToExclusive(), true);
 
     Log::Comment(L"========== resize buffer ==========");
+	std::cerr << "ScreenBufferTests::TestReflowBiggerLongLineWithColor(): buffer → " << buffer << std::endl;
     const til::point delta{ 15, 0 };
     const auto oldSize = si.GetBufferSize().Dimensions();
+	std::cerr << "ScreenBufferTests::TestReflowBiggerLongLineWithColor(): oldSize → " << oldSize << std::endl;
     const auto newSize{ oldSize + delta };
     VERIFY_SUCCEEDED(si.ResizeWithReflow(newSize));
 
@@ -7821,10 +8341,12 @@ void ScreenBufferTests::TestReflowBiggerLongLineWithColor()
     // there are also 3 B's wrapped in spaces, and finally 5 trailing spaces.
     Log::Comment(L"========== Checking the buffer state (after) ==========");
     verifyBuffer(si.GetTextBuffer(), si.GetViewport().ToExclusive(), false);
+	std::cerr << "<<< Exiting ScreenBufferTests::TestReflowBiggerLongLineWithColor()" << std::endl;
 }
 
 void ScreenBufferTests::TestDeferredMainBufferResize()
 {
+	std::cerr << ">>> Entering ScreenBufferTests::TestDeferredMainBufferResize()" << std::endl;
     BEGIN_TEST_METHOD_PROPERTIES()
         TEST_METHOD_PROPERTY(L"Data:reEnterAltBuffer", L"{false, true}")
     END_TEST_METHOD_PROPERTIES();
@@ -7908,6 +8430,7 @@ void ScreenBufferTests::TestDeferredMainBufferResize()
 
 void ScreenBufferTests::RectangularAreaOperations()
 {
+	std::cerr << ">>> Entering ScreenBufferTests::RectangularAreaOperations()" << std::endl;
     BEGIN_TEST_METHOD_PROPERTIES()
         TEST_METHOD_PROPERTY(L"Data:rectOp", L"{0, 1, 2, 3, 4, 5}")
     END_TEST_METHOD_PROPERTIES();
@@ -8035,6 +8558,7 @@ void ScreenBufferTests::RectangularAreaOperations()
 
 void ScreenBufferTests::CopyDoubleWidthRectangularArea()
 {
+	std::cerr << ">>> Entering ScreenBufferTests::CopyDoubleWidthRectangularArea()" << std::endl;
     auto& gci = ServiceLocator::LocateGlobals().getConsoleInformation();
     auto& si = gci.GetActiveOutputBuffer().GetActiveBuffer();
     auto& stateMachine = si.GetStateMachine();
@@ -8043,6 +8567,8 @@ void ScreenBufferTests::CopyDoubleWidthRectangularArea()
 
     // Fill the entire buffer with Zs. Blue on Green and Underlined.
     const auto bufferChar = L'Z';
+	std::cerr << "ScreenBufferTests::CopyDoubleWidthRectangularArea(): bufferChar → " << bufferChar << std::endl;
+	std::cerr << "ScreenBufferTests::CopyDoubleWidthRectangularArea(): bufferHeight → " << bufferHeight << std::endl;
     const auto bufferHeight = si.GetBufferSize().Height();
     auto bufferAttr = TextAttribute{ FOREGROUND_BLUE | BACKGROUND_GREEN };
     bufferAttr.SetUnderlineStyle(UnderlineStyle::SinglyUnderlined);
@@ -8050,6 +8576,7 @@ void ScreenBufferTests::CopyDoubleWidthRectangularArea()
 
     // Fill the first three lines with Cs. Green on Red and Intense.
     const auto copyChar = L'C';
+	std::cerr << "ScreenBufferTests::CopyDoubleWidthRectangularArea(): copyChar → " << copyChar << std::endl;
     auto copyAttr = TextAttribute{ FOREGROUND_GREEN | BACKGROUND_RED };
     copyAttr.SetIntense(true);
     _FillLines(0, 3, copyChar, copyAttr);
@@ -8067,25 +8594,30 @@ void ScreenBufferTests::CopyDoubleWidthRectangularArea()
 
     Log::Comment(L"The first 30 columns of the target area should remain unchanged");
     const auto thirtyBufferChars = std::wstring(30, bufferChar);
+	std::cerr << "ScreenBufferTests::CopyDoubleWidthRectangularArea(): thirtyBufferChars → " << thirtyBufferChars << std::endl;
     VERIFY_IS_TRUE(_ValidateLinesContain(3, 6, thirtyBufferChars, bufferAttr));
 
     Log::Comment(L"The next 20 columns should contain the copied content");
     const auto twentyCopyChars = std::wstring(20, copyChar);
+	std::cerr << "ScreenBufferTests::CopyDoubleWidthRectangularArea(): twentyCopyChars → " << twentyCopyChars << std::endl;
     VERIFY_IS_TRUE(_ValidateLineContains({ 30, 3 }, twentyCopyChars, copyAttr));
     VERIFY_IS_TRUE(_ValidateLineContains({ 30, 5 }, twentyCopyChars, copyAttr));
 
     Log::Comment(L"But the second target row ends after 10, because of the double-width source");
     const auto tenCopyChars = std::wstring(10, copyChar);
+	std::cerr << "ScreenBufferTests::CopyDoubleWidthRectangularArea(): tenCopyChars → " << tenCopyChars << std::endl;
     VERIFY_IS_TRUE(_ValidateLineContains({ 30, 4 }, tenCopyChars, copyAttr));
 
     Log::Comment(L"The subsequent columns in each row should remain unchanged");
     VERIFY_IS_TRUE(_ValidateLineContains({ 50, 3 }, bufferChar, bufferAttr));
     VERIFY_IS_TRUE(_ValidateLineContains({ 40, 4 }, bufferChar, bufferAttr));
     VERIFY_IS_TRUE(_ValidateLineContains({ 50, 5 }, bufferChar, bufferAttr));
+	std::cerr << "<<< Exiting ScreenBufferTests::CopyDoubleWidthRectangularArea()" << std::endl;
 }
 
 void ScreenBufferTests::DelayedWrapReset()
 {
+	std::cerr << ">>> Entering ScreenBufferTests::DelayedWrapReset()" << std::endl;
     BEGIN_TEST_METHOD_PROPERTIES()
         TEST_METHOD_PROPERTY(L"IsolationLevel", L"Method")
         TEST_METHOD_PROPERTY(L"Data:op", L"{0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35}")
@@ -8193,10 +8725,14 @@ void ScreenBufferTests::DelayedWrapReset()
 
 void ScreenBufferTests::MultilineWrap()
 {
+	std::cerr << ">>> Entering ScreenBufferTests::MultilineWrap()" << std::endl;
     auto& gci = ServiceLocator::LocateGlobals().getConsoleInformation();
     auto& si = gci.GetActiveOutputBuffer().GetActiveBuffer();
     auto& stateMachine = si.GetStateMachine();
     const auto bufferAttr = si.GetTextBuffer().GetCurrentAttributes();
+	std::cerr << "ScreenBufferTests::MultilineWrap(): bufferAttr → " << bufferAttr << std::endl;
+	std::cerr << "ScreenBufferTests::MultilineWrap(): width → " << width << std::endl;
+	std::cerr << "ScreenBufferTests::MultilineWrap(): bottomRow → " << bottomRow << std::endl;
     const auto width = si.GetTextBuffer().GetSize().Width();
     const auto bottomRow = si.GetViewport().BottomInclusive();
 
@@ -8222,10 +8758,12 @@ void ScreenBufferTests::MultilineWrap()
     VERIFY_IS_TRUE(_ValidateLineContains(bottomRow + 1, L"2", bufferAttr));
     VERIFY_IS_TRUE(_ValidateLineContains(bottomRow + 2, L"3", bufferAttr));
     VERIFY_IS_TRUE(_ValidateLineContains(bottomRow + 3, L"4", bufferAttr));
+	std::cerr << "<<< Exiting ScreenBufferTests::MultilineWrap()" << std::endl;
 }
 
 void ScreenBufferTests::EraseColorMode()
 {
+	std::cerr << ">>> Entering ScreenBufferTests::EraseColorMode()" << std::endl;
     BEGIN_TEST_METHOD_PROPERTIES()
         TEST_METHOD_PROPERTY(L"Data:op", L"{0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19}")
         TEST_METHOD_PROPERTY(L"Data:eraseMode", L"{false,true}")
@@ -8317,6 +8855,7 @@ void ScreenBufferTests::EraseColorMode()
 
 void ScreenBufferTests::SimpleMarkCommand()
 {
+	std::cerr << ">>> Entering ScreenBufferTests::SimpleMarkCommand()" << std::endl;
     if (!Feature_ScrollbarMarks::IsEnabled())
     {
         Log::Result(WEX::Logging::TestResults::Skipped);
@@ -8333,6 +8872,7 @@ void ScreenBufferTests::SimpleMarkCommand()
 
     {
         const auto currentRowOffset = tbi.GetCursor().GetPosition().y;
+		std::cerr << "ScreenBufferTests::SimpleMarkCommand(): currentRowOffset → " << currentRowOffset << std::endl;
         auto& currentRow = tbi.GetRowByOffset(currentRowOffset);
 
         stateMachine.ProcessString(FTCS_A L"A Prompt" FTCS_B L"my_command" FTCS_C L"\n");
@@ -8358,10 +8898,12 @@ void ScreenBufferTests::SimpleMarkCommand()
     std::vector<std::wstring> expectedCommands{ L"my_command",
                                                 L"some of a command & more of a command" };
     VERIFY_ARE_EQUAL(expectedCommands, tbi.Commands());
+	std::cerr << "<<< Exiting ScreenBufferTests::SimpleMarkCommand()" << std::endl;
 }
 
 void ScreenBufferTests::SimpleWrappedCommand()
 {
+	std::cerr << ">>> Entering ScreenBufferTests::SimpleWrappedCommand()" << std::endl;
     BEGIN_TEST_METHOD_PROPERTIES()
         TEST_METHOD_PROPERTY(L"IsolationLevel", L"Method")
     END_TEST_METHOD_PROPERTIES()
@@ -8424,6 +8966,7 @@ void ScreenBufferTests::SimpleWrappedCommand()
 
 static void _writePrompt(StateMachine& stateMachine, const auto& path)
 {
+	std::cerr << ">>> Entering _writePrompt(stateMachine=" << stateMachine << ",path=" << path << ")" << std::endl;
     stateMachine.ProcessString(FTCS_D);
     stateMachine.ProcessString(FTCS_A);
     stateMachine.ProcessString(L"\x1b]9;9;");
@@ -8433,10 +8976,12 @@ static void _writePrompt(StateMachine& stateMachine, const auto& path)
     stateMachine.ProcessString(path);
     stateMachine.ProcessString(L"> ");
     stateMachine.ProcessString(FTCS_B);
+	std::cerr << "<<< Exiting _writePrompt(stateMachine=" << stateMachine << ",path=" << path << ")" << std::endl;
 }
 
 void ScreenBufferTests::SimplePromptRegions()
 {
+	std::cerr << ">>> Entering ScreenBufferTests::SimplePromptRegions()" << std::endl;
     if (!Feature_ScrollbarMarks::IsEnabled())
     {
         Log::Result(WEX::Logging::TestResults::Skipped);
@@ -8479,6 +9024,7 @@ void ScreenBufferTests::SimplePromptRegions()
     VERIFY_IS_TRUE(row4.GetScrollbarData().has_value());
 
     const auto marks = tbi.GetMarkExtents();
+	std::cerr << "ScreenBufferTests::SimplePromptRegions(): marks → " << marks << std::endl;
     VERIFY_ARE_EQUAL(2u, marks.size());
 
     {
@@ -8502,4 +9048,5 @@ void ScreenBufferTests::SimplePromptRegions()
         VERIFY_IS_FALSE(mark.commandEnd.has_value());
         VERIFY_IS_FALSE(mark.outputEnd.has_value());
     }
+	std::cerr << "<<< Exiting ScreenBufferTests::SimplePromptRegions()" << std::endl;
 }

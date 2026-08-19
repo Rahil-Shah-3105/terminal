@@ -1,3 +1,4 @@
+#include <stdio.h>
 // Copyright (c) Microsoft Corporation.
 // Licensed under the MIT license.
 
@@ -16,10 +17,12 @@ namespace til
     template<typename T, typename I>
     constexpr auto at(T&& cont, const I i) noexcept -> decltype(auto)
     {
+	fprintf(stderr, ">>> Entering at(cont=%d,i=%d)\n", cont, i);
 #pragma warning(suppress : 26481) // Don't use pointer arithmetic. Use span instead (bounds.1).
 #pragma warning(suppress : 26482) // Suppress bounds.2 check for indexing with constant expressions
 #pragma warning(suppress : 26446) // Suppress bounds.4 check for subscript operator.
 #pragma warning(suppress : 26445) // Suppress lifetime check for a reference to std::span or std::string_view
+		fprintf(stderr, "<<< Exiting at(cont=%d,i=%d)\n", cont, i);
         return cont[i];
     }
 }

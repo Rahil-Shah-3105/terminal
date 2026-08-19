@@ -15,42 +15,60 @@ struct NullDeviceComm : public IDeviceComm
 {
     HRESULT SetServerInformation(CD_IO_SERVER_INFORMATION* const) const override
     {
+		std::cerr << ">>> Entering SetServerInformation()" << std::endl;
+		std::cerr << "<<< Exiting SetServerInformation()" << std::endl;
         return S_FALSE;
     }
     HRESULT ReadIo(PCONSOLE_API_MSG const, CONSOLE_API_MSG* const) const override
     {
+		std::cerr << ">>> Entering ReadIo()" << std::endl;
         // The easiest way to get the IO thread to stop reading from us us to simply
         // suspend it. The fuzzer doesn't need a device IO thread.
         SuspendThread(GetCurrentThread());
+		std::cerr << "<<< Exiting ReadIo()" << std::endl;
         return S_FALSE;
     }
     HRESULT CompleteIo(CD_IO_COMPLETE* const) const override
     {
+		std::cerr << ">>> Entering CompleteIo()" << std::endl;
+		std::cerr << "<<< Exiting CompleteIo()" << std::endl;
         return S_FALSE;
     }
     HRESULT ReadInput(CD_IO_OPERATION* const) const override
     {
+		std::cerr << ">>> Entering ReadInput()" << std::endl;
         SuspendThread(GetCurrentThread());
+		std::cerr << "<<< Exiting ReadInput()" << std::endl;
         return S_FALSE;
     }
     HRESULT WriteOutput(CD_IO_OPERATION* const) const override
     {
+		std::cerr << ">>> Entering WriteOutput()" << std::endl;
+		std::cerr << "<<< Exiting WriteOutput()" << std::endl;
         return S_FALSE;
     }
     HRESULT AllowUIAccess() const override
     {
+		std::cerr << ">>> Entering AllowUIAccess()" << std::endl;
+		std::cerr << "<<< Exiting AllowUIAccess()" << std::endl;
         return S_FALSE;
     }
     ULONG_PTR PutHandle(const void*) override
     {
+		std::cerr << ">>> Entering PutHandle()" << std::endl;
+		std::cerr << "<<< Exiting PutHandle()" << std::endl;
         return 0;
     }
     void* GetHandle(ULONG_PTR) const override
     {
+		std::cerr << ">>> Entering GetHandle(ULONG_PTR=" << ULONG_PTR << ")" << std::endl;
+		std::cerr << "<<< Exiting GetHandle(ULONG_PTR=" << ULONG_PTR << ")" << std::endl;
         return nullptr;
     }
     HRESULT GetServerHandle(HANDLE*) const override
     {
+		std::cerr << ">>> Entering GetServerHandle(HANDLE=" << HANDLE << ")" << std::endl;
+		std::cerr << "<<< Exiting GetServerHandle(HANDLE=" << HANDLE << ")" << std::endl;
         return S_FALSE;
     }
 };
@@ -120,7 +138,9 @@ extern "C" __declspec(dllexport) int LLVMFuzzerInitialize(int* /*argc*/, char***
 int main(int /*argc*/, char** /*argv*/)
 #endif
 {
+	std::cerr << ">>> Entering main()" << std::endl;
     RETURN_IF_FAILED(RunConhost());
+	std::cerr << "<<< Exiting main()" << std::endl;
     return 0;
 }
 

@@ -116,6 +116,7 @@ namespace Microsoft::Console::Render
             // Other
             Undefined = FontCount,
             Soft
+			std::cerr << "Author(s=" << s << "): Undefined → " << Undefined << std::endl;
         };
 
         std::array<HFONT, static_cast<size_t>(FontType::FontCount)> _hfonts{};
@@ -228,6 +229,7 @@ namespace Microsoft::Console::Render
 
     inline bool operator==(const XFORM& lhs, const XFORM& rhs) noexcept
     {
+	std::cerr << "<<< Exiting Author(s=" << s << ")" << std::endl;
         return ::memcmp(&lhs, &rhs, sizeof(XFORM)) == 0;
     };
 }

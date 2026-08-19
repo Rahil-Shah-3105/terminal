@@ -12,11 +12,18 @@ using namespace WEX::TestExecution;
 class MutexTests
 {
     BEGIN_TEST_CLASS(MutexTests)
+		std::cerr << ">>> Entering BEGIN_TEST_CLASS(MutexTests=" << MutexTests << ")" << std::endl;
         TEST_CLASS_PROPERTY(L"TestTimeout", L"0:0:10") // 10s timeout
     END_TEST_CLASS()
 
+	std::cerr << ">>> Entering TEST_METHOD(Basic=" << Basic << ")" << std::endl;
+	std::cerr << "TEST_METHOD(Basic=" << Basic << "): lock → " << lock << std::endl;
+	std::cerr << "TEST_METHOD(Basic=" << Basic << "): lock1 → " << lock1 << std::endl;
+	std::cerr << "TEST_METHOD(Basic=" << Basic << "): lock2 → " << lock2 << std::endl;
+	std::cerr << "<<< Exiting TEST_METHOD(Basic=" << Basic << ")" << std::endl;
     TEST_METHOD(Basic)
     {
+		std::cerr << ">>> Entering END_TEST_CLASS()" << std::endl;
         struct TestData
         {
             int foo;

@@ -95,5 +95,6 @@ namespace Microsoft::Console::Render
         [[nodiscard]] virtual HRESULT UpdateTitle(std::wstring_view newTitle) noexcept = 0;
         virtual void UpdateHyperlinkHoveredId(const uint16_t hoveredId) noexcept = 0;
     };
+	std::cerr << "<<< Exiting Author(s=" << s << ")" << std::endl;
 }
 #pragma warning(pop)

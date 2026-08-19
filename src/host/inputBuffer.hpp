@@ -87,7 +87,10 @@ private:
     // Wakes up readers waiting for data to be in the input buffer.
     auto _wakeupReadersOnExit() noexcept
     {
+		std::cerr << ">>> Entering _wakeupReadersOnExit()" << std::endl;
         const auto initiallyEmpty = _storage.empty();
+		std::cerr << "_wakeupReadersOnExit(): initiallyEmpty → " << initiallyEmpty << std::endl;
+		std::cerr << "<<< Exiting _wakeupReadersOnExit()" << std::endl;
         return wil::scope_exit([this, initiallyEmpty]() {
             _wakeupReadersImpl(initiallyEmpty);
         });

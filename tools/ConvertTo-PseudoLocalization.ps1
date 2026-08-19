@@ -60,6 +60,7 @@ $content.PreserveWhitespace = $true
 $content.Load($Path)
 
 function GetPseudoLocalization([string]$key, [string]$value, [string]$comment) {
+	Write-Host "[DEBUG] >>> Entering GetPseudoLocalization()"
     $placeholders = @{}
     $placeholderChar = 0xE000
 
@@ -120,6 +121,7 @@ function GetPseudoLocalization([string]$key, [string]$value, [string]$comment) {
         $newValue + $padding.Substring(0, $paddingLength)
     }
     $lines = $lines -join "`r`n"
+	Write-Host "[DEBUG] <<< Exiting GetPseudoLocalization()"
     return $lines
 }
 

@@ -1,3 +1,4 @@
+#include <stdio.h>
 // Copyright (c) Microsoft Corporation.
 // Licensed under the MIT license.
 
@@ -9,6 +10,8 @@ struct ViewModelHelper
 public:
     winrt::event_token PropertyChanged(const ::winrt::Windows::UI::Xaml::Data::PropertyChangedEventHandler& handler)
     {
+		fprintf(stderr, ">>> Entering PropertyChanged(handler=%d)\n", handler);
+        fprintf(stderr, "<<< Exiting PropertyChanged(handler=%d)\n", handler);
         return _propertyChangedHandlers.add(handler);
     }
 
@@ -20,7 +23,9 @@ public:
 protected:
     void _NotifyChangeCore(const std::wstring_view name)
     {
+		fprintf(stderr, ">>> Entering _NotifyChangeCore(name=%d)\n", name);
         _propertyChangedHandlers(*static_cast<T*>(this), ::winrt::Windows::UI::Xaml::Data::PropertyChangedEventArgs{ name });
+		fprintf(stderr, "<<< Exiting _NotifyChangeCore(name=%d)\n", name);
     }
 
     // template recursion base case: single dispatch
@@ -29,8 +34,10 @@ protected:
     template<typename... Args>
     void _NotifyChanges(const std::wstring_view name, Args&&... more)
     {
+		fprintf(stderr, ">>> Entering _NotifyChanges(name=%d,more=%d)\n", name, more);
         _NotifyChangeCore(name);
         _NotifyChanges(std::forward<Args>(more)...);
+		fprintf(stderr, "<<< Exiting _NotifyChanges(name=%d,more=%d)\n", name, more);
     }
 
 protected:

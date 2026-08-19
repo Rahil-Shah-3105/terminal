@@ -34,27 +34,35 @@ static const char CTRL_D = 0x4;
 
 void csi(string seq)
 {
+	std::cerr << ">>> Entering csi(seq=" << seq << ")" << std::endl;
     if (!gVtOutput)
     {
         return;
     }
     string fullSeq = "\x1b[";
+	std::cerr << "csi(seq=" << seq << "): fullSeq → " << fullSeq << std::endl;
     fullSeq += seq;
     printf(fullSeq.c_str());
+	std::cerr << "<<< Exiting csi(seq=" << seq << ")" << std::endl;
 }
 
 void useAltBuffer()
 {
+	std::cerr << ">>> Entering useAltBuffer()" << std::endl;
     csi("?1049h");
+	std::cerr << "<<< Exiting useAltBuffer()" << std::endl;
 }
 
 void useMainBuffer()
 {
+	std::cerr << ">>> Entering useMainBuffer()" << std::endl;
     csi("?1049l");
+	std::cerr << "<<< Exiting useMainBuffer()" << std::endl;
 }
 
 void toPrintableBufferA(char c, char* printBuffer, int* printCch)
 {
+	std::cerr << ">>> Entering toPrintableBufferA(c=" << c << ",printBuffer=" << printBuffer << ",printCch=" << printCch << ")" << std::endl;
     if (c == '\x1b')
     {
         printBuffer[0] = '^';
@@ -111,9 +119,11 @@ void toPrintableBufferA(char c, char* printBuffer, int* printCch)
         printBuffer[2] = '\0';
         *printCch = 2;
     }
+	std::cerr << "<<< Exiting toPrintableBufferA(c=" << c << ",printBuffer=" << printBuffer << ",printCch=" << printCch << ")" << std::endl;
 }
 void toPrintableBufferW(wchar_t c, wchar_t* printBuffer, int* printCch)
 {
+	std::cerr << ">>> Entering toPrintableBufferW(c=" << c << ",printBuffer=" << printBuffer << ",printCch=" << printCch << ")" << std::endl;
     if (c == L'\x1b')
     {
         printBuffer[0] = L'^';
@@ -170,10 +180,12 @@ void toPrintableBufferW(wchar_t c, wchar_t* printBuffer, int* printCch)
         printBuffer[2] = L'\0';
         *printCch = 2;
     }
+	std::cerr << "<<< Exiting toPrintableBufferW(c=" << c << ",printBuffer=" << printBuffer << ",printCch=" << printCch << ")" << std::endl;
 }
 
 void handleKeyEventA(KEY_EVENT_RECORD keyEvent)
 {
+	std::cerr << ">>> Entering handleKeyEventA(keyEvent=" << keyEvent << ")" << std::endl;
     char printBuffer[3];
     int printCch = 0;
     const char c = keyEvent.uChar.AsciiChar;
@@ -201,11 +213,14 @@ void handleKeyEventA(KEY_EVENT_RECORD keyEvent)
     if (keyEvent.uChar.AsciiChar == CTRL_D)
     {
         gExitRequested = true;
+		std::cerr << "handleKeyEventA(keyEvent=" << keyEvent << "): gExitRequested → " << gExitRequested << std::endl;
     }
+	std::cerr << "<<< Exiting handleKeyEventA(keyEvent=" << keyEvent << ")" << std::endl;
 }
 
 void handleKeyEventW(KEY_EVENT_RECORD keyEvent)
 {
+	std::cerr << ">>> Entering handleKeyEventW(keyEvent=" << keyEvent << ")" << std::endl;
     wchar_t printBuffer[3];
     int printCch = 0;
     const wchar_t c = keyEvent.uChar.UnicodeChar;
@@ -233,17 +248,21 @@ void handleKeyEventW(KEY_EVENT_RECORD keyEvent)
     if (c == CTRL_D)
     {
         gExitRequested = true;
+		std::cerr << "handleKeyEventW(keyEvent=" << keyEvent << "): gExitRequested → " << gExitRequested << std::endl;
     }
+	std::cerr << "<<< Exiting handleKeyEventW(keyEvent=" << keyEvent << ")" << std::endl;
 }
 
 void handleWindowEvent(WINDOW_BUFFER_SIZE_RECORD windowEvent)
 {
+	std::cerr << ">>> Entering handleWindowEvent(windowEvent=" << windowEvent << ")" << std::endl;
     SHORT bufferWidth = windowEvent.dwSize.X;
     SHORT bufferHeight = windowEvent.dwSize.Y;
 
     CONSOLE_SCREEN_BUFFER_INFOEX csbiex = { 0 };
     csbiex.cbSize = sizeof(CONSOLE_SCREEN_BUFFER_INFOEX);
     bool fSuccess = !!GetConsoleScreenBufferInfoEx(g_hOut, &csbiex);
+	std::cerr << "handleWindowEvent(windowEvent=" << windowEvent << "): fSuccess → " << fSuccess << std::endl;
     if (fSuccess)
     {
         SMALL_RECT srViewport = csbiex.srWindow;
@@ -260,6 +279,7 @@ void handleWindowEvent(WINDOW_BUFFER_SIZE_RECORD windowEvent)
                 viewWidth,
                 viewHeight);
     }
+	std::cerr << "<<< Exiting handleWindowEvent(windowEvent=" << windowEvent << ")" << std::endl;
 }
 
 BOOL WINAPI CtrlHandler(DWORD fdwCtrlType)
@@ -277,6 +297,7 @@ BOOL WINAPI CtrlHandler(DWORD fdwCtrlType)
 
 void usage()
 {
+	std::cerr << ">>> Entering usage()" << std::endl;
     wprintf(L"usage: echokey [options]\n");
     wprintf(L"options:\n");
     wprintf(L"\t-i: enable reading VT input mode.\n");
@@ -285,6 +306,7 @@ void usage()
     wprintf(L"\t-a: Use ReadConsoleInputA instead.\n");
     wprintf(L"\t--alt: run in the alt buffer. Cannot be combined with `-o`\n");
     wprintf(L"\t-?: print this help message\n");
+	std::cerr << "<<< Exiting usage()" << std::endl;
 }
 
 int __cdecl wmain(int argc, wchar_t* argv[])

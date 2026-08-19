@@ -1,3 +1,4 @@
+#include <stdio.h>
 // Copyright (c) Microsoft Corporation.
 // Licensed under the MIT license.
 
@@ -11,6 +12,8 @@ public:
 
     static T* GetThisFromHandle(HWND const window) noexcept
     {
+		fprintf(stderr, ">>> Entering GetThisFromHandle(window=%d)\n", window);
+        fprintf(stderr, "<<< Exiting GetThisFromHandle(window=%d)\n", window);
         return reinterpret_cast<T*>(GetWindowLongPtr(window, GWLP_USERDATA));
     }
 
@@ -110,23 +113,30 @@ public:
 
     RECT GetWindowRect() const noexcept
     {
+		fprintf(stderr, ">>> Entering GetWindowRect()\n");
         RECT rc = { 0 };
         ::GetWindowRect(_window.get(), &rc);
+		fprintf(stderr, "<<< Exiting GetWindowRect()\n");
         return rc;
     }
 
     HWND GetHandle() const noexcept
     {
+		fprintf(stderr, ">>> Entering GetHandle()\n");
+        fprintf(stderr, "<<< Exiting GetHandle()\n");
         return _window.get();
     }
 
     UINT GetCurrentDpi() const noexcept
     {
+		fprintf(stderr, ">>> Entering GetCurrentDpi()\n");
+        fprintf(stderr, "<<< Exiting GetCurrentDpi()\n");
         return ::GetDpiForWindow(_window.get());
     }
 
     float GetCurrentDpiScale() const noexcept
     {
+		fprintf(stderr, ">>> Entering GetCurrentDpiScale()\n");
         const auto dpi = ::GetDpiForWindow(_window.get());
         const auto scale = static_cast<float>(dpi) / static_cast<float>(USER_DEFAULT_SCREEN_DPI);
         return scale;
@@ -135,10 +145,12 @@ public:
     //// Gets the physical size of the client area of the HWND in _window
     til::size GetPhysicalSize() const noexcept
     {
+		fprintf(stderr, ">>> Entering GetPhysicalSize()\n");
         RECT rect = {};
         GetClientRect(_window.get(), &rect);
         const auto windowsWidth = rect.right - rect.left;
         const auto windowsHeight = rect.bottom - rect.top;
+		fprintf(stderr, "<<< Exiting GetPhysicalSize()\n");
         return { windowsWidth, windowsHeight };
     }
 
@@ -153,6 +165,7 @@ public:
     ////   https://docs.microsoft.com/en-us/windows/desktop/hidpi/high-dpi-desktop-application-development-on-windows#per-monitor-and-per-monitor-v2-dpi-awareness
     winrt::Windows::Foundation::Size GetLogicalSize(const til::size physicalSize) const noexcept
     {
+		fprintf(stderr, ">>> Entering GetLogicalSize(physicalSize=%d)\n", physicalSize);
         const auto scale = GetCurrentDpiScale();
         // 0.5 is to ensure that we pixel snap correctly at the edges, this is necessary with odd DPIs like 1.25, 1.5, 1, .75
         const auto logicalWidth = (physicalSize.width / scale) + 0.5f;
@@ -173,8 +186,11 @@ public:
     // - <none>
     void UpdateTitle(std::wstring_view newTitle)
     {
+		fprintf(stderr, ">>> Entering UpdateTitle(newTitle=%d)\n", newTitle);
         _title = newTitle;
         PostMessageW(_window.get(), CM_UPDATE_TITLE, 0, reinterpret_cast<LPARAM>(nullptr));
+		fprintf(stderr, "UpdateTitle(newTitle=%d): _title → %d\n", newTitle, _title);
+    fprintf(stderr, "<<< Exiting UpdateTitle(newTitle=%d)\n", newTitle);
     }
 
     // Method Description:
@@ -183,7 +199,11 @@ public:
     // the window will launch
     void RefreshCurrentDPI()
     {
+		fprintf(stderr, ">>> Entering RefreshCurrentDPI()\n");
         _currentDpi = GetDpiForWindow(_window.get());
+		fprintf(stderr, "RefreshCurrentDPI(): _currentDpi → %d\n", _currentDpi);
+    fprintf(stderr, "RefreshCurrentDPI(): _currentDpi → %d\n", _currentDpi);
+    fprintf(stderr, "<<< Exiting RefreshCurrentDPI()\n");
     }
 
 protected:
@@ -199,7 +219,9 @@ protected:
 
     void _setupUserData()
     {
+		fprintf(stderr, ">>> Entering _setupUserData()\n");
         SetWindowLongPtr(_window.get(), GWLP_USERDATA, reinterpret_cast<LONG_PTR>(static_cast<T*>(this)));
+		fprintf(stderr, "<<< Exiting _setupUserData()\n");
     }
     // Method Description:
     // - This method is called when the window receives the WM_NCCREATE message.

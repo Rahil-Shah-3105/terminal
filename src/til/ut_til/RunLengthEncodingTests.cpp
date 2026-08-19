@@ -22,8 +22,11 @@ namespace WEX::TestExecution
     public:
         static bool AreEqual(const ::std::string_view& expected, const rle_vector& actual) noexcept
         {
+			std::cerr << ">>> Entering AreEqual(expected=" << expected << ",actual=" << actual << ")" << std::endl;
             auto it = expected.data();
             const auto end = it + expected.size();
+			std::cerr << "AreEqual(expected=" << expected << ",actual=" << actual << "): end → " << end << std::endl;
+			std::cerr << "AreEqual(expected=" << expected << ",actual=" << actual << "): it → " << it << std::endl;
             size_t expected_size = 0;
 
             for (const auto& run : actual.runs())
@@ -61,6 +64,7 @@ namespace WEX::TestExecution
                     }
 
                     const value_type expected_value = ch - '0';
+					std::cerr << "AreEqual(expected=" << expected << ",actual=" << actual << "): expected_value → " << expected_value << std::endl;
                     if (expected_value != actual_value)
                     {
                         return false;
@@ -71,11 +75,14 @@ namespace WEX::TestExecution
                 }
             }
 
+			std::cerr << "<<< Exiting AreEqual(expected=" << expected << ",actual=" << actual << ")" << std::endl;
             return it == end && expected_size == actual.size();
         }
 
         static bool AreSame(const ::std::string_view& expected, const rle_vector& actual) noexcept
         {
+			std::cerr << ">>> Entering AreSame(expected=" << expected << ",actual=" << actual << ")" << std::endl;
+			std::cerr << "<<< Exiting AreSame(expected=" << expected << ",actual=" << actual << ")" << std::endl;
             return false;
         }
 
@@ -98,6 +105,7 @@ class RunLengthEncodingTests
 
     static rle_container rle_encode(const std::string_view& from)
     {
+		std::cerr << ">>> Entering rle_encode(from=" << from << ")" << std::endl;
         if (from.empty())
         {
             return {};
@@ -105,7 +113,9 @@ class RunLengthEncodingTests
 
         rle_container to;
         value_type value = from.front() - '0';
+		std::cerr << "rle_encode(from=" << from << "): value → " << value << std::endl;
         size_type length = 0;
+		std::cerr << "rle_encode(from=" << from << "): length → " << length << std::endl;
 
         for (auto ch : from)
         {
@@ -115,6 +125,7 @@ class RunLengthEncodingTests
             }
 
             const value_type val = ch - '0';
+			std::cerr << "rle_encode(from=" << from << "): val → " << val << std::endl;
             if (val != value)
             {
                 to.emplace_back(value, length);
@@ -130,6 +141,7 @@ class RunLengthEncodingTests
             to.emplace_back(value, length);
         }
 
+		std::cerr << "<<< Exiting rle_encode(from=" << from << ")" << std::endl;
         return to;
     }
 
@@ -166,6 +178,7 @@ class RunLengthEncodingTests
 
     static basic_container rle_decode(const rle_container& from)
     {
+		std::cerr << ">>> Entering rle_decode(from=" << from << ")" << std::endl;
         basic_container to;
         to.reserve(from.size());
 
@@ -177,14 +190,19 @@ class RunLengthEncodingTests
             }
         }
 
+		std::cerr << "<<< Exiting rle_decode(from=" << from << ")" << std::endl;
         return to;
     }
 
     TEST_CLASS(RunLengthEncodingTests)
 
+	std::cerr << ">>> Entering TEST_METHOD(ConstructDefault=" << ConstructDefault << ")" << std::endl;
+	std::cerr << "<<< Exiting TEST_METHOD(ConstructDefault=" << ConstructDefault << ")" << std::endl;
     TEST_METHOD(ConstructDefault)
     {
+		std::cerr << ">>> Entering TEST_METHOD(ConstructDefault=" << ConstructDefault << ")" << std::endl;
         rle_vector rle{};
+		std::cerr << ">>> Entering TEST_CLASS(RunLengthEncodingTests=" << RunLengthEncodingTests << ")" << std::endl;
         VERIFY_ARE_EQUAL(0u, rle.size());
         VERIFY_IS_TRUE(rle.empty());
 
@@ -193,26 +211,40 @@ class RunLengthEncodingTests
         rle.replace(0, 0, rle_type{ 1, 5 });
         VERIFY_ARE_EQUAL(5u, rle.size());
         VERIFY_IS_FALSE(rle.empty());
+		std::cerr << "<<< Exiting TEST_METHOD(ConstructDefault=" << ConstructDefault << ")" << std::endl;
     }
 
+	std::cerr << ">>> Entering TEST_METHOD(ConstructWithInitializerList=" << ConstructWithInitializerList << ")" << std::endl;
     TEST_METHOD(ConstructWithInitializerList)
     {
+		std::cerr << ">>> Entering TEST_METHOD(ConstructWithInitializerList=" << ConstructWithInitializerList << ")" << std::endl;
         rle_vector rle{ { { 1, 3 }, { 2, 2 }, { 1, 3 } } };
         VERIFY_ARE_EQUAL("1 1 1|2 2|1 1 1"sv, rle);
     }
 
+	std::cerr << ">>> Entering TEST_METHOD(ConstructWithLengthAndValue=" << ConstructWithLengthAndValue << ")" << std::endl;
+	std::cerr << "<<< Exiting TEST_METHOD(ConstructWithInitializerList=" << ConstructWithInitializerList << ")" << std::endl;
     TEST_METHOD(ConstructWithLengthAndValue)
     {
+		std::cerr << ">>> Entering TEST_METHOD(ConstructWithLengthAndValue=" << ConstructWithLengthAndValue << ")" << std::endl;
         rle_vector rle(5, 1);
+		std::cerr << "<<< Exiting TEST_METHOD(ConstructWithInitializerList=" << ConstructWithInitializerList << ")" << std::endl;
         VERIFY_ARE_EQUAL("1 1 1 1 1"sv, rle);
     }
 
+	std::cerr << ">>> Entering TEST_METHOD(CopyAndMove=" << CopyAndMove << ")" << std::endl;
+	std::cerr << "TEST_METHOD(CopyAndMove=" << CopyAndMove << "): expected_empty → " << expected_empty << std::endl;
+	std::cerr << "TEST_METHOD(CopyAndMove=" << CopyAndMove << "): expected_full → " << expected_full << std::endl;
+	std::cerr << "<<< Exiting TEST_METHOD(ConstructWithLengthAndValue=" << ConstructWithLengthAndValue << ")" << std::endl;
+	std::cerr << "TEST_METHOD(CopyAndMove=" << CopyAndMove << "): rle1 → " << rle1 << std::endl;
     TEST_METHOD(CopyAndMove)
     {
+		std::cerr << ">>> Entering TEST_METHOD(CopyAndMove=" << CopyAndMove << ")" << std::endl;
         constexpr auto expected_full = "1 1 1|2 2|1 1 1"sv;
         constexpr auto expected_empty = ""sv;
 
         rle_vector rle1{ { { 1, 3 }, { 2, 2 }, { 1, 3 } } };
+		std::cerr << "<<< Exiting TEST_METHOD(ConstructWithLengthAndValue=" << ConstructWithLengthAndValue << ")" << std::endl;
         rle_vector rle2;
         VERIFY_ARE_EQUAL(expected_full, rle1);
         VERIFY_ARE_EQUAL(expected_empty, rle2);
@@ -235,9 +267,13 @@ class RunLengthEncodingTests
         VERIFY_ARE_EQUAL(expected_full, rle1);
     }
 
+	std::cerr << ">>> Entering TEST_METHOD(At=" << At << ")" << std::endl;
+	std::cerr << "<<< Exiting TEST_METHOD(CopyAndMove=" << CopyAndMove << ")" << std::endl;
     TEST_METHOD(At)
     {
+		std::cerr << ">>> Entering TEST_METHOD(At=" << At << ")" << std::endl;
         rle_vector rle{
+			std::cerr << "<<< Exiting TEST_METHOD(CopyAndMove=" << CopyAndMove << ")" << std::endl;
             {
                 { 1, 1 },
                 { 3, 2 },
@@ -259,9 +295,12 @@ class RunLengthEncodingTests
         VERIFY_THROWS(rle.at(9), std::out_of_range);
     }
 
+	std::cerr << ">>> Entering TEST_METHOD(Slice=" << Slice << ")" << std::endl;
+	std::cerr << "<<< Exiting TEST_METHOD(At=" << At << ")" << std::endl;
     TEST_METHOD(Slice)
     {
         rle_vector rle{
+			std::cerr << "<<< Exiting TEST_METHOD(At=" << At << ")" << std::endl;
             {
                 { 1, 1 },
                 { 3, 2 },
@@ -295,6 +334,8 @@ class RunLengthEncodingTests
         VERIFY_ARE_EQUAL("3|2|1 1"sv, rle.slice(2, 6));
     }
 
+	std::cerr << "<<< Exiting TEST_METHOD(Slice=" << Slice << ")" << std::endl;
+	std::cerr << "TEST_METHOD(Replace=" << Replace << "): change → " << change << std::endl;
     TEST_METHOD(Replace)
     {
         struct TestCase
@@ -467,6 +508,8 @@ class RunLengthEncodingTests
         VERIFY_IS_TRUE(rle1 != rle2);
     }
 
+	std::cerr << "TEST_METHOD(Iterators=" << Iterators << "): end → " << end << std::endl;
+	std::cerr << "TEST_METHOD(Iterators=" << Iterators << "): beg → " << beg << std::endl;
     TEST_METHOD(Iterators)
     {
         using difference_type = rle_vector::const_iterator::difference_type;

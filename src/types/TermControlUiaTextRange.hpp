@@ -60,4 +60,5 @@ namespace Microsoft::Terminal
         void _TranslatePointFromScreen(til::point& screenPoint) const override;
         til::size _getScreenFontSize() const noexcept override;
     };
+	std::cerr << "<<< Exiting Author(s=" << s << ")" << std::endl;
 }

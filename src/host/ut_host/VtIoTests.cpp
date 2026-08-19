@@ -21,11 +21,15 @@ static constexpr WORD blu = FOREGROUND_BLUE | BACKGROUND_GREEN;
 
 constexpr CHAR_INFO ci_red(wchar_t ch) noexcept
 {
+	std::cerr << ">>> Entering ci_red(ch=" << ch << ")" << std::endl;
+	std::cerr << "<<< Exiting ci_red(ch=" << ch << ")" << std::endl;
     return { ch, red };
 }
 
 constexpr CHAR_INFO ci_blu(wchar_t ch) noexcept
 {
+	std::cerr << ">>> Entering ci_blu(ch=" << ch << ")" << std::endl;
+	std::cerr << "<<< Exiting ci_blu(ch=" << ch << ")" << std::endl;
     return { ch, blu };
 }
 
@@ -65,36 +69,48 @@ static constexpr std::wstring_view s_initialContentVTWide{
 class ::Microsoft::Console::VirtualTerminal::VtIoTests
 {
     BEGIN_TEST_CLASS(VtIoTests)
+		std::cerr << ">>> Entering BEGIN_TEST_CLASS(VtIoTests=" << VtIoTests << ")" << std::endl;
         TEST_CLASS_PROPERTY(L"IsolationLevel", L"Class")
     END_TEST_CLASS()
 
+	std::cerr << ">>> Entering END_TEST_CLASS()" << std::endl;
     CommonState commonState;
     ApiRoutines routines;
     SCREEN_INFORMATION* screenInfo = nullptr;
     wil::unique_hfile rx;
     char rxBuf[4096];
+	std::cerr << "<<< Exiting END_TEST_CLASS()" << std::endl;
 
     std::string_view readOutput() noexcept
     {
+		std::cerr << ">>> Entering readOutput()" << std::endl;
         DWORD read = 0;
         ReadFile(rx.get(), &rxBuf[0], sizeof(rxBuf), &read, nullptr);
+		std::cerr << "<<< Exiting readOutput()" << std::endl;
         return { &rxBuf[0], read };
     }
 
     void setupInitialContents(bool wide) const
     {
+		std::cerr << ">>> Entering setupInitialContents(wide=" << wide << ")" << std::endl;
         auto& sm = screenInfo->GetStateMachine();
         sm.ProcessString(L"\033c");
         sm.ProcessString(wide ? s_initialContentVTWide : s_initialContentVT);
         sm.ProcessString(L"\x1b[H" sgr_rst());
+		std::cerr << "<<< Exiting setupInitialContents(wide=" << wide << ")" << std::endl;
     }
 
     void resetContents() const
     {
+		std::cerr << ">>> Entering resetContents()" << std::endl;
         auto& sm = screenInfo->GetStateMachine();
         sm.ProcessString(L"\033c");
+		std::cerr << "<<< Exiting resetContents()" << std::endl;
     }
 
+	std::cerr << ">>> Entering TEST_CLASS_SETUP(ClassSetup=" << ClassSetup << ")" << std::endl;
+	std::cerr << "TEST_CLASS_SETUP(ClassSetup=" << ClassSetup << "): screenInfo → " << screenInfo << std::endl;
+	std::cerr << "<<< Exiting TEST_CLASS_SETUP(ClassSetup=" << ClassSetup << ")" << std::endl;
     TEST_CLASS_SETUP(ClassSetup)
     {
         wil::unique_hfile tx;
@@ -113,8 +129,13 @@ class ::Microsoft::Console::VirtualTerminal::VtIoTests
         return true;
     }
 
+	std::cerr << ">>> Entering TEST_METHOD(SetConsoleCursorPosition=" << SetConsoleCursorPosition << ")" << std::endl;
+	std::cerr << "TEST_METHOD(SetConsoleCursorPosition=" << SetConsoleCursorPosition << "): expected → " << expected << std::endl;
+	std::cerr << "TEST_METHOD(SetConsoleCursorPosition=" << SetConsoleCursorPosition << "): actual → " << actual << std::endl;
+	std::cerr << "<<< Exiting TEST_METHOD(SetConsoleCursorPosition=" << SetConsoleCursorPosition << ")" << std::endl;
     TEST_METHOD(SetConsoleCursorPosition)
     {
+		std::cerr << ">>> Entering TEST_METHOD(SetConsoleCursorPosition=" << SetConsoleCursorPosition << ")" << std::endl;
         THROW_IF_FAILED(routines.SetConsoleCursorPositionImpl(*screenInfo, { 2, 3 }));
         THROW_IF_FAILED(routines.SetConsoleCursorPositionImpl(*screenInfo, { 0, 0 }));
         THROW_IF_FAILED(routines.SetConsoleCursorPositionImpl(*screenInfo, { 7, 3 }));
@@ -125,9 +146,13 @@ class ::Microsoft::Console::VirtualTerminal::VtIoTests
         VERIFY_ARE_EQUAL(expected, actual);
     }
 
+	std::cerr << ">>> Entering TEST_METHOD(SetConsoleOutputMode=" << SetConsoleOutputMode << ")" << std::endl;
+	std::cerr << "TEST_METHOD(SetConsoleOutputMode=" << SetConsoleOutputMode << "): actual → " << actual << std::endl;
     TEST_METHOD(SetConsoleOutputMode)
     {
+		std::cerr << ">>> Entering TEST_METHOD(SetConsoleOutputMode=" << SetConsoleOutputMode << ")" << std::endl;
         const auto initialMode = screenInfo->OutputMode;
+		std::cerr << "<<< Exiting TEST_METHOD(SetConsoleCursorPosition=" << SetConsoleCursorPosition << ")" << std::endl;
         const auto cleanup = wil::scope_exit([=]() {
             screenInfo->OutputMode = initialMode;
         });
@@ -147,9 +172,16 @@ class ::Microsoft::Console::VirtualTerminal::VtIoTests
         VERIFY_ARE_EQUAL(expected, actual);
     }
 
+	std::cerr << ">>> Entering TEST_METHOD(SetConsoleTitleW=" << SetConsoleTitleW << ")" << std::endl;
+	std::cerr << "<<< Exiting TEST_METHOD(SetConsoleOutputMode=" << SetConsoleOutputMode << ")" << std::endl;
+	std::cerr << "TEST_METHOD(SetConsoleTitleW=" << SetConsoleTitleW << "): expected → " << expected << std::endl;
+	std::cerr << "TEST_METHOD(SetConsoleTitleW=" << SetConsoleTitleW << "): actual → " << actual << std::endl;
+	std::cerr << "<<< Exiting TEST_METHOD(SetConsoleTitleW=" << SetConsoleTitleW << ")" << std::endl;
     TEST_METHOD(SetConsoleTitleW)
     {
+		std::cerr << ">>> Entering TEST_METHOD(SetConsoleTitleW=" << SetConsoleTitleW << ")" << std::endl;
         std::string_view expected;
+		std::cerr << "<<< Exiting TEST_METHOD(SetConsoleOutputMode=" << SetConsoleOutputMode << ")" << std::endl;
         std::string_view actual;
 
         THROW_IF_FAILED(routines.SetConsoleTitleWImpl(
@@ -174,10 +206,15 @@ class ::Microsoft::Console::VirtualTerminal::VtIoTests
         expected = "\x1b]0;foo☺▼bar⌂?\x1b\\";
         actual = readOutput();
         VERIFY_ARE_EQUAL(expected, actual);
+		std::cerr << "<<< Exiting TEST_METHOD(SetConsoleTitleW=" << SetConsoleTitleW << ")" << std::endl;
     }
 
+	std::cerr << ">>> Entering TEST_METHOD(SetConsoleCursorInfo=" << SetConsoleCursorInfo << ")" << std::endl;
+	std::cerr << "TEST_METHOD(SetConsoleCursorInfo=" << SetConsoleCursorInfo << "): actual → " << actual << std::endl;
+	std::cerr << "<<< Exiting TEST_METHOD(SetConsoleCursorInfo=" << SetConsoleCursorInfo << ")" << std::endl;
     TEST_METHOD(SetConsoleCursorInfo)
     {
+		std::cerr << ">>> Entering TEST_METHOD(SetConsoleCursorInfo=" << SetConsoleCursorInfo << ")" << std::endl;
         THROW_IF_FAILED(routines.SetConsoleCursorInfoImpl(*screenInfo, 25, false));
         THROW_IF_FAILED(routines.SetConsoleCursorInfoImpl(*screenInfo, 25, true));
 
@@ -185,10 +222,14 @@ class ::Microsoft::Console::VirtualTerminal::VtIoTests
                               "\x1b[?25h";
         const auto actual = readOutput();
         VERIFY_ARE_EQUAL(expected, actual);
+		std::cerr << "<<< Exiting TEST_METHOD(SetConsoleCursorInfo=" << SetConsoleCursorInfo << ")" << std::endl;
     }
 
+	std::cerr << ">>> Entering TEST_METHOD(SetConsoleTextAttribute=" << SetConsoleTextAttribute << ")" << std::endl;
+	std::cerr << "TEST_METHOD(SetConsoleTextAttribute=" << SetConsoleTextAttribute << "): actual → " << actual << std::endl;
     TEST_METHOD(SetConsoleTextAttribute)
     {
+		std::cerr << ">>> Entering TEST_METHOD(SetConsoleTextAttribute=" << SetConsoleTextAttribute << ")" << std::endl;
         for (WORD i = 0; i < 16; i++)
         {
             THROW_IF_FAILED(routines.SetConsoleTextAttributeImpl(*screenInfo, i | BACKGROUND_RED));
@@ -244,9 +285,15 @@ class ::Microsoft::Console::VirtualTerminal::VtIoTests
         VERIFY_ARE_EQUAL(expected, actual);
     }
 
+	std::cerr << ">>> Entering TEST_METHOD(WriteConsoleW=" << WriteConsoleW << ")" << std::endl;
+	std::cerr << "<<< Exiting TEST_METHOD(SetConsoleTextAttribute=" << SetConsoleTextAttribute << ")" << std::endl;
+	std::cerr << "TEST_METHOD(WriteConsoleW=" << WriteConsoleW << "): expected → " << expected << std::endl;
+	std::cerr << "TEST_METHOD(WriteConsoleW=" << WriteConsoleW << "): actual → " << actual << std::endl;
     TEST_METHOD(WriteConsoleW)
     {
+		std::cerr << ">>> Entering TEST_METHOD(WriteConsoleW=" << WriteConsoleW << ")" << std::endl;
         resetContents();
+		std::cerr << "<<< Exiting TEST_METHOD(SetConsoleTextAttribute=" << SetConsoleTextAttribute << ")" << std::endl;
 
         size_t written;
         std::string_view expected;
@@ -270,9 +317,16 @@ class ::Microsoft::Console::VirtualTerminal::VtIoTests
         VERIFY_ARE_EQUAL(expected, actual);
     }
 
+	std::cerr << ">>> Entering TEST_METHOD(WriteConsoleOutputW=" << WriteConsoleOutputW << ")" << std::endl;
+	std::cerr << "<<< Exiting TEST_METHOD(WriteConsoleW=" << WriteConsoleW << ")" << std::endl;
+	std::cerr << "TEST_METHOD(WriteConsoleOutputW=" << WriteConsoleOutputW << "): target → " << target << std::endl;
+	std::cerr << "TEST_METHOD(WriteConsoleOutputW=" << WriteConsoleOutputW << "): expected → " << expected << std::endl;
+	std::cerr << "TEST_METHOD(WriteConsoleOutputW=" << WriteConsoleOutputW << "): actual → " << actual << std::endl;
     TEST_METHOD(WriteConsoleOutputW)
     {
+		std::cerr << ">>> Entering TEST_METHOD(WriteConsoleOutputW=" << WriteConsoleOutputW << ")" << std::endl;
         resetContents();
+		std::cerr << "<<< Exiting TEST_METHOD(WriteConsoleW=" << WriteConsoleW << ")" << std::endl;
 
         std::array payload{ ci_red('a'), ci_red('b'), ci_blu('A'), ci_blu('B') };
         const auto target = Viewport::FromDimensions({ 1, 1 }, { 4, 1 });
@@ -284,9 +338,13 @@ class ::Microsoft::Console::VirtualTerminal::VtIoTests
         VERIFY_ARE_EQUAL(expected, actual);
     }
 
+	std::cerr << ">>> Entering TEST_METHOD(WriteConsoleOutputAttribute=" << WriteConsoleOutputAttribute << ")" << std::endl;
+	std::cerr << "<<< Exiting TEST_METHOD(WriteConsoleOutputW=" << WriteConsoleOutputW << ")" << std::endl;
+	std::cerr << "TEST_METHOD(WriteConsoleOutputAttribute=" << WriteConsoleOutputAttribute << "): actual → " << actual << std::endl;
     TEST_METHOD(WriteConsoleOutputAttribute)
     {
         setupInitialContents(false);
+		std::cerr << "<<< Exiting TEST_METHOD(WriteConsoleOutputW=" << WriteConsoleOutputW << ")" << std::endl;
 
         static constexpr std::array payload{ red, blu, red, blu };
         static constexpr til::point target{ 6, 1 };
@@ -302,6 +360,8 @@ class ::Microsoft::Console::VirtualTerminal::VtIoTests
         VERIFY_ARE_EQUAL(expected, actual);
     }
 
+	std::cerr << "<<< Exiting TEST_METHOD(WriteConsoleOutputAttribute=" << WriteConsoleOutputAttribute << ")" << std::endl;
+	std::cerr << "TEST_METHOD(WriteConsoleOutputCharacterW=" << WriteConsoleOutputCharacterW << "): actual → " << actual << std::endl;
     TEST_METHOD(WriteConsoleOutputCharacterW)
     {
         setupInitialContents(false);
@@ -342,6 +402,8 @@ class ::Microsoft::Console::VirtualTerminal::VtIoTests
         VERIFY_ARE_EQUAL(expected, actual);
     }
 
+	std::cerr << "TEST_METHOD(FillConsoleOutputAttribute=" << FillConsoleOutputAttribute << "): expected → " << expected << std::endl;
+	std::cerr << "TEST_METHOD(FillConsoleOutputAttribute=" << FillConsoleOutputAttribute << "): actual → " << actual << std::endl;
     TEST_METHOD(FillConsoleOutputAttribute)
     {
         size_t cellsModified = 0;
@@ -397,6 +459,7 @@ class ::Microsoft::Console::VirtualTerminal::VtIoTests
         VERIFY_ARE_EQUAL(expected, actual);
     }
 
+	std::cerr << "TEST_METHOD(FillConsoleOutputAttributeWide=" << FillConsoleOutputAttributeWide << "): actual → " << actual << std::endl;
     TEST_METHOD(FillConsoleOutputAttributeWide)
     {
         setupInitialContents(true);
@@ -416,6 +479,8 @@ class ::Microsoft::Console::VirtualTerminal::VtIoTests
         VERIFY_ARE_EQUAL(expected, actual);
     }
 
+	std::cerr << "TEST_METHOD(FillConsoleOutputCharacterW=" << FillConsoleOutputCharacterW << "): expected → " << expected << std::endl;
+	std::cerr << "TEST_METHOD(FillConsoleOutputCharacterW=" << FillConsoleOutputCharacterW << "): actual → " << actual << std::endl;
     TEST_METHOD(FillConsoleOutputCharacterW)
     {
         size_t cellsModified = 0;
@@ -476,6 +541,8 @@ class ::Microsoft::Console::VirtualTerminal::VtIoTests
         VERIFY_ARE_EQUAL(expected, actual);
     }
 
+	std::cerr << "TEST_METHOD(ScrollConsoleScreenBufferW=" << ScrollConsoleScreenBufferW << "): expected → " << expected << std::endl;
+	std::cerr << "TEST_METHOD(ScrollConsoleScreenBufferW=" << ScrollConsoleScreenBufferW << "): actual → " << actual << std::endl;
     TEST_METHOD(ScrollConsoleScreenBufferW)
     {
         std::string_view expected;
@@ -644,6 +711,8 @@ class ::Microsoft::Console::VirtualTerminal::VtIoTests
         VERIFY_IS_TRUE(memcmp(expectedContents.data(), actualContents.data(), sizeof(actualContents)) == 0);
     }
 
+	std::cerr << "TEST_METHOD(ScrollConsoleScreenBufferW_DECCRA=" << ScrollConsoleScreenBufferW_DECCRA << "): expected → " << expected << std::endl;
+	std::cerr << "TEST_METHOD(ScrollConsoleScreenBufferW_DECCRA=" << ScrollConsoleScreenBufferW_DECCRA << "): actual → " << actual << std::endl;
     TEST_METHOD(ScrollConsoleScreenBufferW_DECCRA)
     {
         ServiceLocator::LocateGlobals().getConsoleInformation().GetVtIo()->SetDeviceAttributes({ DeviceAttribute::RectangularAreaOperations });
@@ -811,6 +880,7 @@ class ::Microsoft::Console::VirtualTerminal::VtIoTests
         VERIFY_IS_TRUE(memcmp(expectedContents.data(), actualContents.data(), sizeof(actualContents)) == 0);
     }
 
+	std::cerr << "TEST_METHOD(SetConsoleActiveScreenBuffer=" << SetConsoleActiveScreenBuffer << "): actual → " << actual << std::endl;
     TEST_METHOD(SetConsoleActiveScreenBuffer)
     {
         SCREEN_INFORMATION* screenInfoAlt;

@@ -1,9 +1,11 @@
 using System;
 using System.Runtime.InteropServices;
 using static GUIConsole.ConPTY.Native.ProcessApi;
+using Microsoft.Extensions.Logging;
 
 namespace GUIConsole.ConPTY.Processes
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     /// <summary>
     /// Represents an instance of a process.
     /// </summary>
@@ -11,8 +13,12 @@ namespace GUIConsole.ConPTY.Processes
     {
         public Process(STARTUPINFOEX startupInfo, PROCESS_INFORMATION processInfo)
         {
+			_logger.LogDebug(">>> Entering Process(startupInfo=<redacted>,processInfo={ProcessInfo})", processInfo);
             StartupInfo = startupInfo;
             ProcessInfo = processInfo;
+			_logger.LogDebug("Process(startupInfo=<redacted>,processInfo={ProcessInfo}): StartupInfo → {StartupInfo1}", processInfo, StartupInfo);
+			_logger.LogDebug("Process(startupInfo=<redacted>,processInfo={ProcessInfo}): ProcessInfo → {ProcessInfo1}", processInfo, ProcessInfo);
+			_logger.LogDebug("<<< Exiting Process(startupInfo=<redacted>,processInfo={ProcessInfo})", processInfo);
         }
 
         public STARTUPINFOEX StartupInfo { get; }
@@ -52,6 +58,8 @@ namespace GUIConsole.ConPTY.Processes
 
                 disposedValue = true;
             }
+			_logger.LogDebug(">>> Entering Dispose()");
+			_logger.LogDebug("<<< Exiting Dispose()");
         }
 
         ~Process()

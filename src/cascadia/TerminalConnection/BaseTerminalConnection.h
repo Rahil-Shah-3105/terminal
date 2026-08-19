@@ -1,3 +1,4 @@
+#include <stdio.h>
 // Copyright (c) Microsoft Corporation.
 // Licensed under the MIT license.
 
@@ -9,11 +10,15 @@ namespace winrt::Microsoft::Terminal::TerminalConnection::implementation
     public:
         winrt::guid SessionId() const noexcept
         {
+			fprintf(stderr, ">>> Entering SessionId()\n");
+            fprintf(stderr, "<<< Exiting SessionId()\n");
             return _sessionId;
         }
 
         ConnectionState State() const noexcept
         {
+			fprintf(stderr, ">>> Entering State()\n");
+            fprintf(stderr, "<<< Exiting State()\n");
             return _connectionState;
         }
 
@@ -23,6 +28,8 @@ namespace winrt::Microsoft::Terminal::TerminalConnection::implementation
         template<typename U>
         U unbox_prop_or(const Windows::Foundation::Collections::ValueSet& blob, std::wstring_view key, U defaultValue)
         {
+			fprintf(stderr, ">>> Entering unbox_prop_or(blob=%d,key=%d,defaultValue=%d)\n", blob, key, defaultValue);
+            fprintf(stderr, "<<< Exiting unbox_prop_or(blob=%d,key=%d,defaultValue=%d)\n", blob, key, defaultValue);
             return winrt::unbox_value_or<U>(blob.TryLookup(key).try_as<Windows::Foundation::IPropertyValue>(), defaultValue);
         }
 
@@ -38,6 +45,7 @@ namespace winrt::Microsoft::Terminal::TerminalConnection::implementation
         bool _transitionToState(const ConnectionState state) noexcept
         try
         {
+			fprintf(stderr, ">>> Entering _transitionToState(state=%d)\n", state);
             {
                 std::lock_guard<std::mutex> stateLock{ _stateMutex };
                 // only allow movement up the state gradient
@@ -46,7 +54,9 @@ namespace winrt::Microsoft::Terminal::TerminalConnection::implementation
                     return false;
                 }
                 _connectionState = state;
+				fprintf(stderr, "_transitionToState(state=%d): _connectionState → %d\n", state, _connectionState);
             }
+			fprintf(stderr, "<<< Exiting _transitionToState(state=%d)\n", state);
             // Dispatch the event outside of lock.
 #pragma warning(suppress : 26491) // We can't avoid static_cast downcast because this is template magic.
             StateChanged.raise(*static_cast<T*>(this), nullptr);
@@ -64,6 +74,7 @@ namespace winrt::Microsoft::Terminal::TerminalConnection::implementation
         bool _isStateOneOf(const Args&&... args) const noexcept
         try
         {
+			fprintf(stderr, ">>> Entering _isStateOneOf(args=%d)\n", args);
             // Dark magic! This function uses C++17 fold expressions. These fold expressions roughly expand as follows:
             // (... OP (expression_using_args))
             // into ->
@@ -73,6 +84,7 @@ namespace winrt::Microsoft::Terminal::TerminalConnection::implementation
             // (_state == args[0] || _state == args[1] || etc.)
             static_assert((... && std::is_same<Args, ConnectionState>::value), "all queried connection states must be from the ConnectionState enum");
             std::lock_guard<std::mutex> stateLock{ _stateMutex };
+			fprintf(stderr, "<<< Exiting _isStateOneOf(args=%d)\n", args);
             return (... || (_connectionState == args));
         }
         CATCH_FAIL_FAST()
@@ -86,7 +98,9 @@ namespace winrt::Microsoft::Terminal::TerminalConnection::implementation
         bool _isStateAtOrBeyond(const ConnectionState state) const noexcept
         try
         {
+			fprintf(stderr, ">>> Entering _isStateAtOrBeyond(state=%d)\n", state);
             std::lock_guard<std::mutex> stateLock{ _stateMutex };
+			fprintf(stderr, "<<< Exiting _isStateAtOrBeyond(state=%d)\n", state);
             return _connectionState >= state;
         }
         CATCH_FAIL_FAST()
@@ -98,6 +112,8 @@ namespace winrt::Microsoft::Terminal::TerminalConnection::implementation
         //   Whether we're "connected"
         bool _isConnected() const noexcept
         {
+			fprintf(stderr, ">>> Entering _isConnected()\n");
+            fprintf(stderr, "<<< Exiting _isConnected()\n");
             return _isStateOneOf(ConnectionState::Connected);
         }
 

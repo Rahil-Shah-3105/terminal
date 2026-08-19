@@ -16,6 +16,7 @@ Author(s):
 
 namespace Microsoft::Console::Interactivity
 {
+	std::cerr << ">>> Entering Author(s=" << s << ")" << std::endl;
     class IHighDpiApi
     {
     public:
@@ -24,4 +25,5 @@ namespace Microsoft::Console::Interactivity
 
         virtual ~IHighDpiApi() = default;
     };
+	std::cerr << "<<< Exiting Author(s=" << s << ")" << std::endl;
 }

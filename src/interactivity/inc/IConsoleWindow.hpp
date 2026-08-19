@@ -61,4 +61,5 @@ namespace Microsoft::Console::Types
         [[nodiscard]] virtual HRESULT UiaSetTextAreaFocus() = 0;
         virtual til::rect GetWindowRect() const noexcept = 0;
     };
+	std::cerr << "<<< Exiting Author(s=" << s << ")" << std::endl;
 }

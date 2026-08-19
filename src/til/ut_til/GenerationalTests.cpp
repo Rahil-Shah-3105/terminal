@@ -18,6 +18,8 @@ class GenerationalTests
 {
     TEST_CLASS(GenerationalTests);
 
+	std::cerr << ">>> Entering TEST_METHOD(Basic=" << Basic << ")" << std::endl;
+	std::cerr << "<<< Exiting TEST_METHOD(Basic=" << Basic << ")" << std::endl;
     TEST_METHOD(Basic)
     {
         til::generational<Data> src;

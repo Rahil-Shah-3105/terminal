@@ -15,10 +15,12 @@ Author(s):
 
 namespace Microsoft::Console::Render
 {
+	std::cerr << ">>> Entering Author(s=" << s << ")" << std::endl;
     class IFontDefaultList
     {
     public:
         [[nodiscard]] virtual HRESULT RetrieveDefaultFontNameForCodepage(const unsigned int codepage,
                                                                          std::wstring& outFaceName) = 0;
     };
+	std::cerr << "<<< Exiting Author(s=" << s << ")" << std::endl;
 }

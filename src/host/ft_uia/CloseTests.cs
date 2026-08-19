@@ -22,10 +22,12 @@ namespace Conhost.UIA.Tests
     using Conhost.UIA.Tests.Common.NativeMethods;
     using Conhost.UIA.Tests.Elements;
     using System.Threading.Tasks;
+	using Microsoft.Extensions.Logging;
 
     [TestClass]
     public class CloseTests
     {
+		private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
         public static Queue<string> messages = new Queue<string>();
 
         public TestContext TestContext { get; set; }
@@ -42,14 +44,18 @@ namespace Conhost.UIA.Tests
         [ClassInitialize]
         public static void ClassSetup(TestContext context)
         {
+			_logger.LogDebug(">>> Entering ClassSetup(context={Context})", context);
             Log.Comment("Searching for CloseTest.exe in the same directory where this test was launched from...");
             closeTestBinaryLocation = Path.Combine(context.TestDeploymentDir, "CloseTest.exe");
             Verify.IsFalse(string.IsNullOrEmpty(closeTestBinaryLocation));
+			_logger.LogDebug("ClassSetup(context={Context}): closeTestBinaryLocation → {CloseTestBinaryLocation}", context, closeTestBinaryLocation);
             Verify.IsTrue(File.Exists(closeTestBinaryLocation));
+			_logger.LogDebug("<<< Exiting ClassSetup(context={Context})", context);
         }
 
         public void ListenToPipe(NamedPipeServerStream stream, CancellationToken token)
         {
+			_logger.LogDebug(">>> Entering ListenToPipe(stream={Stream},token=<redacted>)", stream);
             StreamReader reader = new StreamReader(stream);
             while (!reader.EndOfStream && !token.IsCancellationRequested)
             {
@@ -59,17 +65,21 @@ namespace Conhost.UIA.Tests
                     messages.Enqueue(line);
                 }
             }
+			_logger.LogDebug("<<< Exiting ListenToPipe(stream={Stream},token=<redacted>)", stream);
         }
 
         public void MakePipeServer(CancellationToken token)
         {
+			_logger.LogDebug(">>> Entering MakePipeServer(token=<redacted>)");
             while (!token.IsCancellationRequested)
             {
                 NamedPipeServerStream str = new NamedPipeServerStream(testPipeName, PipeDirection.In, 250);
+				_logger.LogDebug("MakePipeServer(token=<redacted>): str → {Str}", str);
                 str.WaitForConnection();
 
                 Task.Run(() => ListenToPipe(str, token), token);
             }
+			_logger.LogDebug("<<< Exiting MakePipeServer(token=<redacted>)");
         }
 
         [TestMethod]
@@ -77,6 +87,7 @@ namespace Conhost.UIA.Tests
         [TestProperty("Ignore", "True")] // GH#7282 - investigate and reenable
         public void CheckClose()
         {
+			_logger.LogDebug(">>> Entering CheckClose()");
             string closeTestCmdLine = $"{closeTestBinaryLocation} -n {processCount} --log {testPipeName} --delay 1000 --no-realloc";
 
             using (var tokenSource = new CancellationTokenSource())
@@ -114,6 +125,7 @@ namespace Conhost.UIA.Tests
                     Verify.AreEqual(expected, messages.Dequeue());
                 }
             }
+			_logger.LogDebug("<<< Exiting CheckClose()");
         }
     }
 }

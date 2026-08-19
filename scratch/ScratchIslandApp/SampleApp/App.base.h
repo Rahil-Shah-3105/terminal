@@ -1,3 +1,4 @@
+#include <stdio.h>
 #pragma once
 
 namespace winrt::SampleApp::implementation
@@ -9,6 +10,8 @@ namespace winrt::SampleApp::implementation
 
         IXamlType GetXamlType(::winrt::Windows::UI::Xaml::Interop::TypeName const& type)
         {
+			fprintf(stderr, ">>> Entering GetXamlType(type=%d)\n", type);
+            fprintf(stderr, "<<< Exiting GetXamlType(type=%d)\n", type);
             return _appProvider.GetXamlType(type);
         }
 

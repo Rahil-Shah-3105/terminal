@@ -20,57 +20,84 @@ class SizeTests
 {
     TEST_CLASS(SizeTests);
 
+	std::cerr << ">>> Entering TEST_METHOD(DefaultConstruct=" << DefaultConstruct << ")" << std::endl;
+	std::cerr << "<<< Exiting TEST_METHOD(DefaultConstruct=" << DefaultConstruct << ")" << std::endl;
     TEST_METHOD(DefaultConstruct)
     {
+		std::cerr << ">>> Entering TEST_METHOD(DefaultConstruct=" << DefaultConstruct << ")" << std::endl;
         const til::size sz;
         VERIFY_ARE_EQUAL(0, sz.width);
         VERIFY_ARE_EQUAL(0, sz.height);
+		std::cerr << "<<< Exiting TEST_METHOD(DefaultConstruct=" << DefaultConstruct << ")" << std::endl;
     }
 
+	std::cerr << ">>> Entering TEST_METHOD(RawConstruct=" << RawConstruct << ")" << std::endl;
+	std::cerr << "<<< Exiting TEST_METHOD(RawConstruct=" << RawConstruct << ")" << std::endl;
     TEST_METHOD(RawConstruct)
     {
+		std::cerr << ">>> Entering TEST_METHOD(RawConstruct=" << RawConstruct << ")" << std::endl;
         const til::size sz{ 5, 10 };
         VERIFY_ARE_EQUAL(5, sz.width);
         VERIFY_ARE_EQUAL(10, sz.height);
+		std::cerr << "<<< Exiting TEST_METHOD(RawConstruct=" << RawConstruct << ")" << std::endl;
     }
 
+	std::cerr << ">>> Entering TEST_METHOD(RawFloatingConstruct=" << RawFloatingConstruct << ")" << std::endl;
+	std::cerr << "<<< Exiting TEST_METHOD(RawFloatingConstruct=" << RawFloatingConstruct << ")" << std::endl;
     TEST_METHOD(RawFloatingConstruct)
     {
+		std::cerr << ">>> Entering TEST_METHOD(RawFloatingConstruct=" << RawFloatingConstruct << ")" << std::endl;
         const til::size sz{ til::math::rounding, 3.2f, 7.8f };
         VERIFY_ARE_EQUAL(3, sz.width);
         VERIFY_ARE_EQUAL(8, sz.height);
+		std::cerr << "<<< Exiting TEST_METHOD(RawFloatingConstruct=" << RawFloatingConstruct << ")" << std::endl;
     }
 
+	std::cerr << ">>> Entering TEST_METHOD(SignedConstruct=" << SignedConstruct << ")" << std::endl;
+	std::cerr << "<<< Exiting TEST_METHOD(SignedConstruct=" << SignedConstruct << ")" << std::endl;
     TEST_METHOD(SignedConstruct)
     {
+		std::cerr << ">>> Entering TEST_METHOD(SignedConstruct=" << SignedConstruct << ")" << std::endl;
         const auto width = -5;
         const auto height = -10;
 
         const til::size sz{ width, height };
         VERIFY_ARE_EQUAL(width, sz.width);
         VERIFY_ARE_EQUAL(height, sz.height);
+		std::cerr << "<<< Exiting TEST_METHOD(SignedConstruct=" << SignedConstruct << ")" << std::endl;
     }
 
+	std::cerr << ">>> Entering TEST_METHOD(CoordConstruct=" << CoordConstruct << ")" << std::endl;
+	std::cerr << "TEST_METHOD(CoordConstruct=" << CoordConstruct << "): sz → " << sz << std::endl;
+	std::cerr << "<<< Exiting TEST_METHOD(CoordConstruct=" << CoordConstruct << ")" << std::endl;
     TEST_METHOD(CoordConstruct)
     {
+		std::cerr << ">>> Entering TEST_METHOD(CoordConstruct=" << CoordConstruct << ")" << std::endl;
         COORD coord{ -5, 10 };
 
         const auto sz = til::wrap_coord_size(coord);
         VERIFY_ARE_EQUAL(coord.X, sz.width);
         VERIFY_ARE_EQUAL(coord.Y, sz.height);
+		std::cerr << "<<< Exiting TEST_METHOD(CoordConstruct=" << CoordConstruct << ")" << std::endl;
     }
 
+	std::cerr << ">>> Entering TEST_METHOD(SizeConstruct=" << SizeConstruct << ")" << std::endl;
+	std::cerr << "<<< Exiting TEST_METHOD(SizeConstruct=" << SizeConstruct << ")" << std::endl;
     TEST_METHOD(SizeConstruct)
     {
+		std::cerr << ">>> Entering TEST_METHOD(SizeConstruct=" << SizeConstruct << ")" << std::endl;
         SIZE size{ 5, -10 };
 
         const til::size sz{ size };
         VERIFY_ARE_EQUAL(size.cx, sz.width);
         VERIFY_ARE_EQUAL(size.cy, sz.height);
+		std::cerr << "<<< Exiting TEST_METHOD(SizeConstruct=" << SizeConstruct << ")" << std::endl;
     }
 
+	std::cerr << ">>> Entering TEST_METHOD(Equality=" << Equality << ")" << std::endl;
     TEST_METHOD(Equality)
     {
+		std::cerr << ">>> Entering TEST_METHOD(Equality=" << Equality << ")" << std::endl;
         Log::Comment(L"0.) Equal.");
         {
             const til::size s1{ 5, 10 };
@@ -107,9 +134,13 @@ class SizeTests
         }
     }
 
+	std::cerr << ">>> Entering TEST_METHOD(Inequality=" << Inequality << ")" << std::endl;
+	std::cerr << "<<< Exiting TEST_METHOD(Equality=" << Equality << ")" << std::endl;
     TEST_METHOD(Inequality)
     {
+		std::cerr << ">>> Entering TEST_METHOD(Inequality=" << Inequality << ")" << std::endl;
         Log::Comment(L"0.) Equal.");
+		std::cerr << "<<< Exiting TEST_METHOD(Equality=" << Equality << ")" << std::endl;
         {
             const til::size s1{ 5, 10 };
             const til::size s2{ 5, 10 };
@@ -145,9 +176,14 @@ class SizeTests
         }
     }
 
+	std::cerr << ">>> Entering TEST_METHOD(Boolean=" << Boolean << ")" << std::endl;
+	std::cerr << "<<< Exiting TEST_METHOD(Inequality=" << Inequality << ")" << std::endl;
+	std::cerr << "TEST_METHOD(Boolean=" << Boolean << "): actual → " << actual << std::endl;
     TEST_METHOD(Boolean)
     {
+		std::cerr << ">>> Entering TEST_METHOD(Boolean=" << Boolean << ")" << std::endl;
         SetVerifyOutput verifyOutputScope{ VerifyOutputSettings::LogOnlyFailures };
+		std::cerr << "<<< Exiting TEST_METHOD(Inequality=" << Inequality << ")" << std::endl;
 
         static constexpr til::CoordType values[] = { til::CoordTypeMin, -1, 0, 1, til::CoordTypeMax };
 
@@ -163,9 +199,14 @@ class SizeTests
         }
     }
 
+	std::cerr << ">>> Entering TEST_METHOD(Addition=" << Addition << ")" << std::endl;
+	std::cerr << "<<< Exiting TEST_METHOD(Boolean=" << Boolean << ")" << std::endl;
+	std::cerr << "TEST_METHOD(Addition=" << Addition << "): bigSize → " << bigSize << std::endl;
     TEST_METHOD(Addition)
     {
+		std::cerr << ">>> Entering TEST_METHOD(Addition=" << Addition << ")" << std::endl;
         Log::Comment(L"0.) Addition of two things that should be in bounds.");
+		std::cerr << "<<< Exiting TEST_METHOD(Boolean=" << Boolean << ")" << std::endl;
         {
             const til::size sz{ 5, 10 };
             const til::size sz2{ 23, 47 };
@@ -202,9 +243,14 @@ class SizeTests
         }
     }
 
+	std::cerr << ">>> Entering TEST_METHOD(Subtraction=" << Subtraction << ")" << std::endl;
+	std::cerr << "<<< Exiting TEST_METHOD(Addition=" << Addition << ")" << std::endl;
+	std::cerr << "TEST_METHOD(Subtraction=" << Subtraction << "): bigSize → " << bigSize << std::endl;
     TEST_METHOD(Subtraction)
     {
+		std::cerr << ">>> Entering TEST_METHOD(Subtraction=" << Subtraction << ")" << std::endl;
         Log::Comment(L"0.) Subtraction of two things that should be in bounds.");
+		std::cerr << "<<< Exiting TEST_METHOD(Addition=" << Addition << ")" << std::endl;
         {
             const til::size sz{ 5, 10 };
             const til::size sz2{ 23, 47 };
@@ -241,9 +287,12 @@ class SizeTests
         }
     }
 
+	std::cerr << "<<< Exiting TEST_METHOD(Subtraction=" << Subtraction << ")" << std::endl;
+	std::cerr << "TEST_METHOD(Multiplication=" << Multiplication << "): bigSize → " << bigSize << std::endl;
     TEST_METHOD(Multiplication)
     {
         Log::Comment(L"0.) Multiplication of two things that should be in bounds.");
+		std::cerr << "<<< Exiting TEST_METHOD(Subtraction=" << Subtraction << ")" << std::endl;
         {
             const til::size sz{ 5, 10 };
             const til::size sz2{ 23, 47 };
@@ -280,6 +329,7 @@ class SizeTests
         }
     }
 
+	std::cerr << "TEST_METHOD(ScaleByFloat=" << ScaleByFloat << "): actual → " << actual << std::endl;
     TEST_METHOD(ScaleByFloat)
     {
         Log::Comment(L"0.) Scale that should be in bounds.");
@@ -307,6 +357,7 @@ class SizeTests
         }
     }
 
+	std::cerr << "TEST_METHOD(Division=" << Division << "): bigSize → " << bigSize << std::endl;
     TEST_METHOD(Division)
     {
         Log::Comment(L"0.) Division of two things that should be in bounds.");
@@ -372,6 +423,7 @@ class SizeTests
         VERIFY_ARE_EQUAL(static_cast<SHORT>(sz.height), sz.narrow_height<SHORT>());
     }
 
+	std::cerr << "TEST_METHOD(Area=" << Area << "): bigSize → " << bigSize << std::endl;
     TEST_METHOD(Area)
     {
         Log::Comment(L"0.) Area of two things that should be in bounds.");
@@ -392,6 +444,7 @@ class SizeTests
             VERIFY_THROWS(fn(), gsl::narrowing_error);
         }
     }
+	std::cerr << "TEST_METHOD(AreaCast=" << AreaCast << "): bigSize → " << bigSize << std::endl;
     TEST_METHOD(AreaCast)
     {
         Log::Comment(L"0.) Area of two things that should be in bounds.");
@@ -413,6 +466,9 @@ class SizeTests
         }
     }
 
+	std::cerr << "TEST_METHOD(CastToSize=" << CastToSize << "): val → " << val << std::endl;
+	std::cerr << "TEST_METHOD(CastToSize=" << CastToSize << "): height → " << height << std::endl;
+	std::cerr << "TEST_METHOD(CastToSize=" << CastToSize << "): overflowExpected → " << overflowExpected << std::endl;
     TEST_METHOD(CastToSize)
     {
         Log::Comment(L"0.) Typical situation.");
@@ -472,6 +528,7 @@ class SizeTests
         }
     }
 
+	std::cerr << "TEST_METHOD(CastToD2D1SizeF=" << CastToD2D1SizeF << "): val → " << val << std::endl;
     TEST_METHOD(CastToD2D1SizeF)
     {
         Log::Comment(L"0.) Typical situation.");

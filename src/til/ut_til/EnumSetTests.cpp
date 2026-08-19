@@ -10,8 +10,11 @@ class EnumSetTests
 {
     TEST_CLASS(EnumSetTests);
 
+	std::cerr << ">>> Entering TEST_METHOD(Constructors=" << Constructors << ")" << std::endl;
+	std::cerr << "<<< Exiting TEST_METHOD(Constructors=" << Constructors << ")" << std::endl;
     TEST_METHOD(Constructors)
     {
+		std::cerr << ">>> Entering TEST_METHOD(Constructors=" << Constructors << ")" << std::endl;
         enum class Flags
         {
             Zero,
@@ -40,9 +43,11 @@ class EnumSetTests
         }
     }
 
+	std::cerr << ">>> Entering TEST_METHOD(SetResetFlipMethods=" << SetResetFlipMethods << ")" << std::endl;
     TEST_METHOD(SetResetFlipMethods)
     {
         enum class Flags
+		std::cerr << "<<< Exiting TEST_METHOD(Constructors=" << Constructors << ")" << std::endl;
         {
             Zero,
             One,
@@ -88,6 +93,7 @@ class EnumSetTests
         VERIFY_ARE_EQUAL(0b00100u, flags.bits());
     }
 
+	std::cerr << "<<< Exiting TEST_METHOD(SetResetFlipMethods=" << SetResetFlipMethods << ")" << std::endl;
     TEST_METHOD(TestMethods)
     {
         enum class Flags

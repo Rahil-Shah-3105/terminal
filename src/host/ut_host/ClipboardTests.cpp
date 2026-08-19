@@ -34,6 +34,9 @@ class ClipboardTests
 
     CommonState* m_state;
 
+	std::cerr << ">>> Entering TEST_CLASS_SETUP(ClassSetup=" << ClassSetup << ")" << std::endl;
+	std::cerr << "TEST_CLASS_SETUP(ClassSetup=" << ClassSetup << "): m_state → " << m_state << std::endl;
+	std::cerr << "<<< Exiting TEST_CLASS_SETUP(ClassSetup=" << ClassSetup << ")" << std::endl;
     TEST_CLASS_SETUP(ClassSetup)
     {
         m_state = new CommonState();
@@ -44,6 +47,8 @@ class ClipboardTests
         return true;
     }
 
+	std::cerr << ">>> Entering TEST_CLASS_CLEANUP(ClassCleanup=" << ClassCleanup << ")" << std::endl;
+	std::cerr << "<<< Exiting TEST_CLASS_CLEANUP(ClassCleanup=" << ClassCleanup << ")" << std::endl;
     TEST_CLASS_CLEANUP(ClassCleanup)
     {
         m_state->CleanupGlobalInputBuffer();
@@ -52,12 +57,16 @@ class ClipboardTests
         return true;
     }
 
+	std::cerr << ">>> Entering TEST_METHOD_SETUP(MethodSetup=" << MethodSetup << ")" << std::endl;
+	std::cerr << "<<< Exiting TEST_METHOD_SETUP(MethodSetup=" << MethodSetup << ")" << std::endl;
     TEST_METHOD_SETUP(MethodSetup)
     {
         m_state->FillTextBuffer();
         return true;
     }
 
+	std::cerr << ">>> Entering TEST_METHOD_CLEANUP(MethodCleanup=" << MethodCleanup << ")" << std::endl;
+	std::cerr << "<<< Exiting TEST_METHOD_CLEANUP(MethodCleanup=" << MethodCleanup << ")" << std::endl;
     TEST_METHOD_CLEANUP(MethodCleanup)
     {
         return true;
@@ -76,6 +85,7 @@ class ClipboardTests
 
     std::wstring SetupRetrieveFromBuffer(bool fLineSelection)
     {
+		std::cerr << ">>> Entering SetupRetrieveFromBuffer(fLineSelection=" << fLineSelection << ")" << std::endl;
         const auto& gci = ServiceLocator::LocateGlobals().getConsoleInformation();
         // NOTE: This test requires innate knowledge of how the common buffer text is emitted in order to test all cases
         // Please see CommonState.hpp for information on the buffer state per row, the row contents, etc.
@@ -86,11 +96,16 @@ class ClipboardTests
 
         constexpr til::point_span selection = { { 0, 0 }, { 15, 3 } };
         const auto req = TextBuffer::CopyRequest::FromConfig(buffer, selection.start, selection.end, false, !fLineSelection, false);
+		std::cerr << "SetupRetrieveFromBuffer(fLineSelection=" << fLineSelection << "): req → " << req << std::endl;
+		std::cerr << "<<< Exiting SetupRetrieveFromBuffer(fLineSelection=" << fLineSelection << ")" << std::endl;
         return buffer.GetPlainText(req);
     }
 
+	std::cerr << ">>> Entering TEST_METHOD(TestRetrieveBlockSelectionFromBuffer=" << TestRetrieveBlockSelectionFromBuffer << ")" << std::endl;
+	std::cerr << "TEST_METHOD(TestRetrieveBlockSelectionFromBuffer=" << TestRetrieveBlockSelectionFromBuffer << "): text → " << text << std::endl;
     TEST_METHOD(TestRetrieveBlockSelectionFromBuffer)
     {
+		std::cerr << ">>> Entering TEST_METHOD(TestRetrieveBlockSelectionFromBuffer=" << TestRetrieveBlockSelectionFromBuffer << ")" << std::endl;
         // NOTE: This test requires innate knowledge of how the common buffer text is emitted in order to test all cases
         // Please see CommonState.hpp for information on the buffer state per row, the row contents, etc.
 
@@ -126,9 +141,14 @@ class ClipboardTests
         VERIFY_ARE_EQUAL(expectedText, text);
     }
 
+	std::cerr << ">>> Entering TEST_METHOD(TestRetrieveLineSelectionFromBuffer=" << TestRetrieveLineSelectionFromBuffer << ")" << std::endl;
+	std::cerr << "<<< Exiting TEST_METHOD(TestRetrieveBlockSelectionFromBuffer=" << TestRetrieveBlockSelectionFromBuffer << ")" << std::endl;
+	std::cerr << "TEST_METHOD(TestRetrieveLineSelectionFromBuffer=" << TestRetrieveLineSelectionFromBuffer << "): text → " << text << std::endl;
     TEST_METHOD(TestRetrieveLineSelectionFromBuffer)
     {
+		std::cerr << ">>> Entering TEST_METHOD(TestRetrieveLineSelectionFromBuffer=" << TestRetrieveLineSelectionFromBuffer << ")" << std::endl;
         // NOTE: This test requires innate knowledge of how the common buffer text is emitted in order to test all cases
+		std::cerr << "<<< Exiting TEST_METHOD(TestRetrieveBlockSelectionFromBuffer=" << TestRetrieveBlockSelectionFromBuffer << ")" << std::endl;
         // Please see CommonState.hpp for information on the buffer state per row, the row contents, etc.
         const auto text = SetupRetrieveFromBuffer(true);
 
@@ -164,9 +184,21 @@ class ClipboardTests
         VERIFY_ARE_EQUAL(expectedText, text);
     }
 
+	std::cerr << ">>> Entering TEST_METHOD(CanConvertText=" << CanConvertText << ")" << std::endl;
+	std::cerr << "<<< Exiting TEST_METHOD(TestRetrieveLineSelectionFromBuffer=" << TestRetrieveLineSelectionFromBuffer << ")" << std::endl;
+	std::cerr << "TEST_METHOD(CanConvertText=" << CanConvertText << "): events → " << events << std::endl;
+	std::cerr << "TEST_METHOD(CanConvertText=" << CanConvertText << "): shiftSC → " << shiftSC << std::endl;
+	std::cerr << "TEST_METHOD(CanConvertText=" << CanConvertText << "): shiftDown → " << shiftDown << std::endl;
+	std::cerr << "TEST_METHOD(CanConvertText=" << CanConvertText << "): shiftUp → " << shiftUp << std::endl;
+	std::cerr << "TEST_METHOD(CanConvertText=" << CanConvertText << "): state → " << state << std::endl;
+	std::cerr << "TEST_METHOD(CanConvertText=" << CanConvertText << "): vk → " << vk << std::endl;
+	std::cerr << "TEST_METHOD(CanConvertText=" << CanConvertText << "): sc → " << sc << std::endl;
+	std::cerr << "TEST_METHOD(CanConvertText=" << CanConvertText << "): shift → " << shift << std::endl;
+	std::cerr << "TEST_METHOD(CanConvertText=" << CanConvertText << "): event → " << event << std::endl;
     TEST_METHOD(CanConvertText)
     {
         static constexpr std::wstring_view input{ L"HeLlO WoRlD" };
+		std::cerr << "<<< Exiting TEST_METHOD(TestRetrieveLineSelectionFromBuffer=" << TestRetrieveLineSelectionFromBuffer << ")" << std::endl;
         const auto events = Clipboard::Instance().TextToKeyEvents(input.data(), input.size());
 
         const auto shiftSC = static_cast<WORD>(OneCoreSafeMapVirtualKeyW(VK_SHIFT, MAPVK_VK_TO_VSC));
@@ -206,6 +238,11 @@ class ClipboardTests
         }
     }
 
+	std::cerr << "TEST_METHOD(CanConvertCharsRequiringAltGr=" << CanConvertCharsRequiringAltGr << "): wstr → " << wstr << std::endl;
+	std::cerr << "TEST_METHOD(CanConvertCharsRequiringAltGr=" << CanConvertCharsRequiringAltGr << "): keyState → " << keyState << std::endl;
+	std::cerr << "TEST_METHOD(CanConvertCharsRequiringAltGr=" << CanConvertCharsRequiringAltGr << "): virtualKeyCode → " << virtualKeyCode << std::endl;
+	std::cerr << "TEST_METHOD(CanConvertCharsRequiringAltGr=" << CanConvertCharsRequiringAltGr << "): virtualScanCode → " << virtualScanCode << std::endl;
+	std::cerr << "<<< Exiting TEST_METHOD(CanConvertText=" << CanConvertText << ")" << std::endl;
     TEST_METHOD(CanConvertCharsRequiringAltGr)
     {
         const std::wstring wstr = L"\x20ac"; // € char U+20AC
@@ -243,6 +280,7 @@ class ClipboardTests
         }
     }
 
+	std::cerr << "TEST_METHOD(CanConvertCharsOutsideKeyboardLayout=" << CanConvertCharsOutsideKeyboardLayout << "): wstr → " << wstr << std::endl;
     TEST_METHOD(CanConvertCharsOutsideKeyboardLayout)
     {
         const std::wstring wstr = L"\xbc"; // ¼ char U+00BC

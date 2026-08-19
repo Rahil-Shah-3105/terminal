@@ -13,6 +13,9 @@ class HashTests
 {
     TEST_CLASS(HashTests);
 
+	std::cerr << ">>> Entering TEST_METHOD(TestVectors=" << TestVectors << ")" << std::endl;
+	std::cerr << "TEST_METHOD(TestVectors=" << TestVectors << "): actual → " << actual << std::endl;
+	std::cerr << "<<< Exiting TEST_METHOD(TestVectors=" << TestVectors << ")" << std::endl;
     TEST_METHOD(TestVectors)
     {
         struct Test

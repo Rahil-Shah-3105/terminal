@@ -1,3 +1,4 @@
+#include <stdio.h>
 /*++
 Copyright (c) Microsoft Corporation
 Licensed under the MIT license.
@@ -24,6 +25,8 @@ namespace Microsoft::Console::Types
     public:
         IdType GetId() const noexcept
         {
+			fprintf(stderr, ">>> Entering GetId()\n");
+            fprintf(stderr, "<<< Exiting GetId()\n");
             return _id;
         }
 
@@ -35,13 +38,16 @@ namespace Microsoft::Console::Types
         // - true if the assignment was successful, false otherwise (it already has an id).
         bool AssignId(IdType id) noexcept
         {
+			fprintf(stderr, ">>> Entering AssignId(id=%d)\n", id);
             if (_id == InvalidId)
             {
                 _id = id;
+				fprintf(stderr, "AssignId(id=%d): _id → %d\n", id, _id);
                 return true;
             }
             else
             {
+				fprintf(stderr, "<<< Exiting AssignId(id=%d)\n", id);
                 return false;
             }
         }

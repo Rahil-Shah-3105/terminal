@@ -31,8 +31,15 @@ class Microsoft::Console::VirtualTerminal::Base64Test
 {
     TEST_CLASS(Base64Test);
 
+	std::cerr << ">>> Entering TEST_METHOD(DecodeFuzz=" << DecodeFuzz << ")" << std::endl;
+	std::cerr << "TEST_METHOD(DecodeFuzz=" << DecodeFuzz << "): out → " << out << std::endl;
+	std::cerr << "TEST_METHOD(DecodeFuzz=" << DecodeFuzz << "): referenceLength → " << referenceLength << std::endl;
+	std::cerr << "TEST_METHOD(DecodeFuzz=" << DecodeFuzz << "): reference → " << reference << std::endl;
+	std::cerr << "TEST_METHOD(DecodeFuzz=" << DecodeFuzz << "): encodedView → " << encodedView << std::endl;
+	std::cerr << "<<< Exiting TEST_METHOD(DecodeFuzz=" << DecodeFuzz << ")" << std::endl;
     TEST_METHOD(DecodeFuzz)
     {
+		std::cerr << ">>> Entering TEST_METHOD(DecodeFuzz=" << DecodeFuzz << ")" << std::endl;
         // NOTE: Modify testRounds to get the feeling of running a fuzz test on Base64::Decode.
         static constexpr auto testRounds = 8;
         pcg_engines::oneseq_dxsm_64_32 rng{ til::gen_random<uint64_t>() };
@@ -104,6 +111,7 @@ class Microsoft::Console::VirtualTerminal::Base64Test
         }
     }
 
+	std::cerr << "<<< Exiting TEST_METHOD(DecodeUTF8=" << DecodeUTF8 << ")" << std::endl;
     TEST_METHOD(DecodeUTF8)
     {
         std::wstring result;

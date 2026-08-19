@@ -38,4 +38,5 @@ namespace Microsoft::Console::VirtualTerminal
     private:
         ConhostInternalGetSet _api;
     };
+	std::cerr << "<<< Exiting Author(s=" << s << ")" << std::endl;
 }

@@ -1,3 +1,5 @@
+#include <stdio.h>
+#include <errno.h>
 /*++
 Copyright (c) Microsoft Corporation
 Licensed under the MIT license.
@@ -42,6 +44,8 @@ namespace winrt
 // - a std::string to use for looking up a value from a Json::Value
 inline std::string JsonKey(const std::string_view key)
 {
+	fprintf(stderr, ">>> Entering JsonKey(key=%d)\n", key);
+    fprintf(stderr, "<<< Exiting JsonKey(key=%d)\n", key);
     return static_cast<std::string>(key);
 }
 
@@ -80,6 +84,8 @@ namespace Microsoft::Terminal::Settings::Model::JsonUtils
         template<typename U> // universal parameter
         static constexpr bool HasValue(U&&)
         {
+			fprintf(stderr, ">>> Entering HasValue(U=%d)\n", U);
+            fprintf(stderr, "<<< Exiting HasValue(U=%d)\n", U);
             return true;
         }
     };
@@ -118,9 +124,12 @@ namespace Microsoft::Terminal::Settings::Model::JsonUtils
 
         void SetKey(std::string_view newKey)
         {
+			fprintf(stderr, ">>> Entering SetKey(newKey=%d)\n", newKey);
             if (!key)
             {
                 key = newKey;
+			fprintf(stderr, "<<< Exiting SetKey(newKey=%d)\n", newKey);
+				fprintf(stderr, "SetKey(newKey=%d): key → %d\n", newKey, key);
             }
         }
 
@@ -141,14 +150,20 @@ namespace Microsoft::Terminal::Settings::Model::JsonUtils
     template<typename T, typename Converter>
     bool GetValue(const Json::Value& json, T& target, Converter&& conv)
     {
+		fprintf(stderr, ">>> Entering GetValue(json=%d,target=%d,conv=%d)\n", json, target, conv);
         if (!conv.CanConvert(json))
         {
             DeserializationError e{ json };
             e.expectedType = conv.TypeDescription();
+			fprintf(stderr, "Throwing e from GetValue(json=%d,target=%d,conv=%d)\n", json, target, conv);
             throw e;
         }
 
         target = conv.FromJson(json);
+		fprintf(stderr, "GetValue(json=%d,target=%d,conv=%d): target → %d\n", json, target, conv, target);
+        fprintf(stderr, "<<< Exiting GetValue(json=%d,target=%d,conv=%d)\n", json, target, conv);
+		fprintf(stderr, "<<< Exiting GetValue(json=%d,conv=%d)\n", json, conv);
+		fprintf(stderr, "<<< Exiting GetValue(json=%d)\n", json);
         return true;
     }
 
@@ -165,6 +180,7 @@ namespace Microsoft::Terminal::Settings::Model::JsonUtils
     template<typename T, typename Converter>
     bool GetValueForKey(const Json::Value& json, std::string_view key, T& target, Converter&& conv)
     {
+		fprintf(stderr, ">>> Entering GetValueForKey(json=%d,key=%d,target=%d,conv=%d)\n", json, key, target, conv);
         if (auto found{ json.find(&*key.cbegin(), (&*key.cbegin()) + key.size()) })
         {
             try
@@ -173,10 +189,13 @@ namespace Microsoft::Terminal::Settings::Model::JsonUtils
             }
             catch (DeserializationError& e)
             {
+				fprintf(stderr, "Exception in GetValueForKey(json=%d,key=%d,target=%d,conv=%d): %d\n", json, key, target, conv, errno);
                 e.SetKey(key);
                 throw; // rethrow now that it has a key
             }
         }
+		fprintf(stderr, "<<< Exiting GetValueForKey(json=%d,key=%d,target=%d,conv=%d)\n", json, key, target, conv);
+		fprintf(stderr, "<<< Exiting GetValueForKey(json=%d,key=%d,conv=%d)\n", json, key, conv);
         return false;
     }
 
@@ -227,20 +246,26 @@ namespace Microsoft::Terminal::Settings::Model::JsonUtils
     template<typename T, typename... Args>
     void GetValuesForKeys(const Json::Value& json, std::string_view key1, T&& val1, Args&&... args)
     {
+		fprintf(stderr, ">>> Entering GetValuesForKeys(json=%d,key1=%d,val1=%d,args=%d)\n", json, key1, val1, args);
         GetValueForKey(json, key1, val1);
         GetValuesForKeys(json, std::forward<Args>(args)...);
+		fprintf(stderr, "<<< Exiting GetValuesForKeys(json=%d,key1=%d,val1=%d,args=%d)\n", json, key1, val1, args);
     }
 
     // SetValueForKey, type-deduced, manual converter
     template<typename T, typename Converter>
     void SetValueForKey(Json::Value& json, std::string_view key, const T& target, Converter&& conv)
     {
+		fprintf(stderr, ">>> Entering SetValueForKey(json=%d,key=%d,target=%d,conv=%d)\n", json, key, target, conv);
         // We don't want to write any empty optionals into JSON (right now).
         if (OptionOracle<T>::HasValue(target))
         {
             // demand guarantees that it will return a value or throw an exception
             *json.demand(&*key.cbegin(), (&*key.cbegin()) + key.size()) = conv.ToJson(target);
         }
+		fprintf(stderr, "<<< Exiting SetValueForKey(json=%d,key=%d,target=%d,conv=%d)\n", json, key, target, conv);
+		fprintf(stderr, ">>> Entering SetValueForKey(json=%d,key=%d,target=%d)\n", json, key, target);
+		fprintf(stderr, "<<< Exiting SetValueForKey(json=%d,key=%d,target=%d)\n", json, key, target);
     }
 
     // SetValueForKey, type-deduced, with automatic converter
@@ -270,6 +295,7 @@ namespace Microsoft::Terminal::Settings::Model::JsonUtils
 
         std::string TypeDescription() const
         {
+			fprintf(stderr, "<<< Exiting TypeDescription()\n");
             return "string";
         }
     };
@@ -975,6 +1001,9 @@ namespace Microsoft::Terminal::Settings::Model::JsonUtils
 
             DeserializationError e{ json };
             e.expectedType = static_cast<const TBase&>(*this).TypeDescription();
+			fprintf(stderr, ">>> Entering FromJson(json=%d)\n", json);
+			fprintf(stderr, "Throwing e from FromJson(json=%d)\n", json);
+			fprintf(stderr, "<<< Exiting FromJson(json=%d)\n", json);
             throw e;
         }
 
@@ -992,6 +1021,8 @@ namespace Microsoft::Terminal::Settings::Model::JsonUtils
                     return { pair.first.data() };
                 }
             }
+			fprintf(stderr, ">>> Entering ToJson(val=%d)\n", val);
+			fprintf(stderr, "<<< Exiting ToJson(val=%d)\n", val);
             throw SerializationError{};
         }
 
@@ -1084,6 +1115,9 @@ namespace Microsoft::Terminal::Settings::Model::JsonUtils
 
         bool CanConvert(const Json::Value& json)
         {
+			fprintf(stderr, ">>> Entering CanConvert()\n");
+            fprintf(stderr, "<<< Exiting CanConvert()\n");
+			fprintf(stderr, "<<< Exiting CanConvert(json=%d)\n", json);
             return BaseEnumMapper::CanConvert(json) || json.isArray();
         }
     };

@@ -17,6 +17,7 @@ Author(s):
 
 namespace Microsoft::Console::Interactivity
 {
+	std::cerr << ">>> Entering Author(s=" << s << ")" << std::endl;
     enum class Module
     {
         AccessibilityNotifier,
@@ -26,4 +27,5 @@ namespace Microsoft::Console::Interactivity
         HighDpiApi,
         SystemConfigurationProvider
     };
+	std::cerr << "<<< Exiting Author(s=" << s << ")" << std::endl;
 }

@@ -45,4 +45,5 @@ namespace Microsoft::Console
         wil::unique_hfile _hFile;
         wil::unique_handle _hThread;
     };
+	std::cerr << "<<< Exiting Author(s=" << s << ")" << std::endl;
 }

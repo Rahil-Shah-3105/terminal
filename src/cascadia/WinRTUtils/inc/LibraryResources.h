@@ -1,3 +1,4 @@
+#include <stdio.h>
 // Copyright (c) Microsoft Corporation.
 // Licensed under the MIT license.
 
@@ -78,6 +79,7 @@ bool HasLibraryResourceWithName(const std::wstring_view key);
 template<typename... Args>
 std::wstring RS_fmt_impl(std::wstring_view key, Args&&... args)
 {
+	fprintf(stderr, ">>> Entering RS_fmt_impl(key=%d,args=%d)\n", key, args);
     const auto format = GetLibraryResourceString(key);
     return fmt::format(fmt::runtime(std::wstring_view{ format }), std::forward<Args>(args)...);
 }

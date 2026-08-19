@@ -56,6 +56,7 @@ $conhostUrl = $ConsoleAdapterPath.TrimStart($SolutionRoot).replace("\", "/")
 $terminalUrl = $TerminalAdapterPath.TrimStart($SolutionRoot).replace("\", "/")
 
 function Read-SourceFiles {
+	Write-Host "[DEBUG] >>> Entering Read-SourceFiles()"
     # extract base interface
     $baseScanner = [regex]'(?x)virtual\s\w+\s(?<method>\w+)(?s)[^;]+;(?-s).*?(?<seq>(?<=\/\/\s).+)'
 

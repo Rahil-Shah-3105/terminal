@@ -65,4 +65,5 @@ private:
                                                                  const DWORD dwMode,
                                                                  _COM_Outptr_ IShellLink** ppsl,
                                                                  _COM_Outptr_ IPersistFile** ppPf);
+																std::cerr << "<<< Exiting Author(s=" << s << ")" << std::endl;
 };

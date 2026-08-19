@@ -1,3 +1,4 @@
+#include <stdio.h>
 // Copyright 2017 The Chromium Authors. All rights reserved.
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
@@ -38,7 +39,9 @@ class ClampedNumeric {
   template <typename Src>
   constexpr ClampedNumeric(Src value)  // NOLINT(runtime/explicit)
       : value_(saturated_cast<T>(value)) {
+	fprintf(stderr, ">>> Entering ClampedNumeric(value=%d)\n", value);
     static_assert(std::is_arithmetic<Src>::value, "Argument must be numeric.");
+	fprintf(stderr, "<<< Exiting ClampedNumeric(value=%d)\n", value);
   }
 
   // This is not an explicit constructor because we want a seamless conversion
@@ -88,8 +91,10 @@ class ClampedNumeric {
   }
 
   constexpr ClampedNumeric Abs() const {
+	fprintf(stderr, ">>> Entering Abs()\n");
     // The negation of two's complement int min is int min, so that's the
     // only overflow case where we will saturate.
+	fprintf(stderr, "<<< Exiting Abs()\n");
     return ClampedNumeric<T>(SaturatedAbsWrapper(value_));
   }
 
@@ -146,7 +151,10 @@ class ClampedNumeric {
             typename L,
             typename R>
   static constexpr ClampedNumeric MathOp(const L lhs, const R rhs) {
+	fprintf(stderr, ">>> Entering MathOp(lhs=%d,rhs=%d)\n", lhs, rhs);
     using Math = typename MathWrapper<M, L, R>::math;
+	fprintf(stderr, "<<< Exiting MathOp(lhs=%d,rhs=%d)\n", lhs, rhs);
+	fprintf(stderr, "<<< Exiting MathOp(rhs=%d)\n", rhs);
     return ClampedNumeric<T>(
         Math::template Do<T>(Wrapper<L>::value(lhs), Wrapper<R>::value(rhs)));
   }
@@ -162,6 +170,8 @@ class ClampedNumeric {
 
   template <typename Dst>
   constexpr operator Dst() const {
+	fprintf(stderr, ">>> Entering Dst()\n");
+    fprintf(stderr, "<<< Exiting Dst()\n");
     return saturated_cast<typename ArithmeticOrUnderlyingEnum<Dst>::type>(
         value_);
   }
@@ -179,6 +189,8 @@ class ClampedNumeric {
   template <typename Src>
   struct Wrapper {
     static constexpr Src value(Src value) {
+	fprintf(stderr, ">>> Entering value(value=%d)\n", value);
+      fprintf(stderr, "<<< Exiting value(value=%d)\n", value);
       return static_cast<typename UnderlyingType<Src>::type>(value);
     }
   };

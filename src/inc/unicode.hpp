@@ -9,6 +9,10 @@ Abstract:
 - This file contains global vars for some common wchar values.
 - taken from input.h
 
+std::cerr << "Author(s=" << s << "): UNICODE_QUOTE → " << UNICODE_QUOTE << std::endl;
+std::cerr << "Author(s=" << s << "): UNICODE_HYPHEN → " << UNICODE_HYPHEN << std::endl;
+std::cerr << "Author(s=" << s << "): UNICODE_ETX → " << UNICODE_ETX << std::endl;
+std::cerr << "<<< Exiting Author(s=" << s << ")" << std::endl;
 Author(s):
 - Austin Diviness (AustDi) Oct 2017
 --*/

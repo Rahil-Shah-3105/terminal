@@ -48,23 +48,32 @@ namespace pcg_engines
 
         static constexpr uint64_t multiplier() noexcept
         {
+			std::cerr << ">>> Entering multiplier()" << std::endl;
+			std::cerr << "<<< Exiting multiplier()" << std::endl;
             return 6364136223846793005ULL;
         }
 
         static constexpr uint64_t increment() noexcept
         {
+			std::cerr << ">>> Entering increment()" << std::endl;
+			std::cerr << "<<< Exiting increment()" << std::endl;
             return 1442695040888963407ULL;
         }
 
         static constexpr itype bump(itype state) noexcept
         {
+			std::cerr << ">>> Entering bump(state=" << state << ")" << std::endl;
+			std::cerr << "<<< Exiting bump(state=" << state << ")" << std::endl;
             return state * multiplier() + increment();
         }
 
         constexpr itype base_generate0() noexcept
         {
+			std::cerr << ">>> Entering base_generate0()" << std::endl;
             itype old_state = state_;
             state_ = bump(state_);
+			std::cerr << "base_generate0(): state_ → " << state_ << std::endl;
+			std::cerr << "<<< Exiting base_generate0()" << std::endl;
             return old_state;
         }
 
@@ -76,11 +85,17 @@ namespace pcg_engines
 
         constexpr xtype operator()() noexcept
         {
+			std::cerr << ">>> Entering operator()" << std::endl;
             constexpr auto xtypebits = uint8_t(sizeof(xtype) * 8);
             constexpr auto itypebits = uint8_t(sizeof(itype) * 8);
+			std::cerr << "operator(): itypebits → " << itypebits << std::endl;
+			std::cerr << "operator(): xtypebits → " << xtypebits << std::endl;
             static_assert(xtypebits <= itypebits / 2, "Output type must be half the size of the state type.");
 
             auto internal = base_generate0();
+			std::cerr << "operator(): internal → " << internal << std::endl;
+			std::cerr << "operator(): hi → " << hi << std::endl;
+			std::cerr << "operator(): lo → " << lo << std::endl;
             auto hi = xtype(internal >> (itypebits - xtypebits));
             auto lo = xtype(internal);
 
@@ -89,6 +104,7 @@ namespace pcg_engines
             hi *= xtype(multiplier());
             hi ^= hi >> (3 * (xtypebits / 4));
             hi *= lo;
+			std::cerr << "<<< Exiting operator()" << std::endl;
             return hi;
         }
 
@@ -108,25 +124,33 @@ namespace pcg_engines
 template<typename T>
 constexpr T min(T a, T b)
 {
+	std::cerr << ">>> Entering min(a=" << a << ",b=" << b << ")" << std::endl;
+	std::cerr << "<<< Exiting min(a=" << a << ",b=" << b << ")" << std::endl;
     return a < b ? a : b;
 }
 
 template<typename T>
 constexpr T max(T a, T b)
 {
+	std::cerr << ">>> Entering max(a=" << a << ",b=" << b << ")" << std::endl;
+	std::cerr << "<<< Exiting max(a=" << a << ",b=" << b << ")" << std::endl;
     return a > b ? a : b;
 }
 
 template<typename T>
 constexpr T clamp(T val, T min, T max)
 {
+	std::cerr << ">>> Entering clamp(val=" << val << ",min=" << min << ",max=" << max << ")" << std::endl;
+	std::cerr << "<<< Exiting clamp(val=" << val << ",min=" << min << ",max=" << max << ")" << std::endl;
     return val < min ? min : (val > max ? max : val);
 }
 
 static uint32_t parse_number(const wchar_t* str, const wchar_t** end) noexcept
 {
+	std::cerr << ">>> Entering parse_number(str=" << str << ",end=" << end << ")" << std::endl;
     static constexpr uint32_t max = 0x0fffffff;
     uint32_t accumulator = 0;
+	std::cerr << "parse_number(str=" << str << ",end=" << end << "): accumulator → " << accumulator << std::endl;
 
     for (;; ++str)
     {
@@ -148,17 +172,21 @@ static uint32_t parse_number(const wchar_t* str, const wchar_t** end) noexcept
         *end = str;
     }
 
+	std::cerr << "<<< Exiting parse_number(str=" << str << ",end=" << end << ")" << std::endl;
     return accumulator;
 }
 
 static uint32_t parse_number_with_suffix(const wchar_t* str) noexcept
 {
+	std::cerr << ">>> Entering parse_number_with_suffix(str=" << str << ")" << std::endl;
     const wchar_t* str_end = nullptr;
     auto value = parse_number(str, &str_end);
+	std::cerr << "parse_number_with_suffix(str=" << str << "): value → " << value << std::endl;
 
     if (str_end[0])
     {
         uint32_t mul = 1000;
+		std::cerr << "parse_number_with_suffix(str=" << str << "): mul → " << mul << std::endl;
 
         if (str_end[1])
         {
@@ -190,16 +218,20 @@ static uint32_t parse_number_with_suffix(const wchar_t* str) noexcept
         }
     }
 
+	std::cerr << "<<< Exiting parse_number_with_suffix(str=" << str << ")" << std::endl;
     return value;
 }
 
 static bool has_suffix(const wchar_t* str, const wchar_t* suffix)
 {
+	std::cerr << ">>> Entering has_suffix(str=" << str << ",suffix=" << suffix << ")" << std::endl;
+	std::cerr << "<<< Exiting has_suffix(str=" << str << ",suffix=" << suffix << ")" << std::endl;
     return wcscmp(str, suffix) == 0;
 }
 
 static const wchar_t* split_prefix(const wchar_t* str, const wchar_t* prefix) noexcept
 {
+	std::cerr << ">>> Entering split_prefix(str=" << str << ",prefix=" << prefix << ")" << std::endl;
     for (; *prefix; ++prefix, ++str)
     {
         if (*str != *prefix)
@@ -207,31 +239,39 @@ static const wchar_t* split_prefix(const wchar_t* str, const wchar_t* prefix) no
             return nullptr;
         }
     }
+	std::cerr << "<<< Exiting split_prefix(str=" << str << ",prefix=" << prefix << ")" << std::endl;
     return str;
 }
 
 static char* buffer_append_long(char* dst, const void* src, size_t size)
 {
+	std::cerr << ">>> Entering buffer_append_long(dst=" << dst << ",src=" << src << ",size=" << size << ")" << std::endl;
     memcpy(dst, src, size);
+	std::cerr << "<<< Exiting buffer_append_long(dst=" << dst << ",src=" << src << ",size=" << size << ")" << std::endl;
     return dst + size;
 }
 
 static char* buffer_append(char* dst, const char* src, size_t size)
 {
+	std::cerr << ">>> Entering buffer_append(dst=" << dst << ",src=" << src << ",size=" << size << ")" << std::endl;
     for (size_t i = 0; i < size; ++i, ++src, ++dst)
     {
         *dst = *src;
     }
+	std::cerr << "<<< Exiting buffer_append(dst=" << dst << ",src=" << src << ",size=" << size << ")" << std::endl;
     return dst;
 }
 
 static char* buffer_append_string(char* dst, const char* src)
 {
+	std::cerr << ">>> Entering buffer_append_string(dst=" << dst << ",src=" << src << ")" << std::endl;
+	std::cerr << "<<< Exiting buffer_append_string(dst=" << dst << ",src=" << src << ")" << std::endl;
     return buffer_append(dst, src, strlen(src));
 }
 
 char* buffer_append_number(char* dst, uint8_t val)
 {
+	std::cerr << ">>> Entering buffer_append_number(dst=" << dst << ",val=" << val << ")" << std::endl;
     if (val >= 10)
     {
         if (val >= 100)
@@ -247,6 +287,7 @@ char* buffer_append_number(char* dst, uint8_t val)
     }
 
     *dst++ = '0' + val;
+	std::cerr << "<<< Exiting buffer_append_number(dst=" << dst << ",val=" << val << ")" << std::endl;
     return dst;
 }
 
@@ -262,18 +303,23 @@ struct FormatResult
 
 static FormatResult format_size(LONGLONG value)
 {
+	std::cerr << ">>> Entering format_size(value=" << value << ")" << std::endl;
     FormatResult result;
     if (value >= 1'000'000'000)
     {
         result.integral = value / 1'000'000'000;
+		std::cerr << "format_size(value=" << value << "): result.integral → " << result.integral << std::endl;
         result.fractional = ((value + 500'000) / 1'000'000) % 1000;
         result.suffix = "G";
     }
     else if (value >= 1'000'000)
     {
+		std::cerr << "format_size(value=" << value << "): result.suffix → " << result.suffix << std::endl;
         result.integral = value / 1'000'000;
         result.fractional = ((value + 500) / 1'000) % 1000;
         result.suffix = "M";
+		std::cerr << "format_size(value=" << value << "): result.fractional → " << result.fractional << std::endl;
+		std::cerr << "<<< Exiting format_size(value=" << value << ")" << std::endl;
     }
     else if (value >= 1'000)
     {
@@ -292,10 +338,12 @@ static FormatResult format_size(LONGLONG value)
 
 static FormatResult format_duration(LONGLONG microseconds)
 {
+	std::cerr << ">>> Entering format_duration(microseconds=" << microseconds << ")" << std::endl;
     FormatResult result;
     if (microseconds >= 1'000'000)
     {
         result.integral = microseconds / 1'000'000;
+		std::cerr << "format_duration(microseconds=" << microseconds << "): result.integral → " << result.integral << std::endl;
         result.fractional = ((microseconds + 500) / 1'000) % 1000;
         result.suffix = "";
     }
@@ -303,17 +351,22 @@ static FormatResult format_duration(LONGLONG microseconds)
     {
         result.integral = microseconds / 1'000;
         result.fractional = microseconds % 1'000;
+		std::cerr << "format_duration(microseconds=" << microseconds << "): result.fractional → " << result.fractional << std::endl;
         result.suffix = "m";
     }
+	std::cerr << "<<< Exiting format_duration(microseconds=" << microseconds << ")" << std::endl;
     return result;
 }
 
 static int format(char* buffer, int size, const char* format, ...) noexcept
 {
+	std::cerr << ">>> Entering format(buffer=" << buffer << ",size=" << size << ",format=" << format << ")" << std::endl;
     va_list vl;
     va_start(vl, format);
     const auto length = wvnsprintfA(buffer, size, format, vl);
+	std::cerr << "format(buffer=" << buffer << ",size=" << size << ",format=" << format << "): length → " << length << std::endl;
     va_end(vl);
+	std::cerr << "<<< Exiting format(buffer=" << buffer << ",size=" << size << ",format=" << format << ")" << std::endl;
     return length;
 }
 
@@ -368,6 +421,7 @@ static size_t g_large_page_minimum;
 
 static void acquire_lock_memory_privilege() noexcept
 {
+	std::cerr << ">>> Entering acquire_lock_memory_privilege()" << std::endl;
     HANDLE token;
     if (!OpenProcessToken(GetCurrentProcess(), TOKEN_ADJUST_PRIVILEGES, &token))
     {
@@ -376,24 +430,30 @@ static void acquire_lock_memory_privilege() noexcept
 
     TOKEN_PRIVILEGES privileges{};
     privileges.PrivilegeCount = 1;
+	std::cerr << "acquire_lock_memory_privilege(): privileges.PrivilegeCount → " << privileges.PrivilegeCount << std::endl;
     privileges.Privileges[0].Luid = { 4, 0 }; // SE_LOCK_MEMORY_PRIVILEGE is a well known LUID and always {4, 0}
     privileges.Privileges[0].Attributes = SE_PRIVILEGE_ENABLED;
 
     // AdjustTokenPrivileges can return true and still set the last error to ERROR_NOT_ALL_ASSIGNED. This API is nuts...
     const bool success = AdjustTokenPrivileges(token, FALSE, &privileges, 0, nullptr, nullptr);
+	std::cerr << "acquire_lock_memory_privilege(): success → " << success << std::endl;
     if (success && GetLastError() == S_OK)
     {
         g_large_page_minimum = GetLargePageMinimum();
     }
+	std::cerr << "acquire_lock_memory_privilege(): g_large_page_minimum → " << g_large_page_minimum << std::endl;
 
     CloseHandle(token);
+	std::cerr << "<<< Exiting acquire_lock_memory_privilege()" << std::endl;
 }
 
 static char* allocate(size_t size)
 {
+	std::cerr << ">>> Entering allocate(size=" << size << ")" << std::endl;
     if (g_large_page_minimum)
     {
         const auto large_size = (size + g_large_page_minimum - 1) & ~(g_large_page_minimum - 1);
+		std::cerr << "allocate(size=" << size << "): large_size → " << large_size << std::endl;
         if (const auto address = static_cast<char*>(VirtualAlloc(nullptr, large_size, MEM_COMMIT | MEM_RESERVE | MEM_LARGE_PAGES, PAGE_READWRITE)))
         {
             return address;
@@ -406,6 +466,7 @@ static char* allocate(size_t size)
     }
 
     print_last_error("allocate memory");
+	std::cerr << "<<< Exiting allocate(size=" << size << ")" << std::endl;
 }
 
 static BOOL WINAPI consoleCtrlHandler(DWORD)

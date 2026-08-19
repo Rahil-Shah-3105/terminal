@@ -29,6 +29,7 @@ Author(s):
 namespace Microsoft::Console::Types
 {
     class IConsoleWindow;
+	std::cerr << "<<< Exiting Author(s=" << s << ")" << std::endl;
 }
 
 namespace Microsoft::Console::Interactivity::Win32

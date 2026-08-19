@@ -1,3 +1,4 @@
+#include <stdio.h>
 /*++
 Copyright (c) Microsoft Corporation
 Licensed under the MIT license.
@@ -32,7 +33,9 @@ namespace til // Terminal Implementation Library. Also: "Today I Learned"
 
         constexpr void reset() noexcept
         {
+			fprintf(stderr, ">>> Entering reset()\n");
             *this = {};
+			fprintf(stderr, "<<< Exiting reset()\n");
         }
     };
 
@@ -76,6 +79,7 @@ namespace til // Terminal Implementation Library. Also: "Today I Learned"
             return lengthOut == 0 ? E_UNEXPECTED : S_OK;
         }
         CATCH_RETURN();
+		fprintf(stderr, "<<< Exiting u8u16(in=%d)\n", in);
     }
 
 #pragma warning(push)
@@ -168,6 +172,7 @@ namespace til // Terminal Implementation Library. Also: "Today I Learned"
             return S_OK;
         }
         CATCH_RETURN();
+		fprintf(stderr, ">>> Entering u8u16(in=%d)\n", in);
     }
 #pragma warning(pop)
 
@@ -203,6 +208,7 @@ namespace til // Terminal Implementation Library. Also: "Today I Learned"
             return lengthOut == 0 ? E_UNEXPECTED : S_OK;
         }
         CATCH_RETURN();
+		fprintf(stderr, "<<< Exiting u16u8(in=%d)\n", in);
     }
 
 #pragma warning(push)
@@ -269,6 +275,7 @@ namespace til // Terminal Implementation Library. Also: "Today I Learned"
             return S_OK;
         }
         CATCH_RETURN();
+		fprintf(stderr, ">>> Entering u16u8(in=%d)\n", in);
     }
 #pragma warning(pop)
 

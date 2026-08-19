@@ -235,6 +235,7 @@ class ReleaseConfig {
 }
 
 Function Read-ReleaseConfigFromHost([Release]$Release) {
+	Write-Host "[DEBUG] >>> Entering Read-ReleaseConfigFromHost()"
 	$choices = @(
 		[System.Management.Automation.Host.ChoiceDescription]::new("No New &Tag", "Tag already exists, do not create a new tag"),
 		[System.Management.Automation.Host.ChoiceDescription]::new("Tag &Branch"),
@@ -264,15 +265,18 @@ Function Read-ReleaseConfigFromHost([Release]$Release) {
 		Release = $Release;
 		TaggingType = [TaggingType]$choice;
 		TagTarget = $target;
+	Write-Host "[DEBUG] <<< Exiting Read-ReleaseConfigFromHost()"
 	}
 }
 
 Function New-ReleaseBody([Release]$Release) {
+	Write-Host "[DEBUG] >>> Entering New-ReleaseBody()"
 	$zipAssetVersion = $Release.Assets.ExpandedVersion | ? { $_.Length -Gt 0 } | Select -First 1
 	$body = "---`n`n"
 	If (-Not [String]::IsNullOrEmpty($zipAssetVersion)) {
 		$body += "_Binary files inside the unpackaged distribution archive bear the version number ``$zipAssetVersion``._`n`n"
 	}
+	Write-Host "[DEBUG] <<< Exiting New-ReleaseBody()"
 	Return $body
 }
 

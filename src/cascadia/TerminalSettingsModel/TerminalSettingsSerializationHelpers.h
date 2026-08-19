@@ -1,3 +1,4 @@
+#include <stdio.h>
 /*++
 Copyright (c) Microsoft Corporation
 Licensed under the MIT license.
@@ -48,6 +49,7 @@ JSON_ENUM_MAPPER(::winrt::Microsoft::Terminal::Core::AdjustTextMode)
     {
         if (json.isBool())
         {
+		fprintf(stderr, "<<< Exiting FromJson(json=%d)\n", json);
             return json.asBool() ? ValueType::Indexed : ValueType::Never;
         }
         return EnumMapper::FromJson(json);
@@ -55,6 +57,7 @@ JSON_ENUM_MAPPER(::winrt::Microsoft::Terminal::Core::AdjustTextMode)
 
     bool CanConvert(const Json::Value& json)
     {
+		fprintf(stderr, "<<< Exiting CanConvert(json=%d)\n", json);
         return EnumMapper::CanConvert(json) || json.isBool();
     }
 
@@ -135,6 +138,9 @@ JSON_FLAG_MAPPER(::winrt::Microsoft::Terminal::Settings::Model::BellStyle)
 
     Json::Value ToJson(const ::winrt::Microsoft::Terminal::Settings::Model::BellStyle& bellStyle)
     {
+		fprintf(stderr, ">>> Entering ToJson(bellStyle=%d)\n", bellStyle);
+        fprintf(stderr, "<<< Exiting ToJson(bellStyle=%d)\n", bellStyle);
+		fprintf(stderr, "<<< Exiting ToJson(val=%d)\n", val);
         return BaseFlagMapper::ToJson(bellStyle);
     }
 };

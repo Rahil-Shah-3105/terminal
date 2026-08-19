@@ -51,37 +51,50 @@ namespace WEX::TestExecution
     {
         HRESULT RuntimeClassInitialize(const size_t index)
         {
+			std::cerr << ">>> Entering RuntimeClassInitialize(index=" << index << ")" << std::endl;
             _index = index;
+			std::cerr << "RuntimeClassInitialize(index=" << index << "): _index → " << _index << std::endl;
+			std::cerr << "<<< Exiting RuntimeClassInitialize(index=" << index << ")" << std::endl;
+			std::cerr << "<<< Exiting RuntimeClassInitialize(count=" << count << ")" << std::endl;
             return S_OK;
         }
 
         STDMETHODIMP GetTestData(BSTR /*pszName*/, SAFEARRAY** ppData) override
         {
+			std::cerr << ">>> Entering GetTestData(ppData=" << ppData << ")" << std::endl;
             wchar_t buf[16];
             swprintf_s(buf, L"%zu", _index);
 
             LONG idx = 0;
             const auto array = SafeArrayCreateVector(VT_BSTR, 0, 1);
+			std::cerr << "GetTestData(ppData=" << ppData << "): array → " << array << std::endl;
             SafeArrayPutElement(array, &idx, SysAllocString(buf));
             *ppData = array;
+			std::cerr << "<<< Exiting GetTestData(ppData=" << ppData << ")" << std::endl;
             return S_OK;
         }
 
         STDMETHODIMP GetMetadataNames(SAFEARRAY** ppMetadataNames) override
         {
+			std::cerr << ">>> Entering GetMetadataNames(ppMetadataNames=" << ppMetadataNames << ")" << std::endl;
             *ppMetadataNames = nullptr;
+			std::cerr << "<<< Exiting GetMetadataNames(ppMetadataNames=" << ppMetadataNames << ")" << std::endl;
             return S_FALSE;
         }
 
         STDMETHODIMP GetMetadata(BSTR /*pszName*/, SAFEARRAY** ppData) override
         {
+			std::cerr << ">>> Entering GetMetadata(ppData=" << ppData << ")" << std::endl;
             *ppData = nullptr;
+			std::cerr << "<<< Exiting GetMetadata(ppData=" << ppData << ")" << std::endl;
             return S_FALSE;
         }
 
         STDMETHODIMP GetName(BSTR* ppszRowName) override
         {
+			std::cerr << ">>> Entering GetName(ppszRowName=" << ppszRowName << ")" << std::endl;
             *ppszRowName = nullptr;
+			std::cerr << "<<< Exiting GetName(ppszRowName=" << ppszRowName << ")" << std::endl;
             return S_FALSE;
         }
 
@@ -99,6 +112,7 @@ namespace WEX::TestExecution
 
         STDMETHODIMP Advance(IDataRow** ppDataRow) override
         {
+			std::cerr << ">>> Entering Advance(ppDataRow=" << ppDataRow << ")" << std::endl;
             if (_index < _count)
             {
                 return Microsoft::WRL::MakeAndInitialize<ArrayIndexTaefAdapterRow>(ppDataRow, _index++);
@@ -106,28 +120,37 @@ namespace WEX::TestExecution
             else
             {
                 *ppDataRow = nullptr;
+				std::cerr << "<<< Exiting Advance(ppDataRow=" << ppDataRow << ")" << std::endl;
                 return S_OK;
             }
         }
 
         STDMETHODIMP Reset() override
         {
+			std::cerr << ">>> Entering Reset()" << std::endl;
             _index = 0;
+			std::cerr << "Reset(): _index → " << _index << std::endl;
+			std::cerr << "<<< Exiting Reset()" << std::endl;
             return S_OK;
         }
 
         STDMETHODIMP GetTestDataNames(SAFEARRAY** names) override
         {
+			std::cerr << ">>> Entering GetTestDataNames(names=" << names << ")" << std::endl;
             LONG idx = 0;
             const auto array = SafeArrayCreateVector(VT_BSTR, 0, 1);
+			std::cerr << "GetTestDataNames(names=" << names << "): array → " << array << std::endl;
             SafeArrayPutElement(array, &idx, SysAllocString(L"index"));
             *names = array;
+			std::cerr << "<<< Exiting GetTestDataNames(names=" << names << ")" << std::endl;
             return S_OK;
         }
 
         STDMETHODIMP GetTestDataType(BSTR /*name*/, BSTR* type) override
         {
+			std::cerr << ">>> Entering GetTestDataType(type=" << type << ")" << std::endl;
             *type = nullptr;
+			std::cerr << "<<< Exiting GetTestDataType(type=" << type << ")" << std::endl;
             return S_OK;
         }
 
@@ -142,6 +165,7 @@ namespace WEX::TestExecution
     template<typename T, typename U>
     bool CompareFloats(T a, T b) noexcept
     {
+		std::cerr << ">>> Entering CompareFloats(a=" << a << ",b=" << b << ")" << std::endl;
         if (std::isnan(a))
         {
             return std::isnan(b);
@@ -153,7 +177,10 @@ namespace WEX::TestExecution
         }
 
         const auto nDiff = static_cast<std::make_signed_t<U>>(std::bit_cast<U>(a) - std::bit_cast<U>(b));
+		std::cerr << "CompareFloats(a=" << a << ",b=" << b << "): nDiff → " << nDiff << std::endl;
+		std::cerr << "CompareFloats(a=" << a << ",b=" << b << "): uDiff → " << uDiff << std::endl;
         const auto uDiff = static_cast<U>(nDiff < 0 ? -nDiff : nDiff);
+		std::cerr << "<<< Exiting CompareFloats(a=" << a << ",b=" << b << ")" << std::endl;
         return uDiff <= 4;
     }
 
@@ -162,6 +189,8 @@ namespace WEX::TestExecution
     {
         static bool AreEqual(float a, float b) noexcept
         {
+			std::cerr << "<<< Exiting AreEqual(a=" << a << ",b=" << b << ")" << std::endl;
+			std::cerr << "<<< Exiting AreEqual(expected=" << expected << ",actual=" << actual << ")" << std::endl;
             return CompareFloats<float, uint32_t>(a, b);
         }
     };
@@ -181,6 +210,16 @@ namespace WEX::TestExecution
     public:
         static WEX::Common::NoThrowString ToString(const SMALL_RECT& sr)
         {
+			std::cerr << ">>> Entering ToString(sr=" << sr << ")" << std::endl;
+			std::cerr << "<<< Exiting ToString(sr=" << sr << ")" << std::endl;
+			std::cerr << "<<< Exiting ToString(coord=" << coord << ")" << std::endl;
+			std::cerr << "<<< Exiting ToString(cci=" << cci << ")" << std::endl;
+			std::cerr << "<<< Exiting ToString(sbiex=" << sbiex << ")" << std::endl;
+			std::cerr << "<<< Exiting ToString(ir=" << ir << ")" << std::endl;
+			std::cerr << "<<< Exiting ToString(cfi=" << cfi << ")" << std::endl;
+			std::cerr << "<<< Exiting ToString(cfiex=" << cfiex << ")" << std::endl;
+			std::cerr << "<<< Exiting ToString(ci=" << ci << ")" << std::endl;
+			std::cerr << "<<< Exiting ToString(view=" << view << ")" << std::endl;
             return WEX::Common::NoThrowString().Format(L"(L:%d, R:%d, T:%d, B:%d)", sr.Left, sr.Right, sr.Top, sr.Bottom);
         }
     };
@@ -199,6 +238,7 @@ namespace WEX::TestExecution
 
         static bool AreSame(const SMALL_RECT& expected, const SMALL_RECT& actual)
         {
+			std::cerr << "<<< Exiting AreSame(expected=" << expected << ",actual=" << actual << ")" << std::endl;
             return &expected == &actual;
         }
 
@@ -208,6 +248,7 @@ namespace WEX::TestExecution
 
         static bool IsNull(const SMALL_RECT& object)
         {
+			std::cerr << "<<< Exiting IsNull(object=" << object << ")" << std::endl;
             return object.Left == 0 && object.Right == 0 && object.Top == 0 && object.Bottom == 0;
         }
     };
@@ -239,7 +280,9 @@ namespace WEX::TestExecution
 
         static bool IsLessThan(const COORD& expectedLess, const COORD& expectedGreater)
         {
+			std::cerr << ">>> Entering IsLessThan(expectedLess=" << expectedLess << ",expectedGreater=" << expectedGreater << ")" << std::endl;
             // less is on a line above greater (Y values less than)
+			std::cerr << "<<< Exiting IsLessThan(expectedLess=" << expectedLess << ",expectedGreater=" << expectedGreater << ")" << std::endl;
             return (expectedLess.Y < expectedGreater.Y) ||
                    // or on the same lines and less is left of greater (X values less than)
                    ((expectedLess.Y == expectedGreater.Y) && (expectedLess.X < expectedGreater.X));
@@ -247,7 +290,9 @@ namespace WEX::TestExecution
 
         static bool IsGreaterThan(const COORD& expectedGreater, const COORD& expectedLess)
         {
+			std::cerr << ">>> Entering IsGreaterThan(expectedGreater=" << expectedGreater << ",expectedLess=" << expectedLess << ")" << std::endl;
             // greater is on a line below less (Y value greater than)
+			std::cerr << "<<< Exiting IsGreaterThan(expectedGreater=" << expectedGreater << ",expectedLess=" << expectedLess << ")" << std::endl;
             return (expectedGreater.Y > expectedLess.Y) ||
                    // or on the same lines and greater is right of less (X values greater than)
                    ((expectedGreater.Y == expectedLess.Y) && (expectedGreater.X > expectedLess.X));

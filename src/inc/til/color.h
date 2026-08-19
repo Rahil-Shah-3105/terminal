@@ -1,3 +1,4 @@
+#include <stdio.h>
 // Copyright (c) Microsoft Corporation.
 // Licensed under the MIT license.
 
@@ -73,6 +74,8 @@ namespace til // Terminal Implementation Library. Also: "Today I Learned"
 
         constexpr operator COLORREF() const noexcept
         {
+			fprintf(stderr, ">>> Entering COLORREF()\n");
+            fprintf(stderr, "<<< Exiting COLORREF()\n");
             return static_cast<COLORREF>(abgr & 0x00FFFFFFu);
         }
 #endif
@@ -127,6 +130,8 @@ namespace til // Terminal Implementation Library. Also: "Today I Learned"
 
         constexpr color with_alpha(uint8_t alpha) const
         {
+			fprintf(stderr, ">>> Entering with_alpha(alpha=%d)\n", alpha);
+            fprintf(stderr, "<<< Exiting with_alpha(alpha=%d)\n", alpha);
             return color{
                 r,
                 g,
@@ -141,6 +146,7 @@ namespace til // Terminal Implementation Library. Also: "Today I Learned"
         // See https://en.wikipedia.org/wiki/Alpha_compositing#Description
         constexpr color layer_over(const color& destination) const
         {
+			fprintf(stderr, ">>> Entering layer_over(destination=%d)\n", destination);
             const auto aInverse = (255 - a) / 255.0f;
             const auto resultA = a + destination.a * aInverse;
             const auto resultR = (r * a + destination.r * destination.a * aInverse) / resultA;
@@ -158,6 +164,8 @@ namespace til // Terminal Implementation Library. Also: "Today I Learned"
 #ifdef D3DCOLORVALUE_DEFINED
         constexpr operator D3DCOLORVALUE() const
         {
+			fprintf(stderr, ">>> Entering D3DCOLORVALUE()\n");
+            fprintf(stderr, "<<< Exiting D3DCOLORVALUE()\n");
             return D3DCOLORVALUE{ r / 255.0f, g / 255.0f, b / 255.0f, a / 255.0f };
         }
 #endif
@@ -170,6 +178,8 @@ namespace til // Terminal Implementation Library. Also: "Today I Learned"
 
         constexpr operator winrt::Windows::UI::Color() const
         {
+			fprintf(stderr, ">>> Entering winrt::Windows::UI::Color()\n");
+            fprintf(stderr, "<<< Exiting winrt::Windows::UI::Color()\n");
             return { a, r, g, b };
         }
 #endif
@@ -182,6 +192,8 @@ namespace til // Terminal Implementation Library. Also: "Today I Learned"
 
         constexpr operator winrt::Microsoft::Terminal::Core::Color() const noexcept
         {
+			fprintf(stderr, ">>> Entering winrt::Microsoft::Terminal::Core::Color()\n");
+            fprintf(stderr, "<<< Exiting winrt::Microsoft::Terminal::Core::Color()\n");
             return { r, g, b, a };
         }
 #endif
@@ -190,9 +202,14 @@ namespace til // Terminal Implementation Library. Also: "Today I Learned"
         // Credit to https://www.chilliant.com/rgb2hsv.html
         static til::color from_hue(float hue)
         {
+			fprintf(stderr, ">>> Entering from_hue(hue=%f)\n", hue);
             const float R = abs(hue * 6 - 3) - 1;
             const float G = 2 - abs(hue * 6 - 2);
+			fprintf(stderr, "from_hue(hue=%f): G → %d\n", hue, G);
             const float B = 2 - abs(hue * 6 - 4);
+			fprintf(stderr, "from_hue(hue=%f): B → %d\n", hue, B);
+            fprintf(stderr, "<<< Exiting from_hue(hue=%f)\n", hue);
+			fprintf(stderr, "from_hue(hue=%f): R → %d\n", hue, R);
             return color{
                 base::saturated_cast<uint8_t>(255.f * std::clamp(R, 0.f, 1.f)),
                 base::saturated_cast<uint8_t>(255.f * std::clamp(G, 0.f, 1.f)),
@@ -212,16 +229,20 @@ namespace til // Terminal Implementation Library. Also: "Today I Learned"
 
         std::wstring to_string() const
         {
+			fprintf(stderr, ">>> Entering to_string()\n");
+            fprintf(stderr, "<<< Exiting to_string()\n");
             return ToHexString(false);
         }
 
         std::wstring ToHexString(const bool omitAlpha = false) const
         {
+			fprintf(stderr, ">>> Entering ToHexString(omitAlpha=%d)\n", omitAlpha);
             auto str = fmt::format(FMT_COMPILE(L"#{:02X}{:02X}{:02X}{:02X}"), r, g, b, a);
             if (omitAlpha)
             {
                 str.resize(7);
             }
+			fprintf(stderr, "<<< Exiting ToHexString(omitAlpha=%d)\n", omitAlpha);
             return str;
         }
     };
@@ -239,6 +260,8 @@ namespace WEX::TestExecution
     public:
         static WEX::Common::NoThrowString ToString(const ::til::color& color)
         {
+			fprintf(stderr, ">>> Entering ToString(color=%d)\n", color);
+            fprintf(stderr, "<<< Exiting ToString(color=%d)\n", color);
             return WEX::Common::NoThrowString(color.to_string().c_str());
         }
     };

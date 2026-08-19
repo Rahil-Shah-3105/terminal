@@ -39,6 +39,8 @@ public:
     STDMETHOD(RegisterCOMObject)
     (_In_opt_z_ const wchar_t* serverName, _In_reads_(count) IID* clsids, _In_reads_(count) IClassFactory** factories, _Inout_updates_(count) DWORD* cookies, unsigned int count)
     {
+		std::cerr << ">>> Entering STDMETHOD(RegisterCOMObject=" << RegisterCOMObject << ")" << std::endl;
+		std::cerr << "<<< Exiting STDMETHOD(RegisterCOMObject=" << RegisterCOMObject << ")" << std::endl;
         return Microsoft::WRL::Details::RegisterCOMObject<RegClsType>(serverName, clsids, factories, cookies, count);
     }
 };
@@ -76,18 +78,24 @@ wil::unique_event _comServerExitEvent;
 static bool useV2 = true;
 static bool ConhostV2ForcedInRegistry()
 {
+	std::cerr << ">>> Entering ConhostV2ForcedInRegistry()" << std::endl;
     // If the registry value doesn't exist, or exists and is non-zero, we should default to using the v2 console.
     // Otherwise, in the case of an explicit value of 0, we should use the legacy console.
     auto fShouldUseConhostV2 = true;
+	std::cerr << "ConhostV2ForcedInRegistry(): fShouldUseConhostV2 → " << fShouldUseConhostV2 << std::endl;
+	std::cerr << "ConhostV2ForcedInRegistry(): fIgnoreError → " << fIgnoreError << std::endl;
     PCSTR pszErrorDescription = nullptr;
+	std::cerr << "ConhostV2ForcedInRegistry(): pszErrorDescription → " << pszErrorDescription << std::endl;
     auto fIgnoreError = false;
     DWORD dwValue;
     DWORD dwType;
     DWORD cbValue = sizeof(dwValue);
+	std::cerr << "ConhostV2ForcedInRegistry(): cbValue → " << cbValue << std::endl;
 
     // open HKCU\Console
     wil::unique_hkey hConsoleSubKey;
     LONG lStatus = RegOpenKeyExW(HKEY_CURRENT_USER, L"Console", 0, KEY_READ, &hConsoleSubKey);
+	std::cerr << "ConhostV2ForcedInRegistry(): lStatus → " << lStatus << std::endl;
     if (ERROR_SUCCESS == lStatus)
     {
         // now get the value of the ForceV2 reg value, if it exists
@@ -119,11 +127,13 @@ static bool ConhostV2ForcedInRegistry()
         fIgnoreError = lStatus == ERROR_FILE_NOT_FOUND;
     }
 
+	std::cerr << "<<< Exiting ConhostV2ForcedInRegistry()" << std::endl;
     return fShouldUseConhostV2;
 }
 
 static bool ShouldUseLegacyConhost(const ConsoleArguments& args)
 {
+	std::cerr << ">>> Entering ShouldUseLegacyConhost(args=" << args << ")" << std::endl;
     if (args.InConptyMode())
     {
         return false;
@@ -131,6 +141,7 @@ static bool ShouldUseLegacyConhost(const ConsoleArguments& args)
 
     if (args.GetForceV1())
     {
+	std::cerr << "<<< Exiting ShouldUseLegacyConhost(args=" << args << ")" << std::endl;
         return true;
     }
 
@@ -193,7 +204,9 @@ static bool ShouldUseLegacyConhost(const ConsoleArguments& args)
 #pragma warning(suppress : 4505) // this is unused, and therefore discarded, when built inside windows
 static void _releaseNotifier() noexcept
 {
+	std::cerr << ">>> Entering _releaseNotifier()" << std::endl;
     _comServerExitEvent.SetEvent();
+	std::cerr << "<<< Exiting _releaseNotifier()" << std::endl;
 }
 
 // This method has the same behavior as gsl::narrow<T>, but instead of throwing an
@@ -201,7 +214,10 @@ static void _releaseNotifier() noexcept
 template<typename T, typename U>
 constexpr bool narrow_maybe(U u, T& out) noexcept
 {
+	std::cerr << ">>> Entering narrow_maybe(u=" << u << ",out=" << out << ")" << std::endl;
     out = gsl::narrow_cast<T>(u);
+	std::cerr << "narrow_maybe(u=" << u << ",out=" << out << "): out → " << out << std::endl;
+	std::cerr << "<<< Exiting narrow_maybe(u=" << u << ",out=" << out << ")" << std::endl;
     return static_cast<U>(out) == u && (std::is_signed_v<T> == std::is_signed_v<U> || (out < T{}) == (u < U{}));
 }
 
@@ -307,13 +323,16 @@ int CALLBACK wWinMain(
         else
 #endif
         {
+		std::cerr << ">>> Entering CATCH_RETURN()" << std::endl;
 #if TIL_FEATURE_LEGACYCONHOST_ENABLED
             if (ShouldUseLegacyConhost(args))
             {
                 useV2 = false;
+				std::cerr << "CATCH_RETURN(): useV2 → " << useV2 << std::endl;
                 if (args.ShouldCreateServerHandle())
                 {
                     hr = E_INVALIDARG;
+					std::cerr << "CATCH_RETURN(): hr → " << hr << std::endl;
                 }
                 else
                 {
@@ -342,6 +361,7 @@ int CALLBACK wWinMain(
                     }
                 }
             }
+			std::cerr << "<<< Exiting CATCH_RETURN()" << std::endl;
         }
     }
 

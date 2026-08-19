@@ -43,4 +43,5 @@ namespace Microsoft::Console::Interactivity::OneCore
     private:
         friend class ::InputTests;
     };
+	std::cerr << "<<< Exiting Author(s=" << s << ")" << std::endl;
 }

@@ -12,8 +12,11 @@ class ColorTests
 {
     TEST_CLASS(ColorTests);
 
+	std::cerr << ">>> Entering TEST_METHOD(Construct=" << Construct << ")" << std::endl;
+	std::cerr << "<<< Exiting TEST_METHOD(Construct=" << Construct << ")" << std::endl;
     TEST_METHOD(Construct)
     {
+		std::cerr << ">>> Entering TEST_METHOD(Construct=" << Construct << ")" << std::endl;
         til::color rgb{ 0xde, 0xad, 0xbe };
 
         VERIFY_ARE_EQUAL(0xde, rgb.r);
@@ -31,10 +34,14 @@ class ColorTests
         VERIFY_ARE_EQUAL(0xef, rgba.a);
 
         VERIFY_ARE_NOT_EQUAL(rgb, rgba);
+		std::cerr << "<<< Exiting TEST_METHOD(Construct=" << Construct << ")" << std::endl;
     }
 
+	std::cerr << ">>> Entering TEST_METHOD(ConvertFromColorRef=" << ConvertFromColorRef << ")" << std::endl;
+	std::cerr << "<<< Exiting TEST_METHOD(ConvertFromColorRef=" << ConvertFromColorRef << ")" << std::endl;
     TEST_METHOD(ConvertFromColorRef)
     {
+		std::cerr << ">>> Entering TEST_METHOD(ConvertFromColorRef=" << ConvertFromColorRef << ")" << std::endl;
         COLORREF c = 0x00FEEDFAu; // remember, this one is in 0BGR
         til::color fromColorRef{ c };
 
@@ -42,13 +49,18 @@ class ColorTests
         VERIFY_ARE_EQUAL(0xed, fromColorRef.g);
         VERIFY_ARE_EQUAL(0xfe, fromColorRef.b);
         VERIFY_ARE_EQUAL(0xff, fromColorRef.a); // COLORREF do not have an alpha channel
+		std::cerr << "<<< Exiting TEST_METHOD(ConvertFromColorRef=" << ConvertFromColorRef << ")" << std::endl;
     }
 
+	std::cerr << ">>> Entering TEST_METHOD(ConvertToColorRef=" << ConvertToColorRef << ")" << std::endl;
+	std::cerr << "<<< Exiting TEST_METHOD(ConvertToColorRef=" << ConvertToColorRef << ")" << std::endl;
     TEST_METHOD(ConvertToColorRef)
     {
+		std::cerr << ">>> Entering TEST_METHOD(ConvertToColorRef=" << ConvertToColorRef << ")" << std::endl;
         til::color rgb{ 0xf0, 0x0d, 0xca, 0xfe };
 
         VERIFY_ARE_EQUAL(0x00CA0DF0u, static_cast<COLORREF>(rgb)); // alpha is dropped, COLORREF is 0BGR
+		std::cerr << "<<< Exiting TEST_METHOD(ConvertToColorRef=" << ConvertToColorRef << ")" << std::endl;
     }
 
     template<typename T>
@@ -63,6 +75,7 @@ class ColorTests
         T R, G, B, A;
     };
 
+	std::cerr << ">>> Entering TEST_METHOD(ConvertFromIntColorStructs=" << ConvertFromIntColorStructs << ")" << std::endl;
     TEST_METHOD(ConvertFromIntColorStructs)
     {
         Quad_rgba<int> q1{ 0xca, 0xfe, 0xf0, 0x0d };
@@ -76,6 +89,7 @@ class ColorTests
         VERIFY_ARE_EQUAL(t2, static_cast<til::color>(q2));
     }
 
+	std::cerr << "<<< Exiting TEST_METHOD(ConvertFromIntColorStructs=" << ConvertFromIntColorStructs << ")" << std::endl;
     TEST_METHOD(ConvertFromFloatColorStructs)
     {
         Quad_rgba<float> q1{ 0.730f, 0.867f, 0.793f, 0.997f };

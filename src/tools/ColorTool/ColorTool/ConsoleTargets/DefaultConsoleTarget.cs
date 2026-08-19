@@ -5,6 +5,7 @@
 
 using Microsoft.Win32;
 using System;
+using Microsoft.Extensions.Logging;
 
 namespace ColorTool.ConsoleTargets
 {
@@ -13,8 +14,10 @@ namespace ColorTool.ConsoleTargets
     /// </summary>
     class DefaultConsoleTarget : IConsoleTarget
     {
+		private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
         public void ApplyColorScheme(ColorScheme colorScheme, bool quietMode, bool compactColortable)
         {
+			_logger.LogDebug(">>> Entering ApplyColorScheme(colorScheme={ColorScheme},quietMode={QuietMode},compactColortable={CompactColortable})", colorScheme, quietMode, compactColortable);
             RegistryKey consoleKey = Registry.CurrentUser.OpenSubKey("Console", true);
             for (int i = 0; i < colorScheme.ColorTable.Length; i++)
             {
@@ -59,6 +62,7 @@ namespace ColorTool.ConsoleTargets
             }
 
             Console.WriteLine(Resources.WroteToDefaults);
+			_logger.LogDebug("<<< Exiting ApplyColorScheme(colorScheme={ColorScheme},quietMode={QuietMode},compactColortable={CompactColortable})", colorScheme, quietMode, compactColortable);
         }
     }
 }

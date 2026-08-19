@@ -38,25 +38,32 @@ using System.Threading.Tasks;
 
 using Pipelines.Sockets.Unofficial;
 using Vanara.PInvoke;
+using Microsoft.Extensions.Logging;
 
 namespace Samples.Terminal
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     internal class Program
     {
         private static async Task Main(string[] args)
         {
             // run for 90 seconds
             var timeout = TimeSpan.FromSeconds(90);
+			_logger.LogDebug("Main(args={Args}): timeout → {Timeout}", args, timeout);
 
             // in reality this will likely never be reached, but it is useful to guard against
             // conditions where the queue isn't drained, or not drained fast enough. 
             const int maxNonKeyEventRetention = 128;
 
             var source = new CancellationTokenSource(timeout);
+			_logger.LogDebug("Main(args={Args}): source → {Source}", args, source);
             var token = source.Token;
+			_logger.LogWarning("Main(args={Args}): token → {Token}", args, token);
             var handle = Kernel32.GetStdHandle(Kernel32.StdHandleType.STD_INPUT_HANDLE);
+			_logger.LogDebug("Main(args={Args}): handle → {Handle}", args, handle);
 
             if (!Kernel32.GetConsoleMode(handle, out Kernel32.CONSOLE_INPUT_MODE mode))
+				_logger.LogWarning("Throwing GetExceptionForWin32Error from Main(args={Args})", args);
                 throw NativeMethods.GetExceptionForWin32Error(Marshal.GetLastWin32Error());
 
             mode |= Kernel32.CONSOLE_INPUT_MODE.ENABLE_WINDOW_INPUT;
@@ -65,6 +72,7 @@ namespace Samples.Terminal
             mode &= ~Kernel32.CONSOLE_INPUT_MODE.ENABLE_LINE_INPUT;
 
             if (!Kernel32.SetConsoleMode(handle, mode))
+				_logger.LogWarning("Throwing GetExceptionForLastWin32Error from Main(args={Args})", args);
                 throw NativeMethods.GetExceptionForLastWin32Error();
 
             // base our provider/consumer on a bounded queue to keep memory usage under control
@@ -82,6 +90,7 @@ namespace Samples.Terminal
                     {
                         // blocking call
                         var record = events.Take(token);
+						_logger.LogDebug("Main(args={Args}): record → {Record}", args, record);
 
                         Console.WriteLine("record: {0}",
                             Enum.GetName(typeof(Kernel32.EVENT_TYPE), record.EventType));
@@ -103,14 +112,17 @@ namespace Samples.Terminal
                 
                 // get a unicode character stream over console input 
                 Stream stdin = new ReadConsoleInputStream(handle, events);
+				_logger.LogDebug("Main(args={Args}): stdin → {Stdin}", args, stdin);
 
                 // wrap in a System.IO.Pipelines.PipeReader to get clean async and span/memory usage 
                 var reader = StreamConnection.GetReader(stdin);
+				_logger.LogDebug("Main(args={Args}): reader → {Reader}", args, reader);
 
                 while (!token.IsCancellationRequested)
                 {
                     // blocking call
                     var result = await reader.ReadAsync(token);
+					_logger.LogDebug("Main(args={Args}): result → {Result}", args, result);
 
                     if (result.IsCanceled)
                         break;
@@ -122,6 +134,7 @@ namespace Samples.Terminal
                     {
                         // decode back from unicode
                         var datum = Encoding.Unicode.GetString(mem.Span);
+						_logger.LogDebug("Main(args={Args}): datum → {Datum}", args, datum);
                         Console.Write(datum);
                     }
 

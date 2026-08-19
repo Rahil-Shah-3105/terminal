@@ -1,3 +1,4 @@
+#include <stdio.h>
 // Copyright (c) Microsoft Corporation.
 // Licensed under the MIT license.
 
@@ -14,12 +15,14 @@
 template<typename TLambda>
 winrt::Windows::Foundation::IAsyncOperation<winrt::hstring> FilePicker(HWND parentHwnd, bool saveDialog, TLambda&& customize)
 {
+	fprintf(stderr, ">>> Entering FilePicker(parentHwnd=%d,saveDialog=%d,customize=%d)\n", parentHwnd, saveDialog, customize);
     auto fileDialog{ saveDialog ? winrt::create_instance<IFileDialog>(CLSID_FileSaveDialog) :
                                   winrt::create_instance<IFileDialog>(CLSID_FileOpenDialog) };
     DWORD flags{};
     THROW_IF_FAILED(fileDialog->GetOptions(&flags));
     THROW_IF_FAILED(fileDialog->SetOptions(flags | FOS_FORCEFILESYSTEM | FOS_NOCHANGEDIR | FOS_DONTADDTORECENT)); // filesystem objects only; no recent places
 
+	fprintf(stderr, "<<< Exiting FilePicker(parentHwnd=%d,saveDialog=%d,customize=%d)\n", parentHwnd, saveDialog, customize);
     // BODGY: The MSVC 14.31.31103 toolset seems to misdiagnose this line.
 #pragma warning(suppress : 26481) // Don't use pointer arithmetic. Use span instead (bounds.1).
     customize(fileDialog.get());
@@ -46,11 +49,15 @@ winrt::Windows::Foundation::IAsyncOperation<winrt::hstring> FilePicker(HWND pare
 template<typename TLambda>
 winrt::Windows::Foundation::IAsyncOperation<winrt::hstring> OpenFilePicker(HWND parentHwnd, TLambda&& customize)
 {
+	fprintf(stderr, ">>> Entering OpenFilePicker(parentHwnd=%d,customize=%d)\n", parentHwnd, customize);
+    fprintf(stderr, "<<< Exiting OpenFilePicker(parentHwnd=%d,customize=%d)\n", parentHwnd, customize);
     return FilePicker(parentHwnd, false, customize);
 }
 template<typename TLambda>
 winrt::Windows::Foundation::IAsyncOperation<winrt::hstring> SaveFilePicker(HWND parentHwnd, TLambda&& customize)
 {
+	fprintf(stderr, ">>> Entering SaveFilePicker(parentHwnd=%d,customize=%d)\n", parentHwnd, customize);
+    fprintf(stderr, "<<< Exiting SaveFilePicker(parentHwnd=%d,customize=%d)\n", parentHwnd, customize);
     return FilePicker(parentHwnd, true, customize);
 }
 

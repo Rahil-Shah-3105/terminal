@@ -1,3 +1,4 @@
+#include <stdio.h>
 // Copyright (c) Microsoft Corporation.
 // Licensed under the MIT license.
 
@@ -39,6 +40,8 @@ namespace til // Terminal Implementation Library. Also: "Today I Learned"
 
         constexpr explicit operator bool() const noexcept
         {
+			fprintf(stderr, ">>> Entering bool()\n");
+            fprintf(stderr, "<<< Exiting bool()\n");
             return width > 0 && height > 0;
         }
 
@@ -102,18 +105,24 @@ namespace til // Terminal Implementation Library. Also: "Today I Learned"
         template<typename T = CoordType>
         constexpr T narrow_width() const
         {
+			fprintf(stderr, ">>> Entering narrow_width()\n");
+            fprintf(stderr, "<<< Exiting narrow_width()\n");
             return gsl::narrow<T>(width);
         }
 
         template<typename T = CoordType>
         constexpr T narrow_height() const
         {
+			fprintf(stderr, ">>> Entering narrow_height()\n");
+            fprintf(stderr, "<<< Exiting narrow_height()\n");
             return gsl::narrow<T>(height);
         }
 
         template<typename T = CoordType>
         constexpr T area() const
         {
+			fprintf(stderr, ">>> Entering area()\n");
+            fprintf(stderr, "<<< Exiting area()\n");
             return gsl::narrow<T>(static_cast<int64_t>(width) * static_cast<int64_t>(height));
         }
 
@@ -125,6 +134,8 @@ namespace til // Terminal Implementation Library. Also: "Today I Learned"
 
         constexpr SIZE to_win32_size() const noexcept
         {
+			fprintf(stderr, ">>> Entering to_win32_size()\n");
+            fprintf(stderr, "<<< Exiting to_win32_size()\n");
             return { width, height };
         }
 
@@ -137,7 +148,9 @@ namespace til // Terminal Implementation Library. Also: "Today I Learned"
         // Prefer casting to SIZE and back to til::size instead if possible.
         SIZE* as_win32_size() noexcept
         {
+		fprintf(stderr, ">>> Entering as_win32_size()\n");
 #pragma warning(suppress : 26490) // Don't use reinterpret_cast (type.1).
+			fprintf(stderr, "<<< Exiting as_win32_size()\n");
             return std::launder(reinterpret_cast<SIZE*>(this));
         }
 #endif
@@ -152,6 +165,8 @@ namespace til // Terminal Implementation Library. Also: "Today I Learned"
 
         constexpr D2D1_SIZE_F to_d2d_size() const noexcept
         {
+			fprintf(stderr, ">>> Entering to_d2d_size()\n");
+            fprintf(stderr, "<<< Exiting to_d2d_size()\n");
             return { static_cast<float>(width), static_cast<float>(height) };
         }
 #endif
@@ -166,12 +181,16 @@ namespace til // Terminal Implementation Library. Also: "Today I Learned"
 
         winrt::Windows::Foundation::Size to_winrt_size() const noexcept
         {
+			fprintf(stderr, ">>> Entering to_winrt_size()\n");
+            fprintf(stderr, "<<< Exiting to_winrt_size()\n");
             return { static_cast<float>(width), static_cast<float>(height) };
         }
 #endif
 
         std::wstring to_string() const
         {
+			fprintf(stderr, ">>> Entering to_string()\n");
+            fprintf(stderr, "<<< Exiting to_string()\n");
             return wil::str_printf<std::wstring>(L"[W:%d, H:%d]", width, height);
         }
 
@@ -181,11 +200,15 @@ namespace til // Terminal Implementation Library. Also: "Today I Learned"
 
     constexpr size wrap_coord_size(const COORD sz) noexcept
     {
+		fprintf(stderr, ">>> Entering wrap_coord_size(sz=%d)\n", sz);
+        fprintf(stderr, "<<< Exiting wrap_coord_size(sz=%d)\n", sz);
         return { sz.X, sz.Y };
     }
 
     constexpr COORD unwrap_coord_size(const size sz)
     {
+		fprintf(stderr, ">>> Entering unwrap_coord_size(sz=%d)\n", sz);
+        fprintf(stderr, "<<< Exiting unwrap_coord_size(sz=%d)\n", sz);
         return {
             gsl::narrow<short>(sz.width),
             gsl::narrow<short>(sz.height),
@@ -194,15 +217,19 @@ namespace til // Terminal Implementation Library. Also: "Today I Learned"
 
     constexpr HRESULT unwrap_coord_size_hr(const size sz, COORD& out) noexcept
     {
+		fprintf(stderr, ">>> Entering unwrap_coord_size_hr(sz=%d,out=%d)\n", sz, out);
         short x = 0;
         short y = 0;
         if (narrow_maybe(sz.width, x) && narrow_maybe(sz.height, y))
         {
             out.X = x;
+			fprintf(stderr, "unwrap_coord_size_hr(sz=%d,out=%d): out.X → %d\n", sz, out, out.X);
+			fprintf(stderr, "unwrap_coord_size_hr(sz=%d,out=%d): out.Y → %d\n", sz, out, out.Y);
             out.Y = y;
             return S_OK;
         }
         RETURN_WIN32(ERROR_UNHANDLED_EXCEPTION);
+		fprintf(stderr, "<<< Exiting unwrap_coord_size_hr(sz=%d,out=%d)\n", sz, out);
     }
 };
 
@@ -215,6 +242,8 @@ namespace WEX::TestExecution
     public:
         static WEX::Common::NoThrowString ToString(const til::size size)
         {
+			fprintf(stderr, ">>> Entering ToString(size=%d)\n", size);
+            fprintf(stderr, "<<< Exiting ToString(size=%d)\n", size);
             return WEX::Common::NoThrowString(size.to_string().c_str());
         }
     };
@@ -225,11 +254,15 @@ namespace WEX::TestExecution
     public:
         static bool AreEqual(const til::size expected, const til::size actual) noexcept
         {
+			fprintf(stderr, ">>> Entering AreEqual(expected=%d,actual=%d)\n", expected, actual);
+            fprintf(stderr, "<<< Exiting AreEqual(expected=%d,actual=%d)\n", expected, actual);
             return expected == actual;
         }
 
         static bool AreSame(const til::size expected, const til::size actual) noexcept
         {
+			fprintf(stderr, ">>> Entering AreSame(expected=%d,actual=%d)\n", expected, actual);
+            fprintf(stderr, "<<< Exiting AreSame(expected=%d,actual=%d)\n", expected, actual);
             return &expected == &actual;
         }
 
@@ -239,6 +272,8 @@ namespace WEX::TestExecution
 
         static bool IsNull(const til::size object) noexcept
         {
+			fprintf(stderr, ">>> Entering IsNull(object=%d)\n", object);
+            fprintf(stderr, "<<< Exiting IsNull(object=%d)\n", object);
             return object == til::size{};
         }
     };
