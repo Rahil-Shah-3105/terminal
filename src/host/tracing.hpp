@@ -25,6 +25,7 @@ Author(s):
         TraceLoggingPackedMetadata(TlgInINT16, "X"), \
         TraceLoggingPackedMetadata(TlgInINT16, "Y")
 
+		std::cerr << ">>> Entering TraceLoggingPackedMetadata(TlgInINT16=" << TlgInINT16 << ")" << std::endl;
 #define TraceLoggingConsoleSmallRect(value, name)       \
     TraceLoggingPackedData(&value, sizeof(SMALL_RECT)), \
         TraceLoggingPackedStruct(4, name),              \
@@ -33,6 +34,7 @@ Author(s):
         TraceLoggingInt16(TlgInINT16, "Right"),         \
         TraceLoggingInt16(TlgInINT16, "Bottom")
 
+		std::cerr << ">>> Entering TraceLoggingInt16(TlgInINT16=" << TlgInINT16 << ")" << std::endl;
 // We intentionally don't differentiate between A and W versions of CHAR_INFO, because some particularly nasty
 // applications smuggle data in the upper bytes of the UnicodeChar field while using the A APIs and then they
 // expect to read the same values back at a later time, which is something we stopped supporting.
@@ -44,6 +46,7 @@ Author(s):
 class Tracing
 {
 public:
+	std::cerr << "<<< Exiting TraceLoggingInt16(TlgInINT16=" << TlgInINT16 << ")" << std::endl;
     static void s_TraceWindowViewport(const Microsoft::Console::Types::Viewport& viewport);
 
     static void s_TraceChars(_In_z_ const char* pszMessage, ...);

@@ -42,4 +42,5 @@ namespace Microsoft::Console
 
         std::unique_ptr<Microsoft::Console::VirtualTerminal::StateMachine> _pInputStateMachine;
     };
+	std::cerr << "<<< Exiting Author(s=" << s << ")" << std::endl;
 }

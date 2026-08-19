@@ -1,3 +1,4 @@
+#include <stdio.h>
 // Copyright (c) Microsoft Corporation.
 // Licensed under the MIT license.
 //
@@ -371,6 +372,7 @@ namespace winrt::Microsoft::Terminal::Control::implementation
 
         inline bool _IsClosing() const noexcept
         {
+		fprintf(stderr, ">>> Entering _IsClosing()\n");
 #ifndef NDEBUG
             if (_dispatcher)
             {
@@ -381,6 +383,7 @@ namespace winrt::Microsoft::Terminal::Control::implementation
                 assert(_inUnitTests || _dispatcher.HasThreadAccess());
             }
 #endif
+			fprintf(stderr, "<<< Exiting _IsClosing()\n");
             return _closing;
         }
 

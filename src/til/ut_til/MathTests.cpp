@@ -31,6 +31,7 @@ class MathTests
     template<typename TG, typename TilMath>
     static void _RunCases(TilMath, const std::initializer_list<TestCase<TG>>& cases)
     {
+		std::cerr << ">>> Entering _RunCases(TilMath=" << TilMath << ",cases=" << cases << ")" << std::endl;
         for (const auto& tc : cases)
         {
             if (tc.throws)
@@ -42,10 +43,14 @@ class MathTests
                 VERIFY_ARE_EQUAL(tc.expected, TilMath::template cast<decltype(tc.expected)>(tc.given));
             }
         }
+		std::cerr << "<<< Exiting _RunCases(TilMath=" << TilMath << ",cases=" << cases << ")" << std::endl;
     }
 
+	std::cerr << ">>> Entering TEST_METHOD(Ceiling=" << Ceiling << ")" << std::endl;
+	std::cerr << "<<< Exiting TEST_METHOD(Ceiling=" << Ceiling << ")" << std::endl;
     TEST_METHOD(Ceiling)
     {
+		std::cerr << ">>> Entering TEST_METHOD(Ceiling=" << Ceiling << ")" << std::endl;
         _RunCases<FloatType>(
             til::math::ceiling,
             {
@@ -63,11 +68,14 @@ class MathTests
             });
     }
 
+	std::cerr << ">>> Entering TEST_METHOD(Flooring=" << Flooring << ")" << std::endl;
     TEST_METHOD(Flooring)
     {
+		std::cerr << ">>> Entering TEST_METHOD(Flooring=" << Flooring << ")" << std::endl;
         _RunCases<FloatType>(
             til::math::flooring,
             {
+				std::cerr << "<<< Exiting TEST_METHOD(Ceiling=" << Ceiling << ")" << std::endl;
                 { 1., 1 },
                 { 1.9, 1 },
                 { -7.1, -8 },
@@ -82,11 +90,13 @@ class MathTests
             });
     }
 
+	std::cerr << "<<< Exiting TEST_METHOD(Flooring=" << Flooring << ")" << std::endl;
     TEST_METHOD(Rounding)
     {
         _RunCases<FloatType>(
             til::math::rounding,
             {
+				std::cerr << "<<< Exiting TEST_METHOD(Flooring=" << Flooring << ")" << std::endl;
                 { 1., 1 },
                 { 1.9, 2 },
                 { -7.1, -7 },

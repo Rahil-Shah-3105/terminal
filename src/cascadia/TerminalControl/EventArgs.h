@@ -1,3 +1,4 @@
+#include <stdio.h>
 // Copyright (c) Microsoft Corporation.
 // Licensed under the MIT license.
 
@@ -74,6 +75,7 @@ namespace winrt::Microsoft::Terminal::Control::implementation
     private:
         static winrt::com_array<uint8_t> _cast(const std::string& str)
         {
+			fprintf(stderr, ">>> Entering _cast(str=%d)\n", str);
             const auto beg = reinterpret_cast<const uint8_t*>(str.data());
             const auto len = str.size();
             return { beg, beg + len };
@@ -93,7 +95,9 @@ namespace winrt::Microsoft::Terminal::Control::implementation
 
         void HandleClipboardData(hstring value)
         {
+			fprintf(stderr, ">>> Entering HandleClipboardData(value=%d)\n", value);
             m_clipboardDataHandler(value);
+			fprintf(stderr, "<<< Exiting HandleClipboardData(value=%d)\n", value);
         };
 
         WINRT_PROPERTY(bool, BracketedPasteEnabled, false);

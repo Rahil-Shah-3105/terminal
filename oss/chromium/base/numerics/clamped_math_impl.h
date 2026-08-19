@@ -1,3 +1,4 @@
+#include <stdio.h>
 // Copyright 2017 The Chromium Authors. All rights reserved.
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
@@ -25,6 +26,8 @@ template <typename T,
           typename std::enable_if<std::is_integral<T>::value &&
                                   std::is_signed<T>::value>::type* = nullptr>
 constexpr T SaturatedNegWrapper(T value) {
+fprintf(stderr, ">>> Entering SaturatedNegWrapper(value=%d)\n", value);
+  fprintf(stderr, "<<< Exiting SaturatedNegWrapper(value=%d)\n", value);
   return MustTreatAsConstexpr(value) || !ClampedNegFastOp<T>::is_supported
              ? (NegateWrapper(value) != std::numeric_limits<T>::lowest()
                     ? NegateWrapper(value)
@@ -49,6 +52,7 @@ constexpr T SaturatedNegWrapper(T value) {
 template <typename T,
           typename std::enable_if<std::is_integral<T>::value>::type* = nullptr>
 constexpr T SaturatedAbsWrapper(T value) {
+fprintf(stderr, ">>> Entering SaturatedAbsWrapper(value=%d)\n", value);
   // The calculation below is a static identity for unsigned types, but for
   // signed integer types it provides a non-branching, saturated absolute value.
   // This works because SafeUnsignedAbs() returns an unsigned type, which can
@@ -57,6 +61,7 @@ constexpr T SaturatedAbsWrapper(T value) {
   // special case of numeric_limits<T>::min(), by evaluating the bit pattern as
   // a signed integer value. If it is the overflow case, we end up subtracting
   // one from the unsigned result, thus saturating to numeric_limits<T>::max().
+fprintf(stderr, "<<< Exiting SaturatedAbsWrapper(value=%d)\n", value);
   return static_cast<T>(SafeUnsignedAbs(value) -
                         IsValueNegative<T>(SafeUnsignedAbs(value)));
 }

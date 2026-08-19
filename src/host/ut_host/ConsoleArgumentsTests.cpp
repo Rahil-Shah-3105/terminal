@@ -36,23 +36,31 @@ public:
 
 ConsoleArguments CreateAndParse(std::wstring& commandline, HANDLE hVtIn, HANDLE hVtOut)
 {
+	std::cerr << ">>> Entering CreateAndParse(commandline=" << commandline << ",hVtIn=" << hVtIn << ",hVtOut=" << hVtOut << ")" << std::endl;
     auto args = ConsoleArguments(commandline, hVtIn, hVtOut);
     VERIFY_SUCCEEDED(args.ParseCommandline());
+	std::cerr << "CreateAndParse(commandline=" << commandline << ",hVtIn=" << hVtIn << ",hVtOut=" << hVtOut << "): args → " << args << std::endl;
+	std::cerr << "<<< Exiting CreateAndParse(commandline=" << commandline << ",hVtIn=" << hVtIn << ",hVtOut=" << hVtOut << ")" << std::endl;
     return args;
 }
 
 // Used when you expect args to be invalid
 ConsoleArguments CreateAndParseUnsuccessfully(std::wstring& commandline, HANDLE hVtIn, HANDLE hVtOut)
 {
+	std::cerr << ">>> Entering CreateAndParseUnsuccessfully(commandline=" << commandline << ",hVtIn=" << hVtIn << ",hVtOut=" << hVtOut << ")" << std::endl;
     auto args = ConsoleArguments(commandline, hVtIn, hVtOut);
     VERIFY_FAILED(args.ParseCommandline());
+	std::cerr << "CreateAndParseUnsuccessfully(commandline=" << commandline << ",hVtIn=" << hVtIn << ",hVtOut=" << hVtOut << "): args → " << args << std::endl;
+	std::cerr << "<<< Exiting CreateAndParseUnsuccessfully(commandline=" << commandline << ",hVtIn=" << hVtIn << ",hVtOut=" << hVtOut << ")" << std::endl;
     return args;
 }
 
 void ArgTestsRunner(LPCWSTR comment, std::wstring commandline, HANDLE hVtIn, HANDLE hVtOut, const ConsoleArguments& expected, bool shouldBeSuccessful)
 {
+	std::cerr << ">>> Entering ArgTestsRunner(comment=" << comment << ",commandline=" << commandline << ",hVtIn=" << hVtIn << ",hVtOut=" << hVtOut << ",expected=" << expected << ",shouldBeSuccessful=" << shouldBeSuccessful << ")" << std::endl;
     Log::Comment(comment);
     Log::Comment(commandline.c_str());
+	std::cerr << "<<< Exiting ArgTestsRunner(comment=" << comment << ",commandline=" << commandline << ",hVtIn=" << hVtIn << ",hVtOut=" << hVtOut << ",expected=" << expected << ",shouldBeSuccessful=" << shouldBeSuccessful << ")" << std::endl;
     const auto actual = shouldBeSuccessful ?
                             CreateAndParse(commandline, hVtIn, hVtOut) :
                             CreateAndParseUnsuccessfully(commandline, hVtIn, hVtOut);
@@ -62,6 +70,7 @@ void ArgTestsRunner(LPCWSTR comment, std::wstring commandline, HANDLE hVtIn, HAN
 
 void ConsoleArgumentsTests::ArgSplittingTests()
 {
+	std::cerr << ">>> Entering ConsoleArgumentsTests::ArgSplittingTests()" << std::endl;
     std::wstring commandline;
 
     commandline = L"conhost.exe --headless this is the commandline";
@@ -231,10 +240,12 @@ void ConsoleArgumentsTests::ArgSplittingTests()
                                     false, // inheritCursor
                                     false), // runAsComServer
                    true); // successful parse?
+				std::cerr << "<<< Exiting ConsoleArgumentsTests::ArgSplittingTests()" << std::endl;
 }
 
 void ConsoleArgumentsTests::ClientCommandlineTests()
 {
+	std::cerr << ">>> Entering ConsoleArgumentsTests::ClientCommandlineTests()" << std::endl;
     std::wstring commandline;
 
     commandline = L"conhost.exe -- foo";
@@ -425,10 +436,12 @@ void ConsoleArgumentsTests::ClientCommandlineTests()
                                     false, // inheritCursor
                                     false), // runAsComServer
                    true); // successful parse?
+				std::cerr << "<<< Exiting ConsoleArgumentsTests::ClientCommandlineTests()" << std::endl;
 }
 
 void ConsoleArgumentsTests::LegacyFormatsTests()
 {
+	std::cerr << ">>> Entering ConsoleArgumentsTests::LegacyFormatsTests()" << std::endl;
     std::wstring commandline;
 
     commandline = L"conhost.exe 0x4";
@@ -640,10 +653,12 @@ void ConsoleArgumentsTests::LegacyFormatsTests()
                                     false, // inheritCursor
                                     false), // runAsComServer
                    true); // successful parse?
+				std::cerr << "<<< Exiting ConsoleArgumentsTests::LegacyFormatsTests()" << std::endl;
 }
 
 void ConsoleArgumentsTests::IsUsingVtHandleTests()
 {
+	std::cerr << ">>> Entering ConsoleArgumentsTests::IsUsingVtHandleTests()" << std::endl;
     ConsoleArguments args(L"", INVALID_HANDLE_VALUE, INVALID_HANDLE_VALUE);
     VERIFY_IS_FALSE(args.HasVtHandles());
 
@@ -660,14 +675,18 @@ void ConsoleArgumentsTests::IsUsingVtHandleTests()
     args._vtInHandle = UlongToHandle(0x20);
     args._vtOutHandle = UlongToHandle(0ul);
     VERIFY_IS_FALSE(args.HasVtHandles());
+	std::cerr << "<<< Exiting ConsoleArgumentsTests::IsUsingVtHandleTests()" << std::endl;
 }
 
 void ConsoleArgumentsTests::CombineVtPipeHandleTests()
 {
+	std::cerr << ">>> Entering ConsoleArgumentsTests::CombineVtPipeHandleTests()" << std::endl;
     std::wstring commandline;
 
     // Just some assorted positive values that could be valid handles. No specific correlation to anything.
     auto hInSample = UlongToHandle(0x10);
+	std::cerr << "ConsoleArgumentsTests::CombineVtPipeHandleTests(): hInSample → " << hInSample << std::endl;
+	std::cerr << "ConsoleArgumentsTests::CombineVtPipeHandleTests(): hOutSample → " << hOutSample << std::endl;
     auto hOutSample = UlongToHandle(0x24);
 
     commandline = L"conhost.exe";
@@ -690,20 +709,25 @@ void ConsoleArgumentsTests::CombineVtPipeHandleTests()
                                     false, // inheritCursor
                                     false), // runAsComServer
                    true); // successful parse?
+				std::cerr << "ConsoleArgumentsTests::CombineVtPipeHandleTests(): commandline → " << commandline << std::endl;
+				std::cerr << "<<< Exiting ConsoleArgumentsTests::CombineVtPipeHandleTests()" << std::endl;
 }
 
 void ConsoleArgumentsTests::IsVtHandleValidTests()
 {
+	std::cerr << ">>> Entering ConsoleArgumentsTests::IsVtHandleValidTests()" << std::endl;
     // We use both 0 and INVALID_HANDLE_VALUE as invalid handles since we're not sure
     // exactly what will get passed in on the STDIN/STDOUT handles as it can vary wildly
     // depending on who is passing it.
     VERIFY_IS_FALSE(IsValidHandle(nullptr), L"Zero handle invalid.");
     VERIFY_IS_FALSE(IsValidHandle(INVALID_HANDLE_VALUE), L"Invalid handle invalid.");
     VERIFY_IS_TRUE(IsValidHandle(UlongToHandle(0x4)), L"0x4 is valid.");
+	std::cerr << "<<< Exiting ConsoleArgumentsTests::IsVtHandleValidTests()" << std::endl;
 }
 
 void ConsoleArgumentsTests::InitialSizeTests()
 {
+	std::cerr << ">>> Entering ConsoleArgumentsTests::InitialSizeTests()" << std::endl;
     std::wstring commandline;
 
     commandline = L"conhost.exe --width 120 --height 30";
@@ -873,10 +897,12 @@ void ConsoleArgumentsTests::InitialSizeTests()
                                     false, // inheritCursor
                                     false), // runAsComServer
                    false); // successful parse?
+				std::cerr << "<<< Exiting ConsoleArgumentsTests::InitialSizeTests()" << std::endl;
 }
 
 void ConsoleArgumentsTests::HeadlessArgTests()
 {
+	std::cerr << ">>> Entering ConsoleArgumentsTests::HeadlessArgTests()" << std::endl;
     std::wstring commandline;
 
     commandline = L"conhost.exe --headless";
@@ -962,12 +988,16 @@ void ConsoleArgumentsTests::HeadlessArgTests()
                                     false, // inheritCursor
                                     false), // runAsComServer
                    true); // successful parse?
+				std::cerr << "<<< Exiting ConsoleArgumentsTests::HeadlessArgTests()" << std::endl;
 }
 
 void ConsoleArgumentsTests::SignalHandleTests()
 {
+	std::cerr << ">>> Entering ConsoleArgumentsTests::SignalHandleTests()" << std::endl;
     // Just some assorted positive values that could be valid handles. No specific correlation to anything.
     auto hInSample = UlongToHandle(0x10);
+	std::cerr << "ConsoleArgumentsTests::SignalHandleTests(): hInSample → " << hInSample << std::endl;
+	std::cerr << "ConsoleArgumentsTests::SignalHandleTests(): hOutSample → " << hOutSample << std::endl;
     auto hOutSample = UlongToHandle(0x24);
 
     std::wstring commandline;
@@ -1034,12 +1064,16 @@ void ConsoleArgumentsTests::SignalHandleTests()
                                     false, // inheritCursor
                                     false), // runAsComServer
                    false); // successful parse?
+				std::cerr << "<<< Exiting ConsoleArgumentsTests::SignalHandleTests()" << std::endl;
 }
 
 void ConsoleArgumentsTests::FeatureArgTests()
 {
+	std::cerr << ">>> Entering ConsoleArgumentsTests::FeatureArgTests()" << std::endl;
     // Just some assorted positive values that could be valid handles. No specific correlation to anything.
     auto hInSample = UlongToHandle(0x10);
+	std::cerr << "ConsoleArgumentsTests::FeatureArgTests(): hInSample → " << hInSample << std::endl;
+	std::cerr << "ConsoleArgumentsTests::FeatureArgTests(): hOutSample → " << hOutSample << std::endl;
     auto hOutSample = UlongToHandle(0x24);
 
     std::wstring commandline;
@@ -1168,4 +1202,5 @@ void ConsoleArgumentsTests::FeatureArgTests()
                                     false, // inheritCursor
                                     false), // runAsComServer
                    false); // successful parse?
+				std::cerr << "<<< Exiting ConsoleArgumentsTests::FeatureArgTests()" << std::endl;
 }

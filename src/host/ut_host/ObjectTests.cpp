@@ -18,6 +18,9 @@ class ObjectTests
 
     TEST_CLASS(ObjectTests);
 
+	std::cerr << ">>> Entering TEST_CLASS_SETUP(ClassSetup=" << ClassSetup << ")" << std::endl;
+	std::cerr << "TEST_CLASS_SETUP(ClassSetup=" << ClassSetup << "): m_state → " << m_state << std::endl;
+	std::cerr << "<<< Exiting TEST_CLASS_SETUP(ClassSetup=" << ClassSetup << ")" << std::endl;
     TEST_CLASS_SETUP(ClassSetup)
     {
         m_state = new CommonState();
@@ -29,6 +32,8 @@ class ObjectTests
         return true;
     }
 
+	std::cerr << ">>> Entering TEST_CLASS_CLEANUP(ClassCleanup=" << ClassCleanup << ")" << std::endl;
+	std::cerr << "<<< Exiting TEST_CLASS_CLEANUP(ClassCleanup=" << ClassCleanup << ")" << std::endl;
     TEST_CLASS_CLEANUP(ClassCleanup)
     {
         m_state->CleanupGlobalScreenBuffer();
@@ -39,16 +44,24 @@ class ObjectTests
         return true;
     }
 
+	std::cerr << ">>> Entering TEST_METHOD_SETUP(MethodSetup=" << MethodSetup << ")" << std::endl;
+	std::cerr << "<<< Exiting TEST_METHOD_SETUP(MethodSetup=" << MethodSetup << ")" << std::endl;
     TEST_METHOD_SETUP(MethodSetup)
     {
         return true;
     }
 
+	std::cerr << ">>> Entering TEST_METHOD_CLEANUP(MethodCleanup=" << MethodCleanup << ")" << std::endl;
+	std::cerr << "<<< Exiting TEST_METHOD_CLEANUP(MethodCleanup=" << MethodCleanup << ")" << std::endl;
     TEST_METHOD_CLEANUP(MethodCleanup)
     {
         return true;
     }
 
+	std::cerr << ">>> Entering TEST_METHOD(TestFailedHandleAllocationWhenNotShared=" << TestFailedHandleAllocationWhenNotShared << ")" << std::endl;
+	auto __logStart = std::chrono::steady_clock::now();
+	std::cerr << "TEST_METHOD(TestFailedHandleAllocationWhenNotShared=" << TestFailedHandleAllocationWhenNotShared << "): newOutputAsHeader → " << newOutputAsHeader << std::endl;
+	std::cerr << "<<< Exiting TEST_METHOD(TestFailedHandleAllocationWhenNotShared=" << TestFailedHandleAllocationWhenNotShared << ")" << std::endl;
     TEST_METHOD(TestFailedHandleAllocationWhenNotShared)
     {
         Log::Comment(L"Create a new output buffer modeled from the default/active one.");

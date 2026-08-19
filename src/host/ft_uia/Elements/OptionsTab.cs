@@ -13,19 +13,24 @@ namespace Conhost.UIA.Tests.Elements
     using Conhost.UIA.Tests.Common;
     using NativeMethods = Conhost.UIA.Tests.Common.NativeMethods;
     using OpenQA.Selenium.Appium;
+	using Microsoft.Extensions.Logging;
 
     public class OptionsTab : TabBase
     {
+		private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
         public List<CheckBoxMeta> Checkboxes { get; private set; }
         public CheckBoxMeta GlobalV1V2Box { get; private set; }
         public AppiumWebElement MoreInfoLink { get; private set; }
 
         public OptionsTab(PropertiesDialog propDialog) : base(propDialog, " Options ")
         {
+		_logger.LogDebug(">>> Entering OptionsTab(propDialog={PropDialog})", propDialog);
+		_logger.LogDebug("<<< Exiting OptionsTab(propDialog={PropDialog})", propDialog);
         }
 
         protected override void PopulateItemsOnNavigate(AppiumWebElement propWindow)
         {
+			_logger.LogDebug(">>> Entering PopulateItemsOnNavigate(propWindow={PropWindow})", propWindow);
             this.GlobalV1V2Box = new CheckBoxMeta(propWindow, "Use legacy console (requires relaunch)", "ForceV2", false, true, false, NativeMethods.WinConP.PKEY_Console_ForceV2);
 
             this.Checkboxes = new List<CheckBoxMeta>();
@@ -36,25 +41,34 @@ namespace Conhost.UIA.Tests.Elements
             this.Checkboxes.Add(new CheckBoxMeta(propWindow, "Use Ctrl+Shift+C/V as Copy/Paste", "InterceptCopyPaste", false, false, true, NativeMethods.WinConP.PKEY_Console_InterceptCopyPaste));
 
             this.MoreInfoLink = propWindow.FindElementByName("new console features");
+			_logger.LogDebug("<<< Exiting PopulateItemsOnNavigate(propWindow={PropWindow})", propWindow);
         }
 
         public override IEnumerable<AppiumWebElement> GetObjectsDisabledForV1Console()
         {
+			_logger.LogDebug(">>> Entering GetObjectsDisabledForV1Console()");
+			_logger.LogDebug("<<< Exiting GetObjectsDisabledForV1Console()");
             return this.Checkboxes.Select(meta => meta.Box);
         }
 
         public override IEnumerable<AppiumWebElement> GetObjectsUnaffectedByV1V2Switch()
         {
+			_logger.LogDebug(">>> Entering GetObjectsUnaffectedByV1V2Switch()");
+			_logger.LogDebug("<<< Exiting GetObjectsUnaffectedByV1V2Switch()");
             return new AppiumWebElement[] { this.GlobalV1V2Box.Box, this.MoreInfoLink };
         }
 
         public override IEnumerable<CheckBoxMeta> GetCheckboxesForVerification()
         {
+			_logger.LogDebug(">>> Entering GetCheckboxesForVerification()");
+			_logger.LogDebug("<<< Exiting GetCheckboxesForVerification()");
             return this.Checkboxes;
         }
 
         public override IEnumerable<SliderMeta> GetSlidersForVerification()
         {
+			_logger.LogDebug(">>> Entering GetSlidersForVerification()");
+			_logger.LogDebug("<<< Exiting GetSlidersForVerification()");
             return new SliderMeta[0];
         }
     }

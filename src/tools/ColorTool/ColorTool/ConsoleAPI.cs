@@ -5,6 +5,7 @@
 
 using System;
 using System.Runtime.InteropServices;
+using Microsoft.Extensions.Logging;
 
 namespace ColorTool
 {
@@ -31,6 +32,7 @@ namespace ColorTool
         [Flags]
         public enum ConsoleOutputModes : uint
         {
+			private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
             ENABLE_PROCESSED_OUTPUT = 0x0001,
             ENABLE_WRAP_AT_EOL_OUTPUT = 0x0002,
             ENABLE_VIRTUAL_TERMINAL_PROCESSING = 0x0004,
@@ -56,6 +58,8 @@ namespace ColorTool
 
             public static CONSOLE_SCREEN_BUFFER_INFO_EX Create()
             {
+				_logger.LogDebug(">>> Entering Create()");
+				_logger.LogDebug("<<< Exiting Create()");
                 return new CONSOLE_SCREEN_BUFFER_INFO_EX { cbSize = 96 };
             }
         }
@@ -88,6 +92,8 @@ namespace ColorTool
 
         public static uint RGB(int r, int g, int b)
         {
+			_logger.LogDebug(">>> Entering RGB(r={R},g={G},b={B})", r, g, b);
+			_logger.LogDebug("<<< Exiting RGB(r={R},g={G},b={B})", r, g, b);
             return (uint)r + (((uint)g) << 8) + (((uint)b) << 16);
         }
     }

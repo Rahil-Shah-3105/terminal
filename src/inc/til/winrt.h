@@ -1,3 +1,4 @@
+#include <stdio.h>
 // Copyright (c) Microsoft Corporation.
 // Licensed under the MIT license.
 
@@ -23,6 +24,7 @@ namespace til // Terminal Implementation Library. Also: "Today I Learned"
         }
         explicit operator bool() const noexcept
         {
+		fprintf(stderr, ">>> Entering bool()\n");
 #ifdef WINRT_Windows_Foundation_H
             if constexpr (std::is_same_v<T, winrt::hstring>)
             {
@@ -31,6 +33,7 @@ namespace til // Terminal Implementation Library. Also: "Today I Learned"
             else
 #endif
             {
+				fprintf(stderr, "<<< Exiting bool()\n");
                 return _value;
             }
         }
@@ -66,11 +69,15 @@ namespace til // Terminal Implementation Library. Also: "Today I Learned"
 
         void raise(auto&&... args)
         {
+			fprintf(stderr, ">>> Entering raise(args=%d)\n", args);
             _handlers(std::forward<decltype(args)>(args)...);
+			fprintf(stderr, "<<< Exiting raise(args=%d)\n", args);
         }
 
     private:
         winrt::event<ArgsT> _handlers;
+		fprintf(stderr, ">>> Entering operator()\n");
+            fprintf(stderr, "<<< Exiting operator()\n");
     };
 
     template<typename SenderT = winrt::Windows::Foundation::IInspectable, typename ArgsT = winrt::Windows::Foundation::IInspectable>
@@ -128,11 +135,15 @@ namespace til // Terminal Implementation Library. Also: "Today I Learned"
     // because if you pass a string literal, you really ought to pass a FMT_COMPILE() instead.
     winrt::hstring hstring_format(auto&&... args)
     {
+		fprintf(stderr, ">>> Entering hstring_format(args=%d)\n", args);
         // We could use fmt::formatted_size and winrt::impl::hstring_builder here,
         // and this would make formatting of large strings a bit faster, and a bit slower
         // for short strings. More importantly, I hit compilation issues so I dropped that.
         fmt::basic_memory_buffer<wchar_t> buf;
         fmt::format_to(std::back_inserter(buf), std::forward<decltype(args)>(args)...);
+		fprintf(stderr, "<<< Exiting hstring_format(args=%d)\n", args);
+		fprintf(stderr, ">>> Entering format(str=%d,ctx=%d)\n", str, ctx);
+        fprintf(stderr, "<<< Exiting format(str=%d,ctx=%d)\n", str, ctx);
         return winrt::hstring{ buf.data(), gsl::narrow<uint32_t>(buf.size()) };
     }
 }

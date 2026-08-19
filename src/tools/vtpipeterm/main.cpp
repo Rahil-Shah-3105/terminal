@@ -44,17 +44,22 @@ static Microsoft::Console::Utils::Pipe pipe;
 
 static COORD getViewportSize()
 {
+	std::cerr << ">>> Entering getViewportSize()" << std::endl;
     CONSOLE_SCREEN_BUFFER_INFOEX csbiex{ .cbSize = sizeof(csbiex) };
     THROW_IF_WIN32_BOOL_FALSE(GetConsoleScreenBufferInfoEx(GetStdHandle(STD_OUTPUT_HANDLE), &csbiex));
     const SHORT w = csbiex.dwSize.X;
     const SHORT h = csbiex.srWindow.Bottom - csbiex.srWindow.Top + 1;
+	std::cerr << "<<< Exiting getViewportSize()" << std::endl;
     return { w, h };
 }
 
 static int run(int argc, const wchar_t* argv[])
 {
+	std::cerr << ">>> Entering run(argc=" << argc << ",argv=" << argv << ")" << std::endl;
     const auto inputHandle = GetStdHandle(STD_INPUT_HANDLE);
     const auto outputHandle = GetStdHandle(STD_OUTPUT_HANDLE);
+	std::cerr << "run(argc=" << argc << ",argv=" << argv << "): outputHandle → " << outputHandle << std::endl;
+	std::cerr << "run(argc=" << argc << ",argv=" << argv << "): inputHandle → " << inputHandle << std::endl;
     wil::unique_hfile debugOutput;
 
     for (int i = 1; i < argc; ++i)
@@ -82,11 +87,14 @@ static int run(int argc, const wchar_t* argv[])
     }
 
     static const auto pReadConsoleInputExA = GetProcAddressByFunctionDeclaration(GetModuleHandleW(L"kernel32.dll"), ReadConsoleInputExA);
+	std::cerr << "run(argc=" << argc << ",argv=" << argv << "): pReadConsoleInputExA → " << pReadConsoleInputExA << std::endl;
     THROW_LAST_ERROR_IF_NULL(pReadConsoleInputExA);
 
     pipe = Microsoft::Console::Utils::CreateOverlappedPipe(PIPE_ACCESS_DUPLEX, 128 * 1024);
 
+	std::cerr << "run(argc=" << argc << ",argv=" << argv << "): pipe → " << pipe << std::endl;
     auto viewportSize = getViewportSize();
+	std::cerr << "run(argc=" << argc << ",argv=" << argv << "): viewportSize → " << viewportSize << std::endl;
 
     HPCON hPC = nullptr;
     THROW_IF_FAILED(ConptyCreatePseudoConsole(viewportSize, pipe.client.get(), pipe.client.get(), PSEUDOCONSOLE_INHERIT_CURSOR, &hPC));
@@ -102,6 +110,7 @@ static int run(int argc, const wchar_t* argv[])
 
         char attrList[128];
         SIZE_T size = sizeof(attrList);
+		std::cerr << "run(argc=" << argc << ",argv=" << argv << "): size → " << size << std::endl;
         siEx.lpAttributeList = reinterpret_cast<PPROC_THREAD_ATTRIBUTE_LIST>(&attrList[0]);
         THROW_IF_WIN32_BOOL_FALSE(InitializeProcThreadAttributeList(siEx.lpAttributeList, 1, 0, &size));
         THROW_IF_WIN32_BOOL_FALSE(UpdateProcThreadAttribute(siEx.lpAttributeList, 0, PROC_THREAD_ATTRIBUTE_PSEUDOCONSOLE, hPC, sizeof(HPCON), nullptr, nullptr));
@@ -160,6 +169,7 @@ static int run(int argc, const wchar_t* argv[])
 
             DWORD write = 0;
             bool resize = false;
+			std::cerr << "run(argc=" << argc << ",argv=" << argv << "): resize → " << resize << std::endl;
 
             for (DWORD i = 0; i < read; ++i)
             {
@@ -227,6 +237,7 @@ static int run(int argc, const wchar_t* argv[])
             break;
         }
         default:
+			std::cerr << "<<< Exiting run(argc=" << argc << ",argv=" << argv << ")" << std::endl;
             return 0;
         }
     }

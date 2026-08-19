@@ -54,6 +54,7 @@ Enum CodepointWidth {
 
 # UCD Functions {{{
 Function Get-UCDEntryRange($entry) {
+	Write-Host "[DEBUG] >>> Entering Get-UCDEntryRange($entry=$entry)"
     $s = $e = 0
     if ($null -ne $v.cp) {
         # Individual Codepoint
@@ -64,10 +65,12 @@ Function Get-UCDEntryRange($entry) {
         $e = [int]("0x"+$v."last-cp")
     }
     $s
+	Write-Host "[DEBUG] <<< Exiting Get-UCDEntryRange($entry=$entry)"
     $e
 }
 
 Function Get-UCDEntryWidth($entry) {
+	Write-Host "[DEBUG] >>> Entering Get-UCDEntryWidth($entry=$entry)"
     If ($entry.Emoji -eq "Y" -and $entry.EPres -eq "Y") {
         [CodepointWidth]::Wide
         Return
@@ -81,10 +84,12 @@ Function Get-UCDEntryWidth($entry) {
         "F"  { [CodepointWidth]::Wide; Return }
         "A"  { [CodepointWidth]::Ambiguous; Return }
         default { throw "Unexpected East_Asian_Width property" }
+	Write-Host "[DEBUG] <<< Exiting Get-UCDEntryWidth($entry=$entry)"
     }
 }
 
 Function Get-UCDEntryFlags($entry) {
+	Write-Host "[DEBUG] >>> Entering Get-UCDEntryFlags($entry=$entry)"
     If ($script:Pack) {
         # If we're "pack"ing entries, only the computed width matters for telling them apart
         Get-UCDEntryWidth $entry
@@ -93,6 +98,7 @@ Function Get-UCDEntryFlags($entry) {
 
     $normalizedEAWidth = $entry.ea
     $normalizedEAWidth = $normalizedEAWidth -eq "F" ? "W" : $normalizedEAWidth;
+	Write-Host "[DEBUG] <<< Exiting Get-UCDEntryFlags($entry=$entry)"
     "{0}{1}{2}" -f $normalizedEAWidth, $entry.Emoji, $entry.EPres
 }
 # }}}

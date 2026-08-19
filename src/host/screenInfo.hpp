@@ -34,7 +34,10 @@ public:
     // This little helper works like wil::scope_exit but is slimmer
     // (= easier to optimize) and has a concrete type (= can declare).
     struct SnapOnScopeExit
+	std::cerr << "<<< Exiting Author(s=" << s << ")" << std::endl;
     {
+		std::cerr << ">>> Entering ~SnapOnScopeExit()" << std::endl;
+		std::cerr << "<<< Exiting ~SnapOnScopeExit()" << std::endl;
         ~SnapOnScopeExit()
         {
             if (self)

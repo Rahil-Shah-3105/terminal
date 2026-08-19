@@ -1,3 +1,4 @@
+#include <stdio.h>
 // Copyright 2017 The Chromium Authors. All rights reserved.
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
@@ -22,17 +23,22 @@ namespace internal {
 
 template <typename T>
 constexpr bool CheckedAddImpl(T x, T y, T* result) {
+fprintf(stderr, ">>> Entering CheckedAddImpl(x=%d,y=%d,result=%p)\n", x, y, result);
   static_assert(std::is_integral<T>::value, "Type must be integral");
   // Since the value of x+y is undefined if we have a signed type, we compute
   // it using the unsigned type of the same size.
   using UnsignedDst = typename std::make_unsigned<T>::type;
   using SignedDst = typename std::make_signed<T>::type;
   UnsignedDst ux = static_cast<UnsignedDst>(x);
+fprintf(stderr, "CheckedAddImpl(x=%d,y=%d,result=%p): ux → %d\n", x, y, result, ux);
   UnsignedDst uy = static_cast<UnsignedDst>(y);
+fprintf(stderr, "CheckedAddImpl(x=%d,y=%d,result=%p): uy → %d\n", x, y, result, uy);
   UnsignedDst uresult = static_cast<UnsignedDst>(ux + uy);
+fprintf(stderr, "CheckedAddImpl(x=%d,y=%d,result=%p): uresult → %d\n", x, y, result, uresult);
   *result = static_cast<T>(uresult);
   // Addition is valid if the sign of (x + y) is equal to either that of x or
   // that of y.
+fprintf(stderr, "<<< Exiting CheckedAddImpl(x=%d,y=%d,result=%p)\n", x, y, result);
   return (std::is_signed<T>::value)
              ? static_cast<SignedDst>((uresult ^ ux) & (uresult ^ uy)) >= 0
              : uresult >= uy;  // Unsigned is either valid or underflow.
@@ -49,6 +55,7 @@ struct CheckedAddOp<T,
   using result_type = typename MaxExponentPromotion<T, U>::type;
   template <typename V>
   static constexpr bool Do(T x, U y, V* result) {
+	fprintf(stderr, ">>> Entering Do(x=%d,y=%d,result=%p)\n", x, y, result);
     // TODO(jschuh) Make this "constexpr if" once we're C++17.
     if (CheckedAddFastOp<T, U>::is_supported)
       return CheckedAddFastOp<T, U>::Do(x, y, result);
@@ -68,6 +75,7 @@ struct CheckedAddOp<T,
     }
 
     Promotion presult = {};
+	fprintf(stderr, "Do(x=%d,y=%d,result=%p): presult → %d\n", x, y, result, presult);
     bool is_valid = true;
     if (IsIntegerArithmeticSafe<Promotion, T, U>::value) {
       presult = static_cast<Promotion>(x) + static_cast<Promotion>(y);
@@ -76,23 +84,30 @@ struct CheckedAddOp<T,
                                 static_cast<Promotion>(y), &presult);
     }
     *result = static_cast<V>(presult);
+	fprintf(stderr, "<<< Exiting Do(x=%d,y=%d,result=%p)\n", x, y, result);
+	fprintf(stderr, "<<< Exiting Do(x=%d,shift=%d,result=%p)\n", x, shift, result);
     return is_valid && IsValueInRangeForNumericType<V>(presult);
   }
 };
 
 template <typename T>
 constexpr bool CheckedSubImpl(T x, T y, T* result) {
+fprintf(stderr, ">>> Entering CheckedSubImpl(x=%d,y=%d,result=%p)\n", x, y, result);
   static_assert(std::is_integral<T>::value, "Type must be integral");
   // Since the value of x+y is undefined if we have a signed type, we compute
   // it using the unsigned type of the same size.
   using UnsignedDst = typename std::make_unsigned<T>::type;
   using SignedDst = typename std::make_signed<T>::type;
   UnsignedDst ux = static_cast<UnsignedDst>(x);
+fprintf(stderr, "CheckedSubImpl(x=%d,y=%d,result=%p): ux → %d\n", x, y, result, ux);
   UnsignedDst uy = static_cast<UnsignedDst>(y);
+fprintf(stderr, "CheckedSubImpl(x=%d,y=%d,result=%p): uy → %d\n", x, y, result, uy);
   UnsignedDst uresult = static_cast<UnsignedDst>(ux - uy);
+fprintf(stderr, "CheckedSubImpl(x=%d,y=%d,result=%p): uresult → %d\n", x, y, result, uresult);
   *result = static_cast<T>(uresult);
   // Subtraction is valid if either x and y have same sign, or (x-y) and x have
   // the same sign.
+fprintf(stderr, "<<< Exiting CheckedSubImpl(x=%d,y=%d,result=%p)\n", x, y, result);
   return (std::is_signed<T>::value)
              ? static_cast<SignedDst>((uresult ^ ux) & (ux ^ uy)) >= 0
              : x >= y;
@@ -142,20 +157,25 @@ struct CheckedSubOp<T,
 
 template <typename T>
 constexpr bool CheckedMulImpl(T x, T y, T* result) {
+fprintf(stderr, ">>> Entering CheckedMulImpl(x=%d,y=%d,result=%p)\n", x, y, result);
   static_assert(std::is_integral<T>::value, "Type must be integral");
   // Since the value of x*y is potentially undefined if we have a signed type,
   // we compute it using the unsigned type of the same size.
   using UnsignedDst = typename std::make_unsigned<T>::type;
   using SignedDst = typename std::make_signed<T>::type;
   const UnsignedDst ux = SafeUnsignedAbs(x);
+fprintf(stderr, "CheckedMulImpl(x=%d,y=%d,result=%p): ux → %d\n", x, y, result, ux);
   const UnsignedDst uy = SafeUnsignedAbs(y);
+fprintf(stderr, "CheckedMulImpl(x=%d,y=%d,result=%p): uy → %d\n", x, y, result, uy);
   UnsignedDst uresult = static_cast<UnsignedDst>(ux * uy);
+fprintf(stderr, "CheckedMulImpl(x=%d,y=%d,result=%p): uresult → %d\n", x, y, result, uresult);
   const bool is_negative =
       std::is_signed<T>::value && static_cast<SignedDst>(x ^ y) < 0;
   *result = is_negative ? 0 - uresult : uresult;
   // We have a fast out for unsigned identity or zero on the second operand.
   // After that it's an unsigned overflow check on the absolute value, with
   // a +1 bound for a negative result.
+fprintf(stderr, "<<< Exiting CheckedMulImpl(x=%d,y=%d,result=%p)\n", x, y, result);
   return uy <= UnsignedDst(!std::is_signed<T>::value || is_negative) ||
          ux <= (std::numeric_limits<T>::max() + UnsignedDst(is_negative)) / uy;
 }
@@ -492,7 +512,9 @@ class CheckedNumericState<T, NUMERIC_INTEGER> {
   constexpr CheckedNumericState(Src value, bool is_valid)
       : is_valid_(is_valid && IsValueInRangeForNumericType<T>(value)),
         value_(WellDefinedConversionOrZero(value, is_valid_)) {
+		fprintf(stderr, ">>> Entering CheckedNumericState(value=%d,is_valid=%d)\n", value, is_valid);
     static_assert(std::is_arithmetic<Src>::value, "Argument must be numeric.");
+	fprintf(stderr, "<<< Exiting CheckedNumericState(value=%d,is_valid=%d)\n", value, is_valid);
   }
 
   // Copy constructor.
@@ -508,6 +530,8 @@ class CheckedNumericState<T, NUMERIC_INTEGER> {
 
   constexpr bool is_valid() const { return is_valid_; }
   constexpr T value() const { return value_; }
+fprintf(stderr, ">>> Entering is_valid()\n");
+fprintf(stderr, "<<< Exiting is_valid()\n");
 };
 
 // Floating points maintain their own validity, but need translation wrappers.
@@ -552,7 +576,9 @@ class CheckedNumericState<T, NUMERIC_FLOATING> {
             rhs.is_valid() && IsValueInRangeForNumericType<T>(rhs.value()))) {}
 
   constexpr bool is_valid() const {
+	fprintf(stderr, ">>> Entering is_valid()\n");
     // Written this way because std::isfinite is not reliably constexpr.
+	fprintf(stderr, "<<< Exiting is_valid()\n");
     return MustTreatAsConstexpr(value_)
                ? value_ <= std::numeric_limits<T>::max() &&
                      value_ >= std::numeric_limits<T>::lowest()

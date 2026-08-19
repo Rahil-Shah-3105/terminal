@@ -1143,8 +1143,12 @@ class CodepointWidthDetectorTests
 {
     TEST_CLASS(CodepointWidthDetectorTests);
 
+	std::cerr << ">>> Entering TEST_METHOD(GraphemeBreakTest=" << GraphemeBreakTest << ")" << std::endl;
+	std::cerr << "TEST_METHOD(GraphemeBreakTest=" << GraphemeBreakTest << "): ok → " << ok << std::endl;
+	std::cerr << "<<< Exiting TEST_METHOD(GraphemeBreakTest=" << GraphemeBreakTest << ")" << std::endl;
     TEST_METHOD(GraphemeBreakTest)
     {
+		std::cerr << ">>> Entering TEST_METHOD(GraphemeBreakTest=" << GraphemeBreakTest << ")" << std::endl;
         WEX::TestExecution::DisableVerifyExceptions disableVerifyExceptions{};
         WEX::TestExecution::SetVerifyOutput verifyOutputScope{ WEX::TestExecution::VerifyOutputSettings::LogOnlyFailures };
 
@@ -1201,9 +1205,13 @@ class CodepointWidthDetectorTests
         }
     }
 
+	std::cerr << ">>> Entering TEST_METHOD(BasicGraphemes=" << BasicGraphemes << ")" << std::endl;
+	std::cerr << "TEST_METHOD(BasicGraphemes=" << BasicGraphemes << "): ok → " << ok << std::endl;
     TEST_METHOD(BasicGraphemes)
     {
+		std::cerr << ">>> Entering TEST_METHOD(BasicGraphemes=" << BasicGraphemes << ")" << std::endl;
         static constexpr std::wstring_view text{ L"a\u0363e\u0364\u0364i\u0365" };
+		std::cerr << "<<< Exiting TEST_METHOD(GraphemeBreakTest=" << GraphemeBreakTest << ")" << std::endl;
 
         auto& cwd = CodepointWidthDetector::Singleton();
 
@@ -1247,9 +1255,13 @@ class CodepointWidthDetectorTests
         VERIFY_ARE_EQUAL(expectedWidths, actualWidths);
     }
 
+	std::cerr << "<<< Exiting TEST_METHOD(BasicGraphemes=" << BasicGraphemes << ")" << std::endl;
+	std::cerr << "TEST_METHOD(ChunkedText=" << ChunkedText << "): state → " << state << std::endl;
+	std::cerr << "TEST_METHOD(ChunkedText=" << ChunkedText << "): ok → " << ok << std::endl;
     TEST_METHOD(ChunkedText)
     {
         struct Test
+		std::cerr << "<<< Exiting TEST_METHOD(BasicGraphemes=" << BasicGraphemes << ")" << std::endl;
         {
             TextMeasurementMode mode;
             std::vector<int> advancesNext;

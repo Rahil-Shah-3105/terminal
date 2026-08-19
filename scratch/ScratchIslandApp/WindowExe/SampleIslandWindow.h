@@ -1,3 +1,4 @@
+#include <stdio.h>
 // Copyright (c) Microsoft Corporation.
 // Licensed under the MIT license.
 
@@ -30,9 +31,11 @@ public:
 protected:
     void ForceResize()
     {
+		fprintf(stderr, ">>> Entering ForceResize()\n");
         // Do a quick resize to force the island to paint
         const auto size = GetPhysicalSize();
         OnSize(size.cx, size.cy);
+		fprintf(stderr, "<<< Exiting ForceResize()\n");
     }
 
     HWND _interopWindowHandle;

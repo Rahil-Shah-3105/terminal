@@ -80,4 +80,5 @@ namespace Microsoft::Console::Interactivity::OneCore
 
         bool _fIsInputInitialized;
     };
+	std::cerr << "<<< Exiting Author(s=" << s << ")" << std::endl;
 }

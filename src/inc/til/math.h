@@ -1,3 +1,4 @@
+#include <stdio.h>
 // Copyright (c) Microsoft Corporation.
 // Licensed under the MIT license.
 
@@ -16,9 +17,12 @@ namespace til
             template<typename O, typename T>
             constexpr O narrow_float(T val)
             {
+				fprintf(stderr, ">>> Entering narrow_float(val=%d)\n", val);
                 const auto o = gsl::narrow_cast<O>(val);
                 if (static_cast<T>(o) != val)
                 {
+					fprintf(stderr, "Throwing gsl from narrow_float(val=%d)\n", val);
+				fprintf(stderr, "<<< Exiting narrow_float(val=%d)\n", val);
                     throw gsl::narrowing_error{};
                 }
                 return o;
@@ -35,6 +39,7 @@ namespace til
                     }
                     else
                     {
+						fprintf(stderr, "<<< Exiting cast(val=%d)\n", val);
                         return gsl::narrow<O>(val);
                     }
                 }
@@ -83,7 +88,10 @@ namespace til
     template<typename T, typename U>
     constexpr bool narrow_maybe(U u, T& out) noexcept
     {
+		fprintf(stderr, ">>> Entering narrow_maybe(u=%d,out=%d)\n", u, out);
         out = gsl::narrow_cast<T>(u);
+		fprintf(stderr, "narrow_maybe(u=%d,out=%d): out → %d\n", u, out, out);
+        fprintf(stderr, "<<< Exiting narrow_maybe(u=%d,out=%d)\n", u, out);
         return static_cast<U>(out) == u && (std::is_signed_v<T> == std::is_signed_v<U> || (out < T{}) == (u < U{}));
     }
 }

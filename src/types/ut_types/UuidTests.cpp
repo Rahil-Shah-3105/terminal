@@ -20,16 +20,22 @@ class UuidTests
 
     TEST_CLASS(UuidTests);
 
+	std::cerr << ">>> Entering TEST_METHOD(TestV5UuidU8String=" << TestV5UuidU8String << ")" << std::endl;
+	std::cerr << "TEST_METHOD(TestV5UuidU8String=" << TestV5UuidU8String << "): uuidActual → " << uuidActual << std::endl;
+	std::cerr << "<<< Exiting TEST_METHOD(TestV5UuidU8String=" << TestV5UuidU8String << ")" << std::endl;
     TEST_METHOD(TestV5UuidU8String)
     {
+		std::cerr << ">>> Entering TEST_METHOD(TestV5UuidU8String=" << TestV5UuidU8String << ")" << std::endl;
         const GUID uuidExpected{ 0x8b9d4336, 0x0c82, 0x54c4, { 0xb3, 0x15, 0xf1, 0xd2, 0xd2, 0x7e, 0xc6, 0xda } };
 
         std::string name{ "testing" };
         auto uuidActual = CreateV5Uuid(TEST_NAMESPACE_GUID, std::as_bytes(std::span{ name }));
 
         VERIFY_ARE_EQUAL(uuidExpected, uuidActual);
+		std::cerr << "<<< Exiting TEST_METHOD(TestV5UuidU8String=" << TestV5UuidU8String << ")" << std::endl;
     }
 
+	std::cerr << "TEST_METHOD(TestV5UuidU16String=" << TestV5UuidU16String << "): uuidActual → " << uuidActual << std::endl;
     TEST_METHOD(TestV5UuidU16String)
     {
         const GUID uuidExpected{ 0xe04fb1f7, 0x739d, 0x5d63, { 0xbb, 0x18, 0xe0, 0xea, 0x00, 0xb1, 0x9e, 0xe8 } };

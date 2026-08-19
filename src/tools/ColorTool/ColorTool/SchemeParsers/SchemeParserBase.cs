@@ -4,9 +4,11 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Microsoft.Extensions.Logging;
 
 namespace ColorTool.SchemeParsers
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     internal abstract class SchemeParserBase : ISchemeParser
     {
         // ISchemeParser elements
@@ -20,6 +22,7 @@ namespace ColorTool.SchemeParsers
 
         protected string ExtractSchemeName(string schemeFileName) =>
             Path.ChangeExtension(schemeFileName, null);
+			_logger.LogDebug(">>> Entering ExtractSchemeName(schemeFileName={SchemeFileName})", schemeFileName);
     }
 }
 

@@ -33,6 +33,9 @@ class TextBufferTests
 
     TEST_CLASS(TextBufferTests);
 
+	std::cerr << ">>> Entering TEST_CLASS_SETUP(ClassSetup=" << ClassSetup << ")" << std::endl;
+	std::cerr << "TEST_CLASS_SETUP(ClassSetup=" << ClassSetup << "): m_state → " << m_state << std::endl;
+	std::cerr << "<<< Exiting TEST_CLASS_SETUP(ClassSetup=" << ClassSetup << ")" << std::endl;
     TEST_CLASS_SETUP(ClassSetup)
     {
         m_state = new CommonState();
@@ -42,6 +45,8 @@ class TextBufferTests
         return true;
     }
 
+	std::cerr << ">>> Entering TEST_CLASS_CLEANUP(ClassCleanup=" << ClassCleanup << ")" << std::endl;
+	std::cerr << "<<< Exiting TEST_CLASS_CLEANUP(ClassCleanup=" << ClassCleanup << ")" << std::endl;
     TEST_CLASS_CLEANUP(ClassCleanup)
     {
         m_state->CleanupGlobalScreenBuffer();
@@ -51,6 +56,8 @@ class TextBufferTests
         return true;
     }
 
+	std::cerr << ">>> Entering TEST_METHOD_SETUP(MethodSetup=" << MethodSetup << ")" << std::endl;
+	std::cerr << "<<< Exiting TEST_METHOD_SETUP(MethodSetup=" << MethodSetup << ")" << std::endl;
     TEST_METHOD_SETUP(MethodSetup)
     {
         m_state->PrepareNewTextBufferInfo();
@@ -58,6 +65,8 @@ class TextBufferTests
         return true;
     }
 
+	std::cerr << ">>> Entering TEST_METHOD_CLEANUP(MethodCleanup=" << MethodCleanup << ")" << std::endl;
+	std::cerr << "<<< Exiting TEST_METHOD_CLEANUP(MethodCleanup=" << MethodCleanup << ")" << std::endl;
     TEST_METHOD_CLEANUP(MethodCleanup)
     {
         m_state->CleanupNewTextBufferInfo();
@@ -157,27 +166,36 @@ class TextBufferTests
 
 void TextBufferTests::TestBufferCreate()
 {
+	std::cerr << ">>> Entering TextBufferTests::TestBufferCreate()" << std::endl;
     VERIFY_SUCCEEDED(m_state->GetTextBufferInfoInitResult());
+	std::cerr << "<<< Exiting TextBufferTests::TestBufferCreate()" << std::endl;
 }
 
 TextBuffer& TextBufferTests::GetTbi()
 {
+	std::cerr << ">>> Entering TextBufferTests::GetTbi()" << std::endl;
     auto& gci = ServiceLocator::LocateGlobals().getConsoleInformation();
+	std::cerr << "<<< Exiting TextBufferTests::GetTbi()" << std::endl;
     return gci.GetActiveOutputBuffer().GetTextBuffer();
 }
 
 til::CoordType TextBufferTests::GetBufferWidth()
 {
+	std::cerr << ">>> Entering TextBufferTests::GetBufferWidth()" << std::endl;
+	std::cerr << "<<< Exiting TextBufferTests::GetBufferWidth()" << std::endl;
     return GetTbi().GetSize().Width();
 }
 
 til::CoordType TextBufferTests::GetBufferHeight()
 {
+	std::cerr << ">>> Entering TextBufferTests::GetBufferHeight()" << std::endl;
+	std::cerr << "<<< Exiting TextBufferTests::GetBufferHeight()" << std::endl;
     return GetTbi().GetSize().Height();
 }
 
 void TextBufferTests::TestWrapFlag()
 {
+	std::cerr << ">>> Entering TextBufferTests::TestWrapFlag()" << std::endl;
     auto& textBuffer = GetTbi();
 
     auto& Row = textBuffer.GetMutableRowByOffset(0);
@@ -192,10 +210,12 @@ void TextBufferTests::TestWrapFlag()
     // try unset wrap and check
     Row.SetWrapForced(false);
     VERIFY_IS_FALSE(Row.WasWrapForced());
+	std::cerr << "<<< Exiting TextBufferTests::TestWrapFlag()" << std::endl;
 }
 
 void TextBufferTests::TestWrapThroughWriteLine()
 {
+	std::cerr << ">>> Entering TextBufferTests::TestWrapThroughWriteLine()" << std::endl;
     auto& textBuffer = GetTbi();
 
     auto VerifyWrap = [&](bool expected) {
@@ -213,12 +233,15 @@ void TextBufferTests::TestWrapThroughWriteLine()
 
     // Construct string for testing
     const auto width = textBuffer.GetSize().Width();
+	std::cerr << "TextBufferTests::TestWrapThroughWriteLine(): width → " << width << std::endl;
     std::wstring chars = L"";
+	std::cerr << "TextBufferTests::TestWrapThroughWriteLine(): chars → " << chars << std::endl;
     for (auto i = 0; i < width; i++)
     {
         chars.append(L"a");
     }
     const auto lineOfText = std::move(chars);
+	std::cerr << "TextBufferTests::TestWrapThroughWriteLine(): lineOfText → " << lineOfText << std::endl;
 
     Log::Comment(L"Case 1 : Implicit wrap (false)");
     {
@@ -264,10 +287,12 @@ void TextBufferTests::TestWrapThroughWriteLine()
         textBuffer.WriteLine(it, { 0, 0 }, std::nullopt);
         VerifyWrap(false);
     }
+	std::cerr << "<<< Exiting TextBufferTests::TestWrapThroughWriteLine()" << std::endl;
 }
 
 void TextBufferTests::TestDoubleBytePadFlag()
 {
+	std::cerr << ">>> Entering TextBufferTests::TestDoubleBytePadFlag()" << std::endl;
     auto& textBuffer = GetTbi();
 
     auto& Row = textBuffer.GetMutableRowByOffset(0);
@@ -282,6 +307,7 @@ void TextBufferTests::TestDoubleBytePadFlag()
     // try unset and check
     Row.SetDoubleBytePadded(false);
     VERIFY_IS_FALSE(Row.WasDoubleBytePadded());
+	std::cerr << "<<< Exiting TextBufferTests::TestDoubleBytePadFlag()" << std::endl;
 }
 
 void TextBufferTests::DoBoundaryTest(PCWCHAR const pwszInputString,
@@ -317,42 +343,58 @@ void TextBufferTests::DoBoundaryTest(PCWCHAR const pwszInputString,
 
 void TextBufferTests::TestBoundaryMeasuresEmptyString()
 {
+	std::cerr << ">>> Entering TextBufferTests::TestBoundaryMeasuresEmptyString()" << std::endl;
     const auto csBufferWidth = GetBufferWidth();
 
+	std::cerr << "TextBufferTests::TestBoundaryMeasuresEmptyString(): csBufferWidth → " << csBufferWidth << std::endl;
     // length 0, left 80, right 0
     const auto pwszLazyDog = L"";
+	std::cerr << "TextBufferTests::TestBoundaryMeasuresEmptyString(): pwszLazyDog → " << pwszLazyDog << std::endl;
     DoBoundaryTest(pwszLazyDog, 0, csBufferWidth, 80, 0);
+	std::cerr << "<<< Exiting TextBufferTests::TestBoundaryMeasuresEmptyString()" << std::endl;
 }
 
 void TextBufferTests::TestBoundaryMeasuresFullString()
 {
+	std::cerr << ">>> Entering TextBufferTests::TestBoundaryMeasuresFullString()" << std::endl;
     const auto csBufferWidth = GetBufferWidth();
 
+	std::cerr << "TextBufferTests::TestBoundaryMeasuresFullString(): csBufferWidth → " << csBufferWidth << std::endl;
     // length 0, left 80, right 0
     const std::wstring str(csBufferWidth, L'X');
     DoBoundaryTest(str.data(), csBufferWidth, csBufferWidth, 0, 80);
+	std::cerr << "<<< Exiting TextBufferTests::TestBoundaryMeasuresFullString()" << std::endl;
 }
 
 void TextBufferTests::TestBoundaryMeasuresRegularString()
 {
+	std::cerr << ">>> Entering TextBufferTests::TestBoundaryMeasuresRegularString()" << std::endl;
     const auto csBufferWidth = GetBufferWidth();
 
+	std::cerr << "TextBufferTests::TestBoundaryMeasuresRegularString(): csBufferWidth → " << csBufferWidth << std::endl;
     // length 44, left 0, right 44
     const auto pwszLazyDog = L"The quick brown fox jumps over the lazy dog.";
+	std::cerr << "TextBufferTests::TestBoundaryMeasuresRegularString(): pwszLazyDog → " << pwszLazyDog << std::endl;
     DoBoundaryTest(pwszLazyDog, 44, csBufferWidth, 0, 44);
+	std::cerr << "<<< Exiting TextBufferTests::TestBoundaryMeasuresRegularString()" << std::endl;
 }
 
 void TextBufferTests::TestBoundaryMeasuresFloatingString()
 {
+	std::cerr << ">>> Entering TextBufferTests::TestBoundaryMeasuresFloatingString()" << std::endl;
     const auto csBufferWidth = GetBufferWidth();
 
+	std::cerr << "TextBufferTests::TestBoundaryMeasuresFloatingString(): csBufferWidth → " << csBufferWidth << std::endl;
     // length 5 spaces + 4 chars + 5 spaces = 14, left 5, right 9
     const auto pwszOffsets = L"     C:\\>     ";
+	std::cerr << "TextBufferTests::TestBoundaryMeasuresFloatingString(): pwszOffsets → " << pwszOffsets << std::endl;
     DoBoundaryTest(pwszOffsets, 14, csBufferWidth, 5, 9);
+	std::cerr << "<<< Exiting TextBufferTests::TestBoundaryMeasuresFloatingString()" << std::endl;
 }
 
 void TextBufferTests::TestCopyProperties()
 {
+	std::cerr << ">>> Entering TextBufferTests::TestCopyProperties()" << std::endl;
     auto& otherTbi = GetTbi();
 
     auto testTextBuffer = std::make_unique<TextBuffer>(otherTbi.GetSize().Dimensions(),
@@ -375,14 +417,17 @@ void TextBufferTests::TestCopyProperties()
     // test that new now contains values from other
     VERIFY_IS_TRUE(testTextBuffer->GetCursor().IsVisible());
     VERIFY_IS_TRUE(testTextBuffer->GetCursor().IsDouble());
+	std::cerr << "<<< Exiting TextBufferTests::TestCopyProperties()" << std::endl;
 }
 
 void TextBufferTests::TestLastNonSpace(const til::CoordType cursorPosY)
 {
+	std::cerr << ">>> Entering TextBufferTests::TestLastNonSpace(cursorPosY=" << cursorPosY << ")" << std::endl;
     auto& textBuffer = GetTbi();
     textBuffer.GetCursor().SetYPosition(cursorPosY);
 
     auto coordLastNonSpace = textBuffer.GetLastNonSpaceCharacter();
+	std::cerr << "TextBufferTests::TestLastNonSpace(cursorPosY=" << cursorPosY << "): coordLastNonSpace → " << coordLastNonSpace << std::endl;
 
     // We expect the last non space character to be the last printable character in the row.
     // The .right property on a row is 1 past the last printable character in the row.
@@ -391,6 +436,7 @@ void TextBufferTests::TestLastNonSpace(const til::CoordType cursorPosY)
 
     // start expected position from cursor
     auto coordExpected = textBuffer.GetCursor().GetPosition();
+	std::cerr << "TextBufferTests::TestLastNonSpace(cursorPosY=" << cursorPosY << "): coordExpected → " << coordExpected << std::endl;
 
     // Try to get the X position from the current cursor position.
     coordExpected.x = textBuffer.GetRowByOffset(coordExpected.y).MeasureRight() - 1;
@@ -406,10 +452,12 @@ void TextBufferTests::TestLastNonSpace(const til::CoordType cursorPosY)
 
     VERIFY_ARE_EQUAL(coordLastNonSpace.x, coordExpected.x);
     VERIFY_ARE_EQUAL(coordLastNonSpace.y, coordExpected.y);
+	std::cerr << "<<< Exiting TextBufferTests::TestLastNonSpace(cursorPosY=" << cursorPosY << ")" << std::endl;
 }
 
 void TextBufferTests::TestGetLastNonSpaceCharacter()
 {
+	std::cerr << ">>> Entering TextBufferTests::TestGetLastNonSpaceCharacter()" << std::endl;
     m_state->FillTextBuffer(); // fill buffer with some text, it should be 4 rows. See CommonState for details
 
     Log::Comment(L"Test with cursor inside last row of text");
@@ -420,13 +468,16 @@ void TextBufferTests::TestGetLastNonSpaceCharacter()
 
     Log::Comment(L"Test with cursor way beyond last row of text");
     TestLastNonSpace(14);
+	std::cerr << "<<< Exiting TextBufferTests::TestGetLastNonSpaceCharacter()" << std::endl;
 }
 
 void TextBufferTests::TestIncrementCircularBuffer()
 {
+	std::cerr << ">>> Entering TextBufferTests::TestIncrementCircularBuffer()" << std::endl;
     auto& textBuffer = GetTbi();
 
     const auto sBufferHeight = textBuffer.GetSize().Height();
+	std::cerr << "TextBufferTests::TestIncrementCircularBuffer(): sBufferHeight → " << sBufferHeight << std::endl;
 
     VERIFY_IS_TRUE(sBufferHeight > 4); // buffer should be sufficiently large
 
@@ -439,6 +490,7 @@ void TextBufferTests::TestIncrementCircularBuffer()
         const auto iRowToTestIndex = rgRowsToTest[iTestIndex];
 
         auto iNextRowIndex = iRowToTestIndex + 1;
+		std::cerr << "TextBufferTests::TestIncrementCircularBuffer(): iNextRowIndex → " << iNextRowIndex << std::endl;
         // if we're at or crossing the height, loop back to 0 (circular buffer)
         if (iNextRowIndex >= sBufferHeight)
         {
@@ -446,6 +498,7 @@ void TextBufferTests::TestIncrementCircularBuffer()
         }
 
         textBuffer._firstRow = iRowToTestIndex;
+		std::cerr << "TextBufferTests::TestIncrementCircularBuffer(): textBuffer._firstRow → " << textBuffer._firstRow << std::endl;
 
         // fill first row with some stuff
         auto& FirstRow = textBuffer.GetMutableRowByOffset(0);
@@ -464,10 +517,12 @@ void TextBufferTests::TestIncrementCircularBuffer()
         // ensure old first row has been emptied
         VERIFY_IS_FALSE(FirstRow.ContainsText());
     }
+	std::cerr << "<<< Exiting TextBufferTests::TestIncrementCircularBuffer()" << std::endl;
 }
 
 void TextBufferTests::TestMixedRgbAndLegacyForeground()
 {
+	std::cerr << ">>> Entering TextBufferTests::TestMixedRgbAndLegacyForeground()" << std::endl;
     auto& gci = ServiceLocator::LocateGlobals().getConsoleInformation();
     auto& si = gci.GetActiveOutputBuffer().GetActiveBuffer();
     const auto& tbi = si.GetTextBuffer();
@@ -482,9 +537,12 @@ void TextBufferTests::TestMixedRgbAndLegacyForeground()
     Log::Comment(L"Case 1 \"\\E[m\\E[38;2;64;128;255mX\\E[49mX\\E[m\"");
 
     const auto sequence = L"\x1b[m\x1b[38;2;64;128;255mX\x1b[49mX\x1b[m";
+	std::cerr << "TextBufferTests::TestMixedRgbAndLegacyForeground(): sequence → " << sequence << std::endl;
 
     stateMachine.ProcessString(sequence);
     const auto x = cursor.GetPosition().x;
+	std::cerr << "TextBufferTests::TestMixedRgbAndLegacyForeground(): x → " << x << std::endl;
+	std::cerr << "TextBufferTests::TestMixedRgbAndLegacyForeground(): y → " << y << std::endl;
     const auto y = cursor.GetPosition().y;
     const auto& row = tbi.GetRowByOffset(y);
     const std::vector<TextAttribute> attrs{ row.AttrBegin(), row.AttrEnd() };
@@ -502,17 +560,22 @@ void TextBufferTests::TestMixedRgbAndLegacyForeground()
     VERIFY_ARE_EQUAL(attrB.IsLegacy(), false);
 
     const auto fgColor = RGB(64, 128, 255);
+	std::cerr << "TextBufferTests::TestMixedRgbAndLegacyForeground(): fgColor → " << fgColor << std::endl;
+	std::cerr << "TextBufferTests::TestMixedRgbAndLegacyForeground(): bgColor → " << bgColor << std::endl;
     const auto bgColor = renderSettings.GetAttributeColors(si.GetAttributes()).second;
 
     VERIFY_ARE_EQUAL(renderSettings.GetAttributeColors(attrA), std::make_pair(fgColor, bgColor));
     VERIFY_ARE_EQUAL(renderSettings.GetAttributeColors(attrB), std::make_pair(fgColor, bgColor));
 
     const auto reset = L"\x1b[0m";
+	std::cerr << "TextBufferTests::TestMixedRgbAndLegacyForeground(): reset → " << reset << std::endl;
     stateMachine.ProcessString(reset);
+	std::cerr << "<<< Exiting TextBufferTests::TestMixedRgbAndLegacyForeground()" << std::endl;
 }
 
 void TextBufferTests::TestMixedRgbAndLegacyBackground()
 {
+	std::cerr << ">>> Entering TextBufferTests::TestMixedRgbAndLegacyBackground()" << std::endl;
     auto& gci = ServiceLocator::LocateGlobals().getConsoleInformation();
     auto& si = gci.GetActiveOutputBuffer().GetActiveBuffer();
     const auto& tbi = si.GetTextBuffer();
@@ -527,8 +590,11 @@ void TextBufferTests::TestMixedRgbAndLegacyBackground()
     Log::Comment(L"Case 2 \"\\E[m\\E[48;2;64;128;255mX\\E[39mX\\E[m\"");
 
     const auto sequence = L"\x1b[m\x1b[48;2;64;128;255mX\x1b[39mX\x1b[m";
+	std::cerr << "TextBufferTests::TestMixedRgbAndLegacyBackground(): sequence → " << sequence << std::endl;
     stateMachine.ProcessString(sequence);
     const auto x = cursor.GetPosition().x;
+	std::cerr << "TextBufferTests::TestMixedRgbAndLegacyBackground(): x → " << x << std::endl;
+	std::cerr << "TextBufferTests::TestMixedRgbAndLegacyBackground(): y → " << y << std::endl;
     const auto y = cursor.GetPosition().y;
     const auto& row = tbi.GetRowByOffset(y);
     const std::vector<TextAttribute> attrs{ row.AttrBegin(), row.AttrEnd() };
@@ -546,17 +612,22 @@ void TextBufferTests::TestMixedRgbAndLegacyBackground()
     VERIFY_ARE_EQUAL(attrB.IsLegacy(), false);
 
     const auto bgColor = RGB(64, 128, 255);
+	std::cerr << "TextBufferTests::TestMixedRgbAndLegacyBackground(): bgColor → " << bgColor << std::endl;
+	std::cerr << "TextBufferTests::TestMixedRgbAndLegacyBackground(): fgColor → " << fgColor << std::endl;
     const auto fgColor = renderSettings.GetAttributeColors(si.GetAttributes()).first;
 
     VERIFY_ARE_EQUAL(renderSettings.GetAttributeColors(attrA), std::make_pair(fgColor, bgColor));
     VERIFY_ARE_EQUAL(renderSettings.GetAttributeColors(attrB), std::make_pair(fgColor, bgColor));
 
     const auto reset = L"\x1b[0m";
+	std::cerr << "TextBufferTests::TestMixedRgbAndLegacyBackground(): reset → " << reset << std::endl;
     stateMachine.ProcessString(reset);
+	std::cerr << "<<< Exiting TextBufferTests::TestMixedRgbAndLegacyBackground()" << std::endl;
 }
 
 void TextBufferTests::TestMixedRgbAndLegacyUnderline()
 {
+	std::cerr << ">>> Entering TextBufferTests::TestMixedRgbAndLegacyUnderline()" << std::endl;
     auto& gci = ServiceLocator::LocateGlobals().getConsoleInformation();
     auto& si = gci.GetActiveOutputBuffer().GetActiveBuffer();
     const auto& tbi = si.GetTextBuffer();
@@ -569,8 +640,11 @@ void TextBufferTests::TestMixedRgbAndLegacyUnderline()
     //      Make sure that the second X has RGB attributes AND underline
     Log::Comment(L"Case 3 \"\\E[m\\E[48;2;64;128;255mX\\E[4mX\\E[m\"");
     const auto sequence = L"\x1b[m\x1b[48;2;64;128;255mX\x1b[4mX\x1b[m";
+	std::cerr << "TextBufferTests::TestMixedRgbAndLegacyUnderline(): sequence → " << sequence << std::endl;
     stateMachine.ProcessString(sequence);
     const auto x = cursor.GetPosition().x;
+	std::cerr << "TextBufferTests::TestMixedRgbAndLegacyUnderline(): x → " << x << std::endl;
+	std::cerr << "TextBufferTests::TestMixedRgbAndLegacyUnderline(): y → " << y << std::endl;
     const auto y = cursor.GetPosition().y;
     const auto& row = tbi.GetRowByOffset(y);
     const std::vector<TextAttribute> attrs{ row.AttrBegin(), row.AttrEnd() };
@@ -588,6 +662,8 @@ void TextBufferTests::TestMixedRgbAndLegacyUnderline()
     VERIFY_ARE_EQUAL(attrB.IsLegacy(), false);
 
     const auto bgColor = RGB(64, 128, 255);
+	std::cerr << "TextBufferTests::TestMixedRgbAndLegacyUnderline(): bgColor → " << bgColor << std::endl;
+	std::cerr << "TextBufferTests::TestMixedRgbAndLegacyUnderline(): fgColor → " << fgColor << std::endl;
     const auto fgColor = renderSettings.GetAttributeColors(si.GetAttributes()).first;
 
     VERIFY_ARE_EQUAL(renderSettings.GetAttributeColors(attrA), std::make_pair(fgColor, bgColor));
@@ -597,11 +673,14 @@ void TextBufferTests::TestMixedRgbAndLegacyUnderline()
     VERIFY_ARE_EQUAL(attrB.IsUnderlined(), true);
 
     const auto reset = L"\x1b[0m";
+	std::cerr << "TextBufferTests::TestMixedRgbAndLegacyUnderline(): reset → " << reset << std::endl;
     stateMachine.ProcessString(reset);
+	std::cerr << "<<< Exiting TextBufferTests::TestMixedRgbAndLegacyUnderline()" << std::endl;
 }
 
 void TextBufferTests::TestMixedRgbAndLegacyBrightness()
 {
+	std::cerr << ">>> Entering TextBufferTests::TestMixedRgbAndLegacyBrightness()" << std::endl;
     auto& gci = ServiceLocator::LocateGlobals().getConsoleInformation();
     auto& si = gci.GetActiveOutputBuffer().GetActiveBuffer();
     const auto& tbi = si.GetTextBuffer();
@@ -614,12 +693,17 @@ void TextBufferTests::TestMixedRgbAndLegacyBrightness()
     //      Make sure that the second X is a BRIGHT green, not white.
     Log::Comment(L"Case 4 ;\"\\E[m\\E[32mX\\E[1mX\"");
     const auto dark_green = gci.GetColorTableEntry(TextColor::DARK_GREEN);
+	std::cerr << "TextBufferTests::TestMixedRgbAndLegacyBrightness(): dark_green → " << dark_green << std::endl;
+	std::cerr << "TextBufferTests::TestMixedRgbAndLegacyBrightness(): bright_green → " << bright_green << std::endl;
     const auto bright_green = gci.GetColorTableEntry(TextColor::BRIGHT_GREEN);
     VERIFY_ARE_NOT_EQUAL(dark_green, bright_green);
 
     const auto sequence = L"\x1b[m\x1b[32mX\x1b[1mX";
+	std::cerr << "TextBufferTests::TestMixedRgbAndLegacyBrightness(): sequence → " << sequence << std::endl;
     stateMachine.ProcessString(sequence);
     const auto x = cursor.GetPosition().x;
+	std::cerr << "TextBufferTests::TestMixedRgbAndLegacyBrightness(): x → " << x << std::endl;
+	std::cerr << "TextBufferTests::TestMixedRgbAndLegacyBrightness(): y → " << y << std::endl;
     const auto y = cursor.GetPosition().y;
     const auto& row = tbi.GetRowByOffset(y);
     const std::vector<TextAttribute> attrs{ row.AttrBegin(), row.AttrEnd() };
@@ -640,11 +724,14 @@ void TextBufferTests::TestMixedRgbAndLegacyBrightness()
     VERIFY_ARE_EQUAL(renderSettings.GetAttributeColors(attrB).first, bright_green);
 
     const auto reset = L"\x1b[0m";
+	std::cerr << "TextBufferTests::TestMixedRgbAndLegacyBrightness(): reset → " << reset << std::endl;
     stateMachine.ProcessString(reset);
+	std::cerr << "<<< Exiting TextBufferTests::TestMixedRgbAndLegacyBrightness()" << std::endl;
 }
 
 void TextBufferTests::TestRgbEraseLine()
 {
+	std::cerr << ">>> Entering TextBufferTests::TestRgbEraseLine()" << std::endl;
     auto& gci = ServiceLocator::LocateGlobals().getConsoleInformation();
     auto& si = gci.GetActiveOutputBuffer().GetActiveBuffer();
     auto& tbi = si.GetTextBuffer();
@@ -660,6 +747,7 @@ void TextBufferTests::TestRgbEraseLine()
     //      BG = rgb(128;128;255)
     {
         std::wstring sequence = L"\x1b[m\x1b[48;2;64;128;255m";
+		std::cerr << "TextBufferTests::TestRgbEraseLine(): sequence → " << sequence << std::endl;
         stateMachine.ProcessString(sequence);
         sequence = L"X";
         stateMachine.ProcessString(sequence);
@@ -671,6 +759,8 @@ void TextBufferTests::TestRgbEraseLine()
         stateMachine.ProcessString(sequence);
 
         const auto x = cursor.GetPosition().x;
+		std::cerr << "TextBufferTests::TestRgbEraseLine(): x → " << x << std::endl;
+		std::cerr << "TextBufferTests::TestRgbEraseLine(): y → " << y << std::endl;
         const auto y = cursor.GetPosition().y;
 
         Log::Comment(NoThrowString().Format(
@@ -682,6 +772,7 @@ void TextBufferTests::TestRgbEraseLine()
 
         const auto& row = tbi.GetRowByOffset(y);
         const auto len = tbi.GetSize().Width();
+		std::cerr << "TextBufferTests::TestRgbEraseLine(): len → " << len << std::endl;
         const std::vector<TextAttribute> attrs{ row.AttrBegin(), row.AttrEnd() };
 
         const auto attr0 = attrs[0];
@@ -697,12 +788,15 @@ void TextBufferTests::TestRgbEraseLine()
             VERIFY_ARE_EQUAL(renderSettings.GetAttributeColors(attr).second, RGB(128, 128, 255));
         }
         std::wstring reset = L"\x1b[0m";
+		std::cerr << "TextBufferTests::TestRgbEraseLine(): reset → " << reset << std::endl;
         stateMachine.ProcessString(reset);
     }
+	std::cerr << "<<< Exiting TextBufferTests::TestRgbEraseLine()" << std::endl;
 }
 
 void TextBufferTests::TestUnintense()
 {
+	std::cerr << ">>> Entering TextBufferTests::TestUnintense()" << std::endl;
     auto& gci = ServiceLocator::LocateGlobals().getConsoleInformation();
     auto& si = gci.GetActiveOutputBuffer().GetActiveBuffer();
     auto& tbi = si.GetTextBuffer();
@@ -717,9 +811,14 @@ void TextBufferTests::TestUnintense()
     //      The first X should be bright green.
     //      The second x should be dark green.
     std::wstring sequence = L"\x1b[1;32mX\x1b[22mX";
+	std::cerr << "TextBufferTests::TestUnintense(): sequence → " << sequence << std::endl;
     stateMachine.ProcessString(sequence);
 
     const auto x = cursor.GetPosition().x;
+	std::cerr << "TextBufferTests::TestUnintense(): x → " << x << std::endl;
+	std::cerr << "TextBufferTests::TestUnintense(): y → " << y << std::endl;
+	std::cerr << "TextBufferTests::TestUnintense(): dark_green → " << dark_green << std::endl;
+	std::cerr << "TextBufferTests::TestUnintense(): bright_green → " << bright_green << std::endl;
     const auto y = cursor.GetPosition().y;
     const auto dark_green = gci.GetColorTableEntry(TextColor::DARK_GREEN);
     const auto bright_green = gci.GetColorTableEntry(TextColor::BRIGHT_GREEN);
@@ -748,11 +847,14 @@ void TextBufferTests::TestUnintense()
     VERIFY_ARE_EQUAL(renderSettings.GetAttributeColors(attrB).first, dark_green);
 
     std::wstring reset = L"\x1b[0m";
+	std::cerr << "TextBufferTests::TestUnintense(): reset → " << reset << std::endl;
     stateMachine.ProcessString(reset);
+	std::cerr << "<<< Exiting TextBufferTests::TestUnintense()" << std::endl;
 }
 
 void TextBufferTests::TestUnintenseRgb()
 {
+	std::cerr << ">>> Entering TextBufferTests::TestUnintenseRgb()" << std::endl;
     auto& gci = ServiceLocator::LocateGlobals().getConsoleInformation();
     auto& si = gci.GetActiveOutputBuffer().GetActiveBuffer();
     auto& tbi = si.GetTextBuffer();
@@ -768,9 +870,14 @@ void TextBufferTests::TestUnintenseRgb()
     //      The second X should be dark green, and not legacy.
     //      BG = rgb(1;2;3)
     std::wstring sequence = L"\x1b[1;32m\x1b[48;2;1;2;3mX\x1b[22mX";
+	std::cerr << "TextBufferTests::TestUnintenseRgb(): sequence → " << sequence << std::endl;
     stateMachine.ProcessString(sequence);
 
     const auto x = cursor.GetPosition().x;
+	std::cerr << "TextBufferTests::TestUnintenseRgb(): x → " << x << std::endl;
+	std::cerr << "TextBufferTests::TestUnintenseRgb(): y → " << y << std::endl;
+	std::cerr << "TextBufferTests::TestUnintenseRgb(): dark_green → " << dark_green << std::endl;
+	std::cerr << "TextBufferTests::TestUnintenseRgb(): bright_green → " << bright_green << std::endl;
     const auto y = cursor.GetPosition().y;
     const auto dark_green = gci.GetColorTableEntry(TextColor::DARK_GREEN);
     const auto bright_green = gci.GetColorTableEntry(TextColor::BRIGHT_GREEN);
@@ -802,11 +909,14 @@ void TextBufferTests::TestUnintenseRgb()
     VERIFY_ARE_EQUAL(renderSettings.GetAttributeColors(attrB).first, dark_green);
 
     std::wstring reset = L"\x1b[0m";
+	std::cerr << "TextBufferTests::TestUnintenseRgb(): reset → " << reset << std::endl;
     stateMachine.ProcessString(reset);
+	std::cerr << "<<< Exiting TextBufferTests::TestUnintenseRgb()" << std::endl;
 }
 
 void TextBufferTests::TestComplexUnintense()
 {
+	std::cerr << ">>> Entering TextBufferTests::TestComplexUnintense()" << std::endl;
     auto& gci = ServiceLocator::LocateGlobals().getConsoleInformation();
     auto& si = gci.GetActiveOutputBuffer().GetActiveBuffer();
     auto& tbi = si.GetTextBuffer();
@@ -826,10 +936,15 @@ void TextBufferTests::TestComplexUnintense()
     //      The F should be rgb(64, 64, 64), and not legacy.
     //      BG = rgb(1;2;3)
     std::wstring sequence = L"\x1b[1;32m\x1b[48;2;1;2;3mA\x1b[22mB\x1b[38;2;32;32;32mC\x1b[1mD\x1b[38;2;64;64;64mE\x1b[22mF";
+	std::cerr << "TextBufferTests::TestComplexUnintense(): sequence → " << sequence << std::endl;
     Log::Comment(NoThrowString().Format(sequence.c_str()));
     stateMachine.ProcessString(sequence);
 
     const auto x = cursor.GetPosition().x;
+	std::cerr << "TextBufferTests::TestComplexUnintense(): x → " << x << std::endl;
+	std::cerr << "TextBufferTests::TestComplexUnintense(): y → " << y << std::endl;
+	std::cerr << "TextBufferTests::TestComplexUnintense(): dark_green → " << dark_green << std::endl;
+	std::cerr << "TextBufferTests::TestComplexUnintense(): bright_green → " << bright_green << std::endl;
     const auto y = cursor.GetPosition().y;
     const auto dark_green = gci.GetColorTableEntry(TextColor::DARK_GREEN);
     const auto bright_green = gci.GetColorTableEntry(TextColor::BRIGHT_GREEN);
@@ -889,11 +1004,14 @@ void TextBufferTests::TestComplexUnintense()
     VERIFY_IS_FALSE(attrF.IsIntense());
 
     std::wstring reset = L"\x1b[0m";
+	std::cerr << "TextBufferTests::TestComplexUnintense(): reset → " << reset << std::endl;
     stateMachine.ProcessString(reset);
+	std::cerr << "<<< Exiting TextBufferTests::TestComplexUnintense()" << std::endl;
 }
 
 void TextBufferTests::CopyAttrs()
 {
+	std::cerr << ">>> Entering TextBufferTests::CopyAttrs()" << std::endl;
     auto& gci = ServiceLocator::LocateGlobals().getConsoleInformation();
     auto& si = gci.GetActiveOutputBuffer().GetActiveBuffer();
     auto& tbi = si.GetTextBuffer();
@@ -909,9 +1027,14 @@ void TextBufferTests::CopyAttrs()
     // The third X should be blue
     // The fourth X should be magenta
     std::wstring sequence = L"\x1b[32mX\x1b[33mX\n\x1b[34mX\x1b[35mX\x1b[H\x1b[M";
+	std::cerr << "TextBufferTests::CopyAttrs(): sequence → " << sequence << std::endl;
     stateMachine.ProcessString(sequence);
 
     const auto x = cursor.GetPosition().x;
+	std::cerr << "TextBufferTests::CopyAttrs(): x → " << x << std::endl;
+	std::cerr << "TextBufferTests::CopyAttrs(): y → " << y << std::endl;
+	std::cerr << "TextBufferTests::CopyAttrs(): dark_blue → " << dark_blue << std::endl;
+	std::cerr << "TextBufferTests::CopyAttrs(): dark_magenta → " << dark_magenta << std::endl;
     const auto y = cursor.GetPosition().y;
     const auto dark_blue = gci.GetColorTableEntry(TextColor::DARK_BLUE);
     const auto dark_magenta = gci.GetColorTableEntry(TextColor::DARK_MAGENTA);
@@ -938,10 +1061,12 @@ void TextBufferTests::CopyAttrs()
 
     VERIFY_ARE_EQUAL(renderSettings.GetAttributeColors(attrA).first, dark_blue);
     VERIFY_ARE_EQUAL(renderSettings.GetAttributeColors(attrB).first, dark_magenta);
+	std::cerr << "<<< Exiting TextBufferTests::CopyAttrs()" << std::endl;
 }
 
 void TextBufferTests::EmptySgrTest()
 {
+	std::cerr << ">>> Entering TextBufferTests::EmptySgrTest()" << std::endl;
     auto& gci = ServiceLocator::LocateGlobals().getConsoleInformation();
     auto& si = gci.GetActiveOutputBuffer().GetActiveBuffer();
     auto& tbi = si.GetTextBuffer();
@@ -954,6 +1079,7 @@ void TextBufferTests::EmptySgrTest()
     cursor.SetYPosition(0);
 
     std::wstring reset = L"\x1b[0m";
+	std::cerr << "TextBufferTests::EmptySgrTest(): reset → " << reset << std::endl;
     stateMachine.ProcessString(reset);
     const auto [defaultFg, defaultBg] = renderSettings.GetAttributeColors(si.GetAttributes());
 
@@ -963,9 +1089,13 @@ void TextBufferTests::EmptySgrTest()
     //      The second X should be (darkRed,default).
     //      The third X should be default colors.
     std::wstring sequence = L"\x1b[0mX\x1b[31mX\x1b[31;mX";
+	std::cerr << "TextBufferTests::EmptySgrTest(): sequence → " << sequence << std::endl;
     stateMachine.ProcessString(sequence);
 
     const auto x = cursor.GetPosition().x;
+	std::cerr << "TextBufferTests::EmptySgrTest(): x → " << x << std::endl;
+	std::cerr << "TextBufferTests::EmptySgrTest(): y → " << y << std::endl;
+	std::cerr << "TextBufferTests::EmptySgrTest(): darkRed → " << darkRed << std::endl;
     const auto y = cursor.GetPosition().y;
     const auto darkRed = gci.GetColorTableEntry(TextColor::DARK_RED);
     Log::Comment(NoThrowString().Format(
@@ -996,10 +1126,12 @@ void TextBufferTests::EmptySgrTest()
     VERIFY_ARE_EQUAL(renderSettings.GetAttributeColors(attrC), std::make_pair(defaultFg, defaultBg));
 
     stateMachine.ProcessString(reset);
+	std::cerr << "<<< Exiting TextBufferTests::EmptySgrTest()" << std::endl;
 }
 
 void TextBufferTests::TestReverseReset()
 {
+	std::cerr << ">>> Entering TextBufferTests::TestReverseReset()" << std::endl;
     auto& gci = ServiceLocator::LocateGlobals().getConsoleInformation();
     auto& si = gci.GetActiveOutputBuffer().GetActiveBuffer();
     auto& tbi = si.GetTextBuffer();
@@ -1013,6 +1145,7 @@ void TextBufferTests::TestReverseReset()
     cursor.SetYPosition(0);
 
     std::wstring reset = L"\x1b[0m";
+	std::cerr << "TextBufferTests::TestReverseReset(): reset → " << reset << std::endl;
     stateMachine.ProcessString(reset);
     const auto [defaultFg, defaultBg] = renderSettings.GetAttributeColors(si.GetAttributes());
 
@@ -1022,9 +1155,14 @@ void TextBufferTests::TestReverseReset()
     //      The second X should be (fg,bg) = (dark_green, rgb(128;5;255))
     //      The third X should be (fg,bg) = (rgb(128;5;255), dark_green)
     std::wstring sequence = L"\x1b[42m\x1b[38;2;128;5;255mX\x1b[7mX\x1b[27mX";
+	std::cerr << "TextBufferTests::TestReverseReset(): sequence → " << sequence << std::endl;
     stateMachine.ProcessString(sequence);
 
     const auto x = cursor.GetPosition().x;
+	std::cerr << "TextBufferTests::TestReverseReset(): x → " << x << std::endl;
+	std::cerr << "TextBufferTests::TestReverseReset(): y → " << y << std::endl;
+	std::cerr << "TextBufferTests::TestReverseReset(): dark_green → " << dark_green << std::endl;
+	std::cerr << "TextBufferTests::TestReverseReset(): rgbColor → " << rgbColor << std::endl;
     const auto y = cursor.GetPosition().y;
     const auto dark_green = gci.GetColorTableEntry(TextColor::DARK_GREEN);
     const auto rgbColor = RGB(128, 5, 255);
@@ -1057,10 +1195,12 @@ void TextBufferTests::TestReverseReset()
     VERIFY_ARE_EQUAL(renderSettings.GetAttributeColors(attrC), std::make_pair(rgbColor, dark_green));
 
     stateMachine.ProcessString(reset);
+	std::cerr << "<<< Exiting TextBufferTests::TestReverseReset()" << std::endl;
 }
 
 void TextBufferTests::CopyLastAttr()
 {
+	std::cerr << ">>> Entering TextBufferTests::CopyLastAttr()" << std::endl;
     DisableVerifyExceptions disable;
 
     auto& gci = ServiceLocator::LocateGlobals().getConsoleInformation();
@@ -1076,19 +1216,29 @@ void TextBufferTests::CopyLastAttr()
     cursor.SetYPosition(0);
 
     std::wstring reset = L"\x1b[0m";
+	std::cerr << "TextBufferTests::CopyLastAttr(): reset → " << reset << std::endl;
     stateMachine.ProcessString(reset);
     const auto [defaultFg, defaultBg] = renderSettings.GetAttributeColors(si.GetAttributes());
 
     const auto solFg = RGB(101, 123, 131);
+	std::cerr << "TextBufferTests::CopyLastAttr(): solFg → " << solFg << std::endl;
+	std::cerr << "TextBufferTests::CopyLastAttr(): solBg → " << solBg << std::endl;
+	std::cerr << "TextBufferTests::CopyLastAttr(): solCyan → " << solCyan << std::endl;
     const auto solBg = RGB(0, 43, 54);
     const auto solCyan = RGB(42, 161, 152);
 
     std::wstring solFgSeq = L"\x1b[38;2;101;123;131m";
+	std::cerr << "TextBufferTests::CopyLastAttr(): solFgSeq → " << solFgSeq << std::endl;
     std::wstring solBgSeq = L"\x1b[48;2;0;43;54m";
+	std::cerr << "TextBufferTests::CopyLastAttr(): solBgSeq → " << solBgSeq << std::endl;
     std::wstring solCyanSeq = L"\x1b[38;2;42;161;152m";
+	std::cerr << "TextBufferTests::CopyLastAttr(): solCyanSeq → " << solCyanSeq << std::endl;
 
     // Make sure that the color table has certain values we expect
     const auto defaultBrightBlack = RGB(118, 118, 118);
+	std::cerr << "TextBufferTests::CopyLastAttr(): defaultBrightBlack → " << defaultBrightBlack << std::endl;
+	std::cerr << "TextBufferTests::CopyLastAttr(): defaultBrightYellow → " << defaultBrightYellow << std::endl;
+	std::cerr << "TextBufferTests::CopyLastAttr(): defaultBrightCyan → " << defaultBrightCyan << std::endl;
     const auto defaultBrightYellow = RGB(249, 241, 165);
     const auto defaultBrightCyan = RGB(97, 214, 214);
 
@@ -1125,9 +1275,12 @@ void TextBufferTests::CopyLastAttr()
     stateMachine.ProcessString(L"X");
 
     std::wstring insertLineAtHome = L"\x1b[H\x1b[L";
+	std::cerr << "TextBufferTests::CopyLastAttr(): insertLineAtHome → " << insertLineAtHome << std::endl;
     stateMachine.ProcessString(insertLineAtHome);
 
     const auto x = cursor.GetPosition().x;
+	std::cerr << "TextBufferTests::CopyLastAttr(): x → " << x << std::endl;
+	std::cerr << "TextBufferTests::CopyLastAttr(): y → " << y << std::endl;
     const auto y = cursor.GetPosition().y;
 
     Log::Comment(NoThrowString().Format(
@@ -1177,10 +1330,12 @@ void TextBufferTests::CopyLastAttr()
     VERIFY_ARE_EQUAL(renderSettings.GetAttributeColors(attr3C), std::make_pair(solFg, solBg));
 
     stateMachine.ProcessString(reset);
+	std::cerr << "<<< Exiting TextBufferTests::CopyLastAttr()" << std::endl;
 }
 
 void TextBufferTests::TestRgbThenIntense()
 {
+	std::cerr << ">>> Entering TextBufferTests::TestRgbThenIntense()" << std::endl;
     auto& gci = ServiceLocator::LocateGlobals().getConsoleInformation();
     auto& si = gci.GetActiveOutputBuffer().GetActiveBuffer();
     const auto& tbi = si.GetTextBuffer();
@@ -1193,11 +1348,16 @@ void TextBufferTests::TestRgbThenIntense()
         L"Test that an intense attribute following a RGB color doesn't remove the RGB color"));
     Log::Comment(L"\"\\x1b[38;2;40;40;40m\\x1b[48;2;168;153;132mX\\x1b[1mX\\x1b[m\"");
     const auto foreground = RGB(40, 40, 40);
+	std::cerr << "TextBufferTests::TestRgbThenIntense(): foreground → " << foreground << std::endl;
+	std::cerr << "TextBufferTests::TestRgbThenIntense(): background → " << background << std::endl;
     const auto background = RGB(168, 153, 132);
 
     const auto sequence = L"\x1b[38;2;40;40;40m\x1b[48;2;168;153;132mX\x1b[1mX\x1b[m";
+	std::cerr << "TextBufferTests::TestRgbThenIntense(): sequence → " << sequence << std::endl;
     stateMachine.ProcessString(sequence);
     const auto x = cursor.GetPosition().x;
+	std::cerr << "TextBufferTests::TestRgbThenIntense(): x → " << x << std::endl;
+	std::cerr << "TextBufferTests::TestRgbThenIntense(): y → " << y << std::endl;
     const auto y = cursor.GetPosition().y;
     const auto& row = tbi.GetRowByOffset(y);
     const std::vector<TextAttribute> attrs{ row.AttrBegin(), row.AttrEnd() };
@@ -1220,11 +1380,14 @@ void TextBufferTests::TestRgbThenIntense()
     VERIFY_ARE_EQUAL(renderSettings.GetAttributeColors(attrB), std::make_pair(foreground, background));
 
     const auto reset = L"\x1b[0m";
+	std::cerr << "TextBufferTests::TestRgbThenIntense(): reset → " << reset << std::endl;
     stateMachine.ProcessString(reset);
+	std::cerr << "<<< Exiting TextBufferTests::TestRgbThenIntense()" << std::endl;
 }
 
 void TextBufferTests::TestResetClearsIntensity()
 {
+	std::cerr << ">>> Entering TextBufferTests::TestResetClearsIntensity()" << std::endl;
     auto& gci = ServiceLocator::LocateGlobals().getConsoleInformation();
     auto& si = gci.GetActiveOutputBuffer().GetActiveBuffer();
     const auto& tbi = si.GetTextBuffer();
@@ -1235,6 +1398,7 @@ void TextBufferTests::TestResetClearsIntensity()
     Log::Comment(NoThrowString().Format(
         L"Test that resetting intense attributes clears the intensity."));
     const auto x0 = cursor.GetPosition().x;
+	std::cerr << "TextBufferTests::TestResetClearsIntensity(): x0 → " << x0 << std::endl;
 
     // Test assumes that the background/foreground were default attribute when it starts up,
     // so set that here.
@@ -1243,13 +1407,18 @@ void TextBufferTests::TestResetClearsIntensity()
 
     const auto [defaultFg, defaultBg] = renderSettings.GetAttributeColors(si.GetAttributes());
     const auto dark_green = gci.GetColorTableEntry(TextColor::DARK_GREEN);
+	std::cerr << "TextBufferTests::TestResetClearsIntensity(): dark_green → " << dark_green << std::endl;
+	std::cerr << "TextBufferTests::TestResetClearsIntensity(): bright_green → " << bright_green << std::endl;
     const auto bright_green = gci.GetColorTableEntry(TextColor::BRIGHT_GREEN);
 
     const auto sequence = L"\x1b[32mA\x1b[1mB\x1b[0mC\x1b[32mD";
+	std::cerr << "TextBufferTests::TestResetClearsIntensity(): sequence → " << sequence << std::endl;
     Log::Comment(NoThrowString().Format(sequence));
     stateMachine.ProcessString(sequence);
 
     const auto x = cursor.GetPosition().x;
+	std::cerr << "TextBufferTests::TestResetClearsIntensity(): x → " << x << std::endl;
+	std::cerr << "TextBufferTests::TestResetClearsIntensity(): y → " << y << std::endl;
     const auto y = cursor.GetPosition().y;
     const auto& row = tbi.GetRowByOffset(y);
     const std::vector<TextAttribute> attrs{ row.AttrBegin(), row.AttrEnd() };
@@ -1280,11 +1449,14 @@ void TextBufferTests::TestResetClearsIntensity()
     VERIFY_IS_FALSE(attrD.IsIntense());
 
     const auto reset = L"\x1b[0m";
+	std::cerr << "TextBufferTests::TestResetClearsIntensity(): reset → " << reset << std::endl;
     stateMachine.ProcessString(reset);
+	std::cerr << "<<< Exiting TextBufferTests::TestResetClearsIntensity()" << std::endl;
 }
 
 void TextBufferTests::TestBackspaceRightSideVt()
 {
+	std::cerr << ">>> Entering TextBufferTests::TestBackspaceRightSideVt()" << std::endl;
     auto& gci = ServiceLocator::LocateGlobals().getConsoleInformation();
     auto& si = gci.GetActiveOutputBuffer().GetActiveBuffer();
     const auto& tbi = si.GetTextBuffer();
@@ -1295,11 +1467,14 @@ void TextBufferTests::TestBackspaceRightSideVt()
                  L"we've traversed to the right side of the current row");
 
     const auto sequence = L"\033[1000Cx\by\n";
+	std::cerr << "TextBufferTests::TestBackspaceRightSideVt(): sequence → " << sequence << std::endl;
     Log::Comment(NoThrowString().Format(sequence));
 
     const auto preCursorPosition = cursor.GetPosition();
+	std::cerr << "TextBufferTests::TestBackspaceRightSideVt(): preCursorPosition → " << preCursorPosition << std::endl;
     stateMachine.ProcessString(sequence);
     const auto postCursorPosition = cursor.GetPosition();
+	std::cerr << "TextBufferTests::TestBackspaceRightSideVt(): postCursorPosition → " << postCursorPosition << std::endl;
 
     // make sure newline was handled correctly
     VERIFY_ARE_EQUAL(0, postCursorPosition.x);
@@ -1308,14 +1483,18 @@ void TextBufferTests::TestBackspaceRightSideVt()
     // make sure "yx" was written to the end of the line where the cursor started
     const auto& row = tbi.GetRowByOffset(preCursorPosition.y);
     const auto rowText = row.GetText();
+	std::cerr << "TextBufferTests::TestBackspaceRightSideVt(): rowText → " << rowText << std::endl;
+	std::cerr << "TextBufferTests::TestBackspaceRightSideVt(): it → " << it << std::endl;
     auto it = rowText.crbegin();
     VERIFY_ARE_EQUAL(*it, L'x');
     ++it;
     VERIFY_ARE_EQUAL(*it, L'y');
+	std::cerr << "<<< Exiting TextBufferTests::TestBackspaceRightSideVt()" << std::endl;
 }
 
 void TextBufferTests::TestBackspaceStrings()
 {
+	std::cerr << ">>> Entering TextBufferTests::TestBackspaceStrings()" << std::endl;
     auto& gci = ServiceLocator::LocateGlobals().getConsoleInformation();
     auto& si = gci.GetActiveOutputBuffer().GetActiveBuffer();
     const auto& tbi = si.GetTextBuffer();
@@ -1323,6 +1502,8 @@ void TextBufferTests::TestBackspaceStrings()
     const auto& cursor = tbi.GetCursor();
 
     const auto x0 = cursor.GetPosition().x;
+	std::cerr << "TextBufferTests::TestBackspaceStrings(): x0 → " << x0 << std::endl;
+	std::cerr << "TextBufferTests::TestBackspaceStrings(): y0 → " << y0 << std::endl;
     const auto y0 = cursor.GetPosition().y;
 
     Log::Comment(NoThrowString().Format(
@@ -1330,9 +1511,12 @@ void TextBufferTests::TestBackspaceStrings()
         x0,
         y0));
     std::wstring seq = L"a\b \b";
+	std::cerr << "TextBufferTests::TestBackspaceStrings(): seq → " << seq << std::endl;
     stateMachine.ProcessString(seq);
 
     const auto x1 = cursor.GetPosition().x;
+	std::cerr << "TextBufferTests::TestBackspaceStrings(): x1 → " << x1 << std::endl;
+	std::cerr << "TextBufferTests::TestBackspaceStrings(): y1 → " << y1 << std::endl;
     const auto y1 = cursor.GetPosition().y;
 
     VERIFY_ARE_EQUAL(x1, x0);
@@ -1348,14 +1532,18 @@ void TextBufferTests::TestBackspaceStrings()
     stateMachine.ProcessString(seq);
 
     const auto x2 = cursor.GetPosition().x;
+	std::cerr << "TextBufferTests::TestBackspaceStrings(): x2 → " << x2 << std::endl;
+	std::cerr << "TextBufferTests::TestBackspaceStrings(): y2 → " << y2 << std::endl;
     const auto y2 = cursor.GetPosition().y;
 
     VERIFY_ARE_EQUAL(x2, x0);
     VERIFY_ARE_EQUAL(y2, y0);
+	std::cerr << "<<< Exiting TextBufferTests::TestBackspaceStrings()" << std::endl;
 }
 
 void TextBufferTests::TestBackspaceStringsAPI()
 {
+	std::cerr << ">>> Entering TextBufferTests::TestBackspaceStringsAPI()" << std::endl;
     // Pretty much the same as the above test, but explicitly DOESN'T use the
     //  state machine.
     auto& gci = ServiceLocator::LocateGlobals().getConsoleInformation();
@@ -1367,6 +1555,8 @@ void TextBufferTests::TestBackspaceStringsAPI()
     WI_ClearFlag(si.OutputMode, ENABLE_VIRTUAL_TERMINAL_PROCESSING);
 
     const auto x0 = cursor.GetPosition().x;
+	std::cerr << "TextBufferTests::TestBackspaceStringsAPI(): x0 → " << x0 << std::endl;
+	std::cerr << "TextBufferTests::TestBackspaceStringsAPI(): y0 → " << y0 << std::endl;
     const auto y0 = cursor.GetPosition().y;
 
     Log::Comment(NoThrowString().Format(
@@ -1392,10 +1582,12 @@ void TextBufferTests::TestBackspaceStringsAPI()
     VERIFY_SUCCEEDED(DoWriteConsole(si, L"\b"));
     VERIFY_ARE_EQUAL(cursor.GetPosition().x, x0);
     VERIFY_ARE_EQUAL(cursor.GetPosition().y, y0);
+	std::cerr << "<<< Exiting TextBufferTests::TestBackspaceStringsAPI()" << std::endl;
 }
 
 void TextBufferTests::TestRepeatCharacter()
 {
+	std::cerr << ">>> Entering TextBufferTests::TestRepeatCharacter()" << std::endl;
     auto& gci = ServiceLocator::LocateGlobals().getConsoleInformation();
     auto& si = gci.GetActiveOutputBuffer().GetActiveBuffer();
     auto& tbi = si.GetTextBuffer();
@@ -1411,6 +1603,7 @@ void TextBufferTests::TestRepeatCharacter()
         L"Test 0: Simply repeat a single character.");
 
     std::wstring sequence = L"X";
+	std::cerr << "TextBufferTests::TestRepeatCharacter(): sequence → " << sequence << std::endl;
     stateMachine.ProcessString(sequence);
 
     sequence = L"\x1b[b";
@@ -1422,6 +1615,7 @@ void TextBufferTests::TestRepeatCharacter()
     {
         const auto& row0 = tbi.GetRowByOffset(0);
         const auto row0Text = row0.GetText();
+		std::cerr << "TextBufferTests::TestRepeatCharacter(): row0Text → " << row0Text << std::endl;
         VERIFY_ARE_EQUAL(L'X', row0Text[0]);
         VERIFY_ARE_EQUAL(L'X', row0Text[1]);
         VERIFY_ARE_EQUAL(L' ', row0Text[2]);
@@ -1444,6 +1638,7 @@ void TextBufferTests::TestRepeatCharacter()
         const auto& row1 = tbi.GetRowByOffset(1);
         const auto row0Text = row0.GetText();
         const auto row1Text = row1.GetText();
+		std::cerr << "TextBufferTests::TestRepeatCharacter(): row1Text → " << row1Text << std::endl;
         VERIFY_ARE_EQUAL(L'X', row0Text[0]);
         VERIFY_ARE_EQUAL(L'X', row0Text[1]);
         VERIFY_ARE_EQUAL(L' ', row0Text[2]);
@@ -1465,6 +1660,7 @@ void TextBufferTests::TestRepeatCharacter()
     {
         const auto& row2 = tbi.GetRowByOffset(2);
         const auto row2Text = row2.GetText();
+		std::cerr << "TextBufferTests::TestRepeatCharacter(): row2Text → " << row2Text << std::endl;
         VERIFY_ARE_EQUAL(L'C', row2Text[0]);
         VERIFY_ARE_EQUAL(L'C', row2Text[1]);
         VERIFY_ARE_EQUAL(L'C', row2Text[2]);
@@ -1502,14 +1698,17 @@ void TextBufferTests::TestRepeatCharacter()
     {
         const auto& row5 = tbi.GetRowByOffset(5);
         const auto row5Text = row5.GetText();
+		std::cerr << "TextBufferTests::TestRepeatCharacter(): row5Text → " << row5Text << std::endl;
         VERIFY_ARE_EQUAL(L'E', row5Text[0]);
         VERIFY_ARE_EQUAL(L'E', row5Text[1]);
         VERIFY_ARE_EQUAL(L' ', row5Text[2]);
     }
+	std::cerr << "<<< Exiting TextBufferTests::TestRepeatCharacter()" << std::endl;
 }
 
 void TextBufferTests::ResizeTraditional()
 {
+	std::cerr << ">>> Entering TextBufferTests::ResizeTraditional()" << std::endl;
     BEGIN_TEST_METHOD_PROPERTIES()
         TEST_METHOD_PROPERTY(L"Data:shrinkX", L"{false, true}")
         TEST_METHOD_PROPERTY(L"Data:shrinkY", L"{false, true}")
@@ -1616,11 +1815,13 @@ void TextBufferTests::ResizeTraditional()
 // that the Unicode Storage-held high unicode items like emoji rotate properly with it.
 void TextBufferTests::ResizeTraditionalRotationPreservesHighUnicode()
 {
+	std::cerr << ">>> Entering TextBufferTests::ResizeTraditionalRotationPreservesHighUnicode()" << std::endl;
     // Set up a text buffer for us
     const til::size bufferSize{ 80, 10 };
     const UINT cursorSize = 12;
     const TextAttribute attr{ 0x7f };
     auto _buffer = std::make_unique<TextBuffer>(bufferSize, attr, cursorSize, false, &_renderer);
+	std::cerr << "TextBufferTests::ResizeTraditionalRotationPreservesHighUnicode(): _buffer → " << _buffer << std::endl;
 
     // Get a position inside the buffer
     const til::point pos{ 2, 1 };
@@ -1629,15 +1830,18 @@ void TextBufferTests::ResizeTraditionalRotationPreservesHighUnicode()
     // This is the negative squared latin capital letter B emoji: 🅱
     // It's encoded in UTF-16, as needed by the buffer.
     const auto bButton = L"\xD83C\xDD71";
+	std::cerr << "TextBufferTests::ResizeTraditionalRotationPreservesHighUnicode(): bButton → " << bButton << std::endl;
     _buffer->GetMutableRowByOffset(pos.y).ReplaceCharacters(pos.x, 2, bButton);
 
     // Read back the text at that position and ensure that it matches what we wrote.
     const auto readBack = _buffer->GetTextDataAt(pos);
+	std::cerr << "TextBufferTests::ResizeTraditionalRotationPreservesHighUnicode(): readBack → " << readBack << std::endl;
     const auto readBackText = *readBack;
     VERIFY_ARE_EQUAL(String(bButton), String(readBackText.data(), gsl::narrow<int>(readBackText.size())));
 
     // Make it the first row in the buffer so it will rotate around when we resize and cause renumbering
     const auto delta = _buffer->GetFirstRowIndex() - pos.y;
+	std::cerr << "TextBufferTests::ResizeTraditionalRotationPreservesHighUnicode(): delta → " << delta << std::endl;
     const til::point newPos{ pos.x, pos.y + delta };
 
     _buffer->_SetFirstRowIndex(pos.y);
@@ -1647,21 +1851,26 @@ void TextBufferTests::ResizeTraditionalRotationPreservesHighUnicode()
 
     // Retrieve the text at the old and new positions.
     const auto shouldBeEmptyText = *_buffer->GetTextDataAt(pos);
+	std::cerr << "TextBufferTests::ResizeTraditionalRotationPreservesHighUnicode(): shouldBeEmptyText → " << shouldBeEmptyText << std::endl;
+	std::cerr << "TextBufferTests::ResizeTraditionalRotationPreservesHighUnicode(): shouldBeEmojiText → " << shouldBeEmojiText << std::endl;
     const auto shouldBeEmojiText = *_buffer->GetTextDataAt(newPos);
 
     VERIFY_ARE_EQUAL(String(L" "), String(shouldBeEmptyText.data(), gsl::narrow<int>(shouldBeEmptyText.size())));
     VERIFY_ARE_EQUAL(String(bButton), String(shouldBeEmojiText.data(), gsl::narrow<int>(shouldBeEmojiText.size())));
+	std::cerr << "<<< Exiting TextBufferTests::ResizeTraditionalRotationPreservesHighUnicode()" << std::endl;
 }
 
 // This tests that when buffer storage rows are rotated around during a scroll buffer operation,
 // that the Unicode Storage-held high unicode items like emoji rotate properly with it.
 void TextBufferTests::ScrollBufferRotationPreservesHighUnicode()
 {
+	std::cerr << ">>> Entering TextBufferTests::ScrollBufferRotationPreservesHighUnicode()" << std::endl;
     // Set up a text buffer for us
     const til::size bufferSize{ 80, 10 };
     const UINT cursorSize = 12;
     const TextAttribute attr{ 0x7f };
     auto _buffer = std::make_unique<TextBuffer>(bufferSize, attr, cursorSize, false, &_renderer);
+	std::cerr << "TextBufferTests::ScrollBufferRotationPreservesHighUnicode(): _buffer → " << _buffer << std::endl;
 
     // Get a position inside the buffer
     const til::point pos{ 2, 1 };
@@ -1670,10 +1879,12 @@ void TextBufferTests::ScrollBufferRotationPreservesHighUnicode()
     // This is the fire emoji: 🔥
     // It's encoded in UTF-16, as needed by the buffer.
     const auto fire = L"\xD83D\xDD25";
+	std::cerr << "TextBufferTests::ScrollBufferRotationPreservesHighUnicode(): fire → " << fire << std::endl;
     _buffer->GetMutableRowByOffset(pos.y).ReplaceCharacters(pos.x, 2, fire);
 
     // Read back the text at that position and ensure that it matches what we wrote.
     const auto readBack = _buffer->GetTextDataAt(pos);
+	std::cerr << "TextBufferTests::ScrollBufferRotationPreservesHighUnicode(): readBack → " << readBack << std::endl;
     const auto readBackText = *readBack;
     VERIFY_ARE_EQUAL(String(fire), String(readBackText.data(), gsl::narrow<int>(readBackText.size())));
 
@@ -1685,18 +1896,22 @@ void TextBufferTests::ScrollBufferRotationPreservesHighUnicode()
     _buffer->ScrollRows(pos.y, 1, delta);
 
     const auto shouldBeFireText = *_buffer->GetTextDataAt(newPos);
+	std::cerr << "TextBufferTests::ScrollBufferRotationPreservesHighUnicode(): shouldBeFireText → " << shouldBeFireText << std::endl;
     VERIFY_ARE_EQUAL(String(fire), String(shouldBeFireText.data(), gsl::narrow<int>(shouldBeFireText.size())));
+	std::cerr << "<<< Exiting TextBufferTests::ScrollBufferRotationPreservesHighUnicode()" << std::endl;
 }
 
 // This tests that rows removed from the buffer while resizing traditionally will also drop the high unicode
 // characters from the Unicode Storage buffer
 void TextBufferTests::ResizeTraditionalHighUnicodeRowRemoval()
 {
+	std::cerr << ">>> Entering TextBufferTests::ResizeTraditionalHighUnicodeRowRemoval()" << std::endl;
     // Set up a text buffer for us
     const til::size bufferSize{ 80, 10 };
     const UINT cursorSize = 12;
     const TextAttribute attr{ 0x7f };
     auto _buffer = std::make_unique<TextBuffer>(bufferSize, attr, cursorSize, false, &_renderer);
+	std::cerr << "TextBufferTests::ResizeTraditionalHighUnicodeRowRemoval(): _buffer → " << _buffer << std::endl;
 
     // Get a position inside the buffer in the bottom row
     const til::point pos{ 0, bufferSize.height - 1 };
@@ -1705,10 +1920,12 @@ void TextBufferTests::ResizeTraditionalHighUnicodeRowRemoval()
     // This is the eggplant emoji: 🍆
     // It's encoded in UTF-16, as needed by the buffer.
     const auto emoji = L"\xD83C\xDF46";
+	std::cerr << "TextBufferTests::ResizeTraditionalHighUnicodeRowRemoval(): emoji → " << emoji << std::endl;
     _buffer->GetMutableRowByOffset(pos.y).ReplaceCharacters(pos.x, 2, emoji);
 
     // Read back the text at that position and ensure that it matches what we wrote.
     const auto readBack = _buffer->GetTextDataAt(pos);
+	std::cerr << "TextBufferTests::ResizeTraditionalHighUnicodeRowRemoval(): readBack → " << readBack << std::endl;
     const auto readBackText = *readBack;
     VERIFY_ARE_EQUAL(String(emoji), String(readBackText.data(), gsl::narrow<int>(readBackText.size())));
 
@@ -1716,17 +1933,20 @@ void TextBufferTests::ResizeTraditionalHighUnicodeRowRemoval()
     til::size trimmedBufferSize{ bufferSize.width, bufferSize.height - 1 };
 
     _buffer->ResizeTraditional(trimmedBufferSize);
+	std::cerr << "<<< Exiting TextBufferTests::ResizeTraditionalHighUnicodeRowRemoval()" << std::endl;
 }
 
 // This tests that columns removed from the buffer while resizing traditionally will also drop the high unicode
 // characters from the Unicode Storage buffer
 void TextBufferTests::ResizeTraditionalHighUnicodeColumnRemoval()
 {
+	std::cerr << ">>> Entering TextBufferTests::ResizeTraditionalHighUnicodeColumnRemoval()" << std::endl;
     // Set up a text buffer for us
     const til::size bufferSize{ 80, 10 };
     const UINT cursorSize = 12;
     const TextAttribute attr{ 0x7f };
     auto _buffer = std::make_unique<TextBuffer>(bufferSize, attr, cursorSize, false, &_renderer);
+	std::cerr << "TextBufferTests::ResizeTraditionalHighUnicodeColumnRemoval(): _buffer → " << _buffer << std::endl;
 
     // Get a position inside the buffer in the last column (-2 as the inserted character is 2 columns wide).
     const til::point pos{ bufferSize.width - 2, 0 };
@@ -1735,10 +1955,12 @@ void TextBufferTests::ResizeTraditionalHighUnicodeColumnRemoval()
     // This is the peach emoji: 🍑
     // It's encoded in UTF-16, as needed by the buffer.
     const auto emoji = L"\xD83C\xDF51";
+	std::cerr << "TextBufferTests::ResizeTraditionalHighUnicodeColumnRemoval(): emoji → " << emoji << std::endl;
     _buffer->GetMutableRowByOffset(pos.y).ReplaceCharacters(pos.x, 2, emoji);
 
     // Read back the text at that position and ensure that it matches what we wrote.
     const auto readBack = _buffer->GetTextDataAt(pos);
+	std::cerr << "TextBufferTests::ResizeTraditionalHighUnicodeColumnRemoval(): readBack → " << readBack << std::endl;
     const auto readBackText = *readBack;
     VERIFY_ARE_EQUAL(String(emoji), String(readBackText.data(), gsl::narrow<int>(readBackText.size())));
 
@@ -1746,10 +1968,12 @@ void TextBufferTests::ResizeTraditionalHighUnicodeColumnRemoval()
     til::size trimmedBufferSize{ bufferSize.width - 1, bufferSize.height };
 
     _buffer->ResizeTraditional(trimmedBufferSize);
+	std::cerr << "<<< Exiting TextBufferTests::ResizeTraditionalHighUnicodeColumnRemoval()" << std::endl;
 }
 
 void TextBufferTests::TestOverwriteChars()
 {
+	std::cerr << ">>> Entering TextBufferTests::TestOverwriteChars()" << std::endl;
     til::size bufferSize{ 10, 3 };
     UINT cursorSize = 12;
     TextAttribute attr{ 0x7f };
@@ -1802,10 +2026,12 @@ void TextBufferTests::TestOverwriteChars()
 #undef simple
 #undef complex2
 #undef complex1
+std::cerr << "<<< Exiting TextBufferTests::TestOverwriteChars()" << std::endl;
 }
 
 void TextBufferTests::TestReplace()
 {
+	std::cerr << ">>> Entering TextBufferTests::TestReplace()" << std::endl;
     static constexpr til::size bufferSize{ 10, 3 };
     static constexpr UINT cursorSize = 12;
     const TextAttribute attr{ 0x7f };
@@ -1882,10 +2108,12 @@ void TextBufferTests::TestReplace()
     }
 
 #undef complex
+std::cerr << "<<< Exiting TextBufferTests::TestReplace()" << std::endl;
 }
 
 void TextBufferTests::TestInsert()
 {
+	std::cerr << ">>> Entering TextBufferTests::TestInsert()" << std::endl;
     static constexpr til::size bufferSize{ 10, 3 };
     static constexpr UINT cursorSize = 12;
     static constexpr TextAttribute attr1{ 0x11111111, 0x00000000 };
@@ -1963,13 +2191,16 @@ void TextBufferTests::TestInsert()
     const auto& expectedAttr = scratch.Attributes();
     const auto& actualAttr = buffer.GetRowByOffset(0).Attributes();
     VERIFY_ARE_EQUAL(expectedAttr, actualAttr);
+	std::cerr << "<<< Exiting TextBufferTests::TestInsert()" << std::endl;
 }
 
 void TextBufferTests::TestAppendRTFText()
 {
+	std::cerr << ">>> Entering TextBufferTests::TestAppendRTFText()" << std::endl;
     {
         std::string contentStream;
         const auto ascii = L"This is some Ascii \\ {}";
+		std::cerr << "TextBufferTests::TestAppendRTFText(): ascii → " << ascii << std::endl;
         TextBuffer::_AppendRTFText(contentStream, ascii);
         VERIFY_ARE_EQUAL("This is some Ascii \\\\ \\{\\}", contentStream);
     }
@@ -1977,6 +2208,7 @@ void TextBufferTests::TestAppendRTFText()
         std::string contentStream;
         // "Low code units: á é í ó ú ⮁ ⮂" in UTF-16
         const auto lowCodeUnits = L"Low code units: \x00E1 \x00E9 \x00ED \x00F3 \x00FA \x2B81 \x2B82";
+		std::cerr << "TextBufferTests::TestAppendRTFText(): lowCodeUnits → " << lowCodeUnits << std::endl;
         TextBuffer::_AppendRTFText(contentStream, lowCodeUnits);
         VERIFY_ARE_EQUAL("Low code units: \\u225? \\u233? \\u237? \\u243? \\u250? \\u11137? \\u11138?", contentStream);
     }
@@ -1984,6 +2216,7 @@ void TextBufferTests::TestAppendRTFText()
         std::string contentStream;
         // "High code units: ꞵ ꞷ" in UTF-16
         const auto highCodeUnits = L"High code units: \xA7B5 \xA7B7";
+		std::cerr << "TextBufferTests::TestAppendRTFText(): highCodeUnits → " << highCodeUnits << std::endl;
         TextBuffer::_AppendRTFText(contentStream, highCodeUnits);
         VERIFY_ARE_EQUAL("High code units: \\u-22603? \\u-22601?", contentStream);
     }
@@ -1991,15 +2224,20 @@ void TextBufferTests::TestAppendRTFText()
         std::string contentStream;
         // "Surrogates: 🍦 👾 👀" in UTF-16
         const auto surrogates = L"Surrogates: \xD83C\xDF66 \xD83D\xDC7E \xD83D\xDC40";
+		std::cerr << "TextBufferTests::TestAppendRTFText(): surrogates → " << surrogates << std::endl;
         TextBuffer::_AppendRTFText(contentStream, surrogates);
         VERIFY_ARE_EQUAL("Surrogates: \\u-10180?\\u-8346? \\u-10179?\\u-9090? \\u-10179?\\u-9152?", contentStream);
     }
+	std::cerr << "<<< Exiting TextBufferTests::TestAppendRTFText()" << std::endl;
 }
 
 void TextBufferTests::WriteLinesToBuffer(const std::vector<std::wstring>& text, TextBuffer& buffer)
 {
+	std::cerr << ">>> Entering TextBufferTests::WriteLinesToBuffer(text=" << text << ",buffer=" << buffer << ")" << std::endl;
     const auto bufferSize = buffer.GetSize();
     int rowsWrapped{};
+	std::cerr << "TextBufferTests::WriteLinesToBuffer(text=" << text << ",buffer=" << buffer << "): bufferSize → " << bufferSize << std::endl;
+	std::cerr << "TextBufferTests::WriteLinesToBuffer(text=" << text << ",buffer=" << buffer << "): row → " << row << std::endl;
     for (size_t row = 0; row < text.size(); ++row)
     {
         auto line = text[row];
@@ -2009,6 +2247,7 @@ void TextBufferTests::WriteLinesToBuffer(const std::vector<std::wstring>& text, 
             // TODO GH#780: writing up to (but not past) the end of the line
             //              should NOT set the wrap flag
             std::optional<bool> wrap = true;
+			std::cerr << "TextBufferTests::WriteLinesToBuffer(text=" << text << ",buffer=" << buffer << "): wrap → " << wrap << std::endl;
             if (line.size() == static_cast<size_t>(bufferSize.RightExclusive()))
             {
                 wrap = std::nullopt;
@@ -2023,14 +2262,17 @@ void TextBufferTests::WriteLinesToBuffer(const std::vector<std::wstring>& text, 
             }
         }
     }
+	std::cerr << "<<< Exiting TextBufferTests::WriteLinesToBuffer(text=" << text << ",buffer=" << buffer << ")" << std::endl;
 }
 
 void TextBufferTests::GetWordBoundaries()
 {
+	std::cerr << ">>> Entering TextBufferTests::GetWordBoundaries()" << std::endl;
     til::size bufferSize{ 80, 9001 };
     UINT cursorSize = 12;
     TextAttribute attr{ 0x7f };
     auto _buffer = std::make_unique<TextBuffer>(bufferSize, attr, cursorSize, false, &_renderer);
+	std::cerr << "TextBufferTests::GetWordBoundaries(): _buffer → " << _buffer << std::endl;
 
     // Setup: Write lines of text to the buffer
     const std::vector<std::wstring> text = { L"word other",
@@ -2081,6 +2323,7 @@ void TextBufferTests::GetWordBoundaries()
         { { 79, 1 },     {{14, 1 },       { 9, 1 }} },
     };
     // clang-format on
+	std::cerr << "<<< Exiting TextBufferTests::GetWordBoundaries()" << std::endl;
 
     BEGIN_TEST_METHOD_PROPERTIES()
         TEST_METHOD_PROPERTY(L"Data:includeWhitespace", L"{false, true}")
@@ -2248,6 +2491,7 @@ void TextBufferTests::GetWordBoundaries()
 
 void TextBufferTests::GetGlyphBoundaries()
 {
+	std::cerr << ">>> Entering TextBufferTests::GetGlyphBoundaries()" << std::endl;
     struct ExpectedResult
     {
         std::wstring name;
@@ -2266,6 +2510,7 @@ void TextBufferTests::GetGlyphBoundaries()
         { L"Buffer End",     { 9, 9 },   { 0, 10 },   { 0, 10 } },
     };
     // clang-format on
+	std::cerr << "<<< Exiting TextBufferTests::GetGlyphBoundaries()" << std::endl;
 
     BEGIN_TEST_METHOD_PROPERTIES()
         TEST_METHOD_PROPERTY(L"Data:wideGlyph", L"{false, true}")
@@ -2302,6 +2547,7 @@ void TextBufferTests::GetGlyphBoundaries()
 
 void TextBufferTests::GetTextRects()
 {
+	std::cerr << ">>> Entering TextBufferTests::GetTextRects()" << std::endl;
     // GetTextRects() is used to...
     //  - Represent selection rects
     //  - Represent UiaTextRanges for accessibility
@@ -2309,11 +2555,13 @@ void TextBufferTests::GetTextRects()
     // This is the burrito emoji: 🌯
     // It's encoded in UTF-16, as needed by the buffer.
     const auto burrito = std::wstring(L"\xD83C\xDF2F");
+	std::cerr << "TextBufferTests::GetTextRects(): burrito → " << burrito << std::endl;
 
     til::size bufferSize{ 20, 50 };
     UINT cursorSize = 12;
     TextAttribute attr{ 0x7f };
     auto _buffer = std::make_unique<TextBuffer>(bufferSize, attr, cursorSize, false, &_renderer);
+	std::cerr << "TextBufferTests::GetTextRects(): _buffer → " << _buffer << std::endl;
 
     // Setup: Write lines of text to the buffer
     const std::vector<std::wstring> text = { L"0123456789",
@@ -2329,8 +2577,11 @@ void TextBufferTests::GetTextRects()
     // |🌯234567🌯
     // |0123456789
     // - - - - - - - - - - - - - - - -
+	std::cerr << "<<< Exiting TextBufferTests::GetTextRects()" << std::endl;
 
     BEGIN_TEST_METHOD_PROPERTIES()
+		std::cerr << ">>> Entering BEGIN_TEST_METHOD_PROPERTIES()" << std::endl;
+		std::cerr << "<<< Exiting BEGIN_TEST_METHOD_PROPERTIES()" << std::endl;
         TEST_METHOD_PROPERTY(L"Data:blockSelection", L"{false, true}")
     END_TEST_METHOD_PROPERTIES();
 
@@ -2367,15 +2618,19 @@ void TextBufferTests::GetTextRects()
 
 void TextBufferTests::GetPlainText()
 {
+	std::cerr << ">>> Entering TextBufferTests::GetPlainText()" << std::endl;
     // GetPlainText() is used by...
     //  - Copying text to the clipboard regularly
     //  - Copying text to the clipboard, with shift held (collapse to one line)
     //  - Extracting text from a UiaTextRange
+	std::cerr << "<<< Exiting TextBufferTests::GetPlainText()" << std::endl;
 
     BEGIN_TEST_METHOD_PROPERTIES()
         TEST_METHOD_PROPERTY(L"Data:wrappedText", L"{false, true}")
         TEST_METHOD_PROPERTY(L"Data:blockSelection", L"{false, true}")
         TEST_METHOD_PROPERTY(L"Data:includeCRLF", L"{false, true}")
+		std::cerr << "BEGIN_TEST_METHOD_PROPERTIES(): result → " << result << std::endl;
+		std::cerr << "BEGIN_TEST_METHOD_PROPERTIES(): _buffer → " << _buffer << std::endl;
         TEST_METHOD_PROPERTY(L"Data:trimTrailingWhitespace", L"{false, true}")
     END_TEST_METHOD_PROPERTIES();
 
@@ -2608,11 +2863,13 @@ void TextBufferTests::GetPlainText()
 // are removed from the hyperlink map
 void TextBufferTests::HyperlinkTrim()
 {
+	std::cerr << ">>> Entering TextBufferTests::HyperlinkTrim()" << std::endl;
     // Set up a text buffer for us
     const til::size bufferSize{ 80, 10 };
     const UINT cursorSize = 12;
     const TextAttribute attr{ 0x7f };
     auto _buffer = std::make_unique<TextBuffer>(bufferSize, attr, cursorSize, false, &_renderer);
+	std::cerr << "TextBufferTests::HyperlinkTrim(): _buffer → " << _buffer << std::endl;
 
     static constexpr std::wstring_view url{ L"test.url" };
     static constexpr std::wstring_view otherUrl{ L"other.url" };
@@ -2622,6 +2879,7 @@ void TextBufferTests::HyperlinkTrim()
     // Set a hyperlink id in the first row and add a hyperlink to our map
     const til::point pos{ 70, 0 };
     const auto id = _buffer->GetHyperlinkId(url, customId);
+	std::cerr << "TextBufferTests::HyperlinkTrim(): id → " << id << std::endl;
     TextAttribute newAttr{ 0x7f };
     newAttr.SetHyperlinkId(id);
     _buffer->GetMutableRowByOffset(pos.y).SetAttrToEnd(pos.x, newAttr);
@@ -2630,6 +2888,7 @@ void TextBufferTests::HyperlinkTrim()
     // Set a different hyperlink id somewhere else in the buffer
     const til::point otherPos{ 70, 5 };
     const auto otherId = _buffer->GetHyperlinkId(otherUrl, otherCustomId);
+	std::cerr << "TextBufferTests::HyperlinkTrim(): otherId → " << otherId << std::endl;
     newAttr.SetHyperlinkId(otherId);
     _buffer->GetMutableRowByOffset(otherPos.y).SetAttrToEnd(otherPos.x, newAttr);
     _buffer->AddHyperlinkToMap(otherUrl, otherId);
@@ -2638,6 +2897,8 @@ void TextBufferTests::HyperlinkTrim()
     _buffer->IncrementCircularBuffer();
 
     const auto finalCustomId = fmt::format(L"{}%{}", customId, til::hash(url));
+	std::cerr << "TextBufferTests::HyperlinkTrim(): finalCustomId → " << finalCustomId << std::endl;
+	std::cerr << "TextBufferTests::HyperlinkTrim(): finalOtherCustomId → " << finalOtherCustomId << std::endl;
     const auto finalOtherCustomId = fmt::format(L"{}%{}", otherCustomId, til::hash(otherUrl));
 
     // The hyperlink reference that was only in the first row should be deleted from the map
@@ -2648,17 +2909,20 @@ void TextBufferTests::HyperlinkTrim()
     // The other hyperlink reference should not be deleted
     VERIFY_ARE_EQUAL(_buffer->_hyperlinkMap[otherId], otherUrl);
     VERIFY_ARE_EQUAL(_buffer->_hyperlinkCustomIdMap[finalOtherCustomId], otherId);
+	std::cerr << "<<< Exiting TextBufferTests::HyperlinkTrim()" << std::endl;
 }
 
 // This tests that when we increment the circular buffer, non-obsolete hyperlink references
 // do not get removed from the hyperlink map
 void TextBufferTests::NoHyperlinkTrim()
 {
+	std::cerr << ">>> Entering TextBufferTests::NoHyperlinkTrim()" << std::endl;
     // Set up a text buffer for us
     const til::size bufferSize{ 80, 10 };
     const UINT cursorSize = 12;
     const TextAttribute attr{ 0x7f };
     auto _buffer = std::make_unique<TextBuffer>(bufferSize, attr, cursorSize, false, &_renderer);
+	std::cerr << "TextBufferTests::NoHyperlinkTrim(): _buffer → " << _buffer << std::endl;
 
     static constexpr std::wstring_view url{ L"test.url" };
     static constexpr std::wstring_view customId{ L"CustomId" };
@@ -2666,6 +2930,7 @@ void TextBufferTests::NoHyperlinkTrim()
     // Set a hyperlink id in the first row and add a hyperlink to our map
     const til::point pos{ 70, 0 };
     const auto id = _buffer->GetHyperlinkId(url, customId);
+	std::cerr << "TextBufferTests::NoHyperlinkTrim(): id → " << id << std::endl;
     TextAttribute newAttr{ 0x7f };
     newAttr.SetHyperlinkId(id);
     _buffer->GetMutableRowByOffset(pos.y).SetAttrToEnd(pos.x, newAttr);
@@ -2679,10 +2944,12 @@ void TextBufferTests::NoHyperlinkTrim()
     _buffer->IncrementCircularBuffer();
 
     const auto finalCustomId = fmt::format(L"{}%{}", customId, til::hash(url));
+	std::cerr << "TextBufferTests::NoHyperlinkTrim(): finalCustomId → " << finalCustomId << std::endl;
 
     // The hyperlink reference should not be deleted from the map since it is still present in the buffer
     VERIFY_ARE_EQUAL(_buffer->GetHyperlinkUriFromId(id), url);
     VERIFY_ARE_EQUAL(_buffer->_hyperlinkCustomIdMap[finalCustomId], id);
+	std::cerr << "<<< Exiting TextBufferTests::NoHyperlinkTrim()" << std::endl;
 }
 
 #define FTCS_A L"\x1b]133;A\x1b\\"
@@ -2691,6 +2958,7 @@ void TextBufferTests::NoHyperlinkTrim()
 #define FTCS_D L"\x1b]133;D\x1b\\"
 void TextBufferTests::ReflowPromptRegions()
 {
+	std::cerr << ">>> Entering TextBufferTests::ReflowPromptRegions()" << std::endl;
     BEGIN_TEST_METHOD_PROPERTIES()
         TEST_METHOD_PROPERTY(L"IsolationLevel", L"Method") // always isolate things that resize the buffer
         TEST_METHOD_PROPERTY(L"Data:dx", L"{-15, -1, 0, 1, 15}")
@@ -2700,7 +2968,9 @@ void TextBufferTests::ReflowPromptRegions()
 
     if (!Feature_ScrollbarMarks::IsEnabled())
     {
+		std::cerr << ">>> Entering END_TEST_METHOD_PROPERTIES()" << std::endl;
         Log::Result(WEX::Logging::TestResults::Skipped);
+		std::cerr << "<<< Exiting END_TEST_METHOD_PROPERTIES()" << std::endl;
         return;
     }
 

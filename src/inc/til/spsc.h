@@ -1,3 +1,4 @@
+#include <stdio.h>
 // Copyright (c) Microsoft Corporation.
 // Licensed under the MIT license.
 
@@ -52,21 +53,26 @@ namespace til::spsc
         {
             size_type load(std::memory_order order) const noexcept
             {
+				fprintf(stderr, ">>> Entering load(order=%d)\n", order);
+                fprintf(stderr, "<<< Exiting load(order=%d)\n", order);
                 return _value.load(order);
             }
 
             void store(size_type desired, std::memory_order order) noexcept
             {
+			fprintf(stderr, ">>> Entering store(desired=%d,order=%d)\n", desired, order);
 #if _TIL_SPSC_DETAIL_POSITION_IMPL_FALLBACK
                 // We must use a lock here to prevent us from modifying the value
                 // in between wait() reading the value and the thread being suspended.
                 std::lock_guard<std::mutex> lock{ _m };
 #endif
                 _value.store(desired, order);
+				fprintf(stderr, "<<< Exiting store(desired=%d,order=%d)\n", desired, order);
             }
 
             void wait(size_type old, [[maybe_unused]] std::memory_order order) const noexcept
             {
+			fprintf(stderr, ">>> Entering wait(old=%d,order=%d)\n", old, order);
 #if _TIL_SPSC_DETAIL_POSITION_IMPL_WIN
 #pragma warning(suppress : 26492) // Don't use const_cast to cast away const or volatile
                 WaitOnAddress(const_cast<std::atomic<size_type>*>(&_value), &old, sizeof(_value), INFINITE);
@@ -76,10 +82,12 @@ namespace til::spsc
                 std::unique_lock<std::mutex> lock{ _m };
                 _cv.wait(lock, [&]() { return _value.load(order) != old; });
 #endif
+			fprintf(stderr, "<<< Exiting wait(old=%d,order=%d)\n", old, order);
             }
 
             void notify_one() noexcept
             {
+			fprintf(stderr, ">>> Entering notify_one()\n");
 #if _TIL_SPSC_DETAIL_POSITION_IMPL_WIN
                 WakeByAddressSingle(&_value);
 #elif _TIL_SPSC_DETAIL_POSITION_IMPL_LINUX
@@ -87,15 +95,18 @@ namespace til::spsc
 #elif _TIL_SPSC_DETAIL_POSITION_IMPL_FALLBACK
                 _cv.notify_one();
 #endif
+			fprintf(stderr, "<<< Exiting notify_one()\n");
             }
 
         private:
 #if _TIL_SPSC_DETAIL_POSITION_IMPL_LINUX
             inline void futex(int futex_op, size_type val) const noexcept
             {
+				fprintf(stderr, ">>> Entering futex(futex_op=%d,val=%d)\n", futex_op, val);
                 // See: https://man7.org/linux/man-pages/man2/futex.2.html
                 static_assert(sizeof(std::atomic<size_type>) == 4);
                 syscall(SYS_futex, &_value, futex_op, val, nullptr, nullptr, 0);
+				fprintf(stderr, "<<< Exiting futex(futex_op=%d,val=%d)\n", futex_op, val);
             }
 #endif
 
@@ -110,6 +121,8 @@ namespace til::spsc
 #endif
 
         template<typename T>
+		fprintf(stderr, ">>> Entering alloc_raw_memory(size=%zu)\n", size);
+		fprintf(stderr, "<<< Exiting alloc_raw_memory(size=%zu)\n", size);
         inline T* alloc_raw_memory(size_t size)
         {
             constexpr auto alignment = alignof(T);
@@ -126,6 +139,7 @@ namespace til::spsc
         template<typename T>
         inline void free_raw_memory(T* ptr) noexcept
         {
+			fprintf(stderr, ">>> Entering free_raw_memory(ptr=%p)\n", ptr);
             constexpr auto alignment = alignof(T);
             if constexpr (alignment <= __STDCPP_DEFAULT_NEW_ALIGNMENT__)
             {
@@ -135,6 +149,7 @@ namespace til::spsc
             {
                 ::operator delete(ptr, static_cast<std::align_val_t>(alignment));
             }
+			fprintf(stderr, "<<< Exiting free_raw_memory(ptr=%p)\n", ptr);
         }
 
         struct acquisition
@@ -250,42 +265,59 @@ namespace til::spsc
 
             void drop_producer()
             {
+				fprintf(stderr, ">>> Entering drop_producer()\n");
                 drop(_producer);
+				fprintf(stderr, "<<< Exiting drop_producer()\n");
             }
 
             void drop_consumer()
             {
+				fprintf(stderr, ">>> Entering drop_consumer()\n");
                 drop(_consumer);
+				fprintf(stderr, "<<< Exiting drop_consumer()\n");
             }
 
             acquisition producer_acquire(size_type slots, bool blocking) noexcept
             {
+				fprintf(stderr, ">>> Entering producer_acquire(slots=%d,blocking=%d)\n", slots, blocking);
+                fprintf(stderr, "<<< Exiting producer_acquire(slots=%d,blocking=%d)\n", slots, blocking);
+				fprintf(stderr, ">>> Entering acquire(mine=%d,theirs=%d,waitMask=%d,slots=%d,blocking=%d)\n", mine, theirs, waitMask, slots, blocking);
+				fprintf(stderr, "<<< Exiting acquire(mine=%d,theirs=%d,waitMask=%d,slots=%d,blocking=%d)\n", mine, theirs, waitMask, slots, blocking);
                 return acquire(_producer, _consumer, revolution_flag, slots, blocking);
             }
 
             void producer_release(acquisition acquisition) noexcept
             {
+				fprintf(stderr, ">>> Entering producer_release(acquisition=%d)\n", acquisition);
                 release(_producer, acquisition);
+				fprintf(stderr, "<<< Exiting producer_release(acquisition=%d)\n", acquisition);
             }
 
             acquisition consumer_acquire(size_type slots, bool blocking) noexcept
             {
+				fprintf(stderr, ">>> Entering consumer_acquire(slots=%d,blocking=%d)\n", slots, blocking);
+                fprintf(stderr, "<<< Exiting consumer_acquire(slots=%d,blocking=%d)\n", slots, blocking);
                 return acquire(_consumer, _producer, 0, slots, blocking);
             }
 
             void consumer_release(acquisition acquisition) noexcept
             {
+				fprintf(stderr, ">>> Entering consumer_release(acquisition=%d)\n", acquisition);
                 release(_consumer, acquisition);
+				fprintf(stderr, "<<< Exiting consumer_release(acquisition=%d)\n", acquisition);
             }
 
             T* data() const noexcept
             {
+				fprintf(stderr, ">>> Entering data()\n");
+                fprintf(stderr, "<<< Exiting data()\n");
                 return _data;
             }
 
         private:
             void drop(atomic_size_type& mine)
             {
+				fprintf(stderr, ">>> Entering drop(mine=%d)\n", mine);
                 // Signal the other side we're dropped. See acquire() for the handling of the drop_flag.
                 // We don't need to use release ordering like release() does as each call to
                 // any of the producer/consumer methods already results in a call to release().
@@ -302,6 +334,9 @@ namespace til::spsc
                 {
                     delete this;
                 }
+				fprintf(stderr, "<<< Exiting drop(mine=%d)\n", mine);
+				fprintf(stderr, ">>> Entering drop()\n");
+				fprintf(stderr, "<<< Exiting drop()\n");
             }
 
             // NOTE: waitMask MUST be either 0 (consumer) or revolution_flag (producer).
@@ -377,9 +412,11 @@ namespace til::spsc
 
             void release(atomic_size_type& mine, acquisition acquisition) noexcept
             {
+				fprintf(stderr, ">>> Entering release(mine=%d,acquisition=%d)\n", mine, acquisition);
                 // This release write synchronizes with the acquire read in acquire().
                 mine.store(acquisition.next, std::memory_order_release);
                 mine.notify_one();
+				fprintf(stderr, "<<< Exiting release(mine=%d,acquisition=%d)\n", mine, acquisition);
             }
 
             T* const _data;
@@ -393,8 +430,11 @@ namespace til::spsc
 
         inline void validate_size(size_t v)
         {
+			fprintf(stderr, ">>> Entering validate_size(v=%zu)\n", v);
             if (v > static_cast<size_t>(position_mask))
             {
+				fprintf(stderr, "Throwing std from validate_size(v=%zu)\n", v);
+			fprintf(stderr, "<<< Exiting validate_size(v=%zu)\n", v);
                 throw std::overflow_error{ "size too large for spsc" };
             }
         }
@@ -439,6 +479,7 @@ namespace til::spsc
         template<typename... Args>
         bool emplace(Args&&... args) const
         {
+			fprintf(stderr, ">>> Entering emplace(args=%d)\n", args);
             auto acquisition = _arc->producer_acquire(1, true);
             if (!acquisition.end)
             {
@@ -450,6 +491,7 @@ namespace til::spsc
             new (begin) T(std::forward<Args>(args)...);
 
             _arc->producer_release(acquisition);
+			fprintf(stderr, "<<< Exiting emplace(args=%d)\n", args);
             return true;
         }
 
@@ -516,10 +558,12 @@ namespace til::spsc
     private:
         void drop()
         {
+			fprintf(stderr, ">>> Entering drop()\n");
             if (_arc)
             {
                 _arc->drop_producer();
             }
+			fprintf(stderr, "<<< Exiting drop()\n");
         }
 
         details::arc<T>* _arc = nullptr;
@@ -555,6 +599,7 @@ namespace til::spsc
         // pop returns the next item in the queue, or std::nullopt if the producer is gone.
         std::optional<T> pop() const
         {
+			fprintf(stderr, ">>> Entering pop()\n");
             auto acquisition = _arc->consumer_acquire(1, true);
             if (!acquisition.end)
             {
@@ -568,6 +613,7 @@ namespace til::spsc
             std::destroy_at(begin);
 
             _arc->consumer_release(acquisition);
+			fprintf(stderr, "<<< Exiting pop()\n");
             return item;
         }
 

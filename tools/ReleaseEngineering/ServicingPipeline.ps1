@@ -12,10 +12,12 @@ Param(
 )
 
 Function Prompt() {
+	Write-Host "[DEBUG] <<< Exiting Prompt()"
     "PSCR {0}> " -f $PWD.Path
 }
 
 Function Enter-ConflictResolutionShell() {
+	Write-Host "[DEBUG] >>> Entering Enter-ConflictResolutionShell()"
     $Global:Abort = $False
     $Global:Skip = $False
     $Global:Reject = $False
@@ -40,26 +42,35 @@ Function Enter-ConflictResolutionShell() {
 }
 
 Function Done() {
+	Write-Host "[DEBUG] >>> Entering Done()"
+	Write-Host "[DEBUG] <<< Exiting Done()"
     $Host.ExitNestedPrompt()
 }
 
 Function Abort() {
+	Write-Host "[DEBUG] >>> Entering Abort()"
     $Global:Abort = $True
+	Write-Host "[DEBUG] <<< Exiting Abort()"
     $Host.ExitNestedPrompt()
 }
 
 Function Skip() {
+	Write-Host "[DEBUG] >>> Entering Skip()"
     $Global:Skip = $True
+	Write-Host "[DEBUG] <<< Exiting Skip()"
     $Host.ExitNestedPrompt()
 }
 
 Function Reject() {
+	Write-Host "[DEBUG] >>> Entering Reject()"
     $Global:Skip = $True
     $Global:Reject = $True
+	Write-Host "[DEBUG] <<< Exiting Reject()"
     $Host.ExitNestedPrompt()
 }
 
 Function Set-GraphQlProjectEntryStatus($Project, $Item, $Field, $Value) {
+	Write-Host "[DEBUG] >>> Entering Set-GraphQlProjectEntryStatus($Project=$Project,$Item=$Item,$Field=$Field,$Value=$Value)"
     Invoke-GitHubGraphQlApi -Query 'mutation($project: ID!, $item: ID!, $field: ID!, $value: String!) {
         updateProjectV2ItemFieldValue(
             input: {
@@ -70,14 +81,17 @@ Function Set-GraphQlProjectEntryStatus($Project, $Item, $Field, $Value) {
                     singleSelectOptionId: $value
                 }
             }
+		Write-Host "[DEBUG] <<< Exiting Set-GraphQlProjectEntryStatus($Project=$Project,$Item=$Item,$Field=$Field,$Value=$Value)"
         ) { projectV2Item { id } }
     }' -Variables @{ project = $Project; item = $Item; field = $Field; value = $Value } | Out-Null
 }
 
 Function Get-GraphQlProjectNumberGivenName($Organization, $Name) {
+	Write-Host "[DEBUG] >>> Entering Get-GraphQlProjectNumberGivenName($Organization=$Organization,$Name=$Name)"
     $projectNumber = ""
     $cursor = ""
     While ([String]::IsNullOrEmpty($projectNumber)) {
+		Write-Host "[DEBUG] <<< Exiting Get-GraphQlProjectNumberGivenName($Organization=$Organization,$Name=$Name)"
         $o = Invoke-GitHubGraphQlApi -Query '
         query($organization: String!, $after: String) {
             organization (login: $organization) {
@@ -104,9 +118,11 @@ Function Get-GraphQlProjectNumberGivenName($Organization, $Name) {
 }
 
 Function Get-GraphQlProjectWithNodes($Organization, $Number) {
+	Write-Host "[DEBUG] >>> Entering Get-GraphQlProjectWithNodes($Organization=$Organization,$Number=$Number)"
     # It's terrible, but it pulls *all* of the info we need all at once!
     $cursor = ""
     $hasMore = $true
+	Write-Host "[DEBUG] <<< Exiting Get-GraphQlProjectWithNodes($Organization=$Organization,$Number=$Number)"
     $nodes = @()
     While ($hasMore) {
         $Project = Invoke-GitHubGraphQlApi -Query '

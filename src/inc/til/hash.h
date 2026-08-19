@@ -1,3 +1,4 @@
+#include <stdio.h>
 // Copyright (c) Microsoft Corporation.
 // Licensed under the MIT license.
 
@@ -37,7 +38,9 @@ namespace til
         template<typename T>
         hasher& write(const T& v) noexcept
         {
+			fprintf(stderr, ">>> Entering write(v=%d)\n", v);
             hash_trait<T>{}(*this, v);
+			fprintf(stderr, "<<< Exiting write(v=%d)\n", v);
             return *this;
         }
 
@@ -55,6 +58,8 @@ namespace til
 
         constexpr size_t finalize() const noexcept
         {
+			fprintf(stderr, ">>> Entering finalize()\n");
+            fprintf(stderr, "<<< Exiting finalize()\n");
             return _hash;
         }
 
@@ -63,22 +68,28 @@ namespace til
 
         static uint32_t _wyr24(const uint8_t* p, uint32_t k) noexcept
         {
+			fprintf(stderr, ">>> Entering _wyr24(p=%p,k=%p)\n", p, k);
+            fprintf(stderr, "<<< Exiting _wyr24(p=%p,k=%p)\n", p, k);
             return static_cast<uint32_t>(p[0]) << 16 | static_cast<uint32_t>(p[k >> 1]) << 8 | p[k - 1];
         }
 
         static uint32_t _wyr32(const uint8_t* p) noexcept
         {
+			fprintf(stderr, ">>> Entering _wyr32(p=%p)\n", p);
             uint32_t v;
             memcpy(&v, p, 4);
+			fprintf(stderr, "<<< Exiting _wyr32(p=%p)\n", p);
             return v;
         }
 
         static void _wymix32(uint32_t* a, uint32_t* b) noexcept
         {
+			fprintf(stderr, ">>> Entering _wymix32(a=%p,b=%p)\n", a, b);
             uint64_t c = *a ^ UINT32_C(0x53c5ca59);
             c *= *b ^ UINT32_C(0x74743c1b);
             *a = static_cast<uint32_t>(c);
             *b = static_cast<uint32_t>(c >> 32);
+			fprintf(stderr, "<<< Exiting _wymix32(a=%p,b=%p)\n", a, b);
         }
 
         static uint32_t _wyhash(const void* data, uint32_t len, uint32_t seed) noexcept
@@ -106,6 +117,14 @@ namespace til
 
             _wymix32(&seed, &see1);
             _wymix32(&seed, &see1);
+			fprintf(stderr, ">>> Entering hash(v=%d)\n", v);
+			fprintf(stderr, "<<< Exiting hash(v=%d)\n", v);
+			fprintf(stderr, "<<< Exiting hash(data=%p,len=%zu)\n", data, len);
+			fprintf(stderr, ">>> Entering _wyhash(data=%p,len=%p,seed=%d)\n", data, len, seed);
+			fprintf(stderr, "_wyhash(data=%p,len=%d,seed=%d): a → %d\n", data, len, seed, a);
+			fprintf(stderr, "_wyhash(data=%p,len=%d,seed=%d): b → %d\n", data, len, seed, b);
+			fprintf(stderr, "_wyhash(data=%p,len=%d,seed=%d): seed → %d\n", data, len, seed, seed);
+			fprintf(stderr, "<<< Exiting _wyhash(data=%p,len=%p,seed=%d)\n", data, len, seed);
             return seed ^ see1;
         }
 
@@ -113,25 +132,32 @@ namespace til
 
         static uint64_t _wyr3(const uint8_t* p, size_t k) noexcept
         {
+			fprintf(stderr, ">>> Entering _wyr3(p=%p,k=%zu)\n", p, k);
+            fprintf(stderr, "<<< Exiting _wyr3(p=%p,k=%zu)\n", p, k);
             return (static_cast<uint64_t>(p[0]) << 16) | (static_cast<uint64_t>(p[k >> 1]) << 8) | p[k - 1];
         }
 
         static uint64_t _wyr4(const uint8_t* p) noexcept
         {
+			fprintf(stderr, ">>> Entering _wyr4(p=%p)\n", p);
             uint32_t v;
             memcpy(&v, p, 4);
+			fprintf(stderr, "<<< Exiting _wyr4(p=%p)\n", p);
             return v;
         }
 
         static uint64_t _wyr8(const uint8_t* p) noexcept
         {
+			fprintf(stderr, ">>> Entering _wyr8(p=%p)\n", p);
             uint64_t v;
             memcpy(&v, p, 8);
+			fprintf(stderr, "<<< Exiting _wyr8(p=%p)\n", p);
             return v;
         }
 
         static uint64_t _wymix(uint64_t lhs, uint64_t rhs) noexcept
         {
+		fprintf(stderr, ">>> Entering _wymix(lhs=%d,rhs=%d)\n", lhs, rhs);
 #if defined(TIL_HASH_X64)
             uint64_t hi;
             uint64_t lo = _umul128(lhs, rhs, &hi);
@@ -139,6 +165,7 @@ namespace til
             const uint64_t lo = lhs * rhs;
             const uint64_t hi = __umulh(lhs, rhs);
 #endif
+			fprintf(stderr, "<<< Exiting _wymix(lhs=%d,rhs=%d)\n", lhs, rhs);
             return lo ^ hi;
         }
 
@@ -177,7 +204,9 @@ namespace til
                 if (i > 48)
                 {
                     auto seed1 = seed;
+					fprintf(stderr, "_wyhash(data=%p,len=%d,seed=%d): seed1 → %d\n", data, len, seed, seed1);
                     auto seed2 = seed;
+					fprintf(stderr, "_wyhash(data=%p,len=%d,seed=%d): seed2 → %d\n", data, len, seed, seed2);
                     do
                     {
                         seed = _wymix(_wyr8(p) ^ s1, _wyr8(p + 8) ^ seed);
@@ -214,6 +243,8 @@ namespace til
             void operator()(hasher& h, const T& v) const noexcept
             {
                 h.write(static_cast<const void*>(&v), sizeof(T));
+				fprintf(stderr, ">>> Entering operator()\n");
+				fprintf(stderr, "<<< Exiting operator()\n");
             }
         };
 
@@ -238,8 +269,10 @@ namespace til
     {
         void operator()(hasher& h, float v) const noexcept
         {
+			fprintf(stderr, ">>> Entering operator()\n");
             v = v == 0.0f ? 0.0f : v; // map -0 to 0
             h.write(static_cast<const void*>(&v), sizeof(v));
+			fprintf(stderr, "<<< Exiting operator()\n");
         }
     };
 

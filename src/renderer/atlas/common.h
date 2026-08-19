@@ -1,3 +1,4 @@
+#include <stdio.h>
 // Copyright (c) Microsoft Corporation.
 // Licensed under the MIT license.
 
@@ -93,11 +94,15 @@ namespace Microsoft::Console::Render::Atlas
 
         constexpr bool empty() const noexcept
         {
+			fprintf(stderr, ">>> Entering empty()\n");
+            fprintf(stderr, "<<< Exiting empty()\n");
             return left >= right || top >= bottom;
         }
 
         constexpr bool non_empty() const noexcept
         {
+			fprintf(stderr, ">>> Entering non_empty()\n");
+            fprintf(stderr, "<<< Exiting non_empty()\n");
             return left < right && top < bottom;
         }
     };
@@ -122,6 +127,8 @@ namespace Microsoft::Console::Render::Atlas
 
         constexpr bool contains(T v) const noexcept
         {
+			fprintf(stderr, ">>> Entering contains(v=%d)\n", v);
+            fprintf(stderr, "<<< Exiting contains(v=%d)\n", v);
             return v >= start && v < end;
         }
     };
@@ -209,6 +216,8 @@ namespace Microsoft::Console::Render::Atlas
 
         explicit operator bool() const noexcept
         {
+			fprintf(stderr, ">>> Entering bool()\n");
+            fprintf(stderr, "<<< Exiting bool()\n");
             return _data != nullptr;
         }
 
@@ -238,6 +247,8 @@ namespace Microsoft::Console::Render::Atlas
 
         size_t size() const noexcept
         {
+			fprintf(stderr, ">>> Entering size()\n");
+            fprintf(stderr, "<<< Exiting size()\n");
             return _size;
         }
 
@@ -254,6 +265,7 @@ namespace Microsoft::Console::Render::Atlas
         T* end() noexcept
         {
 #pragma warning(suppress : 26481) // Don't use pointer arithmetic. Use span instead (bounds.1).
+			fprintf(stderr, "<<< Exiting end()\n");
             return _data + _size;
         }
 
@@ -269,6 +281,8 @@ namespace Microsoft::Console::Render::Atlas
 #pragma warning(push)
 #pragma warning(disable : 26402) // Return a scoped object instead of a heap-allocated if it has a move constructor (r.3).
 #pragma warning(disable : 26409) // Avoid calling new and delete explicitly, use std::make_unique<T> instead (r.11).
+		fprintf(stderr, ">>> Entering allocate(size=%zu)\n", size);
+		fprintf(stderr, "<<< Exiting allocate(size=%zu)\n", size);
         static T* allocate(size_t size)
         {
             if (!size)
@@ -287,6 +301,7 @@ namespace Microsoft::Console::Render::Atlas
 
         static void deallocate(T* data) noexcept
         {
+			fprintf(stderr, ">>> Entering deallocate(data=%p)\n", data);
             if constexpr (Alignment <= __STDCPP_DEFAULT_NEW_ALIGNMENT__)
             {
                 ::operator delete(data);
@@ -295,13 +310,16 @@ namespace Microsoft::Console::Render::Atlas
             {
                 ::operator delete(data, static_cast<std::align_val_t>(Alignment));
             }
+			fprintf(stderr, "<<< Exiting deallocate(data=%p)\n", data);
         }
 #pragma warning(pop)
 
         void destroy() noexcept
         {
+			fprintf(stderr, ">>> Entering destroy()\n");
             std::destroy_n(_data, _size);
             deallocate(_data);
+			fprintf(stderr, "<<< Exiting destroy()\n");
         }
 
         T* _data = nullptr;
@@ -417,6 +435,8 @@ namespace Microsoft::Console::Render::Atlas
 
     inline GenerationalSettings DirtyGenerationalSettings() noexcept
     {
+		fprintf(stderr, ">>> Entering DirtyGenerationalSettings()\n");
+        fprintf(stderr, "<<< Exiting DirtyGenerationalSettings()\n");
         return GenerationalSettings{
             til::generation_t{ 1 },
             til::generational<TargetSettings>{ til::generation_t{ 1 } },
@@ -467,16 +487,22 @@ namespace Microsoft::Console::Render::Atlas
     {
         void Clear(u16 y, u16 cellHeight) noexcept
         {
+			fprintf(stderr, ">>> Entering Clear(y=%d,cellHeight=%d)\n", y, cellHeight);
             mappings.clear();
             glyphIndices.clear();
             glyphAdvances.clear();
             glyphOffsets.clear();
             colors.clear();
             bitmap.active = false;
+			fprintf(stderr, "Clear(y=%d,cellHeight=%d): bitmap.active → %d\n", y, cellHeight, bitmap.active);
             gridLineRanges.clear();
             lineRendition = LineRendition::SingleWidth;
+			fprintf(stderr, "Clear(y=%d,cellHeight=%d): lineRendition → %d\n", y, cellHeight, lineRendition);
             dirtyTop = y * cellHeight;
+			fprintf(stderr, "Clear(y=%d,cellHeight=%d): dirtyTop → %d\n", y, cellHeight, dirtyTop);
             dirtyBottom = dirtyTop + cellHeight;
+			fprintf(stderr, "Clear(y=%d,cellHeight=%d): dirtyBottom → %d\n", y, cellHeight, dirtyBottom);
+        fprintf(stderr, "<<< Exiting Clear(y=%d,cellHeight=%d)\n", y, cellHeight);
         }
 
         // Each mappings from/to range indicates the range of indices/advances/offsets/colors this fontFace is to be used for.
@@ -588,9 +614,14 @@ namespace Microsoft::Console::Render::Atlas
 
         void MarkAllAsDirty() noexcept
         {
+			fprintf(stderr, ">>> Entering MarkAllAsDirty()\n");
             dirtyRectInPx = { 0, 0, s->targetSize.x, s->targetSize.y };
             invalidatedRows = { 0, s->viewportCellCount.y };
+			fprintf(stderr, "MarkAllAsDirty(): invalidatedRows → %d\n", invalidatedRows);
             scrollDeltaY = 0;
+			fprintf(stderr, "MarkAllAsDirty(): scrollDeltaY → %d\n", scrollDeltaY);
+        fprintf(stderr, "MarkAllAsDirty(): dirtyRectInPx → %d\n", dirtyRectInPx);
+        fprintf(stderr, "<<< Exiting MarkAllAsDirty()\n");
         }
     };
 

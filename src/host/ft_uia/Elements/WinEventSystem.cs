@@ -16,9 +16,11 @@ namespace Conhost.UIA.Tests.Elements
     using System.Threading.Tasks;
     using WEX.Logging.Interop;
     using WEX.TestExecution;
+	using Microsoft.Extensions.Logging;
 
     public interface IWinEventCallbacks
     {
+		private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
         void CaretSelection(int x, int y);
         void CaretVisible(int x, int y);
         void UpdateRegion(int left, int top, int right, int bottom);
@@ -33,7 +35,9 @@ namespace Conhost.UIA.Tests.Elements
     {
         public WinEventSystem(IWinEventCallbacks callbacks, uint pid)
         {
+			_logger.LogDebug(">>> Entering WinEventSystem(callbacks={Callbacks},pid={Pid})", callbacks, pid);
             this.AttachWinEventHook(callbacks, pid);
+			_logger.LogDebug("<<< Exiting WinEventSystem(callbacks={Callbacks},pid={Pid})", callbacks, pid);
         }
 
         ~WinEventSystem()
@@ -43,18 +47,23 @@ namespace Conhost.UIA.Tests.Elements
 
         public void Dispose()
         {
+			_logger.LogDebug(">>> Entering Dispose()");
             this.Dispose(true);
             GC.SuppressFinalize(this);
+			_logger.LogDebug("<<< Exiting Dispose()");
         }
 
         private bool isDisposed = false;
         protected virtual void Dispose(bool disposing)
         {
+			_logger.LogDebug(">>> Entering Dispose(disposing={Disposing})", disposing);
             if (!this.isDisposed)
             {
                 DetachWinEventHook();
                 this.isDisposed = true;
+				_logger.LogDebug("Dispose(disposing={Disposing}): this.isDisposed → {Arg1}", disposing, this.isDisposed);
             }
+			_logger.LogDebug("<<< Exiting Dispose(disposing={Disposing})", disposing);
         }
 
         bool messagePumpDone = false;
@@ -62,22 +71,32 @@ namespace Conhost.UIA.Tests.Elements
 
         private void AttachWinEventHook(IWinEventCallbacks callbacks, uint pid)
         {
+			_logger.LogDebug(">>> Entering AttachWinEventHook(callbacks={Callbacks},pid={Pid})", callbacks, pid);
             if (messagePumpTask == null)
             {
                 messagePumpDone = false;
+				_logger.LogDebug("AttachWinEventHook(callbacks={Callbacks},pid={Pid}): messagePumpDone → {MessagePumpDone}", callbacks, pid, messagePumpDone);
                 messagePumpTask = Task.Run(() => MessagePump(callbacks, pid));
             }
+			_logger.LogDebug("AttachWinEventHook(callbacks={Callbacks},pid={Pid}): messagePumpTask → {MessagePumpTask}", callbacks, pid, messagePumpTask);
+			_logger.LogDebug("<<< Exiting AttachWinEventHook(callbacks={Callbacks},pid={Pid})", callbacks, pid);
         }
 
         private void DetachWinEventHook()
         {
+			_logger.LogDebug(">>> Entering DetachWinEventHook()");
             if (messagePumpTask != null)
             {
                 messagePumpDone = true;
+				_logger.LogDebug("DetachWinEventHook(): messagePumpDone → {MessagePumpDone}", messagePumpDone);
                 messagePumpTask.Wait();
 
                 messagePumpTask = null;
+				_logger.LogDebug("DetachWinEventHook(): messagePumpTask → {MessagePumpTask}", messagePumpTask);
             }
+			_logger.LogDebug("<<< Exiting DetachWinEventHook()");
+			_logger.LogDebug(">>> Entering MessagePump(callbacks={Callbacks},pid={Pid})", callbacks, pid);
+			_logger.LogDebug("<<< Exiting MessagePump(callbacks={Callbacks},pid={Pid})", callbacks, pid);
         }
 
         // This must be public or marshalling cannot call back to it.
@@ -88,12 +107,17 @@ namespace Conhost.UIA.Tests.Elements
 
             public WinEventCallback(IWinEventCallbacks callbacks, uint pidOfInterest)
             {
+				_logger.LogDebug(">>> Entering WinEventCallback(callbacks={Callbacks},pidOfInterest={PidOfInterest})", callbacks, pidOfInterest);
                 this.pid = pidOfInterest;
                 this.callbacks = callbacks;
+				_logger.LogDebug("WinEventCallback(callbacks={Callbacks},pidOfInterest={PidOfInterest}): callbacks → {Callbacks1}", callbacks, pidOfInterest, callbacks);
+				_logger.LogDebug("WinEventCallback(callbacks={Callbacks},pidOfInterest={PidOfInterest}): this.pid → {Arg2}", callbacks, pidOfInterest, this.pid);
+				_logger.LogDebug("<<< Exiting WinEventCallback(callbacks={Callbacks},pidOfInterest={PidOfInterest})", callbacks, pidOfInterest);
             }
 
             public void WinEventProc(IntPtr hWinEventHook, User32.WinEventId eventType, IntPtr hwnd, int idObject, int idChild, uint dwEventThread, uint dwmsEventTime)
             {
+				_logger.LogDebug(">>> Entering WinEventProc(hWinEventHook={HWinEventHook},eventType={EventType},hwnd={Hwnd},idObject={IdObject},idChild={IdChild},dwEventThread={DwEventThread},dwmsEventTime={DwmsEventTime})", hWinEventHook, eventType, hwnd, idObject, idChild, dwEventThread, dwmsEventTime);
                 uint dwProcessId;
                 User32.GetWindowThreadProcessId(hwnd, out dwProcessId);
 
@@ -137,6 +161,7 @@ namespace Conhost.UIA.Tests.Elements
                         callbacks.EndApplication(idObject, idChild);
                         break;
                 }
+				_logger.LogDebug("<<< Exiting WinEventProc(hWinEventHook={HWinEventHook},eventType={EventType},hwnd={Hwnd},idObject={IdObject},idChild={IdChild},dwEventThread={DwEventThread},dwmsEventTime={DwmsEventTime})", hWinEventHook, eventType, hwnd, idObject, idChild, dwEventThread, dwmsEventTime);
             }
         }
 
@@ -145,6 +170,7 @@ namespace Conhost.UIA.Tests.Elements
             Log.Comment("Accessibility message pump thread started");
 
             WinEventCallback callback = new WinEventCallback(callbacks, pid);
+			_logger.LogDebug("MessagePump(callbacks={Callbacks},pid={Pid}): callback → {Callback}", callbacks, pid, callback);
 
             IntPtr hWinEventHook = User32.SetWinEventHook(
                       User32.WinEventId.EVENT_CONSOLE_CARET,

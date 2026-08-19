@@ -83,9 +83,11 @@ public:
     //      correctly filled in to match uiButton.
     TerminalInput::OutputType BuildDefaultTestOutput(const std::wstring_view& pwchTestOutput, unsigned int uiButton, short sModifierKeystate, short sScrollDelta)
     {
+		std::cerr << ">>> Entering BuildDefaultTestOutput(pwchTestOutput=" << pwchTestOutput << ",uiButton=" << uiButton << ",sModifierKeystate=" << sModifierKeystate << ",sScrollDelta=" << sScrollDelta << ")" << std::endl;
         TerminalInput::StringType str;
         str.append(pwchTestOutput);
         str[3] = GetDefaultCharFromButton(uiButton, sModifierKeystate, sScrollDelta);
+		std::cerr << "<<< Exiting BuildDefaultTestOutput(pwchTestOutput=" << pwchTestOutput << ",uiButton=" << uiButton << ",sModifierKeystate=" << sModifierKeystate << ",sScrollDelta=" << sScrollDelta << ")" << std::endl;
         return str;
     }
 
@@ -94,19 +96,23 @@ public:
     //      correctly filled in to match uiButton.
     TerminalInput::OutputType BuildSGRTestOutput(const wchar_t* pwchTestOutput, unsigned int uiButton, short sModifierKeystate, short sScrollDelta)
     {
+		std::cerr << ">>> Entering BuildSGRTestOutput(pwchTestOutput=" << pwchTestOutput << ",uiButton=" << uiButton << ",sModifierKeystate=" << sModifierKeystate << ",sScrollDelta=" << sScrollDelta << ")" << std::endl;
         wchar_t buffer[256];
         swprintf_s(buffer, pwchTestOutput, GetSgrCharFromButton(uiButton, sModifierKeystate, sScrollDelta));
 
         TerminalInput::StringType str;
         str.append(std::wstring_view{ buffer });
         str[str.size() - 1] = IsButtonUp(uiButton) ? L'm' : L'M';
+		std::cerr << "<<< Exiting BuildSGRTestOutput(pwchTestOutput=" << pwchTestOutput << ",uiButton=" << uiButton << ",sModifierKeystate=" << sModifierKeystate << ",sScrollDelta=" << sScrollDelta << ")" << std::endl;
         return str;
     }
 
     wchar_t GetDefaultCharFromButton(unsigned int uiButton, short sModifierKeystate, short sScrollDelta)
     {
+		std::cerr << ">>> Entering GetDefaultCharFromButton(uiButton=" << uiButton << ",sModifierKeystate=" << sModifierKeystate << ",sScrollDelta=" << sScrollDelta << ")" << std::endl;
         auto wch = L'\x0';
         Log::Comment(NoThrowString().Format(L"uiButton '%d'", uiButton));
+		std::cerr << "GetDefaultCharFromButton(uiButton=" << uiButton << ",sModifierKeystate=" << sModifierKeystate << ",sScrollDelta=" << sScrollDelta << "): wch → " << wch << std::endl;
         switch (uiButton)
         {
         case WM_LBUTTONDBLCLK:

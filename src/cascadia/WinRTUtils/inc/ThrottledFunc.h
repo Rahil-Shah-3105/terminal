@@ -1,3 +1,4 @@
+#include <stdio.h>
 // Copyright (c) Microsoft Corporation.
 // Licensed under the MIT license.
 
@@ -58,17 +59,21 @@ public:
     template<typename... MakeArgs>
     void Run(MakeArgs&&... args)
     {
+		fprintf(stderr, ">>> Entering Run(args=%d)\n", args);
         _lead(std::make_tuple(std::forward<MakeArgs>(args)...));
+		fprintf(stderr, "<<< Exiting Run(args=%d)\n", args);
     }
 
     template<typename F>
     void ModifyPending(F func)
     {
+		fprintf(stderr, ">>> Entering ModifyPending(func=%d)\n", func);
         const auto guard = _lock.lock_exclusive();
         if (_pendingRunArgs)
         {
             std::apply(func, *_pendingRunArgs);
         }
+		fprintf(stderr, "<<< Exiting ModifyPending(func=%d)\n", func);
     }
 
 private:
@@ -81,20 +86,25 @@ private:
 
     wil::unique_threadpool_timer _create_timer()
     {
+		fprintf(stderr, ">>> Entering _create_timer()\n");
         wil::unique_threadpool_timer timer{ CreateThreadpoolTimer(&_timer_callback, this, nullptr) };
         THROW_LAST_ERROR_IF(!timer);
+		fprintf(stderr, "<<< Exiting _create_timer()\n");
         return timer;
     }
 
     void _lead(std::tuple<Args...> args)
     {
+		fprintf(stderr, ">>> Entering _lead(args=%d)\n", args);
         bool timerRunning = false;
 
+		fprintf(stderr, "_lead(args=%d): timerRunning → %d\n", args, timerRunning);
         {
             const auto guard = _lock.lock_exclusive();
 
             timerRunning = _timerRunning;
             _timerRunning = true;
+			fprintf(stderr, "_lead(args=%d): _timerRunning → %d\n", args, _timerRunning);
 
             if (!timerRunning && _leading)
             {
@@ -118,27 +128,33 @@ private:
         {
             SetThreadpoolTimer(_timer.get(), &_delay, 0, 0);
         }
+		fprintf(stderr, "<<< Exiting _lead(args=%d)\n", args);
     }
 
     void _trail()
     {
+		fprintf(stderr, ">>> Entering _trail()\n");
         decltype(_pendingRunArgs) args;
 
         {
             const auto guard = _lock.lock_exclusive();
 
             _timerRunning = false;
+			fprintf(stderr, "_trail(): _timerRunning → %d\n", _timerRunning);
             args = std::exchange(_pendingRunArgs, std::nullopt);
         }
+		fprintf(stderr, "_trail(): args → %d\n", args);
 
         if (args)
         {
             _execute(std::move(*args), false);
         }
+		fprintf(stderr, "<<< Exiting _trail()\n");
     }
 
     void _execute(std::tuple<Args...> args, bool schedule)
     {
+		fprintf(stderr, ">>> Entering _execute(args=%d,schedule=%d)\n", args, schedule);
         _dispatcher.TryEnqueue(
             winrt::Windows::System::DispatcherQueuePriority::Normal,
             [weakSelf = this->weak_from_this(), args = std::move(args), schedule]() mutable {
@@ -156,6 +172,7 @@ private:
                     }
                 }
             });
+			fprintf(stderr, "<<< Exiting _execute(args=%d,schedule=%d)\n", args, schedule);
     }
 
     winrt::Windows::System::DispatcherQueue _dispatcher;

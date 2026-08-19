@@ -20,6 +20,7 @@ using Conhost.UIA.Tests.Common;
 using Conhost.UIA.Tests.Common.NativeMethods;
 using Conhost.UIA.Tests.Elements;
 using OpenQA.Selenium;
+using Microsoft.Extensions.Logging;
 
 
 namespace Conhost.UIA.Tests
@@ -27,12 +28,14 @@ namespace Conhost.UIA.Tests
     [TestClass]
     class KeyPressTests
     {
+		private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
         public TestContext TestContext { get; set; }
 
         [TestMethod]
         [TestProperty("Ignore", "True")] // GH#7282 - investigate and reenable
         public void VerifyCtrlKeysBash()
         {
+			_logger.LogDebug(">>> Entering VerifyCtrlKeysBash()");
             using (RegistryHelper reg = new RegistryHelper())
             {
                 reg.BackupRegistry();
@@ -67,12 +70,14 @@ namespace Conhost.UIA.Tests
                     }
                 }
             }
+			_logger.LogDebug("<<< Exiting VerifyCtrlKeysBash()");
         }
 
         [TestMethod]
         [TestProperty("Ignore", "True")] // GH#7282 - investigate and reenable
         public void VerifyCtrlCBash()
         {
+			_logger.LogDebug(">>> Entering VerifyCtrlCBash()");
             using (RegistryHelper reg = new RegistryHelper())
             {
                 reg.BackupRegistry();
@@ -107,11 +112,13 @@ namespace Conhost.UIA.Tests
                     }
                 }
             }
+			_logger.LogDebug("<<< Exiting VerifyCtrlCBash()");
         }
 
         [TestMethod]
         public void VerifyCtrlZCmd()
         {
+			_logger.LogDebug(">>> Entering VerifyCtrlZCmd()");
             using (RegistryHelper reg = new RegistryHelper())
             {
                 reg.BackupRegistry();
@@ -143,11 +150,13 @@ namespace Conhost.UIA.Tests
                     }
                 }
             }
+			_logger.LogDebug("<<< Exiting VerifyCtrlZCmd()");
         }
 
         [TestMethod]
         public void VerifyCtrlHCmd()
         {
+			_logger.LogDebug(">>> Entering VerifyCtrlHCmd()");
             using (RegistryHelper reg = new RegistryHelper())
             {
                 reg.BackupRegistry();
@@ -180,11 +189,13 @@ namespace Conhost.UIA.Tests
                     }
                 }
             }
+			_logger.LogDebug("<<< Exiting VerifyCtrlHCmd()");
         }
 
         [TestMethod]
         public void VerifyCtrlCCmd()
         {
+			_logger.LogDebug(">>> Entering VerifyCtrlCCmd()");
             using (RegistryHelper reg = new RegistryHelper())
             {
                 reg.BackupRegistry();
@@ -227,6 +238,7 @@ namespace Conhost.UIA.Tests
                     }
                 }
             }
+			_logger.LogDebug("<<< Exiting VerifyCtrlCCmd()");
         }
     }
 }

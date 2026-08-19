@@ -23,6 +23,7 @@ namespace Microsoft::Console::Render
     class Cluster
     {
     public:
+		std::cerr << "<<< Exiting Author(s=" << s << ")" << std::endl;
         constexpr Cluster() noexcept = default;
         constexpr Cluster(const std::wstring_view text, const til::CoordType columns) noexcept :
             _text{ text },
@@ -34,12 +35,14 @@ namespace Microsoft::Console::Render
         // This might replace the string with the replacement character if it doesn't fit as one wchar_t.
         constexpr wchar_t GetTextAsSingle() const noexcept
         {
+			std::cerr << ">>> Entering GetTextAsSingle()" << std::endl;
             if (_text.size() == 1)
             {
                 return til::at(_text, 0);
             }
             else
             {
+				std::cerr << "<<< Exiting GetTextAsSingle()" << std::endl;
                 return UNICODE_REPLACEMENT;
             }
         }
@@ -47,6 +50,8 @@ namespace Microsoft::Console::Render
         // Provides the string of wchar_ts for this cluster.
         constexpr std::wstring_view GetText() const noexcept
         {
+			std::cerr << ">>> Entering GetText()" << std::endl;
+			std::cerr << "<<< Exiting GetText()" << std::endl;
             return _text;
         }
 
@@ -54,6 +59,8 @@ namespace Microsoft::Console::Render
         // visually when rendered onto a line.
         constexpr til::CoordType GetColumns() const noexcept
         {
+			std::cerr << ">>> Entering GetColumns()" << std::endl;
+			std::cerr << "<<< Exiting GetColumns()" << std::endl;
             return _columns;
         }
 

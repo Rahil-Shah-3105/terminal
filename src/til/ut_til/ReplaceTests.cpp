@@ -31,6 +31,7 @@ class ReplaceTests
 
 void ReplaceTests::ReplaceStrings()
 {
+	std::cerr << ">>> Entering ReplaceTests::ReplaceStrings()" << std::endl;
     std::string foo{ "foo" };
 
     auto temp1 = til::replace_needle_in_haystack(foo, "f", "b");
@@ -38,10 +39,12 @@ void ReplaceTests::ReplaceStrings()
 
     auto temp2 = til::replace_needle_in_haystack(temp1, "o", "00");
     VERIFY_ARE_EQUAL("b0000", temp2);
+	std::cerr << "<<< Exiting ReplaceTests::ReplaceStrings()" << std::endl;
 }
 
 void ReplaceTests::ReplaceStringAndViews()
 {
+	std::cerr << ">>> Entering ReplaceTests::ReplaceStringAndViews()" << std::endl;
     std::string foo{ "foo" };
     std::string_view f{ "f" };
     std::string_view b{ "b" };
@@ -53,10 +56,12 @@ void ReplaceTests::ReplaceStringAndViews()
 
     auto temp2 = til::replace_needle_in_haystack(temp1, o, zeroZero);
     VERIFY_ARE_EQUAL("b0000", temp2);
+	std::cerr << "<<< Exiting ReplaceTests::ReplaceStringAndViews()" << std::endl;
 }
 
 void ReplaceTests::ReplaceStringsInplace()
 {
+	std::cerr << ">>> Entering ReplaceTests::ReplaceStringsInplace()" << std::endl;
     std::string foo{ "foo" };
 
     til::replace_needle_in_haystack_inplace(foo, "f", "b");
@@ -64,10 +69,12 @@ void ReplaceTests::ReplaceStringsInplace()
 
     til::replace_needle_in_haystack_inplace(foo, "o", "00");
     VERIFY_ARE_EQUAL("b0000", foo);
+	std::cerr << "<<< Exiting ReplaceTests::ReplaceStringsInplace()" << std::endl;
 }
 
 void ReplaceTests::ReplaceStringAndViewsInplace()
 {
+	std::cerr << ">>> Entering ReplaceTests::ReplaceStringAndViewsInplace()" << std::endl;
     std::string foo{ "foo" };
     std::string_view f{ "f" };
     std::string_view b{ "b" };
@@ -79,10 +86,12 @@ void ReplaceTests::ReplaceStringAndViewsInplace()
 
     til::replace_needle_in_haystack_inplace(foo, o, zeroZero);
     VERIFY_ARE_EQUAL("b0000", foo);
+	std::cerr << "<<< Exiting ReplaceTests::ReplaceStringAndViewsInplace()" << std::endl;
 }
 
 void ReplaceTests::ReplaceWstrings()
 {
+	std::cerr << ">>> Entering ReplaceTests::ReplaceWstrings()" << std::endl;
     std::wstring foo{ L"foo" };
 
     auto temp1 = til::replace_needle_in_haystack(foo, L"f", L"b");
@@ -90,10 +99,12 @@ void ReplaceTests::ReplaceWstrings()
 
     auto temp2 = til::replace_needle_in_haystack(temp1, L"o", L"00");
     VERIFY_ARE_EQUAL(L"b0000", temp2);
+	std::cerr << "<<< Exiting ReplaceTests::ReplaceWstrings()" << std::endl;
 }
 
 void ReplaceTests::ReplaceWstringAndViews()
 {
+	std::cerr << ">>> Entering ReplaceTests::ReplaceWstringAndViews()" << std::endl;
     std::wstring foo{ L"foo" };
     std::wstring_view f{ L"f" };
     std::wstring_view b{ L"b" };
@@ -105,10 +116,12 @@ void ReplaceTests::ReplaceWstringAndViews()
 
     auto temp2 = til::replace_needle_in_haystack(temp1, o, zeroZero);
     VERIFY_ARE_EQUAL(L"b0000", temp2);
+	std::cerr << "<<< Exiting ReplaceTests::ReplaceWstringAndViews()" << std::endl;
 }
 
 void ReplaceTests::ReplaceWstringsInplace()
 {
+	std::cerr << ">>> Entering ReplaceTests::ReplaceWstringsInplace()" << std::endl;
     std::wstring foo{ L"foo" };
 
     til::replace_needle_in_haystack_inplace(foo, L"f", L"b");
@@ -116,10 +129,12 @@ void ReplaceTests::ReplaceWstringsInplace()
 
     til::replace_needle_in_haystack_inplace(foo, L"o", L"00");
     VERIFY_ARE_EQUAL(L"b0000", foo);
+	std::cerr << "<<< Exiting ReplaceTests::ReplaceWstringsInplace()" << std::endl;
 }
 
 void ReplaceTests::ReplaceWstringAndViewsInplace()
 {
+	std::cerr << ">>> Entering ReplaceTests::ReplaceWstringAndViewsInplace()" << std::endl;
     std::wstring foo{ L"foo" };
     std::wstring_view f{ L"f" };
     std::wstring_view b{ L"b" };
@@ -131,4 +146,5 @@ void ReplaceTests::ReplaceWstringAndViewsInplace()
 
     til::replace_needle_in_haystack_inplace(foo, o, zeroZero);
     VERIFY_ARE_EQUAL(L"b0000", foo);
+	std::cerr << "<<< Exiting ReplaceTests::ReplaceWstringAndViewsInplace()" << std::endl;
 }

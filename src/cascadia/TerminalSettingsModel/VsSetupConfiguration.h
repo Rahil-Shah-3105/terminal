@@ -1,3 +1,4 @@
+#include <stdio.h>
 /*++
 Copyright (c) Microsoft Corporation
 Licensed under the MIT license.
@@ -43,16 +44,22 @@ namespace winrt::Microsoft::Terminal::Settings::Model
 
             std::wstring ResolvePath(std::wstring_view relativePath) const
             {
+				fprintf(stderr, ">>> Entering ResolvePath(relativePath=%d)\n", relativePath);
+                fprintf(stderr, "<<< Exiting ResolvePath(relativePath=%d)\n", relativePath);
                 return VsSetupConfiguration::ResolvePath(inst.get(), relativePath);
             }
 
             bool VersionInRange(std::wstring_view range) const
             {
+				fprintf(stderr, ">>> Entering VersionInRange(range=%d)\n", range);
+                fprintf(stderr, "<<< Exiting VersionInRange(range=%d)\n", range);
                 return InstallationVersionInRange(query.get(), inst.get(), range);
             }
 
             std::wstring GetVersion() const
             {
+				fprintf(stderr, ">>> Entering GetVersion()\n");
+                fprintf(stderr, "<<< Exiting GetVersion()\n");
                 return VsSetupConfiguration::GetInstallationVersion(inst.get());
             }
 
@@ -68,28 +75,36 @@ namespace winrt::Microsoft::Terminal::Settings::Model
 
             std::wstring GetInstallationPath() const
             {
+				fprintf(stderr, ">>> Entering GetInstallationPath()\n");
+                fprintf(stderr, "<<< Exiting GetInstallationPath()\n");
                 return VsSetupConfiguration::GetInstallationPath(inst.get());
             }
 
             std::wstring GetInstanceId() const
             {
+				fprintf(stderr, ">>> Entering GetInstanceId()\n");
+                fprintf(stderr, "<<< Exiting GetInstanceId()\n");
                 return VsSetupConfiguration::GetInstanceId(inst.get());
             }
 
             ComPtrPropertyStore GetInstancePropertyStore() const
             {
+				fprintf(stderr, ">>> Entering GetInstancePropertyStore()\n");
                 ComPtrPropertyStore properties;
                 inst.query_to<ISetupPropertyStore>(&properties);
+				fprintf(stderr, "<<< Exiting GetInstancePropertyStore()\n");
                 return properties;
             }
 
             ComPtrCustomPropertyStore GetCustomPropertyStore() const
             {
+				fprintf(stderr, ">>> Entering GetCustomPropertyStore()\n");
                 ComPtrSetupInstance2 instance2;
                 inst.query_to<ISetupInstance2>(&instance2);
                 ComPtrCustomPropertyStore properties;
                 if (FAILED(instance2->GetProperties(&properties)))
                 {
+				fprintf(stderr, "<<< Exiting GetCustomPropertyStore()\n");
                     return nullptr;
                 }
 
@@ -98,11 +113,13 @@ namespace winrt::Microsoft::Terminal::Settings::Model
 
             ComPtrCatalogPropertyStore GetCatalogPropertyStore() const
             {
+				fprintf(stderr, ">>> Entering GetCatalogPropertyStore()\n");
                 ComPtrInstanceCatalog instanceCatalog;
                 inst.query_to<ISetupInstanceCatalog>(&instanceCatalog);
                 ComPtrCatalogPropertyStore properties;
                 if (FAILED(instanceCatalog->GetCatalogInfo(&properties)))
                 {
+				fprintf(stderr, "<<< Exiting GetCatalogPropertyStore()\n");
                     return nullptr;
                 }
 
@@ -111,6 +128,8 @@ namespace winrt::Microsoft::Terminal::Settings::Model
 
             std::wstring GetProfileNameSuffix() const
             {
+				fprintf(stderr, ">>> Entering GetProfileNameSuffix()\n");
+                fprintf(stderr, "<<< Exiting GetProfileNameSuffix()\n");
                 return profileNameSuffix;
             }
 
@@ -135,6 +154,7 @@ namespace winrt::Microsoft::Terminal::Settings::Model
 
             std::wstring BuildProfileNameSuffix() const
             {
+				fprintf(stderr, ">>> Entering BuildProfileNameSuffix()\n");
                 auto catalogProperties = GetCatalogPropertyStore();
                 if (catalogProperties != nullptr)
                 {
@@ -163,6 +183,7 @@ namespace winrt::Microsoft::Terminal::Settings::Model
                         suffix.append(GetChannelNameSuffixTag(instanceProperties.get()));
                     }
 
+				fprintf(stderr, "<<< Exiting BuildProfileNameSuffix()\n");
                     return suffix;
                 }
 
@@ -187,6 +208,7 @@ namespace winrt::Microsoft::Terminal::Settings::Model
 
             static std::wstring GetChannelNameSuffixTag(ISetupPropertyStore* instanceProperties)
             {
+				fprintf(stderr, ">>> Entering GetChannelNameSuffixTag(instanceProperties=%p)\n", instanceProperties);
                 std::wstring tag;
                 auto channelName{ GetChannelName(instanceProperties) };
 
@@ -200,16 +222,20 @@ namespace winrt::Microsoft::Terminal::Settings::Model
                     tag.append(L" [" + channelName + L"]");
                 }
 
+				fprintf(stderr, "<<< Exiting GetChannelNameSuffixTag(instanceProperties=%p)\n", instanceProperties);
                 return tag;
             }
 
             static std::wstring GetChannelId(ISetupPropertyStore* instanceProperties)
             {
+				fprintf(stderr, ">>> Entering GetChannelId(instanceProperties=%p)\n", instanceProperties);
+                fprintf(stderr, "<<< Exiting GetChannelId(instanceProperties=%p)\n", instanceProperties);
                 return GetStringProperty(instanceProperties, L"channelId");
             }
 
             static std::wstring GetChannelName(ISetupPropertyStore* instanceProperties)
             {
+				fprintf(stderr, ">>> Entering GetChannelName(instanceProperties=%p)\n", instanceProperties);
                 auto channelId{ GetChannelId(instanceProperties) };
                 if (channelId.empty())
                 {
@@ -225,16 +251,21 @@ namespace winrt::Microsoft::Terminal::Settings::Model
                     channelName.append(channelId.substr(pos + 1));
                 }
 
+				fprintf(stderr, "<<< Exiting GetChannelName(instanceProperties=%p)\n", instanceProperties);
                 return channelName;
             }
 
             static std::wstring GetNickname(ISetupPropertyStore* customProperties)
             {
+				fprintf(stderr, ">>> Entering GetNickname(customProperties=%p)\n", customProperties);
+                fprintf(stderr, "<<< Exiting GetNickname(customProperties=%p)\n", customProperties);
                 return GetStringProperty(customProperties, L"nickname");
             }
 
             static std::wstring GetProductLineVersion(ISetupPropertyStore* customProperties)
             {
+				fprintf(stderr, ">>> Entering GetProductLineVersion(customProperties=%p)\n", customProperties);
+                fprintf(stderr, "<<< Exiting GetProductLineVersion(customProperties=%p)\n", customProperties);
                 return GetStringProperty(customProperties, L"productLineVersion");
             }
         };

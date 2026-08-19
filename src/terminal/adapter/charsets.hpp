@@ -19,10 +19,12 @@ namespace Microsoft::Console::VirtualTerminal
     public:
         constexpr CharSet(const std::initializer_list<std::pair<wchar_t, wchar_t>> replacements)
         {
+			std::cerr << ">>> Entering CharSet(replacements=" << replacements << ")" << std::endl;
             for (auto i = L'\0'; i < gsl::narrow_cast<wchar_t>(_translationTable.size()); i++)
                 _translationTable.at(i) = BaseChar + i;
             for (auto replacement : replacements)
                 _translationTable.at(replacement.first - BaseChar) = replacement.second;
+				std::cerr << "<<< Exiting CharSet(replacements=" << replacements << ")" << std::endl;
         }
         constexpr operator const std::wstring_view() const
         {

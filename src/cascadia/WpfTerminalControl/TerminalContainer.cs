@@ -11,6 +11,7 @@ namespace Microsoft.Terminal.Wpf
     using System.Windows.Automation.Peers;
     using System.Windows.Interop;
     using System.Windows.Media;
+	using Microsoft.Extensions.Logging;
 
     /// <summary>
     /// The container class that hosts the native hwnd terminal.
@@ -20,6 +21,7 @@ namespace Microsoft.Terminal.Wpf
     /// </remarks>
     public class TerminalContainer : HwndHost
     {
+		private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
         private ITerminalConnection connection;
         private IntPtr hwnd;
         private IntPtr terminal;
@@ -31,6 +33,7 @@ namespace Microsoft.Terminal.Wpf
         /// </summary>
         public TerminalContainer()
         {
+			_logger.LogDebug(">>> Entering TerminalContainer()");
             // WPF & TSF can't deal with us setting TF_TMAE_CONSOLE on the UI thread.
             // It simply crashes on Windows 10 if you use the Emoji picker.
             // (On later versions of Windows it just doesn't work.)
@@ -39,6 +42,8 @@ namespace Microsoft.Terminal.Wpf
             this.MessageHook += this.TerminalContainer_MessageHook;
             this.GotFocus += this.TerminalContainer_GotFocus;
             this.Focusable = true;
+			_logger.LogDebug("TerminalContainer(): this.Focusable → {Arg0}", this.Focusable);
+			_logger.LogDebug("<<< Exiting TerminalContainer()");
         }
 
         /// <summary>
@@ -126,7 +131,9 @@ namespace Microsoft.Terminal.Wpf
         /// <param name="viewTop">The top line to show in the terminal.</param>
         internal void UserScroll(int viewTop)
         {
+			_logger.LogDebug(">>> Entering UserScroll(viewTop={ViewTop})", viewTop);
             NativeMethods.TerminalUserScroll(this.terminal, viewTop);
+			_logger.LogDebug("<<< Exiting UserScroll(viewTop={ViewTop})", viewTop);
         }
 
         /// <summary>
@@ -137,8 +144,10 @@ namespace Microsoft.Terminal.Wpf
         /// <param name="fontSize">The font size to use in the terminal.</param>
         internal void SetTheme(TerminalTheme theme, string fontFamily, short fontSize)
         {
+			_logger.LogDebug(">>> Entering SetTheme(theme={Theme},fontFamily={FontFamily},fontSize={FontSize})", theme, fontFamily, fontSize);
             var dpiScale = VisualTreeHelper.GetDpi(this);
 
+			_logger.LogDebug("SetTheme(theme={Theme},fontFamily={FontFamily},fontSize={FontSize}): dpiScale → {DpiScale}", theme, fontFamily, fontSize, dpiScale);
             NativeMethods.TerminalSetTheme(this.terminal, theme, fontFamily, fontSize, (int)dpiScale.PixelsPerInchX);
 
             // Validate before resizing that we have a non-zero size.
@@ -147,6 +156,7 @@ namespace Microsoft.Terminal.Wpf
             {
                 this.Resize(this.TerminalControlSize);
             }
+			_logger.LogDebug("<<< Exiting SetTheme(theme={Theme},fontFamily={FontFamily},fontSize={FontSize})", theme, fontFamily, fontSize);
         }
 
         /// <summary>
@@ -155,8 +165,10 @@ namespace Microsoft.Terminal.Wpf
         /// <returns>The selected text, empty if no text is selected.</returns>
         internal string GetSelectedText()
         {
+			_logger.LogDebug(">>> Entering GetSelectedText()");
             if (NativeMethods.TerminalIsSelectionActive(this.terminal))
             {
+			_logger.LogDebug("<<< Exiting GetSelectedText()");
                 return NativeMethods.TerminalGetSelection(this.terminal);
             }
 
@@ -169,8 +181,10 @@ namespace Microsoft.Terminal.Wpf
         /// <param name="renderSize">Size of the rendering window.</param>
         internal void Resize(Size renderSize)
         {
+			_logger.LogDebug(">>> Entering Resize(renderSize={RenderSize})", renderSize);
             if (renderSize.Width == 0 || renderSize.Height == 0)
             {
+				_logger.LogWarning("Throwing ArgumentException from Resize(renderSize={RenderSize})", renderSize);
                 throw new ArgumentException("Terminal column or row count cannot be 0.", nameof(renderSize));
             }
 
@@ -181,10 +195,14 @@ namespace Microsoft.Terminal.Wpf
                 out NativeMethods.TilSize dimensions);
 
             this.Rows = dimensions.Y;
+			_logger.LogDebug("Resize(renderSize={RenderSize}): this.Rows → {Arg1}", renderSize, this.Rows);
             this.Columns = dimensions.X;
             this.TerminalRendererSize = renderSize;
+			_logger.LogDebug("Resize(renderSize={RenderSize}): this.Columns → {Arg1}", renderSize, this.Columns);
+			_logger.LogDebug("Resize(renderSize={RenderSize}): this.TerminalRendererSize → {Arg1}", renderSize, this.TerminalRendererSize);
 
             this.Connection?.Resize((uint)dimensions.Y, (uint)dimensions.X);
+			_logger.LogDebug("<<< Exiting Resize(renderSize={RenderSize})", renderSize);
         }
 
         /// <summary>
@@ -194,8 +212,10 @@ namespace Microsoft.Terminal.Wpf
         /// <param name="columns">Number of columns to show.</param>
         internal void Resize(uint rows, uint columns)
         {
+			_logger.LogDebug(">>> Entering Resize(rows={Rows},columns={Columns})", rows, columns);
             if (rows == 0)
             {
+				_logger.LogWarning("Throwing ArgumentException from Resize(rows={Rows},columns={Columns})", rows, columns);
                 throw new ArgumentException("Terminal row count cannot be 0.", nameof(rows));
             }
 
@@ -213,15 +233,19 @@ namespace Microsoft.Terminal.Wpf
             NativeMethods.TerminalTriggerResizeWithDimension(this.terminal, dimensions, out var dimensionsInPixels);
 
             this.Columns = dimensions.X;
+			_logger.LogDebug("Resize(rows={Rows},columns={Columns}): this.Columns → {Arg2}", rows, columns, this.Columns);
             this.Rows = dimensions.Y;
 
+			_logger.LogDebug("Resize(rows={Rows},columns={Columns}): this.Rows → {Arg2}", rows, columns, this.Rows);
             this.TerminalRendererSize = new Size
             {
                 Width = dimensionsInPixels.X,
                 Height = dimensionsInPixels.Y,
             };
+			_logger.LogDebug("Resize(rows={Rows},columns={Columns}): this.TerminalRendererSize → {Arg2}", rows, columns, this.TerminalRendererSize);
 
             this.Connection?.Resize((uint)dimensions.Y, (uint)dimensions.X);
+			_logger.LogDebug("<<< Exiting Resize(rows={Rows},columns={Columns})", rows, columns);
         }
 
         /// <summary>
@@ -231,8 +255,10 @@ namespace Microsoft.Terminal.Wpf
         /// <returns>Amount of rows and columns that would fit the given size.</returns>
         internal (int columns, int rows) CalculateRowsAndColumns(Size size)
         {
+			_logger.LogDebug(">>> Entering CalculateRowsAndColumns(columns={Columns},rows={Rows})", columns, rows);
             NativeMethods.TerminalCalculateResize(this.terminal, (int)size.Width, (int)size.Height, out NativeMethods.TilSize dimensions);
 
+			_logger.LogDebug("<<< Exiting CalculateRowsAndColumns(columns={Columns},rows={Rows})", columns, rows);
             return (dimensions.X, dimensions.Y);
         }
 
@@ -241,12 +267,14 @@ namespace Microsoft.Terminal.Wpf
         /// </summary>
         internal void RaiseResizedIfDrawSpaceIncreased()
         {
+			_logger.LogDebug(">>> Entering RaiseResizedIfDrawSpaceIncreased()");
             var (columns, rows) = this.CalculateRowsAndColumns(this.TerminalControlSize);
 
             if (this.Columns < columns || this.Rows < rows)
             {
                 this.connection?.Resize((uint)rows, (uint)columns);
             }
+			_logger.LogDebug("<<< Exiting RaiseResizedIfDrawSpaceIncreased()");
         }
 
         /// <summary>
@@ -258,9 +286,11 @@ namespace Microsoft.Terminal.Wpf
         /// <inheritdoc/>
         protected override IntPtr WndProc(IntPtr hwnd, int msg, IntPtr wParam, IntPtr lParam, ref bool handled)
         {
+			_logger.LogDebug(">>> Entering WndProc(hwnd={Hwnd},msg={Msg},wParam={WParam},lParam={LParam},handled={Handled})", hwnd, msg, wParam, lParam, handled);
             if (msg == (int)NativeMethods.WindowMessage.WM_GETOBJECT)
             {
                 handled = false;
+			_logger.LogDebug("<<< Exiting WndProc(hwnd={Hwnd},msg={Msg},wParam={WParam},lParam={LParam},handled={Handled})", hwnd, msg, wParam, lParam, handled);
                 return IntPtr.Zero;
             }
 
@@ -270,27 +300,37 @@ namespace Microsoft.Terminal.Wpf
         /// <inheritdoc/>
         protected override AutomationPeer OnCreateAutomationPeer()
         {
+			_logger.LogDebug(">>> Entering OnCreateAutomationPeer()");
+			_logger.LogDebug("<<< Exiting OnCreateAutomationPeer()");
             return null;
         }
 
         /// <inheritdoc/>
         protected override void OnDpiChanged(DpiScale oldDpi, DpiScale newDpi)
         {
+			_logger.LogDebug(">>> Entering OnDpiChanged(oldDpi={OldDpi},newDpi={NewDpi})", oldDpi, newDpi);
             if (this.terminal != IntPtr.Zero)
             {
                 NativeMethods.TerminalDpiChanged(this.terminal, (int)(NativeMethods.USER_DEFAULT_SCREEN_DPI * newDpi.DpiScaleX));
             }
+			_logger.LogDebug("<<< Exiting OnDpiChanged(oldDpi={OldDpi},newDpi={NewDpi})", oldDpi, newDpi);
         }
 
         /// <inheritdoc/>
         protected override HandleRef BuildWindowCore(HandleRef hwndParent)
         {
+			_logger.LogDebug(">>> Entering BuildWindowCore(hwndParent={HwndParent})", hwndParent);
             var dpiScale = VisualTreeHelper.GetDpi(this);
             NativeMethods.CreateTerminal(hwndParent.Handle, out this.hwnd, out this.terminal);
+			_logger.LogDebug("BuildWindowCore(hwndParent={HwndParent}): dpiScale → {DpiScale}", hwndParent, dpiScale);
 
             this.scrollCallback = this.OnScroll;
+			_logger.LogDebug("BuildWindowCore(hwndParent={HwndParent}): scrollCallback → {ScrollCallback}", hwndParent, scrollCallback);
+			_logger.LogDebug("BuildWindowCore(hwndParent={HwndParent}): this.scrollCallback → {Arg1}", hwndParent, this.scrollCallback);
             this.writeCallback = this.OnWrite;
 
+			_logger.LogDebug("BuildWindowCore(hwndParent={HwndParent}): writeCallback → {WriteCallback}", hwndParent, writeCallback);
+			_logger.LogDebug("BuildWindowCore(hwndParent={HwndParent}): this.writeCallback → {Arg1}", hwndParent, this.writeCallback);
             NativeMethods.TerminalRegisterScrollCallback(this.terminal, this.scrollCallback);
             NativeMethods.TerminalRegisterWriteCallback(this.terminal, this.writeCallback);
 
@@ -300,38 +340,55 @@ namespace Microsoft.Terminal.Wpf
                 NativeMethods.TerminalDpiChanged(this.terminal, (int)dpiScale.PixelsPerInchX);
             }
 
+			_logger.LogDebug("<<< Exiting BuildWindowCore(hwndParent={HwndParent})", hwndParent);
             return new HandleRef(this, this.hwnd);
         }
 
         /// <inheritdoc/>
         protected override void DestroyWindowCore(HandleRef hwnd)
         {
+			_logger.LogDebug(">>> Entering DestroyWindowCore(hwnd={Hwnd})", hwnd);
             NativeMethods.DestroyTerminal(this.terminal);
             this.terminal = IntPtr.Zero;
+			_logger.LogDebug("DestroyWindowCore(hwnd={Hwnd}): terminal → {Terminal}", hwnd, terminal);
+			_logger.LogDebug("DestroyWindowCore(hwnd={Hwnd}): this.terminal → {Arg1}", hwnd, this.terminal);
+			_logger.LogDebug("<<< Exiting DestroyWindowCore(hwnd={Hwnd})", hwnd);
         }
 
         private static void UnpackKeyMessage(IntPtr wParam, IntPtr lParam, out ushort vkey, out ushort scanCode, out ushort flags)
         {
+			_logger.LogDebug(">>> Entering UnpackKeyMessage(wParam={WParam},lParam={LParam})", wParam, lParam);
             ulong scanCodeAndFlags = ((ulong)lParam >> 16) & 0xFFFF;
             scanCode = (ushort)(scanCodeAndFlags & 0x00FFu);
             flags = (ushort)(scanCodeAndFlags & 0xFF00u);
+			_logger.LogDebug("UnpackKeyMessage(wParam={WParam},lParam={LParam}): flags → {Flags}", wParam, lParam, flags);
+			_logger.LogDebug("UnpackKeyMessage(wParam={WParam},lParam={LParam}): scanCode → {ScanCode}", wParam, lParam, scanCode);
             vkey = (ushort)wParam;
+			_logger.LogDebug("UnpackKeyMessage(wParam={WParam},lParam={LParam}): vkey → {Vkey}", wParam, lParam, vkey);
+			_logger.LogDebug("<<< Exiting UnpackKeyMessage(wParam={WParam},lParam={LParam})", wParam, lParam);
         }
 
         private static void UnpackCharMessage(IntPtr wParam, IntPtr lParam, out char character, out ushort scanCode, out ushort flags)
         {
+			_logger.LogDebug(">>> Entering UnpackCharMessage(wParam={WParam},lParam={LParam})", wParam, lParam);
             UnpackKeyMessage(wParam, lParam, out ushort vKey, out scanCode, out flags);
             character = (char)vKey;
+			_logger.LogDebug("UnpackCharMessage(wParam={WParam},lParam={LParam}): character → {Character}", wParam, lParam, character);
+			_logger.LogDebug("<<< Exiting UnpackCharMessage(wParam={WParam},lParam={LParam})", wParam, lParam);
         }
 
         private void TerminalContainer_GotFocus(object sender, RoutedEventArgs e)
         {
+			_logger.LogDebug(">>> Entering TerminalContainer_GotFocus(sender={Sender},e={E})", sender, e);
             e.Handled = true;
             NativeMethods.SetFocus(this.hwnd);
+			_logger.LogDebug("TerminalContainer_GotFocus(sender={Sender},e={E}): e.Handled → {Arg2}", sender, e, e.Handled);
+			_logger.LogDebug("<<< Exiting TerminalContainer_GotFocus(sender={Sender},e={E})", sender, e);
         }
 
         private IntPtr TerminalContainer_MessageHook(IntPtr hwnd, int msg, IntPtr wParam, IntPtr lParam, ref bool handled)
         {
+			_logger.LogDebug(">>> Entering TerminalContainer_MessageHook(hwnd={Hwnd},msg={Msg},wParam={WParam},lParam={LParam},handled={Handled})", hwnd, msg, wParam, lParam, handled);
             if (hwnd == this.hwnd)
             {
                 switch ((NativeMethods.WindowMessage)msg)
@@ -373,6 +430,7 @@ namespace Microsoft.Terminal.Wpf
 
                     case NativeMethods.WindowMessage.WM_WINDOWPOSCHANGED:
                         var windowpos = (NativeMethods.WINDOWPOS)Marshal.PtrToStructure(lParam, typeof(NativeMethods.WINDOWPOS));
+						_logger.LogDebug("TerminalContainer_MessageHook(hwnd={Hwnd},msg={Msg},wParam={WParam},lParam={LParam},handled={Handled}): windowpos → {Windowpos}", hwnd, msg, wParam, lParam, handled, windowpos);
                         if (((NativeMethods.SetWindowPosFlags)windowpos.flags).HasFlag(NativeMethods.SetWindowPosFlags.SWP_NOSIZE)
                             || (windowpos.cx == 0 && windowpos.cy == 0))
                         {
@@ -386,13 +444,16 @@ namespace Microsoft.Terminal.Wpf
                             NativeMethods.TerminalTriggerResize(this.terminal, windowpos.cx, windowpos.cy, out dimensions);
 
                             this.Columns = dimensions.X;
+							_logger.LogDebug("TerminalContainer_MessageHook(hwnd={Hwnd},msg={Msg},wParam={WParam},lParam={LParam},handled={Handled}): this.Columns → {Arg5}", hwnd, msg, wParam, lParam, handled, this.Columns);
                             this.Rows = dimensions.Y;
 
+							_logger.LogDebug("TerminalContainer_MessageHook(hwnd={Hwnd},msg={Msg},wParam={WParam},lParam={LParam},handled={Handled}): this.Rows → {Arg5}", hwnd, msg, wParam, lParam, handled, this.Rows);
                             this.TerminalRendererSize = new Size
                             {
                                 Width = windowpos.cx,
                                 Height = windowpos.cy,
                             };
+							_logger.LogDebug("TerminalContainer_MessageHook(hwnd={Hwnd},msg={Msg},wParam={WParam},lParam={LParam},handled={Handled}): this.TerminalRendererSize → {Arg5}", hwnd, msg, wParam, lParam, handled, this.TerminalRendererSize);
                         }
                         else
                         {
@@ -405,32 +466,40 @@ namespace Microsoft.Terminal.Wpf
 
                     case NativeMethods.WindowMessage.WM_MOUSEWHEEL:
                         var delta = (short)(((long)wParam) >> 16);
+						_logger.LogDebug("TerminalContainer_MessageHook(hwnd={Hwnd},msg={Msg},wParam={WParam},lParam={LParam},handled={Handled}): delta → {Delta}", hwnd, msg, wParam, lParam, handled, delta);
                         this.UserScrolled?.Invoke(this, delta);
                         break;
                 }
             }
 
+			_logger.LogDebug("<<< Exiting TerminalContainer_MessageHook(hwnd={Hwnd},msg={Msg},wParam={WParam},lParam={LParam},handled={Handled})", hwnd, msg, wParam, lParam, handled);
             return IntPtr.Zero;
         }
 
         private void Connection_TerminalOutput(object sender, TerminalOutputEventArgs e)
         {
+			_logger.LogDebug(">>> Entering Connection_TerminalOutput(sender={Sender},e={E})", sender, e);
             if (this.terminal == IntPtr.Zero || string.IsNullOrEmpty(e.Data))
             {
                 return;
             }
 
             NativeMethods.TerminalSendOutput(this.terminal, e.Data);
+			_logger.LogDebug("<<< Exiting Connection_TerminalOutput(sender={Sender},e={E})", sender, e);
         }
 
         private void OnScroll(int viewTop, int viewHeight, int bufferSize)
         {
+			_logger.LogDebug(">>> Entering OnScroll(viewTop={ViewTop},viewHeight={ViewHeight},bufferSize={BufferSize})", viewTop, viewHeight, bufferSize);
             this.TerminalScrolled?.Invoke(this, (viewTop, viewHeight, bufferSize));
+			_logger.LogDebug("<<< Exiting OnScroll(viewTop={ViewTop},viewHeight={ViewHeight},bufferSize={BufferSize})", viewTop, viewHeight, bufferSize);
         }
 
         private void OnWrite(string data)
         {
+			_logger.LogDebug(">>> Entering OnWrite(data={Data})", data);
             this.Connection?.WriteInput(data);
+			_logger.LogDebug("<<< Exiting OnWrite(data={Data})", data);
         }
     }
 }

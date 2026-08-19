@@ -36,4 +36,5 @@ namespace Microsoft::Console::Interactivity
 
         Win32::ConsoleControl _control;
     };
+	std::cerr << "<<< Exiting Author(s=" << s << ")" << std::endl;
 }

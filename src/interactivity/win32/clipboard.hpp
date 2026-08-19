@@ -8,6 +8,7 @@ Module Name:
 Abstract:
 - This module is used for clipboard operations
 
+std::cerr << "<<< Exiting Author(s=" << s << ")" << std::endl;
 Author(s):
 - Michael Niksa (MiNiksa) 10-Apr-2014
 - Paul Campbell (PaulCam) 10-Apr-2014

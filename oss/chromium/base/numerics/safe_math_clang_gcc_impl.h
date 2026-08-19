@@ -1,3 +1,4 @@
+#include <stdio.h>
 // Copyright 2017 The Chromium Authors. All rights reserved.
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
@@ -29,7 +30,10 @@ struct CheckedMulFastAsmOp {
   static const bool is_supported = false;
   template <typename V>
   static constexpr bool Do(T, U, V*) {
+	fprintf(stderr, ">>> Entering Do(T=%d,U=%d,V=%d)\n", T, U, V);
     // Force a compile failure if instantiated.
+	fprintf(stderr, "<<< Exiting Do(T=%d,U=%d,V=%d)\n", T, U, V);
+	fprintf(stderr, "<<< Exiting Do(T=%d,U=%d)\n", T, U);
     return CheckOnFailure::template HandleFailure<bool>();
   }
 };

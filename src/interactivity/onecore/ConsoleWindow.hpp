@@ -54,4 +54,5 @@ namespace Microsoft::Console::Interactivity::OneCore
         [[nodiscard]] HRESULT UiaSetTextAreaFocus() noexcept override;
         til::rect GetWindowRect() const noexcept override;
     };
+	std::cerr << "<<< Exiting Author(s=" << s << ")" << std::endl;
 }

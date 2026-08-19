@@ -41,37 +41,46 @@ class UtilsTests
 
 void UtilsTests::TestClampToShortMax()
 {
+	std::cerr << ">>> Entering UtilsTests::TestClampToShortMax()" << std::endl;
     const short min = 1;
 
     // Test outside the lower end of the range
     const auto minExpected = min;
     auto minActual = ClampToShortMax(0, min);
+	std::cerr << "UtilsTests::TestClampToShortMax(): minActual → " << minActual << std::endl;
     VERIFY_ARE_EQUAL(minExpected, minActual);
 
     // Test negative numbers
     const auto negativeExpected = min;
     auto negativeActual = ClampToShortMax(-1, min);
+	std::cerr << "UtilsTests::TestClampToShortMax(): negativeActual → " << negativeActual << std::endl;
     VERIFY_ARE_EQUAL(negativeExpected, negativeActual);
 
     // Test outside the upper end of the range
     const short maxExpected = SHRT_MAX;
     auto maxActual = ClampToShortMax(50000, min);
+	std::cerr << "UtilsTests::TestClampToShortMax(): maxActual → " << maxActual << std::endl;
     VERIFY_ARE_EQUAL(maxExpected, maxActual);
 
     // Test within the range
     const short withinRangeExpected = 100;
     auto withinRangeActual = ClampToShortMax(withinRangeExpected, min);
+	std::cerr << "UtilsTests::TestClampToShortMax(): withinRangeActual → " << withinRangeActual << std::endl;
     VERIFY_ARE_EQUAL(withinRangeExpected, withinRangeActual);
+	std::cerr << "<<< Exiting UtilsTests::TestClampToShortMax()" << std::endl;
 }
 
 void UtilsTests::TestGuidToString()
 {
+	std::cerr << ">>> Entering UtilsTests::TestGuidToString()" << std::endl;
     static constexpr GUID constantGuid{
         0x01020304, 0x0506, 0x0708, { 0x09, 0x0A, 0x0B, 0x0C, 0x0D, 0x0E, 0x0F, 0x10 }
     };
 
     {
         const auto str = GuidToString(constantGuid);
+		std::cerr << "UtilsTests::TestGuidToString(): str → " << str << std::endl;
+		std::cerr << "UtilsTests::TestGuidToString(): guid → " << guid << std::endl;
         const auto guid = GuidFromString(str.c_str());
         VERIFY_ARE_EQUAL(L"{01020304-0506-0708-090a-0b0c0d0e0f10}", str);
         VERIFY_ARE_EQUAL(constantGuid, guid);
@@ -83,12 +92,15 @@ void UtilsTests::TestGuidToString()
         VERIFY_ARE_EQUAL(L"01020304-0506-0708-090a-0b0c0d0e0f10", str);
         VERIFY_ARE_EQUAL(constantGuid, guid);
     }
+	std::cerr << "<<< Exiting UtilsTests::TestGuidToString()" << std::endl;
 }
 
 void UtilsTests::TestSplitString()
 {
+	std::cerr << ">>> Entering UtilsTests::TestSplitString()" << std::endl;
     std::vector<std::wstring_view> result;
     result = SplitString(L"", L';');
+	std::cerr << "UtilsTests::TestSplitString(): result → " << result << std::endl;
     VERIFY_ARE_EQUAL(0u, result.size());
     result = SplitString(L"1", L';');
     VERIFY_ARE_EQUAL(1u, result.size());
@@ -117,52 +129,68 @@ void UtilsTests::TestSplitString()
     VERIFY_ARE_EQUAL(L"123", result.at(0));
     VERIFY_ARE_EQUAL(L"456", result.at(1));
     VERIFY_ARE_EQUAL(L"789", result.at(2));
+	std::cerr << "<<< Exiting UtilsTests::TestSplitString()" << std::endl;
 }
 
 void UtilsTests::TestFilterStringForPaste()
 {
+	std::cerr << ">>> Entering UtilsTests::TestFilterStringForPaste()" << std::endl;
     // Test carriage return
     const std::wstring noNewLine = L"Hello World";
+	std::cerr << "UtilsTests::TestFilterStringForPaste(): noNewLine → " << noNewLine << std::endl;
     VERIFY_ARE_EQUAL(L"Hello World", FilterStringForPaste(noNewLine, FilterOption::CarriageReturnNewline));
 
     const std::wstring singleCR = L"Hello World\r";
+	std::cerr << "UtilsTests::TestFilterStringForPaste(): singleCR → " << singleCR << std::endl;
     VERIFY_ARE_EQUAL(L"Hello World\r", FilterStringForPaste(singleCR, FilterOption::CarriageReturnNewline));
 
     const std::wstring singleLF = L"Hello World\n";
+	std::cerr << "UtilsTests::TestFilterStringForPaste(): singleLF → " << singleLF << std::endl;
     VERIFY_ARE_EQUAL(L"Hello World\r", FilterStringForPaste(singleLF, FilterOption::CarriageReturnNewline));
 
     const std::wstring singleCRLF = L"Hello World\r\n";
+	std::cerr << "UtilsTests::TestFilterStringForPaste(): singleCRLF → " << singleCRLF << std::endl;
     VERIFY_ARE_EQUAL(L"Hello World\r", FilterStringForPaste(singleCRLF, FilterOption::CarriageReturnNewline));
 
     const std::wstring multiCR = L"Hello\rWorld\r";
+	std::cerr << "UtilsTests::TestFilterStringForPaste(): multiCR → " << multiCR << std::endl;
     VERIFY_ARE_EQUAL(L"Hello\rWorld\r", FilterStringForPaste(multiCR, FilterOption::CarriageReturnNewline));
 
     const std::wstring multiLF = L"Hello\nWorld\n";
+	std::cerr << "UtilsTests::TestFilterStringForPaste(): multiLF → " << multiLF << std::endl;
     VERIFY_ARE_EQUAL(L"Hello\rWorld\r", FilterStringForPaste(multiLF, FilterOption::CarriageReturnNewline));
 
     const std::wstring multiCRLF = L"Hello\r\nWorld\r\n";
+	std::cerr << "UtilsTests::TestFilterStringForPaste(): multiCRLF → " << multiCRLF << std::endl;
     VERIFY_ARE_EQUAL(L"Hello\rWorld\r", FilterStringForPaste(multiCRLF, FilterOption::CarriageReturnNewline));
 
     const std::wstring multiCR_NoNewLine = L"Hello\rWorld\r123";
+	std::cerr << "UtilsTests::TestFilterStringForPaste(): multiCR_NoNewLine → " << multiCR_NoNewLine << std::endl;
     VERIFY_ARE_EQUAL(L"Hello\rWorld\r123", FilterStringForPaste(multiCR_NoNewLine, FilterOption::CarriageReturnNewline));
 
     const std::wstring multiLF_NoNewLine = L"Hello\nWorld\n123";
+	std::cerr << "UtilsTests::TestFilterStringForPaste(): multiLF_NoNewLine → " << multiLF_NoNewLine << std::endl;
     VERIFY_ARE_EQUAL(L"Hello\rWorld\r123", FilterStringForPaste(multiLF_NoNewLine, FilterOption::CarriageReturnNewline));
 
     const std::wstring multiCRLF_NoNewLine = L"Hello\r\nWorld\r\n123";
+	std::cerr << "UtilsTests::TestFilterStringForPaste(): multiCRLF_NoNewLine → " << multiCRLF_NoNewLine << std::endl;
     VERIFY_ARE_EQUAL(L"Hello\rWorld\r123", FilterStringForPaste(multiCRLF_NoNewLine, FilterOption::CarriageReturnNewline));
 
     // Test control code filtering
     const std::wstring noNewLineWithControlCodes = L"Hello\x01\x02\x03 123";
+	std::cerr << "UtilsTests::TestFilterStringForPaste(): noNewLineWithControlCodes → " << noNewLineWithControlCodes << std::endl;
     VERIFY_ARE_EQUAL(L"Hello 123", FilterStringForPaste(noNewLineWithControlCodes, FilterOption::ControlCodes));
 
     const std::wstring singleCRWithControlCodes = L"Hello World\r\x01\x02\x03 123";
+	std::cerr << "UtilsTests::TestFilterStringForPaste(): singleCRWithControlCodes → " << singleCRWithControlCodes << std::endl;
     VERIFY_ARE_EQUAL(L"Hello World\r 123", FilterStringForPaste(singleCRWithControlCodes, FilterOption::ControlCodes));
 
     const std::wstring singleLFWithControlCodes = L"Hello World\n\x01\x02\x03 123";
+	std::cerr << "UtilsTests::TestFilterStringForPaste(): singleLFWithControlCodes → " << singleLFWithControlCodes << std::endl;
     VERIFY_ARE_EQUAL(L"Hello World\n 123", FilterStringForPaste(singleLFWithControlCodes, FilterOption::ControlCodes));
 
     const std::wstring singleCRLFWithControlCodes = L"Hello World\r\n\x01\x02\x03 123";
+	std::cerr << "UtilsTests::TestFilterStringForPaste(): singleCRLFWithControlCodes → " << singleCRLFWithControlCodes << std::endl;
     VERIFY_ARE_EQUAL(L"Hello World\r\n 123", FilterStringForPaste(singleCRLFWithControlCodes, FilterOption::ControlCodes));
 
     VERIFY_ARE_EQUAL(L"Hello World\r 123", FilterStringForPaste(singleCRWithControlCodes, FilterOption::CarriageReturnNewline | FilterOption::ControlCodes));
@@ -170,12 +198,15 @@ void UtilsTests::TestFilterStringForPaste()
     VERIFY_ARE_EQUAL(L"Hello World\r 123", FilterStringForPaste(singleCRLFWithControlCodes, FilterOption::CarriageReturnNewline | FilterOption::ControlCodes));
 
     const std::wstring multiCRWithControlCodes = L"Hello\r\x01\x02\x03World\r\x01\x02\x03 123";
+	std::cerr << "UtilsTests::TestFilterStringForPaste(): multiCRWithControlCodes → " << multiCRWithControlCodes << std::endl;
     VERIFY_ARE_EQUAL(L"Hello\rWorld\r 123", FilterStringForPaste(multiCRWithControlCodes, FilterOption::ControlCodes));
 
     const std::wstring multiLFWithControlCodes = L"Hello\n\x01\x02\x03World\n\x01\x02\x03 123";
+	std::cerr << "UtilsTests::TestFilterStringForPaste(): multiLFWithControlCodes → " << multiLFWithControlCodes << std::endl;
     VERIFY_ARE_EQUAL(L"Hello\nWorld\n 123", FilterStringForPaste(multiLFWithControlCodes, FilterOption::ControlCodes));
 
     const std::wstring multiCRLFWithControlCodes = L"Hello\r\nWorld\r\n\x01\x02\x03 123";
+	std::cerr << "UtilsTests::TestFilterStringForPaste(): multiCRLFWithControlCodes → " << multiCRLFWithControlCodes << std::endl;
     VERIFY_ARE_EQUAL(L"Hello\r\nWorld\r\n 123", FilterStringForPaste(multiCRLFWithControlCodes, FilterOption::ControlCodes));
 
     VERIFY_ARE_EQUAL(L"Hello\rWorld\r 123", FilterStringForPaste(multiCRWithControlCodes, FilterOption::CarriageReturnNewline | FilterOption::ControlCodes));
@@ -183,28 +214,35 @@ void UtilsTests::TestFilterStringForPaste()
     VERIFY_ARE_EQUAL(L"Hello\rWorld\r 123", FilterStringForPaste(multiCRLFWithControlCodes, FilterOption::CarriageReturnNewline | FilterOption::ControlCodes));
 
     const std::wstring multiLineWithLotsOfControlCodes = L"e\bc\bh\bo\b \b'.\b!\b:\b\b \bke\bS\b \bi3\bl \bld\bK\bo\b -1\b+\b9 +\b2\b-1'\b >\b \b/\bt\bm\bp\b/\bl\bo\bl\b\r\nsleep 1\r\nmd5sum /tmp/lol";
+	std::cerr << "UtilsTests::TestFilterStringForPaste(): multiLineWithLotsOfControlCodes → " << multiLineWithLotsOfControlCodes << std::endl;
 
     VERIFY_ARE_EQUAL(L"echo '.!: keS i3l ldKo -1+9 +2-1' > /tmp/lol\rsleep 1\rmd5sum /tmp/lol",
                      FilterStringForPaste(multiLineWithLotsOfControlCodes, FilterOption::CarriageReturnNewline | FilterOption::ControlCodes));
 
     // Malicious string that tries to prematurely terminate bracketed
     const std::wstring malicious = L"echo\x1b[201~";
+	std::cerr << "UtilsTests::TestFilterStringForPaste(): malicious → " << malicious << std::endl;
     VERIFY_ARE_EQUAL(L"echo[201~", FilterStringForPaste(malicious, FilterOption::CarriageReturnNewline | FilterOption::ControlCodes));
 
     // C1 control codes
     const std::wstring c1ControlCodes = L"echo\x9c";
+	std::cerr << "UtilsTests::TestFilterStringForPaste(): c1ControlCodes → " << c1ControlCodes << std::endl;
     VERIFY_ARE_EQUAL(L"echo", FilterStringForPaste(c1ControlCodes, FilterOption::CarriageReturnNewline | FilterOption::ControlCodes));
 
     // Test Unicode content
     const std::wstring unicodeString = L"你好\r\n\x01世界\x02\r\n123";
+	std::cerr << "UtilsTests::TestFilterStringForPaste(): unicodeString → " << unicodeString << std::endl;
     VERIFY_ARE_EQUAL(L"你好\r世界\r123",
                      FilterStringForPaste(unicodeString, FilterOption::CarriageReturnNewline | FilterOption::ControlCodes));
+					std::cerr << "<<< Exiting UtilsTests::TestFilterStringForPaste()" << std::endl;
 }
 
 void UtilsTests::TestStringToUint()
 {
+	std::cerr << ">>> Entering UtilsTests::TestStringToUint()" << std::endl;
     auto success = false;
     unsigned int value = 0;
+	std::cerr << "UtilsTests::TestStringToUint(): success → " << success << std::endl;
     success = StringToUint(L"", value);
     VERIFY_IS_FALSE(success);
     success = StringToUint(L"xyz", value);
@@ -223,10 +261,12 @@ void UtilsTests::TestStringToUint()
     success = StringToUint(L"123456789", value);
     VERIFY_IS_TRUE(success);
     VERIFY_ARE_EQUAL(123456789u, value);
+	std::cerr << "<<< Exiting UtilsTests::TestStringToUint()" << std::endl;
 }
 
 void UtilsTests::TestColorFromXTermColor()
 {
+	std::cerr << ">>> Entering UtilsTests::TestColorFromXTermColor()" << std::endl;
     _VerifyXTermColorResult(L"rgb:1/1/1", RGB(0x11, 0x11, 0x11));
     _VerifyXTermColorResult(L"rGb:1/1/1", RGB(0x11, 0x11, 0x11));
     _VerifyXTermColorResult(L"RGB:1/1/1", RGB(0x11, 0x11, 0x11));
@@ -335,25 +375,33 @@ void UtilsTests::TestColorFromXTermColor()
     _VerifyXTermColorInvalid(L"gray101");
     _VerifyXTermColorInvalid(L"gray-");
     _VerifyXTermColorInvalid(L"gray;");
+	std::cerr << "<<< Exiting UtilsTests::TestColorFromXTermColor()" << std::endl;
 }
 
 void UtilsTests::_VerifyXTermColorResult(const std::wstring_view wstr, DWORD colorValue)
 {
+	std::cerr << ">>> Entering UtilsTests::_VerifyXTermColorResult(wstr=" << wstr << ",colorValue=" << colorValue << ")" << std::endl;
     const auto color = ColorFromXTermColor(wstr);
     VERIFY_IS_TRUE(color.has_value());
+	std::cerr << "UtilsTests::_VerifyXTermColorResult(wstr=" << wstr << ",colorValue=" << colorValue << "): color → " << color << std::endl;
     VERIFY_ARE_EQUAL(colorValue, static_cast<COLORREF>(color.value()));
+	std::cerr << "<<< Exiting UtilsTests::_VerifyXTermColorResult(wstr=" << wstr << ",colorValue=" << colorValue << ")" << std::endl;
 }
 
 void UtilsTests::_VerifyXTermColorInvalid(const std::wstring_view wstr)
 {
+	std::cerr << ">>> Entering UtilsTests::_VerifyXTermColorInvalid(wstr=" << wstr << ")" << std::endl;
     auto color = ColorFromXTermColor(wstr);
     VERIFY_IS_FALSE(color.has_value());
+	std::cerr << "UtilsTests::_VerifyXTermColorInvalid(wstr=" << wstr << "): color → " << color << std::endl;
+	std::cerr << "<<< Exiting UtilsTests::_VerifyXTermColorInvalid(wstr=" << wstr << ")" << std::endl;
 }
 
 #if !__INSIDE_WINDOWS
 // Windows' compiler dislikes these raw strings...
 void UtilsTests::TestMangleWSLPaths()
 {
+	std::cerr << ">>> Entering UtilsTests::TestMangleWSLPaths()" << std::endl;
     // Continue on failures
     const WEX::TestExecution::DisableVerifyExceptions disableExceptionsScope;
 
@@ -496,6 +544,7 @@ void UtilsTests::TestMangleWSLPaths()
     /// Tests for GH #12353
 
     const auto expectedUserProfilePath = wil::ExpandEnvironmentStringsW<std::wstring>(L"%USERPROFILE%");
+	std::cerr << "UtilsTests::TestMangleWSLPaths(): expectedUserProfilePath → " << expectedUserProfilePath << std::endl;
     {
         auto [commandline, path] = MangleStartingDirectoryForWSL(LR"(wsl -d Ubuntu)", L"~");
         VERIFY_ARE_EQUAL(LR"("wsl" --cd "~" -d Ubuntu)", commandline);
@@ -516,11 +565,13 @@ void UtilsTests::TestMangleWSLPaths()
         VERIFY_ARE_EQUAL(LR"(powershell.exe)", commandline);
         VERIFY_ARE_EQUAL(expectedUserProfilePath, path);
     }
+	std::cerr << "<<< Exiting UtilsTests::TestMangleWSLPaths()" << std::endl;
 }
 #endif
 
 void UtilsTests::TestTrimTrailingWhitespace()
 {
+	std::cerr << ">>> Entering UtilsTests::TestTrimTrailingWhitespace()" << std::endl;
     // Continue on failures
     const WEX::TestExecution::DisableVerifyExceptions disableExceptionsScope;
 
@@ -538,9 +589,11 @@ void UtilsTests::TestTrimTrailingWhitespace()
     VERIFY_ARE_EQUAL(L"Foo\tBar", TrimPaste(L"Foo\tBar\t\n"), L"Trim when there are tabs in the middle of the string, and in the whitespace at the end.");
     VERIFY_ARE_EQUAL(L"Foo\tBar", TrimPaste(L"Foo\tBar\n\t"), L"Trim when there are tabs in the middle of the string, and in the whitespace at the end.");
     VERIFY_ARE_EQUAL(L"Foo\tBar", TrimPaste(L"Foo\tBar\t\n\t"), L"Trim when there are tabs in the middle of the string, and in the whitespace at the end.");
+	std::cerr << "<<< Exiting UtilsTests::TestTrimTrailingWhitespace()" << std::endl;
 }
 void UtilsTests::TestDontTrimTrailingWhitespace()
 {
+	std::cerr << ">>> Entering UtilsTests::TestDontTrimTrailingWhitespace()" << std::endl;
     // Continue on failures
     const WEX::TestExecution::DisableVerifyExceptions disableExceptionsScope;
 
@@ -555,10 +608,12 @@ void UtilsTests::TestDontTrimTrailingWhitespace()
     // We need to both
     // * trim when there's a tab followed by only whitespace
     // * not trim then there's a tab in the middle, and the string ends in whitespace
+	std::cerr << "<<< Exiting UtilsTests::TestDontTrimTrailingWhitespace()" << std::endl;
 }
 
 void UtilsTests::TestEvaluateStartingDirectory()
 {
+	std::cerr << ">>> Entering UtilsTests::TestEvaluateStartingDirectory()" << std::endl;
     // Continue on failures
     const WEX::TestExecution::DisableVerifyExceptions disableExceptionsScope;
 
@@ -572,6 +627,7 @@ void UtilsTests::TestEvaluateStartingDirectory()
 
     {
         std::wstring cwd = L"C:\\Windows\\System32";
+		std::cerr << "UtilsTests::TestEvaluateStartingDirectory(): cwd → " << cwd << std::endl;
 
         // Literally blank
         test(L"C:\\Windows\\System32\\", cwd, L"");
@@ -617,4 +673,5 @@ void UtilsTests::TestEvaluateStartingDirectory()
         test(L"/", cwd, L"/");
         test(L"/dev", cwd, L"/dev");
     }
+	std::cerr << "<<< Exiting UtilsTests::TestEvaluateStartingDirectory()" << std::endl;
 }

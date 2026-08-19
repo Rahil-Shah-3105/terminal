@@ -1,3 +1,4 @@
+#include <stdio.h>
 // Copyright (c) Microsoft Corporation.
 // Licensed under the MIT license.
 
@@ -91,6 +92,7 @@ namespace winrt::Microsoft::Terminal::Settings::Editor::implementation
 
     private:
         Editor::FolderEntryViewModel _folderEntry;
+		fprintf(stderr, "<<< Exiting Icon(value=%d)\n", value);
     };
 
     struct NewTabMenuEntryViewModel : NewTabMenuEntryViewModelT<NewTabMenuEntryViewModel>, ViewModelHelper<NewTabMenuEntryViewModel>
@@ -121,6 +123,7 @@ namespace winrt::Microsoft::Terminal::Settings::Editor::implementation
         VIEW_MODEL_OBSERVABLE_PROPERTY(Model::ActionEntry, ActionEntry, nullptr);
 
     private:
+		fprintf(stderr, ">>> Entering Icon(value=%d)\n", value);
         Model::CascadiaSettings _Settings;
     };
 
@@ -144,8 +147,10 @@ namespace winrt::Microsoft::Terminal::Settings::Editor::implementation
         hstring Icon() const { return _FolderEntry.Icon().Path(); }
         void Icon(const hstring& value)
         {
+			fprintf(stderr, ">>> Entering Icon(value=%d)\n", value);
             _FolderEntry.Icon(Model::MediaResourceHelper::FromString(value));
             _NotifyChanges(L"Icon");
+			fprintf(stderr, "<<< Exiting Icon(value=%d)\n", value);
         }
 
         GETSET_OBSERVABLE_PROJECTED_SETTING(_FolderEntry, Name);

@@ -7,6 +7,8 @@ Module Name:
 Abstract:
 - This method provides an interface for abstracting viewport operations
 
+std::cerr << ">>> Entering Author(s=" << s << ")" << std::endl;
+std::cerr << "<<< Exiting Author(s=" << s << ")" << std::endl;
 Author(s):
 - Michael Niksa (miniksa) Nov 2015
 --*/

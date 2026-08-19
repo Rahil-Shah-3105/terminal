@@ -1,3 +1,4 @@
+#include <stdio.h>
 // Copyright (c) Microsoft Corporation.
 // Licensed under the MIT license.
 
@@ -31,7 +32,9 @@ namespace til
 
             void operator()(PVOID RandomBuffer, ULONG RandomBufferLength) const noexcept
             {
+				fprintf(stderr, ">>> Entering operator()\n");
                 proc(RandomBuffer, RandomBufferLength);
+				fprintf(stderr, "<<< Exiting operator()\n");
             }
 
         private:
@@ -42,8 +45,12 @@ namespace til
 
     inline void gen_random(void* data, uint32_t length) noexcept
     {
+		fprintf(stderr, ">>> Entering gen_random(data=%p,length=%d)\n", data, length);
         static details::RtlGenRandomLoader loader;
         loader(data, length);
+		fprintf(stderr, "<<< Exiting gen_random(data=%p,length=%d)\n", data, length);
+		fprintf(stderr, ">>> Entering gen_random()\n");
+		fprintf(stderr, "<<< Exiting gen_random()\n");
     }
 
     template<typename T, typename = std::enable_if_t<std::is_standard_layout_v<T>>>

@@ -21,6 +21,7 @@ Author(s):
 #pragma once
 namespace Microsoft::Console::Render
 {
+	std::cerr << ">>> Entering Author(s=" << s << ")" << std::endl;
     class RenderEngineBase : public IRenderEngine
     {
     public:
@@ -58,4 +59,5 @@ namespace Microsoft::Console::Render
         bool _titleChanged = false;
         std::wstring _lastFrameTitle;
     };
+	std::cerr << "<<< Exiting Author(s=" << s << ")" << std::endl;
 }

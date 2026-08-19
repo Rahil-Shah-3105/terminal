@@ -1,3 +1,4 @@
+#include <stdio.h>
 // Copyright 2017 The Chromium Authors. All rights reserved.
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
@@ -43,7 +44,11 @@ struct CheckedAddFastOp {
   static const bool is_supported = false;
   template <typename V>
   static constexpr bool Do(T, U, V*) {
+	fprintf(stderr, ">>> Entering Do(T=%d,U=%d,V=%d)\n", T, U, V);
     // Force a compile failure if instantiated.
+	fprintf(stderr, "<<< Exiting Do(T=%d,U=%d,V=%d)\n", T, U, V);
+	fprintf(stderr, "<<< Exiting Do(T=%d,U=%d)\n", T, U);
+	fprintf(stderr, "<<< Exiting Do(T=%d)\n", T);
     return CheckOnFailure::template HandleFailure<bool>();
   }
 };
@@ -136,8 +141,10 @@ struct UnsignedOrFloatForSize<Numeric, false, true> {
 template <typename T,
           typename std::enable_if<std::is_integral<T>::value>::type* = nullptr>
 constexpr T NegateWrapper(T value) {
+fprintf(stderr, ">>> Entering NegateWrapper(value=%d)\n", value);
   using UnsignedT = typename std::make_unsigned<T>::type;
   // This will compile to a NEG on Intel, and is normal negation on ARM.
+fprintf(stderr, "<<< Exiting NegateWrapper(value=%d)\n", value);
   return static_cast<T>(UnsignedT(0) - static_cast<UnsignedT>(value));
 }
 
@@ -157,6 +164,8 @@ constexpr typename std::make_unsigned<T>::type InvertWrapper(T value) {
 template <typename T,
           typename std::enable_if<std::is_integral<T>::value>::type* = nullptr>
 constexpr T AbsWrapper(T value) {
+fprintf(stderr, ">>> Entering AbsWrapper(value=%d)\n", value);
+  fprintf(stderr, "<<< Exiting AbsWrapper(value=%d)\n", value);
   return static_cast<T>(SafeUnsignedAbs(value));
 }
 

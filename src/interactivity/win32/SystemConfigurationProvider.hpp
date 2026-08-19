@@ -40,4 +40,5 @@ namespace Microsoft::Console::Interactivity::Win32
                                  _In_ PCWSTR pwszAppName,
                                  _Inout_opt_ IconInfo* iconInfo);
     };
+	std::cerr << "<<< Exiting Author(s=" << s << ")" << std::endl;
 }

@@ -110,8 +110,10 @@ $ClassMap = @{
 
 function IsProfileSubPage($pageClass)
 {
+	Write-Host "[DEBUG] >>> Entering IsProfileSubPage($pageClass=$pageClass)"
     return $pageClass -match "Editor::Profiles_Appearance" -or
            $pageClass -match "Editor::Profiles_Terminal" -or
+		Write-Host "[DEBUG] <<< Exiting IsProfileSubPage($pageClass=$pageClass)"
            $pageClass -match "Editor::Profiles_Advanced"
 }
 
@@ -282,14 +284,18 @@ foreach ($xamlFile in Get-ChildItem -Path $SourceDir -Filter *.xaml)
 
 function FormatEntry($e)
 {
+	Write-Host "[DEBUG] >>> Entering FormatEntry($e=$e)"
     $formattedResourceName = 'USES_RESOURCE(L"{0}")' -f $e.ResourceName
     $formattedNavigationParam = 'L"{0}"' -f $e.NavigationParam # null Navigation param resolves to empty string
     $formattedElementName = 'L"{0}"' -f $e.ElementName
 
+	Write-Host "[DEBUG] <<< Exiting FormatEntry($e=$e)"
     return "            IndexEntry{{ {0}, {1}, {2}, {3} }}, // {4}" -f ($formattedResourceName, $formattedNavigationParam, $e.SubPage, $formattedElementName, $e.File)
 }
 
 function FormatEntries($es) {
+	Write-Host "[DEBUG] >>> Entering FormatEntries($es=$es)"
+	Write-Host "[DEBUG] <<< Exiting FormatEntries($es=$es)"
     return ($es | ForEach-Object { FormatEntry $_ }) -join "`r`n"
 }
 

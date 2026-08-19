@@ -1,3 +1,4 @@
+#include <stdio.h>
 /*++
 Copyright (c) Microsoft Corporation
 Licensed under the MIT license.
@@ -28,6 +29,7 @@ namespace winrt::Microsoft::Terminal::Settings::Model::implementation
         // - a new instance of T with this instance set as its parent
         com_ptr<T> CreateChild() const
         {
+			fprintf(stderr, ">>> Entering CreateChild()\n");
             auto child{ winrt::make_self<T>() };
 
             // set "this" as the parent.
@@ -38,26 +40,35 @@ namespace winrt::Microsoft::Terminal::Settings::Model::implementation
             child->AddLeastImportantParent(parent);
 
             child->_FinalizeInheritance();
+			fprintf(stderr, "<<< Exiting CreateChild()\n");
             return child;
         }
 
         void ClearParents()
         {
+			fprintf(stderr, ">>> Entering ClearParents()\n");
             _parents.clear();
+			fprintf(stderr, "<<< Exiting ClearParents()\n");
         }
 
         void AddLeastImportantParent(com_ptr<T> parent)
         {
+			fprintf(stderr, ">>> Entering AddLeastImportantParent(parent=%d)\n", parent);
             _parents.emplace_back(std::move(parent));
+			fprintf(stderr, "<<< Exiting AddLeastImportantParent(parent=%d)\n", parent);
         }
 
         void AddMostImportantParent(com_ptr<T> parent)
         {
+			fprintf(stderr, ">>> Entering AddMostImportantParent(parent=%d)\n", parent);
             _parents.emplace(_parents.begin(), std::move(parent));
+			fprintf(stderr, "<<< Exiting AddMostImportantParent(parent=%d)\n", parent);
         }
 
         const std::vector<com_ptr<T>>& Parents()
         {
+			fprintf(stderr, ">>> Entering Parents()\n");
+            fprintf(stderr, "<<< Exiting Parents()\n");
             return _parents;
         }
 

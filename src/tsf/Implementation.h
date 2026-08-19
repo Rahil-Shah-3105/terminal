@@ -1,3 +1,4 @@
+#include <stdio.h>
 // Copyright (c) Microsoft Corporation.
 // Licensed under the MIT license.
 
@@ -77,12 +78,14 @@ namespace Microsoft::Console::TSF
             // ITfEditSession method
             STDMETHODIMP DoEditSession(TfEditCookie ec) noexcept override
             {
+				fprintf(stderr, ">>> Entering DoEditSession(ec=%d)\n", ec);
                 try
                 {
                     (self->*Callback)(ec);
                     return S_OK;
                 }
                 CATCH_RETURN();
+				fprintf(stderr, "<<< Exiting DoEditSession(ec=%d)\n", ec);
             }
         };
 
