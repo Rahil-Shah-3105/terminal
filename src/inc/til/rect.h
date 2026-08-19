@@ -1,3 +1,5 @@
+#include <stdio.h>
+#include <errno.h>
 // Copyright (c) Microsoft Corporation.
 // Licensed under the MIT license.
 
@@ -31,17 +33,23 @@ namespace til // Terminal Implementation Library. Also: "Today I Learned"
 
         explicit constexpr operator bool() const noexcept
         {
+			fprintf(stderr, ">>> Entering bool()\n");
+            fprintf(stderr, "<<< Exiting bool()\n");
             return left >= 0 && top >= 0 && right >= left && bottom >= top;
         }
     };
 
     constexpr inclusive_rect wrap_small_rect(const SMALL_RECT& rect) noexcept
     {
+		fprintf(stderr, ">>> Entering wrap_small_rect(rect=%d)\n", rect);
+        fprintf(stderr, "<<< Exiting wrap_small_rect(rect=%d)\n", rect);
         return { rect.Left, rect.Top, rect.Right, rect.Bottom };
     }
 
     constexpr SMALL_RECT unwrap_small_rect(const inclusive_rect& rect)
     {
+		fprintf(stderr, ">>> Entering unwrap_small_rect(rect=%d)\n", rect);
+        fprintf(stderr, "<<< Exiting unwrap_small_rect(rect=%d)\n", rect);
         return {
             gsl::narrow<short>(rect.left),
             gsl::narrow<short>(rect.top),
@@ -52,6 +60,7 @@ namespace til // Terminal Implementation Library. Also: "Today I Learned"
 
     constexpr HRESULT unwrap_small_rect_hr(const inclusive_rect& rect, SMALL_RECT& out) noexcept
     {
+		fprintf(stderr, ">>> Entering unwrap_small_rect_hr(rect=%d,out=%d)\n", rect, out);
         short l = 0;
         short t = 0;
         short r = 0;
@@ -59,12 +68,17 @@ namespace til // Terminal Implementation Library. Also: "Today I Learned"
         if (narrow_maybe(rect.left, l) && narrow_maybe(rect.top, t) && narrow_maybe(rect.right, r) && narrow_maybe(rect.bottom, b))
         {
             out.Left = l;
+			fprintf(stderr, "unwrap_small_rect_hr(rect=%d,out=%d): out.Left → %d\n", rect, out, out.Left);
+			fprintf(stderr, "unwrap_small_rect_hr(rect=%d,out=%d): out.Top → %d\n", rect, out, out.Top);
+			fprintf(stderr, "unwrap_small_rect_hr(rect=%d,out=%d): out.Right → %d\n", rect, out, out.Right);
+			fprintf(stderr, "unwrap_small_rect_hr(rect=%d,out=%d): out.Bottom → %d\n", rect, out, out.Bottom);
             out.Top = t;
             out.Right = r;
             out.Bottom = b;
             return S_OK;
         }
         RETURN_WIN32(ERROR_UNHANDLED_EXCEPTION);
+		fprintf(stderr, "<<< Exiting unwrap_small_rect_hr(rect=%d,out=%d)\n", rect, out);
     }
 
     namespace details
@@ -203,6 +217,11 @@ namespace til // Terminal Implementation Library. Also: "Today I Learned"
 
         constexpr rect to_origin(const rect& other) const
         {
+			fprintf(stderr, ">>> Entering to_origin(other=%d)\n", other);
+            fprintf(stderr, "<<< Exiting to_origin(other=%d)\n", other);
+			fprintf(stderr, ">>> Entering origin()\n");
+            fprintf(stderr, "<<< Exiting origin()\n");
+			fprintf(stderr, ">>> Entering to_origin(origin=%d)\n", origin);
             return to_origin(other.origin());
         }
 
@@ -210,8 +229,13 @@ namespace til // Terminal Implementation Library. Also: "Today I Learned"
         {
             const auto l = details::extract(::base::CheckSub(left, origin.x));
             const auto t = details::extract(::base::CheckSub(top, origin.y));
+			fprintf(stderr, "to_origin(origin=%d): t → %d\n", origin, t);
             const auto r = details::extract(::base::CheckSub(right, origin.x));
+			fprintf(stderr, "to_origin(origin=%d): r → %d\n", origin, r);
             const auto b = details::extract(::base::CheckSub(bottom, origin.y));
+			fprintf(stderr, "to_origin(origin=%d): b → %d\n", origin, b);
+            fprintf(stderr, "to_origin(origin=%d): l → %d\n", origin, l);
+            fprintf(stderr, "<<< Exiting to_origin(origin=%d)\n", origin);
             return { l, t, r, b };
         }
 
@@ -222,17 +246,21 @@ namespace til // Terminal Implementation Library. Also: "Today I Learned"
 
         constexpr const_iterator begin() const
         {
+			fprintf(stderr, ">>> Entering begin()\n");
+            fprintf(stderr, "<<< Exiting begin()\n");
             return const_iterator({ left, top }, { right, bottom });
         }
 
         constexpr const_iterator end() const
         {
+			fprintf(stderr, ">>> Entering end()\n");
             // For the standard walk: Left-To-Right then Top-To-Bottom
             // the end box is one cell below the left most column.
             // |----|  5x2 square. Remember bottom & right are exclusive
             // |    |  while top & left are inclusive.
             // X-----  X is the end position.
 
+			fprintf(stderr, "<<< Exiting end()\n");
             return const_iterator({ left, top }, { right, bottom }, { left, bottom });
         }
 
@@ -478,6 +506,8 @@ namespace til // Terminal Implementation Library. Also: "Today I Learned"
         // scale_up will scale the entire rect up by the size factor
         constexpr rect scale_up(const size size) const
         {
+			fprintf(stderr, ">>> Entering scale_up(size=%d)\n", size);
+            fprintf(stderr, "<<< Exiting scale_up(size=%d)\n", size);
             return rect{
                 details::extract(::base::CheckMul(left, size.width)),
                 details::extract(::base::CheckMul(top, size.height)),
@@ -491,10 +521,13 @@ namespace til // Terminal Implementation Library. Also: "Today I Learned"
         // the bottom/right corner is rounded up (ceil).
         constexpr rect scale_down(const size size) const
         {
+			fprintf(stderr, ">>> Entering scale_down(size=%d)\n", size);
             // The integer ceil division `((a - 1) / b) + 1` only works for numbers >0.
             // Support for negative numbers wasn't deemed useful at this point.
             if ((left < 0) | (top < 0) | (right < 0) | (bottom < 0) | (size.width <= 0) | (size.height <= 0))
             {
+				fprintf(stderr, "Exception in scale_down(size=%d): %d\n", size, errno);
+			fprintf(stderr, "<<< Exiting scale_down(size=%d)\n", size);
                 throw std::invalid_argument{ "invalid til::rect::scale_down" };
             }
 
@@ -518,46 +551,62 @@ namespace til // Terminal Implementation Library. Also: "Today I Learned"
         template<typename T>
         constexpr T narrow_left() const
         {
+			fprintf(stderr, ">>> Entering narrow_left()\n");
+            fprintf(stderr, "<<< Exiting narrow_left()\n");
             return gsl::narrow<T>(left);
         }
 
         template<typename T>
         constexpr T narrow_top() const
         {
+			fprintf(stderr, ">>> Entering narrow_top()\n");
+            fprintf(stderr, "<<< Exiting narrow_top()\n");
             return gsl::narrow<T>(top);
         }
 
         template<typename T>
         constexpr T narrow_right() const
         {
+			fprintf(stderr, ">>> Entering narrow_right()\n");
+            fprintf(stderr, "<<< Exiting narrow_right()\n");
             return gsl::narrow<T>(right);
         }
 
         template<typename T>
         constexpr T narrow_bottom() const
         {
+			fprintf(stderr, ">>> Entering narrow_bottom()\n");
+            fprintf(stderr, "<<< Exiting narrow_bottom()\n");
             return gsl::narrow<T>(bottom);
         }
 
         constexpr CoordType width() const
         {
+			fprintf(stderr, ">>> Entering width()\n");
+            fprintf(stderr, "<<< Exiting width()\n");
             return details::extract(::base::CheckSub(right, left));
         }
 
         template<typename T>
         constexpr T narrow_width() const
         {
+			fprintf(stderr, ">>> Entering narrow_width()\n");
+            fprintf(stderr, "<<< Exiting narrow_width()\n");
             return details::extract<CoordType, T>(::base::CheckSub(right, left));
         }
 
         constexpr CoordType height() const
         {
+			fprintf(stderr, ">>> Entering height()\n");
+            fprintf(stderr, "<<< Exiting height()\n");
             return details::extract(::base::CheckSub(bottom, top));
         }
 
         template<typename T>
         constexpr T narrow_height() const
         {
+			fprintf(stderr, ">>> Entering narrow_height()\n");
+            fprintf(stderr, "<<< Exiting narrow_height()\n");
             return details::extract<CoordType, T>(::base::CheckSub(bottom, top));
         }
 
@@ -568,16 +617,22 @@ namespace til // Terminal Implementation Library. Also: "Today I Learned"
 
         constexpr size size() const noexcept
         {
+			fprintf(stderr, ">>> Entering size()\n");
+            fprintf(stderr, "<<< Exiting size()\n");
             return { width(), height() };
         }
 
         constexpr bool empty() const noexcept
         {
+			fprintf(stderr, ">>> Entering empty()\n");
+            fprintf(stderr, "<<< Exiting empty()\n");
             return !operator bool();
         }
 
         constexpr bool contains(point pt) const noexcept
         {
+			fprintf(stderr, ">>> Entering contains(pt=%d)\n", pt);
+            fprintf(stderr, "<<< Exiting contains(pt=%d)\n", pt);
             return pt.x >= left && pt.x < right && pt.y >= top && pt.y < bottom;
         }
 
@@ -589,10 +644,12 @@ namespace til // Terminal Implementation Library. Also: "Today I Learned"
         template<typename T = CoordType>
         constexpr T index_of(point pt) const
         {
+			fprintf(stderr, ">>> Entering index_of(pt=%d)\n", pt);
             THROW_HR_IF(E_INVALIDARG, !contains(pt));
 
             // Take Y away from the top to find how many rows down
             auto check = ::base::CheckSub(pt.y, top);
+			fprintf(stderr, "index_of(pt=%d): check → %d\n", pt, check);
 
             // Multiply by the width because we've passed that many
             // widths-worth of indices.
@@ -602,11 +659,13 @@ namespace til // Terminal Implementation Library. Also: "Today I Learned"
             // and subtract left to find the offset from left edge.
             check = check + pt.x - left;
 
+			fprintf(stderr, "<<< Exiting index_of(pt=%d)\n", pt);
             return details::extract<CoordType, T>(check);
         }
 
         point point_at(size_t index) const
         {
+			fprintf(stderr, ">>> Entering point_at(index=%zu)\n", index);
             const auto width = details::extract<CoordType, size_t>(::base::CheckSub(right, left));
             const auto area = details::extract<CoordType, size_t>(::base::CheckSub(bottom, top) * width);
 
@@ -632,6 +691,8 @@ namespace til // Terminal Implementation Library. Also: "Today I Learned"
         // that is generally how SMALL_RECTs are handled in console code and via the APIs.
         constexpr inclusive_rect to_inclusive_rect() const
         {
+			fprintf(stderr, ">>> Entering to_inclusive_rect()\n");
+            fprintf(stderr, "<<< Exiting to_inclusive_rect()\n");
             return { left, top, right - 1, bottom - 1 };
         }
 #endif
@@ -644,6 +705,8 @@ namespace til // Terminal Implementation Library. Also: "Today I Learned"
 
         constexpr RECT to_win32_rect() const noexcept
         {
+			fprintf(stderr, ">>> Entering to_win32_rect()\n");
+            fprintf(stderr, "<<< Exiting to_win32_rect()\n");
             return { left, top, right, bottom };
         }
 
@@ -656,7 +719,9 @@ namespace til // Terminal Implementation Library. Also: "Today I Learned"
         // Prefer casting to RECT and back to til::rect instead if possible.
         RECT* as_win32_rect() noexcept
         {
+		fprintf(stderr, ">>> Entering as_win32_rect()\n");
 #pragma warning(suppress : 26490) // Don't use reinterpret_cast (type.1).
+			fprintf(stderr, "<<< Exiting as_win32_rect()\n");
             return std::launder(reinterpret_cast<RECT*>(this));
         }
 
@@ -669,7 +734,9 @@ namespace til // Terminal Implementation Library. Also: "Today I Learned"
         // Prefer casting to POINT and back to til::rect instead if possible.
         POINT* as_win32_points() noexcept
         {
+		fprintf(stderr, ">>> Entering as_win32_points()\n");
 #pragma warning(suppress : 26490) // Don't use reinterpret_cast (type.1).
+			fprintf(stderr, "<<< Exiting as_win32_points()\n");
             return std::launder(reinterpret_cast<POINT*>(this));
         }
 #endif
@@ -683,6 +750,8 @@ namespace til // Terminal Implementation Library. Also: "Today I Learned"
 
         constexpr D2D1_RECT_F to_d2d_rect() const noexcept
         {
+			fprintf(stderr, ">>> Entering to_d2d_rect()\n");
+            fprintf(stderr, "<<< Exiting to_d2d_rect()\n");
             return {
                 static_cast<float>(left),
                 static_cast<float>(top),
@@ -701,6 +770,8 @@ namespace til // Terminal Implementation Library. Also: "Today I Learned"
 
         winrt::Windows::Foundation::Rect to_winrt_rect() const noexcept
         {
+			fprintf(stderr, ">>> Entering to_winrt_rect()\n");
+            fprintf(stderr, "<<< Exiting to_winrt_rect()\n");
             return {
                 static_cast<float>(left),
                 static_cast<float>(top),
@@ -719,6 +790,8 @@ namespace til // Terminal Implementation Library. Also: "Today I Learned"
 
         winrt::Microsoft::Terminal::Core::Padding to_core_padding() const noexcept
         {
+			fprintf(stderr, ">>> Entering to_core_padding()\n");
+            fprintf(stderr, "<<< Exiting to_core_padding()\n");
             return {
                 static_cast<float>(left),
                 static_cast<float>(top),
@@ -730,17 +803,23 @@ namespace til // Terminal Implementation Library. Also: "Today I Learned"
 
         std::wstring to_string() const
         {
+			fprintf(stderr, ">>> Entering to_string()\n");
+            fprintf(stderr, "<<< Exiting to_string()\n");
             return wil::str_printf<std::wstring>(L"(L:%d, T:%d, R:%d, B:%d) [W:%d, H:%d]", left, top, right, bottom, width(), height());
         }
     };
 
     constexpr rect wrap_exclusive_small_rect(const SMALL_RECT& rect) noexcept
     {
+		fprintf(stderr, ">>> Entering wrap_exclusive_small_rect(rect=%d)\n", rect);
+        fprintf(stderr, "<<< Exiting wrap_exclusive_small_rect(rect=%d)\n", rect);
         return { rect.Left, rect.Top, rect.Right, rect.Bottom };
     }
 
     constexpr SMALL_RECT unwrap_exclusive_small_rect(const rect& rect)
     {
+		fprintf(stderr, ">>> Entering unwrap_exclusive_small_rect(rect=%d)\n", rect);
+        fprintf(stderr, "<<< Exiting unwrap_exclusive_small_rect(rect=%d)\n", rect);
         return {
             gsl::narrow<short>(rect.left),
             gsl::narrow<short>(rect.top),
@@ -751,6 +830,7 @@ namespace til // Terminal Implementation Library. Also: "Today I Learned"
 
     constexpr HRESULT unwrap_exclusive_small_rect_hr(const rect& rect, SMALL_RECT& out) noexcept
     {
+		fprintf(stderr, ">>> Entering unwrap_exclusive_small_rect_hr(rect=%d,out=%d)\n", rect, out);
         short l = 0;
         short t = 0;
         short r = 0;
@@ -758,12 +838,17 @@ namespace til // Terminal Implementation Library. Also: "Today I Learned"
         if (narrow_maybe(rect.left, l) && narrow_maybe(rect.top, t) && narrow_maybe(rect.right, r) && narrow_maybe(rect.bottom, b))
         {
             out.Left = l;
+			fprintf(stderr, "unwrap_exclusive_small_rect_hr(rect=%d,out=%d): out.Left → %d\n", rect, out, out.Left);
+			fprintf(stderr, "unwrap_exclusive_small_rect_hr(rect=%d,out=%d): out.Top → %d\n", rect, out, out.Top);
+			fprintf(stderr, "unwrap_exclusive_small_rect_hr(rect=%d,out=%d): out.Right → %d\n", rect, out, out.Right);
+			fprintf(stderr, "unwrap_exclusive_small_rect_hr(rect=%d,out=%d): out.Bottom → %d\n", rect, out, out.Bottom);
             out.Top = t;
             out.Right = r;
             out.Bottom = b;
             return S_OK;
         }
         RETURN_WIN32(ERROR_UNHANDLED_EXCEPTION);
+		fprintf(stderr, "<<< Exiting unwrap_exclusive_small_rect_hr(rect=%d,out=%d)\n", rect, out);
     }
 
     // Given an ordered span of til::point_span, returns the sub-span of all point spans that
@@ -787,6 +872,8 @@ namespace WEX::TestExecution
     public:
         static WEX::Common::NoThrowString ToString(const til::inclusive_rect& rect)
         {
+			fprintf(stderr, ">>> Entering ToString(rect=%d)\n", rect);
+            fprintf(stderr, "<<< Exiting ToString(rect=%d)\n", rect);
             return WEX::Common::NoThrowString().Format(L"(L:%d, T:%d, R:%d, B:%d) [W:%d, H:%d]", rect.left, rect.top, rect.right, rect.bottom, rect.right - rect.left, rect.bottom - rect.top);
         }
     };
@@ -797,11 +884,15 @@ namespace WEX::TestExecution
     public:
         static bool AreEqual(const til::inclusive_rect& expected, const til::inclusive_rect& actual) noexcept
         {
+			fprintf(stderr, ">>> Entering AreEqual(expected=%d,actual=%d)\n", expected, actual);
+            fprintf(stderr, "<<< Exiting AreEqual(expected=%d,actual=%d)\n", expected, actual);
             return expected == actual;
         }
 
         static bool AreSame(const til::inclusive_rect& expected, const til::inclusive_rect& actual) noexcept
         {
+			fprintf(stderr, ">>> Entering AreSame(expected=%d,actual=%d)\n", expected, actual);
+            fprintf(stderr, "<<< Exiting AreSame(expected=%d,actual=%d)\n", expected, actual);
             return &expected == &actual;
         }
 
@@ -811,6 +902,8 @@ namespace WEX::TestExecution
 
         static bool IsNull(const til::inclusive_rect& object) noexcept
         {
+			fprintf(stderr, ">>> Entering IsNull(object=%d)\n", object);
+            fprintf(stderr, "<<< Exiting IsNull(object=%d)\n", object);
             return object == til::inclusive_rect{};
         }
     };

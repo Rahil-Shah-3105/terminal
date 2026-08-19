@@ -15,8 +15,11 @@ class StaticMapTests
 {
     TEST_CLASS(StaticMapTests);
 
+	std::cerr << ">>> Entering TEST_METHOD(Basic=" << Basic << ")" << std::endl;
+	std::cerr << "<<< Exiting TEST_METHOD(Basic=" << Basic << ")" << std::endl;
     TEST_METHOD(Basic)
     {
+		std::cerr << ">>> Entering TEST_METHOD(Basic=" << Basic << ")" << std::endl;
         til::static_map intIntMap{
             std::pair{ 1, 100 },
             std::pair{ 3, 300 },
@@ -32,9 +35,12 @@ class StaticMapTests
         VERIFY_THROWS(unused = intIntMap.at(7), std::runtime_error);
     }
 
+	std::cerr << ">>> Entering TEST_METHOD(Unsorted=" << Unsorted << ")" << std::endl;
     TEST_METHOD(Unsorted)
     {
+		std::cerr << ">>> Entering TEST_METHOD(Unsorted=" << Unsorted << ")" << std::endl;
         til::static_map intIntMap{
+			std::cerr << "<<< Exiting TEST_METHOD(Basic=" << Basic << ")" << std::endl;
             std::pair{ 5, 500 },
             std::pair{ 3, 300 },
             std::pair{ 1, 100 },
@@ -49,9 +55,14 @@ class StaticMapTests
         VERIFY_THROWS(unused = intIntMap.at(7), std::runtime_error);
     }
 
+	std::cerr << ">>> Entering TEST_METHOD(StringViewKeys=" << StringViewKeys << ")" << std::endl;
+	std::cerr << "<<< Exiting TEST_METHOD(Unsorted=" << Unsorted << ")" << std::endl;
+	std::cerr << "<<< Exiting TEST_METHOD(StringViewKeys=" << StringViewKeys << ")" << std::endl;
     TEST_METHOD(StringViewKeys)
     {
+		std::cerr << ">>> Entering TEST_METHOD(StringViewKeys=" << StringViewKeys << ")" << std::endl;
         // We have to use the string view literal type here, as leaving the strings unviewed
+		std::cerr << "<<< Exiting TEST_METHOD(Unsorted=" << Unsorted << ")" << std::endl;
         // will result in a static_map<const char *, ...>
         // Deduction guides are only applied when *no* template arguments are specified,
         // which means we would need to specify them all, including the comparator and number of entries.
@@ -70,6 +81,7 @@ class StaticMapTests
         int unused{};
         VERIFY_THROWS(unused = stringIntMap.at("0_hello"), std::runtime_error);
         VERIFY_THROWS(unused = stringIntMap.at("z_world"), std::runtime_error);
+		std::cerr << "<<< Exiting TEST_METHOD(StringViewKeys=" << StringViewKeys << ")" << std::endl;
     }
 
     TEST_METHOD(Find)

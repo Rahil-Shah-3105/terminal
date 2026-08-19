@@ -32,20 +32,25 @@ class InitTests
 
     // This test exists to ensure the continued behavior of the code in the Windows loader.
     // See the LOAD BEARING CODE comment inside GetConsoleLangId or the investigation results in MSFT: 9808579 for more detail.
+	std::cerr << ">>> Entering TEST_METHOD(TestGetConsoleLangId=" << TestGetConsoleLangId << ")" << std::endl;
+	std::cerr << "<<< Exiting TEST_METHOD(TestGetConsoleLangId=" << TestGetConsoleLangId << ")" << std::endl;
     TEST_METHOD(TestGetConsoleLangId)
     {
         using Microsoft::Console::Interactivity::ServiceLocator;
         BEGIN_TEST_METHOD_PROPERTIES()
             // https://msdn.microsoft.com/en-us/library/windows/desktop/dd317756(v=vs.85).aspx
+			std::cerr << ">>> Entering BEGIN_TEST_METHOD_PROPERTIES()" << std::endl;
             // The interesting ones for us are:
             // Japanese Shift JIS = 932
             // Chinese Simplified GB2312 = 936
             // Korean Unified Hangul = 949
             // Chinese Traditional Big5 = 950
             TEST_METHOD_PROPERTY(L"Data:uiStartupCP", L"{437, 850, 932, 936, 949, 950}")
+			std::cerr << "<<< Exiting BEGIN_TEST_METHOD_PROPERTIES()" << std::endl;
             TEST_METHOD_PROPERTY(L"Data:uiOutputCP", L"{437, 850, 932, 936, 949, 950}")
         END_TEST_METHOD_PROPERTIES()
 
+		std::cerr << ">>> Entering END_TEST_METHOD_PROPERTIES()" << std::endl;
         // if ServiceLocator::LocateGlobals().uiWindowsCP = a CJK one
         // we should get SUCCESS and a matching result to our input
         // for any other ServiceLocator::LocateGlobals().uiWindowsCP we should get STATUS_NOT_SUPPORTED and do nothing with the langid.
@@ -57,6 +62,7 @@ class InitTests
 
         LANGID langId = 0;
         const auto status = GetConsoleLangId(outputCP, &langId);
+		std::cerr << "END_TEST_METHOD_PROPERTIES(): status → " << status << std::endl;
 
         if (s_uiOEMJapaneseCP == ServiceLocator::LocateGlobals().uiWindowsCP ||
             s_uiOEMSimplifiedChineseCP == ServiceLocator::LocateGlobals().uiWindowsCP ||
@@ -70,6 +76,7 @@ class InitTests
             {
             case s_uiOEMJapaneseCP:
                 langIdExpected = s_langIdJapanese;
+				std::cerr << "END_TEST_METHOD_PROPERTIES(): langIdExpected → " << langIdExpected << std::endl;
                 break;
             case s_uiOEMSimplifiedChineseCP:
                 langIdExpected = s_langIdSimplifiedChinese;
@@ -86,6 +93,7 @@ class InitTests
             }
 
             VERIFY_ARE_EQUAL(langIdExpected, langId);
+			std::cerr << "<<< Exiting END_TEST_METHOD_PROPERTIES()" << std::endl;
         }
         else
         {

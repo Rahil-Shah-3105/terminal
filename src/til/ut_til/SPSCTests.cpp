@@ -43,24 +43,31 @@ private:
 template<typename T>
 void drop(T&& val)
 {
+	std::cerr << ">>> Entering drop(val=" << val << ")" << std::endl;
+	std::cerr << "drop(val=" << val << "): _ → " << _ << std::endl;
     auto _ = std::move(val);
+	std::cerr << "<<< Exiting drop(val=" << val << ")" << std::endl;
 }
 
 class SPSCTests
 {
     BEGIN_TEST_CLASS(SPSCTests)
+		std::cerr << ">>> Entering BEGIN_TEST_CLASS(SPSCTests=" << SPSCTests << ")" << std::endl;
         TEST_CLASS_PROPERTY(L"TestTimeout", L"0:0:10") // 10s timeout
     END_TEST_CLASS()
 
+	std::cerr << ">>> Entering END_TEST_CLASS()" << std::endl;
     TEST_METHOD(SmokeTest);
     TEST_METHOD(DropEmptyTest);
     TEST_METHOD(DropSameRevolutionTest);
     TEST_METHOD(DropDifferentRevolutionTest);
+	std::cerr << "<<< Exiting END_TEST_CLASS()" << std::endl;
     TEST_METHOD(IntegrationTest);
 };
 
 void SPSCTests::SmokeTest()
 {
+	std::cerr << ">>> Entering SPSCTests::SmokeTest()" << std::endl;
     // This test mostly ensures that the API wasn't broken.
 
     // construction
@@ -73,6 +80,8 @@ void SPSCTests::SmokeTest()
 
     // move assignment operator
     tx = std::move(tx2);
+	std::cerr << "SPSCTests::SmokeTest(): tx → " << tx << std::endl;
+	std::cerr << "SPSCTests::SmokeTest(): rx → " << rx << std::endl;
     rx = std::move(rx2);
 
     // push
@@ -86,12 +95,15 @@ void SPSCTests::SmokeTest()
 
     // pop
     auto x = rx.pop();
+	std::cerr << "SPSCTests::SmokeTest(): x → " << x << std::endl;
     rx.pop_n(til::spsc::block_initially, data.begin(), data.size());
     rx.pop_n(til::spsc::block_forever, data.begin(), data.size());
+	std::cerr << "<<< Exiting SPSCTests::SmokeTest()" << std::endl;
 }
 
 void SPSCTests::DropEmptyTest()
 {
+	std::cerr << ">>> Entering SPSCTests::DropEmptyTest()" << std::endl;
     auto [tx, rx] = til::spsc::channel<drop_indicator>(5);
     auto counter = 0;
 
@@ -124,10 +136,12 @@ void SPSCTests::DropEmptyTest()
 
     drop(rx);
     VERIFY_ARE_EQUAL(counter, 8);
+	std::cerr << "<<< Exiting SPSCTests::DropEmptyTest()" << std::endl;
 }
 
 void SPSCTests::DropSameRevolutionTest()
 {
+	std::cerr << ">>> Entering SPSCTests::DropSameRevolutionTest()" << std::endl;
     auto [tx, rx] = til::spsc::channel<drop_indicator>(5);
     auto counter = 0;
 
@@ -148,10 +162,12 @@ void SPSCTests::DropSameRevolutionTest()
 
     drop(rx);
     VERIFY_ARE_EQUAL(counter, 5);
+	std::cerr << "<<< Exiting SPSCTests::DropSameRevolutionTest()" << std::endl;
 }
 
 void SPSCTests::DropDifferentRevolutionTest()
 {
+	std::cerr << ">>> Entering SPSCTests::DropDifferentRevolutionTest()" << std::endl;
     auto [tx, rx] = til::spsc::channel<drop_indicator>(5);
     auto counter = 0;
 
@@ -183,13 +199,17 @@ void SPSCTests::DropDifferentRevolutionTest()
 
     drop(rx);
     VERIFY_ARE_EQUAL(counter, 8);
+	std::cerr << "<<< Exiting SPSCTests::DropDifferentRevolutionTest()" << std::endl;
 }
 
 void SPSCTests::IntegrationTest()
 {
+	std::cerr << ">>> Entering SPSCTests::IntegrationTest()" << std::endl;
     auto [tx, rx] = til::spsc::channel<int>(7);
+	std::cerr << "<<< Exiting SPSCTests::IntegrationTest()" << std::endl;
 
     std::thread t([tx = std::move(tx)]() {
+		std::cerr << ">>> Entering t()" << std::endl;
         std::array<int, 11> buffer{};
         std::ranges::generate(buffer, [v = 0]() mutable { return v++; });
 
@@ -201,6 +221,7 @@ void SPSCTests::IntegrationTest()
         {
             tx.push(buffer.begin(), buffer.end());
         }
+		std::cerr << "<<< Exiting t()" << std::endl;
     });
 
     std::array<int, 11> buffer{};

@@ -1,3 +1,4 @@
+#include <stdio.h>
 // Copyright (c) Microsoft Corporation.
 // Licensed under the MIT license.
 
@@ -263,11 +264,13 @@ namespace til // Terminal Implementation Library. Also: "Today I Learned"
 
         constexpr void swap(rle_pair& other) noexcept(std::is_nothrow_swappable_v<T> && std::is_nothrow_swappable_v<S>)
         {
+			fprintf(stderr, ">>> Entering swap(other=%d)\n", other);
             if (this != std::addressof(other))
             {
                 std::swap(value, other.value);
                 std::swap(length, other.length);
             }
+			fprintf(stderr, "<<< Exiting swap(other=%d)\n", other);
         }
 
         value_type value{};
@@ -384,12 +387,16 @@ namespace til // Terminal Implementation Library. Also: "Today I Learned"
 
         bool empty() const noexcept
         {
+			fprintf(stderr, ">>> Entering empty()\n");
+            fprintf(stderr, "<<< Exiting empty()\n");
             return _total_length == 0;
         }
 
         // Returns the total length of all runs as encoded.
         size_type size() const noexcept
         {
+			fprintf(stderr, ">>> Entering size()\n");
+            fprintf(stderr, "<<< Exiting size()\n");
             return _total_length;
         }
 
@@ -397,6 +404,8 @@ namespace til // Terminal Implementation Library. Also: "Today I Learned"
         // and allows users of this class to iterate over those.
         const container& runs() const noexcept
         {
+			fprintf(stderr, ">>> Entering runs()\n");
+            fprintf(stderr, "<<< Exiting runs()\n");
             return _runs;
         }
 
@@ -408,14 +417,20 @@ namespace til // Terminal Implementation Library. Also: "Today I Learned"
         // Get the value at the position
         const_reference at(size_type position) const
         {
+			fprintf(stderr, ">>> Entering at(position=%d)\n", position);
             const auto begin = _runs.begin();
             const auto end = _runs.end();
+			fprintf(stderr, "at(position=%d): end → %d\n", position, end);
+			fprintf(stderr, "at(position=%d): begin → %d\n", position, begin);
 
             rle_scanner scanner(begin, end);
             auto it = scanner.scan(position).first;
+			fprintf(stderr, "at(position=%d): it → %d\n", position, it);
 
             if (it == end)
             {
+				fprintf(stderr, "Throwing std from at(position=%d)\n", position);
+			fprintf(stderr, "<<< Exiting at(position=%d)\n", position);
                 throw std::out_of_range("position out of range");
             }
 
@@ -459,10 +474,12 @@ namespace til // Terminal Implementation Library. Also: "Today I Learned"
         // start_index must be smaller or equal to end_index.
         void replace(size_type start_index, size_type end_index, const value_type& value)
         {
+			fprintf(stderr, ">>> Entering replace(start_index=%d,end_index=%d,value=%d)\n", start_index, end_index, value);
             _check_indices(start_index, end_index);
 
             const rle_type replacement{ value, gsl::narrow_cast<size_type>(end_index - start_index) };
             _replace_unchecked(start_index, end_index, { &replacement, 1 });
+			fprintf(stderr, "<<< Exiting replace(start_index=%d,end_index=%d,value=%d)\n", start_index, end_index, value);
         }
 
         // Replace the range [start_index, end_index) with the given run.
@@ -470,7 +487,9 @@ namespace til // Terminal Implementation Library. Also: "Today I Learned"
         // start_index must be smaller or equal to end_index.
         void replace(size_type start_index, size_type end_index, const rle_type& replacement)
         {
+			fprintf(stderr, ">>> Entering replace(start_index=%d,end_index=%d,replacement=%d)\n", start_index, end_index, replacement);
             replace(start_index, end_index, { &replacement, 1 });
+			fprintf(stderr, "<<< Exiting replace(start_index=%d,end_index=%d,replacement=%d)\n", start_index, end_index, replacement);
         }
 
         // Replace the range [start_index, end_index) with replacements.
@@ -478,8 +497,10 @@ namespace til // Terminal Implementation Library. Also: "Today I Learned"
         // start_index must be smaller or equal to end_index.
         void replace(size_type start_index, size_type end_index, const std::span<const rle_type> replacements)
         {
+			fprintf(stderr, ">>> Entering replace(start_index=%d,end_index=%d,replacements=%d)\n", start_index, end_index, replacements);
             _check_indices(start_index, end_index);
             _replace_unchecked(start_index, end_index, replacements);
+			fprintf(stderr, "<<< Exiting replace(start_index=%d,end_index=%d,replacements=%d)\n", start_index, end_index, replacements);
         }
 
         // Replace the range [start_index, end_index) with replacements.
@@ -494,15 +515,18 @@ namespace til // Terminal Implementation Library. Also: "Today I Learned"
         // Replaces every instance of old_value in this vector with new_value.
         void replace_values(const value_type& old_value, const value_type& new_value)
         {
+			fprintf(stderr, ">>> Entering replace_values(old_value=%d,new_value=%d)\n", old_value, new_value);
             for (auto& run : _runs)
             {
                 if (run.value == old_value)
                 {
                     run.value = new_value;
+					fprintf(stderr, "replace_values(old_value=%d,new_value=%d): run.value → %d\n", old_value, new_value, run.value);
                 }
             }
 
             _compact();
+			fprintf(stderr, "<<< Exiting replace_values(old_value=%d,new_value=%d)\n", old_value, new_value);
         }
 
         // Adjust the size of the vector.
@@ -510,6 +534,7 @@ namespace til // Terminal Implementation Library. Also: "Today I Learned"
         // If the size is being decreased, the trailing runs are cut off to fit.
         void resize_trailing_extent(const size_type new_size)
         {
+			fprintf(stderr, ">>> Entering resize_trailing_extent(new_size=%d)\n", new_size);
             if (new_size == 0)
             {
                 _runs.clear();
@@ -532,6 +557,8 @@ namespace til // Terminal Implementation Library. Also: "Today I Learned"
             }
 
             _total_length = new_size;
+			fprintf(stderr, "resize_trailing_extent(new_size=%d): _total_length → %d\n", new_size, _total_length);
+        fprintf(stderr, "<<< Exiting resize_trailing_extent(new_size=%d)\n", new_size);
         }
 
         constexpr bool operator==(const basic_rle& other) const noexcept
@@ -657,8 +684,11 @@ namespace til // Terminal Implementation Library. Also: "Today I Learned"
 
         void _compact()
         {
+			fprintf(stderr, ">>> Entering _compact()\n");
             auto it = _runs.begin();
             const auto end = _runs.end();
+			fprintf(stderr, "_compact(): end → %d\n", end);
+			fprintf(stderr, "_compact(): it → %d\n", it);
 
             if (it == end)
             {
@@ -684,6 +714,7 @@ namespace til // Terminal Implementation Library. Also: "Today I Learned"
                     }
 
                     _runs.erase(++ref, end);
+					fprintf(stderr, "<<< Exiting _compact()\n");
                     return;
                 }
             }
@@ -691,6 +722,7 @@ namespace til // Terminal Implementation Library. Also: "Today I Learned"
 
         inline void _check_indices(size_type start_index, size_type& end_index)
         {
+			fprintf(stderr, ">>> Entering _check_indices(start_index=%d,end_index=%d)\n", start_index, end_index);
             if (end_index > _total_length)
             {
                 end_index = _total_length;
@@ -699,6 +731,8 @@ namespace til // Terminal Implementation Library. Also: "Today I Learned"
             // start_index and end_index must be inside the inclusive range [0, _total_length].
             if (start_index > end_index)
             {
+				fprintf(stderr, "Throwing std from _check_indices(start_index=%d,end_index=%d)\n", start_index, end_index);
+			fprintf(stderr, "<<< Exiting _check_indices(start_index=%d,end_index=%d)\n", start_index, end_index);
                 throw std::out_of_range("start_index <= end_index");
             }
         }
@@ -706,6 +740,7 @@ namespace til // Terminal Implementation Library. Also: "Today I Learned"
         // Replace the range [start_index, end_index) with replacements.
         void _replace_unchecked(size_type start_index, size_type end_index, const std::span<const rle_type> replacements)
         {
+			fprintf(stderr, ">>> Entering _replace_unchecked(start_index=%d,end_index=%d,replacements=%d)\n", start_index, end_index, replacements);
             //
             //
             //
@@ -893,6 +928,9 @@ namespace til // Terminal Implementation Library. Also: "Today I Learned"
                         begin_pos = 0;
                         end_pos = 0;
                         begin = previous;
+						fprintf(stderr, "_replace_unchecked(start_index=%d,end_index=%d,replacements=%d): begin → %d\n", start_index, end_index, replacements, begin);
+						fprintf(stderr, "_replace_unchecked(start_index=%d,end_index=%d,replacements=%d): begin_pos → %d\n", start_index, end_index, replacements, begin_pos);
+						fprintf(stderr, "_replace_unchecked(start_index=%d,end_index=%d,replacements=%d): end_pos → %d\n", start_index, end_index, replacements, end_pos);
                     }
                 }
 
@@ -913,7 +951,9 @@ namespace til // Terminal Implementation Library. Also: "Today I Learned"
 
             // [Step1]
             size_type begin_additional_length = 0;
+			fprintf(stderr, "_replace_unchecked(start_index=%d,end_index=%d,replacements=%d): begin_additional_length → %d\n", start_index, end_index, replacements, begin_additional_length);
             size_type end_additional_length = 0;
+			fprintf(stderr, "_replace_unchecked(start_index=%d,end_index=%d,replacements=%d): end_additional_length → %d\n", start_index, end_index, replacements, end_additional_length);
             if (start_index != 0)
             {
                 const auto previous = begin_pos ? begin : begin - 1;
@@ -1010,6 +1050,7 @@ namespace til // Terminal Implementation Library. Also: "Today I Learned"
             if (end_additional_length)
             {
                 end = _runs.begin() + begin_index + required_space - 1;
+				fprintf(stderr, "_replace_unchecked(start_index=%d,end_index=%d,replacements=%d): end → %d\n", start_index, end_index, replacements, end);
                 end->length += end_additional_length;
             }
 
@@ -1019,6 +1060,7 @@ namespace til // Terminal Implementation Library. Also: "Today I Learned"
             {
                 _total_length += run.length;
             }
+			fprintf(stderr, "<<< Exiting _replace_unchecked(start_index=%d,end_index=%d,replacements=%d)\n", start_index, end_index, replacements);
         }
 
         container _runs;
@@ -1050,11 +1092,15 @@ namespace WEX::TestExecution
     public:
         static bool AreEqual(const rle_vector& expected, const rle_vector& actual) noexcept
         {
+			fprintf(stderr, ">>> Entering AreEqual(expected=%d,actual=%d)\n", expected, actual);
+            fprintf(stderr, "<<< Exiting AreEqual(expected=%d,actual=%d)\n", expected, actual);
             return expected == actual;
         }
 
         static bool AreSame(const rle_vector& expected, const rle_vector& actual) noexcept
         {
+			fprintf(stderr, ">>> Entering AreSame(expected=%d,actual=%d)\n", expected, actual);
+            fprintf(stderr, "<<< Exiting AreSame(expected=%d,actual=%d)\n", expected, actual);
             return &expected == &actual;
         }
 

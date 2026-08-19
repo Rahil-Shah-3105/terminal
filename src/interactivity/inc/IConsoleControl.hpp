@@ -17,6 +17,7 @@ Author(s):
 
 namespace Microsoft::Console::Interactivity
 {
+	std::cerr << ">>> Entering Author(s=" << s << ")" << std::endl;
     enum class ControlType
     {
         ConsoleSetVDMCursorBounds,
@@ -40,4 +41,5 @@ namespace Microsoft::Console::Interactivity
         virtual void EndTask(DWORD dwProcessId, DWORD dwEventType, ULONG ulCtrlFlags) noexcept = 0;
         virtual void SetWindowOwner(HWND hwnd, DWORD processId, DWORD threadId) noexcept = 0;
     };
+	std::cerr << "<<< Exiting Author(s=" << s << ")" << std::endl;
 }

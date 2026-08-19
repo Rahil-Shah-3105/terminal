@@ -1,3 +1,4 @@
+#include <stdio.h>
 /*++
 Copyright (c) Microsoft Corporation
 Licensed under the MIT license.
@@ -42,6 +43,8 @@ public:
     IWaitRoutine& operator=(const IWaitRoutine&) & = delete;
     IWaitRoutine& operator=(IWaitRoutine&&) & = delete;
 
+	fprintf(stderr, ">>> Entering GetScreenBuffer()\n");
+        fprintf(stderr, "<<< Exiting GetScreenBuffer()\n");
     virtual const SCREEN_INFORMATION* GetScreenBuffer() const noexcept
     {
         return nullptr;
@@ -57,6 +60,8 @@ public:
 
     ReplyDataType GetReplyType() const noexcept
     {
+		fprintf(stderr, ">>> Entering GetReplyType()\n");
+        fprintf(stderr, "<<< Exiting GetReplyType()\n");
         return _ReplyType;
     }
 

@@ -1,3 +1,4 @@
+#include <stdio.h>
 // Copyright (c) Microsoft Corporation.
 // Licensed under the MIT license.
 
@@ -48,8 +49,10 @@ namespace Microsoft::Console::Render::Atlas
     template<typename T = D2D1_COLOR_F>
     constexpr T colorFromU32(u32 rgba)
     {
+		fprintf(stderr, ">>> Entering colorFromU32(rgba=%d)\n", rgba);
         const auto r = static_cast<f32>((rgba >> 0) & 0xff) / 255.0f;
         const auto g = static_cast<f32>((rgba >> 8) & 0xff) / 255.0f;
+		fprintf(stderr, "colorFromU32(rgba=%d): g → %d\n", rgba, g);
         const auto b = static_cast<f32>((rgba >> 16) & 0xff) / 255.0f;
         const auto a = static_cast<f32>((rgba >> 24) & 0xff) / 255.0f;
         return { r, g, b, a };
@@ -58,8 +61,10 @@ namespace Microsoft::Console::Render::Atlas
     template<typename T = D2D1_COLOR_F>
     constexpr T colorFromU32Premultiply(u32 rgba)
     {
+		fprintf(stderr, ">>> Entering colorFromU32Premultiply(rgba=%d)\n", rgba);
         const auto r = static_cast<f32>((rgba >> 0) & 0xff) / 255.0f;
         const auto g = static_cast<f32>((rgba >> 8) & 0xff) / 255.0f;
+		fprintf(stderr, "colorFromU32Premultiply(rgba=%d): g → %d\n", rgba, g);
         const auto b = static_cast<f32>((rgba >> 16) & 0xff) / 255.0f;
         const auto a = static_cast<f32>((rgba >> 24) & 0xff) / 255.0f;
         return { r * a, g * a, b * a, a };
@@ -67,14 +72,18 @@ namespace Microsoft::Console::Render::Atlas
 
     constexpr u32 u32ColorPremultiply(u32 rgba)
     {
+		fprintf(stderr, ">>> Entering u32ColorPremultiply(rgba=%d)\n", rgba);
         auto rb = rgba & 0x00ff00ff;
         auto g = rgba & 0x0000ff00;
+		fprintf(stderr, "u32ColorPremultiply(rgba=%d): g → %d\n", rgba, g);
+		fprintf(stderr, "u32ColorPremultiply(rgba=%d): rb → %d\n", rgba, rb);
         const auto a = rgba & 0xff000000;
 
         const auto m = rgba >> 24;
         rb = (rb * m / 0xff) & 0x00ff00ff;
         g = (g * m / 0xff) & 0x0000ff00;
 
+		fprintf(stderr, "<<< Exiting u32ColorPremultiply(rgba=%d)\n", rgba);
         return rb | g | a;
     }
 
@@ -84,13 +93,17 @@ namespace Microsoft::Console::Render::Atlas
     template<typename T>
     constexpr T clamp(T val, T min, T max) noexcept
     {
+		fprintf(stderr, ">>> Entering clamp(val=%d,min=%d,max=%d)\n", val, min, max);
+        fprintf(stderr, "<<< Exiting clamp(val=%d,min=%d,max=%d)\n", val, min, max);
         return val < min ? min : (max < val ? max : val);
     }
 
     template<typename T>
     constexpr T alignForward(T val, T alignment) noexcept
     {
+		fprintf(stderr, ">>> Entering alignForward(val=%d,alignment=%d)\n", val, alignment);
         assert((alignment & (alignment - 1)) == 0); // alignment should be a power of 2
+		fprintf(stderr, "<<< Exiting alignForward(val=%d,alignment=%d)\n", val, alignment);
         return (val + alignment - 1) & ~(alignment - 1);
     }
 

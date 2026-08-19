@@ -26,21 +26,26 @@ namespace
 {
     TerminalInput::OutputType process(TerminalInput& input, bool keyDown, uint16_t vk, uint16_t sc, wchar_t ch, uint32_t state)
     {
+		std::cerr << ">>> Entering process(input=" << input << ",keyDown=" << keyDown << ",vk=" << vk << ",sc=" << sc << ",ch=" << ch << ",state=" << state << ")" << std::endl;
         INPUT_RECORD record{};
         record.EventType = KEY_EVENT;
+		std::cerr << "process(input=" << input << ",keyDown=" << keyDown << ",vk=" << vk << ",sc=" << sc << ",ch=" << ch << ",state=" << state << "): record.EventType → " << record.EventType << std::endl;
         record.Event.KeyEvent.bKeyDown = keyDown ? TRUE : FALSE;
         record.Event.KeyEvent.wRepeatCount = 1;
         record.Event.KeyEvent.wVirtualKeyCode = vk;
         record.Event.KeyEvent.wVirtualScanCode = sc;
         record.Event.KeyEvent.uChar.UnicodeChar = ch;
         record.Event.KeyEvent.dwControlKeyState = state;
+		std::cerr << "<<< Exiting process(input=" << input << ",keyDown=" << keyDown << ",vk=" << vk << ",sc=" << sc << ",ch=" << ch << ",state=" << state << ")" << std::endl;
         return input.HandleKey(record);
     }
 
     TerminalInput createInput(uint8_t flags)
     {
+		std::cerr << ">>> Entering createInput(flags=" << flags << ")" << std::endl;
         TerminalInput input;
         input.SetKittyKeyboardProtocol(flags, TerminalInput::KittyKeyboardProtocolMode::Replace);
+		std::cerr << "<<< Exiting createInput(flags=" << flags << ")" << std::endl;
         return input;
     }
 
@@ -259,6 +264,9 @@ class KittyKeyboardProtocolTests
 
     TEST_CLASS(KittyKeyboardProtocolTests);
 
+	std::cerr << ">>> Entering TEST_CLASS_SETUP(ClassSetup=" << ClassSetup << ")" << std::endl;
+	std::cerr << "TEST_CLASS_SETUP(ClassSetup=" << ClassSetup << "): layout → " << layout << std::endl;
+	std::cerr << "<<< Exiting TEST_CLASS_SETUP(ClassSetup=" << ClassSetup << ")" << std::endl;
     TEST_CLASS_SETUP(ClassSetup)
     {
         layout = TestHook::SetTerminalInputKeyboardLayout(L"0001040c"); // French (Standard, AZERTY)
@@ -269,14 +277,20 @@ class KittyKeyboardProtocolTests
         return true;
     }
 
+	std::cerr << ">>> Entering TEST_CLASS_CLEANUP(ClassCleanup=" << ClassCleanup << ")" << std::endl;
+	std::cerr << "TEST_CLASS_CLEANUP(ClassCleanup=" << ClassCleanup << "): layout → " << layout << std::endl;
+	std::cerr << "<<< Exiting TEST_CLASS_CLEANUP(ClassCleanup=" << ClassCleanup << ")" << std::endl;
     TEST_CLASS_CLEANUP(ClassCleanup)
     {
         layout = {};
         return true;
     }
 
+	std::cerr << ">>> Entering TEST_METHOD(KeyPressTests=" << KeyPressTests << ")" << std::endl;
+	std::cerr << "<<< Exiting TEST_METHOD(KeyRepeatEvents=" << KeyRepeatEvents << ")" << std::endl;
     TEST_METHOD(KeyPressTests)
     {
+		std::cerr << ">>> Entering TEST_METHOD(KeyPressTests=" << KeyPressTests << ")" << std::endl;
         BEGIN_TEST_METHOD_PROPERTIES()
             TEST_METHOD_PROPERTY(L"DataSource", L"Export:KittyKeyTestDataSource")
         END_TEST_METHOD_PROPERTIES()
@@ -297,27 +311,37 @@ class KittyKeyboardProtocolTests
         VERIFY_ARE_EQUAL(expected, actual, msg.c_str());
     }
 
+	std::cerr << ">>> Entering TEST_METHOD(KeyRepeatEvents=" << KeyRepeatEvents << ")" << std::endl;
     TEST_METHOD(KeyRepeatEvents)
     {
+		std::cerr << ">>> Entering TEST_METHOD(KeyRepeatEvents=" << KeyRepeatEvents << ")" << std::endl;
         auto input = createInput(E | K);
         VERIFY_ARE_EQUAL(TerminalInput::MakeOutput(L"\x1b[97u"), process(input, true, 'A', 0x10, L'a', 0));
+		std::cerr << "TEST_METHOD(KeyRepeatEvents=" << KeyRepeatEvents << "): input → " << input << std::endl;
         VERIFY_ARE_EQUAL(TerminalInput::MakeOutput(L"\x1b[97;1:2u"), process(input, true, 'A', 0x10, L'a', 0)); // repeat
         VERIFY_ARE_EQUAL(TerminalInput::MakeOutput(L"\x1b[97;1:2u"), process(input, true, 'A', 0x10, L'a', 0)); // repeat
         VERIFY_ARE_EQUAL(TerminalInput::MakeOutput(L"\x1b[97;1:3u"), process(input, false, 'A', 0x10, L'a', 0)); // release
         VERIFY_ARE_EQUAL(TerminalInput::MakeOutput(L"\x1b[97u"), process(input, true, 'A', 0x10, L'a', 0)); // new press
+		std::cerr << "<<< Exiting TEST_METHOD(KeyRepeatEvents=" << KeyRepeatEvents << ")" << std::endl;
     }
 
+	std::cerr << ">>> Entering TEST_METHOD(KeyRepeatWithModifiers=" << KeyRepeatWithModifiers << ")" << std::endl;
+	std::cerr << "<<< Exiting TEST_METHOD(KeyRepeatWithModifiers=" << KeyRepeatWithModifiers << ")" << std::endl;
     TEST_METHOD(KeyRepeatWithModifiers)
     {
         auto input = createInput(E | K);
         VERIFY_ARE_EQUAL(TerminalInput::MakeOutput(L"\x1b[97;2u"), process(input, true, 'A', 0x10, L'A', SHIFT_PRESSED));
+		std::cerr << "TEST_METHOD(KeyRepeatWithModifiers=" << KeyRepeatWithModifiers << "): input → " << input << std::endl;
         VERIFY_ARE_EQUAL(TerminalInput::MakeOutput(L"\x1b[97;2:2u"), process(input, true, 'A', 0x10, L'A', SHIFT_PRESSED));
+		std::cerr << "<<< Exiting TEST_METHOD(KeyRepeatWithModifiers=" << KeyRepeatWithModifiers << ")" << std::endl;
     }
 
+	std::cerr << "<<< Exiting TEST_METHOD(KeyRepeatResetOnDifferentKey=" << KeyRepeatResetOnDifferentKey << ")" << std::endl;
     TEST_METHOD(KeyRepeatResetOnDifferentKey)
     {
         auto input = createInput(E | K);
         VERIFY_ARE_EQUAL(TerminalInput::MakeOutput(L"\x1b[97u"), process(input, true, 'A', 0x10, L'a', 0));
+		std::cerr << "TEST_METHOD(KeyRepeatResetOnDifferentKey=" << KeyRepeatResetOnDifferentKey << "): input → " << input << std::endl;
         VERIFY_ARE_EQUAL(TerminalInput::MakeOutput(L"\x1b[98u"), process(input, true, 'B', 0x30, L'b', 0)); // different key
         VERIFY_ARE_EQUAL(TerminalInput::MakeOutput(L"\x1b[97u"), process(input, true, 'A', 0x10, L'a', 0)); // not repeat
     }
@@ -326,5 +350,6 @@ class KittyKeyboardProtocolTests
     {
         auto input = createInput(E);
         VERIFY_ARE_EQUAL(TerminalInput::MakeOutput(L""), process(input, false, VK_OEM_6, 0x0D, L'¨', SHIFT_PRESSED));
+		std::cerr << "TEST_METHOD(IgnoreDeadKey=" << IgnoreDeadKey << "): input → " << input << std::endl;
     }
 };

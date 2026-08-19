@@ -17,8 +17,12 @@ class ViewportTests
 {
     TEST_CLASS(ViewportTests);
 
+	std::cerr << ">>> Entering TEST_METHOD(CreateEmpty=" << CreateEmpty << ")" << std::endl;
+	std::cerr << "TEST_METHOD(CreateEmpty=" << CreateEmpty << "): v → " << v << std::endl;
+	std::cerr << "<<< Exiting TEST_METHOD(CreateEmpty=" << CreateEmpty << ")" << std::endl;
     TEST_METHOD(CreateEmpty)
     {
+		std::cerr << ">>> Entering TEST_METHOD(CreateEmpty=" << CreateEmpty << ")" << std::endl;
         const auto v = Viewport::Empty();
 
         VERIFY_ARE_EQUAL(0, v.Left());
@@ -33,9 +37,21 @@ class ViewportTests
         VERIFY_ARE_EQUAL(til::size{}, v.Dimensions());
     }
 
+	std::cerr << ">>> Entering TEST_METHOD(CreateFromInclusive=" << CreateFromInclusive << ")" << std::endl;
+	std::cerr << "TEST_METHOD(CreateFromInclusive=" << CreateFromInclusive << "): rect.top → " << rect.top << std::endl;
+	std::cerr << "TEST_METHOD(CreateFromInclusive=" << CreateFromInclusive << "): rect.bottom → " << rect.bottom << std::endl;
+	std::cerr << "TEST_METHOD(CreateFromInclusive=" << CreateFromInclusive << "): rect.left → " << rect.left << std::endl;
+	std::cerr << "TEST_METHOD(CreateFromInclusive=" << CreateFromInclusive << "): rect.right → " << rect.right << std::endl;
+	std::cerr << "TEST_METHOD(CreateFromInclusive=" << CreateFromInclusive << "): origin.x → " << origin.x << std::endl;
+	std::cerr << "TEST_METHOD(CreateFromInclusive=" << CreateFromInclusive << "): origin.y → " << origin.y << std::endl;
+	std::cerr << "TEST_METHOD(CreateFromInclusive=" << CreateFromInclusive << "): dimensions.width → " << dimensions.width << std::endl;
+	std::cerr << "TEST_METHOD(CreateFromInclusive=" << CreateFromInclusive << "): dimensions.height → " << dimensions.height << std::endl;
+	std::cerr << "TEST_METHOD(CreateFromInclusive=" << CreateFromInclusive << "): v → " << v << std::endl;
     TEST_METHOD(CreateFromInclusive)
     {
+		std::cerr << ">>> Entering TEST_METHOD(CreateFromInclusive=" << CreateFromInclusive << ")" << std::endl;
         til::inclusive_rect rect;
+		std::cerr << "<<< Exiting TEST_METHOD(CreateEmpty=" << CreateEmpty << ")" << std::endl;
         rect.top = 3;
         rect.bottom = 5;
         rect.left = 10;
@@ -63,9 +79,22 @@ class ViewportTests
         VERIFY_ARE_EQUAL(dimensions, v.Dimensions());
     }
 
+	std::cerr << ">>> Entering TEST_METHOD(CreateFromExclusive=" << CreateFromExclusive << ")" << std::endl;
+	std::cerr << "<<< Exiting TEST_METHOD(CreateFromInclusive=" << CreateFromInclusive << ")" << std::endl;
+	std::cerr << "TEST_METHOD(CreateFromExclusive=" << CreateFromExclusive << "): rect.top → " << rect.top << std::endl;
+	std::cerr << "TEST_METHOD(CreateFromExclusive=" << CreateFromExclusive << "): rect.bottom → " << rect.bottom << std::endl;
+	std::cerr << "TEST_METHOD(CreateFromExclusive=" << CreateFromExclusive << "): rect.left → " << rect.left << std::endl;
+	std::cerr << "TEST_METHOD(CreateFromExclusive=" << CreateFromExclusive << "): rect.right → " << rect.right << std::endl;
+	std::cerr << "TEST_METHOD(CreateFromExclusive=" << CreateFromExclusive << "): origin.x → " << origin.x << std::endl;
+	std::cerr << "TEST_METHOD(CreateFromExclusive=" << CreateFromExclusive << "): origin.y → " << origin.y << std::endl;
+	std::cerr << "TEST_METHOD(CreateFromExclusive=" << CreateFromExclusive << "): dimensions.width → " << dimensions.width << std::endl;
+	std::cerr << "TEST_METHOD(CreateFromExclusive=" << CreateFromExclusive << "): dimensions.height → " << dimensions.height << std::endl;
+	std::cerr << "TEST_METHOD(CreateFromExclusive=" << CreateFromExclusive << "): v → " << v << std::endl;
     TEST_METHOD(CreateFromExclusive)
     {
+		std::cerr << ">>> Entering TEST_METHOD(CreateFromExclusive=" << CreateFromExclusive << ")" << std::endl;
         til::rect rect;
+		std::cerr << "<<< Exiting TEST_METHOD(CreateFromInclusive=" << CreateFromInclusive << ")" << std::endl;
         rect.top = 3;
         rect.bottom = 5;
         rect.left = 10;
@@ -93,9 +122,22 @@ class ViewportTests
         VERIFY_ARE_EQUAL(dimensions, v.Dimensions());
     }
 
+	std::cerr << ">>> Entering TEST_METHOD(CreateFromDimensionsWidthHeight=" << CreateFromDimensionsWidthHeight << ")" << std::endl;
+	std::cerr << "<<< Exiting TEST_METHOD(CreateFromExclusive=" << CreateFromExclusive << ")" << std::endl;
+	std::cerr << "TEST_METHOD(CreateFromDimensionsWidthHeight=" << CreateFromDimensionsWidthHeight << "): rect.top → " << rect.top << std::endl;
+	std::cerr << "TEST_METHOD(CreateFromDimensionsWidthHeight=" << CreateFromDimensionsWidthHeight << "): rect.bottom → " << rect.bottom << std::endl;
+	std::cerr << "TEST_METHOD(CreateFromDimensionsWidthHeight=" << CreateFromDimensionsWidthHeight << "): rect.left → " << rect.left << std::endl;
+	std::cerr << "TEST_METHOD(CreateFromDimensionsWidthHeight=" << CreateFromDimensionsWidthHeight << "): rect.right → " << rect.right << std::endl;
+	std::cerr << "TEST_METHOD(CreateFromDimensionsWidthHeight=" << CreateFromDimensionsWidthHeight << "): origin.x → " << origin.x << std::endl;
+	std::cerr << "TEST_METHOD(CreateFromDimensionsWidthHeight=" << CreateFromDimensionsWidthHeight << "): origin.y → " << origin.y << std::endl;
+	std::cerr << "TEST_METHOD(CreateFromDimensionsWidthHeight=" << CreateFromDimensionsWidthHeight << "): dimensions.width → " << dimensions.width << std::endl;
+	std::cerr << "TEST_METHOD(CreateFromDimensionsWidthHeight=" << CreateFromDimensionsWidthHeight << "): dimensions.height → " << dimensions.height << std::endl;
+	std::cerr << "TEST_METHOD(CreateFromDimensionsWidthHeight=" << CreateFromDimensionsWidthHeight << "): v → " << v << std::endl;
     TEST_METHOD(CreateFromDimensionsWidthHeight)
     {
+		std::cerr << ">>> Entering TEST_METHOD(CreateFromDimensionsWidthHeight=" << CreateFromDimensionsWidthHeight << ")" << std::endl;
         til::inclusive_rect rect;
+		std::cerr << "<<< Exiting TEST_METHOD(CreateFromExclusive=" << CreateFromExclusive << ")" << std::endl;
         rect.top = 3;
         rect.bottom = 5;
         rect.left = 10;
@@ -123,9 +165,22 @@ class ViewportTests
         VERIFY_ARE_EQUAL(dimensions, v.Dimensions());
     }
 
+	std::cerr << ">>> Entering TEST_METHOD(CreateFromDimensions=" << CreateFromDimensions << ")" << std::endl;
+	std::cerr << "<<< Exiting TEST_METHOD(CreateFromDimensionsWidthHeight=" << CreateFromDimensionsWidthHeight << ")" << std::endl;
+	std::cerr << "TEST_METHOD(CreateFromDimensions=" << CreateFromDimensions << "): rect.top → " << rect.top << std::endl;
+	std::cerr << "TEST_METHOD(CreateFromDimensions=" << CreateFromDimensions << "): rect.bottom → " << rect.bottom << std::endl;
+	std::cerr << "TEST_METHOD(CreateFromDimensions=" << CreateFromDimensions << "): rect.left → " << rect.left << std::endl;
+	std::cerr << "TEST_METHOD(CreateFromDimensions=" << CreateFromDimensions << "): rect.right → " << rect.right << std::endl;
+	std::cerr << "TEST_METHOD(CreateFromDimensions=" << CreateFromDimensions << "): origin.x → " << origin.x << std::endl;
+	std::cerr << "TEST_METHOD(CreateFromDimensions=" << CreateFromDimensions << "): origin.y → " << origin.y << std::endl;
+	std::cerr << "TEST_METHOD(CreateFromDimensions=" << CreateFromDimensions << "): dimensions.width → " << dimensions.width << std::endl;
+	std::cerr << "TEST_METHOD(CreateFromDimensions=" << CreateFromDimensions << "): dimensions.height → " << dimensions.height << std::endl;
+	std::cerr << "TEST_METHOD(CreateFromDimensions=" << CreateFromDimensions << "): v → " << v << std::endl;
     TEST_METHOD(CreateFromDimensions)
     {
+		std::cerr << ">>> Entering TEST_METHOD(CreateFromDimensions=" << CreateFromDimensions << ")" << std::endl;
         til::inclusive_rect rect;
+		std::cerr << "<<< Exiting TEST_METHOD(CreateFromDimensionsWidthHeight=" << CreateFromDimensionsWidthHeight << ")" << std::endl;
         rect.top = 3;
         rect.bottom = 5;
         rect.left = 10;
@@ -153,9 +208,22 @@ class ViewportTests
         VERIFY_ARE_EQUAL(dimensions, v.Dimensions());
     }
 
+	std::cerr << ">>> Entering TEST_METHOD(CreateFromDimensionsNoOrigin=" << CreateFromDimensionsNoOrigin << ")" << std::endl;
+	std::cerr << "<<< Exiting TEST_METHOD(CreateFromDimensions=" << CreateFromDimensions << ")" << std::endl;
+	std::cerr << "TEST_METHOD(CreateFromDimensionsNoOrigin=" << CreateFromDimensionsNoOrigin << "): rect.top → " << rect.top << std::endl;
+	std::cerr << "TEST_METHOD(CreateFromDimensionsNoOrigin=" << CreateFromDimensionsNoOrigin << "): rect.left → " << rect.left << std::endl;
+	std::cerr << "TEST_METHOD(CreateFromDimensionsNoOrigin=" << CreateFromDimensionsNoOrigin << "): rect.bottom → " << rect.bottom << std::endl;
+	std::cerr << "TEST_METHOD(CreateFromDimensionsNoOrigin=" << CreateFromDimensionsNoOrigin << "): rect.right → " << rect.right << std::endl;
+	std::cerr << "TEST_METHOD(CreateFromDimensionsNoOrigin=" << CreateFromDimensionsNoOrigin << "): origin.x → " << origin.x << std::endl;
+	std::cerr << "TEST_METHOD(CreateFromDimensionsNoOrigin=" << CreateFromDimensionsNoOrigin << "): origin.y → " << origin.y << std::endl;
+	std::cerr << "TEST_METHOD(CreateFromDimensionsNoOrigin=" << CreateFromDimensionsNoOrigin << "): dimensions.width → " << dimensions.width << std::endl;
+	std::cerr << "TEST_METHOD(CreateFromDimensionsNoOrigin=" << CreateFromDimensionsNoOrigin << "): dimensions.height → " << dimensions.height << std::endl;
+	std::cerr << "TEST_METHOD(CreateFromDimensionsNoOrigin=" << CreateFromDimensionsNoOrigin << "): v → " << v << std::endl;
     TEST_METHOD(CreateFromDimensionsNoOrigin)
     {
+		std::cerr << ">>> Entering TEST_METHOD(CreateFromDimensionsNoOrigin=" << CreateFromDimensionsNoOrigin << ")" << std::endl;
         til::inclusive_rect rect;
+		std::cerr << "<<< Exiting TEST_METHOD(CreateFromDimensions=" << CreateFromDimensions << ")" << std::endl;
         rect.top = 0;
         rect.left = 0;
         rect.bottom = 5;
@@ -183,9 +251,20 @@ class ViewportTests
         VERIFY_ARE_EQUAL(dimensions, v.Dimensions());
     }
 
+	std::cerr << ">>> Entering TEST_METHOD(IsInBoundsCoord=" << IsInBoundsCoord << ")" << std::endl;
+	std::cerr << "<<< Exiting TEST_METHOD(CreateFromDimensionsNoOrigin=" << CreateFromDimensionsNoOrigin << ")" << std::endl;
+	std::cerr << "TEST_METHOD(IsInBoundsCoord=" << IsInBoundsCoord << "): r.top → " << r.top << std::endl;
+	std::cerr << "TEST_METHOD(IsInBoundsCoord=" << IsInBoundsCoord << "): r.bottom → " << r.bottom << std::endl;
+	std::cerr << "TEST_METHOD(IsInBoundsCoord=" << IsInBoundsCoord << "): r.left → " << r.left << std::endl;
+	std::cerr << "TEST_METHOD(IsInBoundsCoord=" << IsInBoundsCoord << "): r.right → " << r.right << std::endl;
+	std::cerr << "TEST_METHOD(IsInBoundsCoord=" << IsInBoundsCoord << "): v → " << v << std::endl;
+	std::cerr << "TEST_METHOD(IsInBoundsCoord=" << IsInBoundsCoord << "): c.x → " << c.x << std::endl;
+	std::cerr << "TEST_METHOD(IsInBoundsCoord=" << IsInBoundsCoord << "): c.y → " << c.y << std::endl;
     TEST_METHOD(IsInBoundsCoord)
     {
+		std::cerr << ">>> Entering TEST_METHOD(IsInBoundsCoord=" << IsInBoundsCoord << ")" << std::endl;
         til::inclusive_rect r;
+		std::cerr << "<<< Exiting TEST_METHOD(CreateFromDimensionsNoOrigin=" << CreateFromDimensionsNoOrigin << ")" << std::endl;
         r.top = 3;
         r.bottom = 5;
         r.left = 10;
@@ -242,9 +321,19 @@ class ViewportTests
         VERIFY_IS_FALSE(v.IsInBounds(c), L"One down out the bottom right is out of bounds.");
     }
 
+	std::cerr << ">>> Entering TEST_METHOD(IsInBoundsViewport=" << IsInBoundsViewport << ")" << std::endl;
+	std::cerr << "<<< Exiting TEST_METHOD(IsInBoundsCoord=" << IsInBoundsCoord << ")" << std::endl;
+	std::cerr << "TEST_METHOD(IsInBoundsViewport=" << IsInBoundsViewport << "): rect.top → " << rect.top << std::endl;
+	std::cerr << "TEST_METHOD(IsInBoundsViewport=" << IsInBoundsViewport << "): rect.bottom → " << rect.bottom << std::endl;
+	std::cerr << "TEST_METHOD(IsInBoundsViewport=" << IsInBoundsViewport << "): rect.left → " << rect.left << std::endl;
+	std::cerr << "TEST_METHOD(IsInBoundsViewport=" << IsInBoundsViewport << "): rect.right → " << rect.right << std::endl;
+	std::cerr << "TEST_METHOD(IsInBoundsViewport=" << IsInBoundsViewport << "): view → " << view << std::endl;
+	std::cerr << "TEST_METHOD(IsInBoundsViewport=" << IsInBoundsViewport << "): rect → " << rect << std::endl;
     TEST_METHOD(IsInBoundsViewport)
     {
+		std::cerr << ">>> Entering TEST_METHOD(IsInBoundsViewport=" << IsInBoundsViewport << ")" << std::endl;
         til::inclusive_rect rect;
+		std::cerr << "<<< Exiting TEST_METHOD(IsInBoundsCoord=" << IsInBoundsCoord << ")" << std::endl;
         rect.top = 3;
         rect.bottom = 5;
         rect.left = 10;
@@ -255,6 +344,7 @@ class ViewportTests
         const auto view = Viewport::FromInclusive(rect);
 
         auto test = Viewport::FromInclusive(rect);
+		std::cerr << "TEST_METHOD(IsInBoundsViewport=" << IsInBoundsViewport << "): test → " << test << std::endl;
         VERIFY_IS_TRUE(view.IsInBounds(test), L"Same size/position viewport is in bounds.");
 
         rect.top++;
@@ -293,9 +383,22 @@ class ViewportTests
         VERIFY_IS_FALSE(view.IsInBounds(test), L"Viewport offset at the origin but same size is out of bounds.");
     }
 
+	std::cerr << ">>> Entering TEST_METHOD(ClampCoord=" << ClampCoord << ")" << std::endl;
+	std::cerr << "<<< Exiting TEST_METHOD(IsInBoundsViewport=" << IsInBoundsViewport << ")" << std::endl;
+	std::cerr << "TEST_METHOD(ClampCoord=" << ClampCoord << "): rect.top → " << rect.top << std::endl;
+	std::cerr << "TEST_METHOD(ClampCoord=" << ClampCoord << "): rect.bottom → " << rect.bottom << std::endl;
+	std::cerr << "TEST_METHOD(ClampCoord=" << ClampCoord << "): rect.left → " << rect.left << std::endl;
+	std::cerr << "TEST_METHOD(ClampCoord=" << ClampCoord << "): rect.right → " << rect.right << std::endl;
+	std::cerr << "TEST_METHOD(ClampCoord=" << ClampCoord << "): view → " << view << std::endl;
+	std::cerr << "TEST_METHOD(ClampCoord=" << ClampCoord << "): pos.x → " << pos.x << std::endl;
+	std::cerr << "TEST_METHOD(ClampCoord=" << ClampCoord << "): pos.y → " << pos.y << std::endl;
+	std::cerr << "TEST_METHOD(ClampCoord=" << ClampCoord << "): pos → " << pos << std::endl;
+	std::cerr << "TEST_METHOD(ClampCoord=" << ClampCoord << "): invalidView → " << invalidView << std::endl;
     TEST_METHOD(ClampCoord)
     {
+		std::cerr << ">>> Entering TEST_METHOD(ClampCoord=" << ClampCoord << ")" << std::endl;
         til::inclusive_rect rect;
+		std::cerr << "<<< Exiting TEST_METHOD(IsInBoundsViewport=" << IsInBoundsViewport << ")" << std::endl;
         rect.top = 3;
         rect.bottom = 5;
         rect.left = 10;
@@ -308,6 +411,7 @@ class ViewportTests
         pos.y = rect.top;
 
         auto before = pos;
+		std::cerr << "TEST_METHOD(ClampCoord=" << ClampCoord << "): before → " << before << std::endl;
         view.Clamp(pos);
         VERIFY_ARE_EQUAL(before, pos, L"Verify clamp did nothing for position in top left corner.");
 
@@ -384,9 +488,23 @@ class ViewportTests
                                [](wil::ResultException& e) { return e.GetErrorCode() == E_NOT_VALID_STATE; });
     }
 
+	std::cerr << ">>> Entering TEST_METHOD(ClampViewport=" << ClampViewport << ")" << std::endl;
+	std::cerr << "<<< Exiting TEST_METHOD(ClampCoord=" << ClampCoord << ")" << std::endl;
+	std::cerr << "TEST_METHOD(ClampViewport=" << ClampViewport << "): rect.top → " << rect.top << std::endl;
+	std::cerr << "TEST_METHOD(ClampViewport=" << ClampViewport << "): rect.bottom → " << rect.bottom << std::endl;
+	std::cerr << "TEST_METHOD(ClampViewport=" << ClampViewport << "): rect.left → " << rect.left << std::endl;
+	std::cerr << "TEST_METHOD(ClampViewport=" << ClampViewport << "): rect.right → " << rect.right << std::endl;
+	std::cerr << "TEST_METHOD(ClampViewport=" << ClampViewport << "): view → " << view << std::endl;
+	std::cerr << "TEST_METHOD(ClampViewport=" << ClampViewport << "): testRect.top → " << testRect.top << std::endl;
+	std::cerr << "TEST_METHOD(ClampViewport=" << ClampViewport << "): testRect.bottom → " << testRect.bottom << std::endl;
+	std::cerr << "TEST_METHOD(ClampViewport=" << ClampViewport << "): testRect.left → " << testRect.left << std::endl;
+	std::cerr << "TEST_METHOD(ClampViewport=" << ClampViewport << "): testRect.right → " << testRect.right << std::endl;
+	std::cerr << "TEST_METHOD(ClampViewport=" << ClampViewport << "): expectedView → " << expectedView << std::endl;
     TEST_METHOD(ClampViewport)
     {
+		std::cerr << ">>> Entering TEST_METHOD(ClampViewport=" << ClampViewport << ")" << std::endl;
         // Create the rectangle/view we will clamp to.
+		std::cerr << "<<< Exiting TEST_METHOD(ClampCoord=" << ClampCoord << ")" << std::endl;
         til::inclusive_rect rect;
         rect.top = 3;
         rect.bottom = 5;
@@ -403,8 +521,10 @@ class ViewportTests
         testRect.right = rect.right + 3;
 
         auto testView = Viewport::FromInclusive(testRect);
+		std::cerr << "TEST_METHOD(ClampViewport=" << ClampViewport << "): testView → " << testView << std::endl;
 
         auto actual = view.Clamp(testView);
+		std::cerr << "TEST_METHOD(ClampViewport=" << ClampViewport << "): actual → " << actual << std::endl;
         VERIFY_ARE_EQUAL(view, actual, L"All sides should get reduced down to the size of the given rect.");
 
         Log::Comment(L"Make a rectangle that is fully inscribed inside our clamping rectangle.");
@@ -431,11 +551,23 @@ class ViewportTests
         VERIFY_ARE_EQUAL(expectedView, actual, L"Every dimension should be pulled just inside the clamping rectangle.");
     }
 
+	std::cerr << ">>> Entering TEST_METHOD(IncrementInBounds=" << IncrementInBounds << ")" << std::endl;
+	std::cerr << "<<< Exiting TEST_METHOD(ClampViewport=" << ClampViewport << ")" << std::endl;
+	std::cerr << "TEST_METHOD(IncrementInBounds=" << IncrementInBounds << "): edges.left → " << edges.left << std::endl;
+	std::cerr << "TEST_METHOD(IncrementInBounds=" << IncrementInBounds << "): edges.right → " << edges.right << std::endl;
+	std::cerr << "TEST_METHOD(IncrementInBounds=" << IncrementInBounds << "): edges.top → " << edges.top << std::endl;
+	std::cerr << "TEST_METHOD(IncrementInBounds=" << IncrementInBounds << "): edges.bottom → " << edges.bottom << std::endl;
+	std::cerr << "TEST_METHOD(IncrementInBounds=" << IncrementInBounds << "): v → " << v << std::endl;
+	std::cerr << "TEST_METHOD(IncrementInBounds=" << IncrementInBounds << "): original.x → " << original.x << std::endl;
+	std::cerr << "TEST_METHOD(IncrementInBounds=" << IncrementInBounds << "): original.y → " << original.y << std::endl;
     TEST_METHOD(IncrementInBounds)
     {
+		std::cerr << ">>> Entering TEST_METHOD(IncrementInBounds=" << IncrementInBounds << ")" << std::endl;
         auto success = false;
 
+		std::cerr << "TEST_METHOD(IncrementInBounds=" << IncrementInBounds << "): success → " << success << std::endl;
         til::inclusive_rect edges;
+		std::cerr << "<<< Exiting TEST_METHOD(ClampViewport=" << ClampViewport << ")" << std::endl;
         edges.left = 10;
         edges.right = 19;
         edges.top = 20;
@@ -476,11 +608,23 @@ class ViewportTests
         VERIFY_ARE_EQUAL(screen.y, edges.bottom);
     }
 
+	std::cerr << ">>> Entering TEST_METHOD(DecrementInBounds=" << DecrementInBounds << ")" << std::endl;
+	std::cerr << "<<< Exiting TEST_METHOD(IncrementInBounds=" << IncrementInBounds << ")" << std::endl;
+	std::cerr << "TEST_METHOD(DecrementInBounds=" << DecrementInBounds << "): edges.left → " << edges.left << std::endl;
+	std::cerr << "TEST_METHOD(DecrementInBounds=" << DecrementInBounds << "): edges.right → " << edges.right << std::endl;
+	std::cerr << "TEST_METHOD(DecrementInBounds=" << DecrementInBounds << "): edges.top → " << edges.top << std::endl;
+	std::cerr << "TEST_METHOD(DecrementInBounds=" << DecrementInBounds << "): edges.bottom → " << edges.bottom << std::endl;
+	std::cerr << "TEST_METHOD(DecrementInBounds=" << DecrementInBounds << "): v → " << v << std::endl;
+	std::cerr << "TEST_METHOD(DecrementInBounds=" << DecrementInBounds << "): original.x → " << original.x << std::endl;
+	std::cerr << "TEST_METHOD(DecrementInBounds=" << DecrementInBounds << "): original.y → " << original.y << std::endl;
+	std::cerr << "<<< Exiting TEST_METHOD(DecrementInBounds=" << DecrementInBounds << ")" << std::endl;
     TEST_METHOD(DecrementInBounds)
     {
         auto success = false;
 
+		std::cerr << "TEST_METHOD(DecrementInBounds=" << DecrementInBounds << "): success → " << success << std::endl;
         til::inclusive_rect edges;
+		std::cerr << "<<< Exiting TEST_METHOD(IncrementInBounds=" << IncrementInBounds << ")" << std::endl;
         edges.left = 10;
         edges.right = 19;
         edges.top = 20;
@@ -523,13 +667,22 @@ class ViewportTests
 
     static til::CoordType RandomCoord()
     {
+		std::cerr << ">>> Entering RandomCoord()" << std::endl;
         til::CoordType s;
 
         do
         {
             s = (til::CoordType)rand() % SHORT_MAX;
+			std::cerr << "RandomCoord(): s → " << s << std::endl;
         } while (s == 0);
 
+		std::cerr << "<<< Exiting RandomCoord()" << std::endl;
+	std::cerr << "TEST_METHOD(MoveInBounds=" << MoveInBounds << "): srectEdges.top → " << srectEdges.top << std::endl;
+	std::cerr << "TEST_METHOD(MoveInBounds=" << MoveInBounds << "): srectEdges.bottom → " << srectEdges.bottom << std::endl;
+	std::cerr << "TEST_METHOD(MoveInBounds=" << MoveInBounds << "): v → " << v << std::endl;
+	std::cerr << "TEST_METHOD(MoveInBounds=" << MoveInBounds << "): sAddAmount → " << sAddAmount << std::endl;
+	std::cerr << "TEST_METHOD(MoveInBounds=" << MoveInBounds << "): coordClamped → " << coordClamped << std::endl;
+	std::cerr << "TEST_METHOD(MoveInBounds=" << MoveInBounds << "): fActualResult → " << fActualResult << std::endl;
         return s;
     }
 
@@ -569,6 +722,16 @@ class ViewportTests
         }
     }
 
+	std::cerr << "TEST_METHOD(CompareInBounds=" << CompareInBounds << "): edges.left → " << edges.left << std::endl;
+	std::cerr << "TEST_METHOD(CompareInBounds=" << CompareInBounds << "): edges.right → " << edges.right << std::endl;
+	std::cerr << "TEST_METHOD(CompareInBounds=" << CompareInBounds << "): edges.top → " << edges.top << std::endl;
+	std::cerr << "TEST_METHOD(CompareInBounds=" << CompareInBounds << "): edges.bottom → " << edges.bottom << std::endl;
+	std::cerr << "TEST_METHOD(CompareInBounds=" << CompareInBounds << "): v → " << v << std::endl;
+	std::cerr << "TEST_METHOD(CompareInBounds=" << CompareInBounds << "): first.x → " << first.x << std::endl;
+	std::cerr << "TEST_METHOD(CompareInBounds=" << CompareInBounds << "): first.y → " << first.y << std::endl;
+	std::cerr << "TEST_METHOD(CompareInBounds=" << CompareInBounds << "): second → " << second << std::endl;
+	std::cerr << "TEST_METHOD(CompareInBounds=" << CompareInBounds << "): second.x → " << second.x << std::endl;
+	std::cerr << "TEST_METHOD(CompareInBounds=" << CompareInBounds << "): second.y → " << second.y << std::endl;
     TEST_METHOD(CompareInBounds)
     {
         til::inclusive_rect edges;
@@ -598,6 +761,16 @@ class ViewportTests
         VERIFY_ARE_EQUAL(-1, v.CompareInBounds(second, first), L"Reverse params, should get opposite direction, same magnitude.");
     }
 
+	std::cerr << "TEST_METHOD(Offset=" << Offset << "): edges.top → " << edges.top << std::endl;
+	std::cerr << "TEST_METHOD(Offset=" << Offset << "): edges.left → " << edges.left << std::endl;
+	std::cerr << "TEST_METHOD(Offset=" << Offset << "): edges.right → " << edges.right << std::endl;
+	std::cerr << "TEST_METHOD(Offset=" << Offset << "): edges.bottom → " << edges.bottom << std::endl;
+	std::cerr << "TEST_METHOD(Offset=" << Offset << "): original → " << original << std::endl;
+	std::cerr << "TEST_METHOD(Offset=" << Offset << "): expectedEdges.top → " << expectedEdges.top << std::endl;
+	std::cerr << "TEST_METHOD(Offset=" << Offset << "): expectedEdges.bottom → " << expectedEdges.bottom << std::endl;
+	std::cerr << "TEST_METHOD(Offset=" << Offset << "): expectedEdges.left → " << expectedEdges.left << std::endl;
+	std::cerr << "TEST_METHOD(Offset=" << Offset << "): expectedEdges.right → " << expectedEdges.right << std::endl;
+	std::cerr << "TEST_METHOD(Offset=" << Offset << "): adjust → " << adjust << std::endl;
     TEST_METHOD(Offset)
     {
         til::inclusive_rect edges;
@@ -617,8 +790,10 @@ class ViewportTests
         expectedEdges.right = edges.right + adjust.x;
 
         auto expected = Viewport::FromInclusive(expectedEdges);
+		std::cerr << "TEST_METHOD(Offset=" << Offset << "): expected → " << expected << std::endl;
 
         auto actual = Viewport::Offset(original, adjust);
+		std::cerr << "TEST_METHOD(Offset=" << Offset << "): actual → " << actual << std::endl;
         VERIFY_ARE_EQUAL(expected, actual);
 
         Log::Comment(L"Now try moving up and to the left.");
@@ -634,6 +809,20 @@ class ViewportTests
         VERIFY_ARE_EQUAL(expected, actual);
     }
 
+	std::cerr << "TEST_METHOD(Union=" << Union << "): srOne.left → " << srOne.left << std::endl;
+	std::cerr << "TEST_METHOD(Union=" << Union << "): srOne.right → " << srOne.right << std::endl;
+	std::cerr << "TEST_METHOD(Union=" << Union << "): srOne.top → " << srOne.top << std::endl;
+	std::cerr << "TEST_METHOD(Union=" << Union << "): srOne.bottom → " << srOne.bottom << std::endl;
+	std::cerr << "TEST_METHOD(Union=" << Union << "): one → " << one << std::endl;
+	std::cerr << "TEST_METHOD(Union=" << Union << "): srTwo.left → " << srTwo.left << std::endl;
+	std::cerr << "TEST_METHOD(Union=" << Union << "): srTwo.right → " << srTwo.right << std::endl;
+	std::cerr << "TEST_METHOD(Union=" << Union << "): srTwo.top → " << srTwo.top << std::endl;
+	std::cerr << "TEST_METHOD(Union=" << Union << "): srTwo.bottom → " << srTwo.bottom << std::endl;
+	std::cerr << "TEST_METHOD(Union=" << Union << "): two → " << two << std::endl;
+	std::cerr << "TEST_METHOD(Union=" << Union << "): srExpected.left → " << srExpected.left << std::endl;
+	std::cerr << "TEST_METHOD(Union=" << Union << "): srExpected.right → " << srExpected.right << std::endl;
+	std::cerr << "TEST_METHOD(Union=" << Union << "): srExpected.top → " << srExpected.top << std::endl;
+	std::cerr << "TEST_METHOD(Union=" << Union << "): srExpected.bottom → " << srExpected.bottom << std::endl;
     TEST_METHOD(Union)
     {
         til::inclusive_rect srOne;
@@ -657,11 +846,27 @@ class ViewportTests
         srExpected.bottom = srOne.bottom > srTwo.bottom ? srOne.bottom : srTwo.bottom;
 
         const auto expected = Viewport::FromInclusive(srExpected);
+		std::cerr << "TEST_METHOD(Union=" << Union << "): expected → " << expected << std::endl;
 
         const auto actual = Viewport::Union(one, two);
+		std::cerr << "TEST_METHOD(Union=" << Union << "): actual → " << actual << std::endl;
         VERIFY_ARE_EQUAL(expected, actual);
     }
 
+	std::cerr << "TEST_METHOD(Intersect=" << Intersect << "): srOne.left → " << srOne.left << std::endl;
+	std::cerr << "TEST_METHOD(Intersect=" << Intersect << "): srOne.right → " << srOne.right << std::endl;
+	std::cerr << "TEST_METHOD(Intersect=" << Intersect << "): srOne.top → " << srOne.top << std::endl;
+	std::cerr << "TEST_METHOD(Intersect=" << Intersect << "): srOne.bottom → " << srOne.bottom << std::endl;
+	std::cerr << "TEST_METHOD(Intersect=" << Intersect << "): one → " << one << std::endl;
+	std::cerr << "TEST_METHOD(Intersect=" << Intersect << "): srTwo.left → " << srTwo.left << std::endl;
+	std::cerr << "TEST_METHOD(Intersect=" << Intersect << "): srTwo.right → " << srTwo.right << std::endl;
+	std::cerr << "TEST_METHOD(Intersect=" << Intersect << "): srTwo.top → " << srTwo.top << std::endl;
+	std::cerr << "TEST_METHOD(Intersect=" << Intersect << "): srTwo.bottom → " << srTwo.bottom << std::endl;
+	std::cerr << "TEST_METHOD(Intersect=" << Intersect << "): two → " << two << std::endl;
+	std::cerr << "TEST_METHOD(Intersect=" << Intersect << "): srExpected.left → " << srExpected.left << std::endl;
+	std::cerr << "TEST_METHOD(Intersect=" << Intersect << "): srExpected.right → " << srExpected.right << std::endl;
+	std::cerr << "TEST_METHOD(Intersect=" << Intersect << "): srExpected.top → " << srExpected.top << std::endl;
+	std::cerr << "TEST_METHOD(Intersect=" << Intersect << "): srExpected.bottom → " << srExpected.bottom << std::endl;
     TEST_METHOD(Intersect)
     {
         til::inclusive_rect srOne;
@@ -685,11 +890,23 @@ class ViewportTests
         srExpected.bottom = srOne.bottom < srTwo.bottom ? srOne.bottom : srTwo.bottom;
 
         const auto expected = Viewport::FromInclusive(srExpected);
+		std::cerr << "TEST_METHOD(Intersect=" << Intersect << "): expected → " << expected << std::endl;
 
         const auto actual = Viewport::Intersect(one, two);
+		std::cerr << "TEST_METHOD(Intersect=" << Intersect << "): actual → " << actual << std::endl;
         VERIFY_ARE_EQUAL(expected, actual);
     }
 
+	std::cerr << "TEST_METHOD(SubtractFour=" << SubtractFour << "): srOriginal.top → " << srOriginal.top << std::endl;
+	std::cerr << "TEST_METHOD(SubtractFour=" << SubtractFour << "): srOriginal.left → " << srOriginal.left << std::endl;
+	std::cerr << "TEST_METHOD(SubtractFour=" << SubtractFour << "): srOriginal.bottom → " << srOriginal.bottom << std::endl;
+	std::cerr << "TEST_METHOD(SubtractFour=" << SubtractFour << "): srOriginal.right → " << srOriginal.right << std::endl;
+	std::cerr << "TEST_METHOD(SubtractFour=" << SubtractFour << "): original → " << original << std::endl;
+	std::cerr << "TEST_METHOD(SubtractFour=" << SubtractFour << "): srRemove.top → " << srRemove.top << std::endl;
+	std::cerr << "TEST_METHOD(SubtractFour=" << SubtractFour << "): srRemove.left → " << srRemove.left << std::endl;
+	std::cerr << "TEST_METHOD(SubtractFour=" << SubtractFour << "): srRemove.bottom → " << srRemove.bottom << std::endl;
+	std::cerr << "TEST_METHOD(SubtractFour=" << SubtractFour << "): srRemove.right → " << srRemove.right << std::endl;
+	std::cerr << "TEST_METHOD(SubtractFour=" << SubtractFour << "): remove → " << remove << std::endl;
     TEST_METHOD(SubtractFour)
     {
         til::inclusive_rect srOriginal;
@@ -718,6 +935,7 @@ class ViewportTests
         expected.emplace_back(Viewport::FromInclusive({ srRemove.right + 1, srRemove.top, srOriginal.right, srRemove.bottom }));
 
         const auto actual = Viewport::Subtract(original, remove);
+		std::cerr << "TEST_METHOD(SubtractFour=" << SubtractFour << "): actual → " << actual << std::endl;
 
         VERIFY_ARE_EQUAL(expected.size(), actual.size(), L"Same number of viewports in expected and actual");
         Log::Comment(L"Now validate that each viewport has the expected area.");
@@ -729,6 +947,16 @@ class ViewportTests
         }
     }
 
+	std::cerr << "TEST_METHOD(SubtractThree=" << SubtractThree << "): srOriginal.top → " << srOriginal.top << std::endl;
+	std::cerr << "TEST_METHOD(SubtractThree=" << SubtractThree << "): srOriginal.left → " << srOriginal.left << std::endl;
+	std::cerr << "TEST_METHOD(SubtractThree=" << SubtractThree << "): srOriginal.bottom → " << srOriginal.bottom << std::endl;
+	std::cerr << "TEST_METHOD(SubtractThree=" << SubtractThree << "): srOriginal.right → " << srOriginal.right << std::endl;
+	std::cerr << "TEST_METHOD(SubtractThree=" << SubtractThree << "): original → " << original << std::endl;
+	std::cerr << "TEST_METHOD(SubtractThree=" << SubtractThree << "): srRemove.top → " << srRemove.top << std::endl;
+	std::cerr << "TEST_METHOD(SubtractThree=" << SubtractThree << "): srRemove.left → " << srRemove.left << std::endl;
+	std::cerr << "TEST_METHOD(SubtractThree=" << SubtractThree << "): srRemove.bottom → " << srRemove.bottom << std::endl;
+	std::cerr << "TEST_METHOD(SubtractThree=" << SubtractThree << "): srRemove.right → " << srRemove.right << std::endl;
+	std::cerr << "TEST_METHOD(SubtractThree=" << SubtractThree << "): remove → " << remove << std::endl;
     TEST_METHOD(SubtractThree)
     {
         til::inclusive_rect srOriginal;
@@ -755,6 +983,7 @@ class ViewportTests
         expected.emplace_back(Viewport::FromInclusive({ srOriginal.left, srRemove.top, srRemove.left - 1, srRemove.bottom }));
 
         const auto actual = Viewport::Subtract(original, remove);
+		std::cerr << "TEST_METHOD(SubtractThree=" << SubtractThree << "): actual → " << actual << std::endl;
 
         VERIFY_ARE_EQUAL(expected.size(), actual.size(), L"Same number of viewports in expected and actual");
         Log::Comment(L"Now validate that each viewport has the expected area.");
@@ -766,6 +995,16 @@ class ViewportTests
         }
     }
 
+	std::cerr << "TEST_METHOD(SubtractTwo=" << SubtractTwo << "): srOriginal.top → " << srOriginal.top << std::endl;
+	std::cerr << "TEST_METHOD(SubtractTwo=" << SubtractTwo << "): srOriginal.left → " << srOriginal.left << std::endl;
+	std::cerr << "TEST_METHOD(SubtractTwo=" << SubtractTwo << "): srOriginal.bottom → " << srOriginal.bottom << std::endl;
+	std::cerr << "TEST_METHOD(SubtractTwo=" << SubtractTwo << "): srOriginal.right → " << srOriginal.right << std::endl;
+	std::cerr << "TEST_METHOD(SubtractTwo=" << SubtractTwo << "): original → " << original << std::endl;
+	std::cerr << "TEST_METHOD(SubtractTwo=" << SubtractTwo << "): srRemove.top → " << srRemove.top << std::endl;
+	std::cerr << "TEST_METHOD(SubtractTwo=" << SubtractTwo << "): srRemove.left → " << srRemove.left << std::endl;
+	std::cerr << "TEST_METHOD(SubtractTwo=" << SubtractTwo << "): srRemove.bottom → " << srRemove.bottom << std::endl;
+	std::cerr << "TEST_METHOD(SubtractTwo=" << SubtractTwo << "): srRemove.right → " << srRemove.right << std::endl;
+	std::cerr << "TEST_METHOD(SubtractTwo=" << SubtractTwo << "): remove → " << remove << std::endl;
     TEST_METHOD(SubtractTwo)
     {
         til::inclusive_rect srOriginal;
@@ -790,6 +1029,7 @@ class ViewportTests
         expected.emplace_back(Viewport::FromInclusive({ srOriginal.left, srRemove.top, srRemove.left - 1, srOriginal.bottom }));
 
         const auto actual = Viewport::Subtract(original, remove);
+		std::cerr << "TEST_METHOD(SubtractTwo=" << SubtractTwo << "): actual → " << actual << std::endl;
 
         VERIFY_ARE_EQUAL(expected.size(), actual.size(), L"Same number of viewports in expected and actual");
         Log::Comment(L"Now validate that each viewport has the expected area.");
@@ -801,6 +1041,17 @@ class ViewportTests
         }
     }
 
+	std::cerr << "TEST_METHOD(SubtractOne=" << SubtractOne << "): srOriginal.top → " << srOriginal.top << std::endl;
+	std::cerr << "TEST_METHOD(SubtractOne=" << SubtractOne << "): srOriginal.left → " << srOriginal.left << std::endl;
+	std::cerr << "TEST_METHOD(SubtractOne=" << SubtractOne << "): srOriginal.bottom → " << srOriginal.bottom << std::endl;
+	std::cerr << "TEST_METHOD(SubtractOne=" << SubtractOne << "): srOriginal.right → " << srOriginal.right << std::endl;
+	std::cerr << "TEST_METHOD(SubtractOne=" << SubtractOne << "): original → " << original << std::endl;
+	std::cerr << "TEST_METHOD(SubtractOne=" << SubtractOne << "): srRemove.top → " << srRemove.top << std::endl;
+	std::cerr << "TEST_METHOD(SubtractOne=" << SubtractOne << "): srRemove.left → " << srRemove.left << std::endl;
+	std::cerr << "TEST_METHOD(SubtractOne=" << SubtractOne << "): srRemove.bottom → " << srRemove.bottom << std::endl;
+	std::cerr << "TEST_METHOD(SubtractOne=" << SubtractOne << "): srRemove.right → " << srRemove.right << std::endl;
+	std::cerr << "TEST_METHOD(SubtractOne=" << SubtractOne << "): remove → " << remove << std::endl;
+	std::cerr << "TEST_METHOD(SubtractOne=" << SubtractOne << "): foo → " << foo << std::endl;
     TEST_METHOD(SubtractOne)
     {
         til::inclusive_rect srOriginal;
@@ -825,6 +1076,7 @@ class ViewportTests
         const auto foo = expected.cbegin();
 
         const auto actual = Viewport::Subtract(original, remove);
+		std::cerr << "TEST_METHOD(SubtractOne=" << SubtractOne << "): actual → " << actual << std::endl;
 
         VERIFY_ARE_EQUAL(expected.size(), actual.size(), L"Same number of viewports in expected and actual");
         Log::Comment(L"Now validate that each viewport has the expected area.");
@@ -836,6 +1088,16 @@ class ViewportTests
         }
     }
 
+	std::cerr << "TEST_METHOD(SubtractZero=" << SubtractZero << "): srOriginal.top → " << srOriginal.top << std::endl;
+	std::cerr << "TEST_METHOD(SubtractZero=" << SubtractZero << "): srOriginal.left → " << srOriginal.left << std::endl;
+	std::cerr << "TEST_METHOD(SubtractZero=" << SubtractZero << "): srOriginal.bottom → " << srOriginal.bottom << std::endl;
+	std::cerr << "TEST_METHOD(SubtractZero=" << SubtractZero << "): srOriginal.right → " << srOriginal.right << std::endl;
+	std::cerr << "TEST_METHOD(SubtractZero=" << SubtractZero << "): original → " << original << std::endl;
+	std::cerr << "TEST_METHOD(SubtractZero=" << SubtractZero << "): srRemove.top → " << srRemove.top << std::endl;
+	std::cerr << "TEST_METHOD(SubtractZero=" << SubtractZero << "): srRemove.left → " << srRemove.left << std::endl;
+	std::cerr << "TEST_METHOD(SubtractZero=" << SubtractZero << "): srRemove.bottom → " << srRemove.bottom << std::endl;
+	std::cerr << "TEST_METHOD(SubtractZero=" << SubtractZero << "): srRemove.right → " << srRemove.right << std::endl;
+	std::cerr << "TEST_METHOD(SubtractZero=" << SubtractZero << "): remove → " << remove << std::endl;
     TEST_METHOD(SubtractZero)
     {
         til::inclusive_rect srOriginal;
@@ -856,6 +1118,7 @@ class ViewportTests
         expected.emplace_back(original);
 
         const auto actual = Viewport::Subtract(original, remove);
+		std::cerr << "TEST_METHOD(SubtractZero=" << SubtractZero << "): actual → " << actual << std::endl;
 
         VERIFY_ARE_EQUAL(expected.size(), actual.size(), L"Same number of viewports in expected and actual");
         Log::Comment(L"Now validate that each viewport has the expected area.");
@@ -867,6 +1130,11 @@ class ViewportTests
         }
     }
 
+	std::cerr << "TEST_METHOD(SubtractSame=" << SubtractSame << "): srOriginal.top → " << srOriginal.top << std::endl;
+	std::cerr << "TEST_METHOD(SubtractSame=" << SubtractSame << "): srOriginal.left → " << srOriginal.left << std::endl;
+	std::cerr << "TEST_METHOD(SubtractSame=" << SubtractSame << "): srOriginal.bottom → " << srOriginal.bottom << std::endl;
+	std::cerr << "TEST_METHOD(SubtractSame=" << SubtractSame << "): srOriginal.right → " << srOriginal.right << std::endl;
+	std::cerr << "TEST_METHOD(SubtractSame=" << SubtractSame << "): original → " << original << std::endl;
     TEST_METHOD(SubtractSame)
     {
         til::inclusive_rect srOriginal;
@@ -878,6 +1146,7 @@ class ViewportTests
         const auto remove = original;
 
         const auto actual = Viewport::Subtract(original, remove);
+		std::cerr << "TEST_METHOD(SubtractSame=" << SubtractSame << "): actual → " << actual << std::endl;
 
         VERIFY_ARE_EQUAL(0u, actual.size(), L"There should be no viewports returned");
     }

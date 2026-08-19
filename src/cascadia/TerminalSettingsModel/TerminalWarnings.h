@@ -1,3 +1,4 @@
+#include <stdio.h>
 /*++
 Copyright (c) Microsoft Corporation
 Licensed under the MIT license.
@@ -31,6 +32,8 @@ namespace winrt::Microsoft::Terminal::Settings::Model::implementation
         // _GetErrorText (in App.cpp) to get the localized exception string.
         const char* what() const override
         {
+			fprintf(stderr, ">>> Entering what()\n");
+            fprintf(stderr, "<<< Exiting what()\n");
             return "Exception while loading or validating Terminal settings";
         };
 

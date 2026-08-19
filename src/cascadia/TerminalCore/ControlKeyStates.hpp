@@ -84,61 +84,84 @@ public:
 
 #ifdef WINRT_Microsoft_Terminal_Core_H
     constexpr ControlKeyStates(const winrt::Microsoft::Terminal::Core::ControlKeyStates& projKeyStates) :
+		std::cerr << ">>> Entering ControlKeyStates(projKeyStates=" << projKeyStates << ")" << std::endl;
         ControlKeyStates(projKeyStates.Value)
     {
+	std::cerr << ">>> Entering ControlKeyStates(projKeyStates=" << projKeyStates << ")" << std::endl;
     }
 
     operator winrt::Microsoft::Terminal::Core::ControlKeyStates() const noexcept
     {
+		std::cerr << ">>> Entering winrt::Microsoft::Terminal::Core::ControlKeyStates()" << std::endl;
         winrt::Microsoft::Terminal::Core::ControlKeyStates ret;
         ret.Value = _value;
+		std::cerr << "winrt::Microsoft::Terminal::Core::ControlKeyStates(): ret.Value → " << ret.Value << std::endl;
+		std::cerr << "<<< Exiting winrt::Microsoft::Terminal::Core::ControlKeyStates()" << std::endl;
         return ret;
     }
 #endif
 
     constexpr DWORD Value() const noexcept
     {
+		std::cerr << ">>> Entering Value()" << std::endl;
+		std::cerr << "<<< Exiting Value()" << std::endl;
         return _value;
     }
 
     constexpr bool IsShiftPressed() const noexcept
     {
+		std::cerr << ">>> Entering IsShiftPressed()" << std::endl;
+		std::cerr << "<<< Exiting IsShiftPressed()" << std::endl;
         return IsAnyFlagSet(ShiftPressed);
     }
 
     constexpr bool IsAltPressed() const noexcept
     {
+		std::cerr << ">>> Entering IsAltPressed()" << std::endl;
+		std::cerr << "<<< Exiting IsAltPressed()" << std::endl;
         return IsAnyFlagSet(RightAltPressed | LeftAltPressed);
     }
 
     constexpr bool IsCtrlPressed() const noexcept
     {
+		std::cerr << ">>> Entering IsCtrlPressed()" << std::endl;
+		std::cerr << "<<< Exiting IsCtrlPressed()" << std::endl;
         return IsAnyFlagSet(RightCtrlPressed | LeftCtrlPressed);
     }
 
     constexpr bool IsWinPressed() const noexcept
     {
+		std::cerr << ">>> Entering IsWinPressed()" << std::endl;
+		std::cerr << "<<< Exiting IsWinPressed()" << std::endl;
         return IsAnyFlagSet(RightWinPressed | LeftWinPressed);
     }
 
     constexpr bool IsAltGrPressed() const noexcept
     {
+		std::cerr << ">>> Entering IsAltGrPressed()" << std::endl;
+		std::cerr << "<<< Exiting IsAltGrPressed()" << std::endl;
         return AreAllFlagsSet(RightAltPressed | LeftCtrlPressed);
     }
 
     constexpr bool IsModifierPressed() const noexcept
     {
+		std::cerr << ">>> Entering IsModifierPressed()" << std::endl;
+		std::cerr << "<<< Exiting IsModifierPressed()" << std::endl;
         return IsAnyFlagSet(RightAltPressed | LeftAltPressed | RightCtrlPressed | LeftCtrlPressed | ShiftPressed);
     }
 
 private:
     constexpr bool AreAllFlagsSet(ControlKeyStates mask) const noexcept
     {
+		std::cerr << ">>> Entering AreAllFlagsSet(mask=" << mask << ")" << std::endl;
+		std::cerr << "<<< Exiting AreAllFlagsSet(mask=" << mask << ")" << std::endl;
         return (Value() & mask.Value()) == mask.Value();
     }
 
     constexpr bool IsAnyFlagSet(ControlKeyStates mask) const noexcept
     {
+		std::cerr << ">>> Entering IsAnyFlagSet(mask=" << mask << ")" << std::endl;
+		std::cerr << "<<< Exiting IsAnyFlagSet(mask=" << mask << ")" << std::endl;
         return (Value() & mask.Value()) != 0;
     }
 

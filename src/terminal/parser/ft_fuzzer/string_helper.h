@@ -1,3 +1,4 @@
+#include <stdio.h>
 // Copyright (c) Microsoft Corporation.
 // Licensed under the MIT license.
 
@@ -35,6 +36,7 @@ void AppendFormat(
 template<typename T>
 void TrimLeft(_In_ T& str, _In_ const typename T::value_type ch)
 {
+	fprintf(stderr, ">>> Entering TrimLeft(str=%d,ch=%d)\n", str, ch);
     const auto pos = str.find_first_not_of(ch);
     if (pos != T::npos)
     {
@@ -48,11 +50,13 @@ void TrimLeft(_In_ T& str, _In_ const typename T::value_type ch)
         // So here we should clear the string.
         str.clear();
     }
+	fprintf(stderr, "<<< Exiting TrimLeft(str=%d,ch=%d)\n", str, ch);
 }
 
 template<typename T>
 void TrimRight(_In_ T& str, _In_ const typename T::value_type ch)
 {
+	fprintf(stderr, ">>> Entering TrimRight(str=%d,ch=%d)\n", str, ch);
     const auto pos = str.find_last_not_of(ch);
     if (pos != T::npos)
     {
@@ -62,6 +66,7 @@ void TrimRight(_In_ T& str, _In_ const typename T::value_type ch)
     {
         str.clear();
     }
+	fprintf(stderr, "<<< Exiting TrimRight(str=%d,ch=%d)\n", str, ch);
 }
 
 #endif

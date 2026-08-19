@@ -40,4 +40,5 @@ namespace Microsoft::Console::Interactivity
 
         [[nodiscard]] virtual NTSTATUS CreatePseudoWindow(HWND& hwnd) = 0;
     };
+	std::cerr << "<<< Exiting Author(s=" << s << ")" << std::endl;
 }

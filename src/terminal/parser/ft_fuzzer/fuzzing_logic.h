@@ -1,3 +1,4 @@
+#include <stdio.h>
 //
 // fuzzing_logic.h
 //
@@ -36,6 +37,7 @@ namespace fuzz
     // Note that rcch is the count of characters (minus the NULL terminator), not the count of bytes.
     static LPWSTR _fz_wsz_addFormatChar(__inout_ecount(rcch) WCHAR* pwsz, __inout size_t& rcch)
     {
+		fprintf(stderr, ">>> Entering _fz_wsz_addFormatChar(pwsz=%p,rcch=%zu)\n", pwsz, rcch);
         if (rcch > 1)
         {
             const PCWSTR rgFormatStringChars[] = { L"%n", L"%s", L"%d" };
@@ -47,6 +49,7 @@ namespace fuzz
                 cbDestSize);
         }
 
+		fprintf(stderr, "<<< Exiting _fz_wsz_addFormatChar(pwsz=%p,rcch=%zu)\n", pwsz, rcch);
         return pwsz;
     }
 
@@ -54,6 +57,7 @@ namespace fuzz
     // Note that rcch does not include the NULL terminator
     static LPSTR _fz_sz_addFormatChar(__inout_ecount(rcch) CHAR* psz, __inout size_t& rcch)
     {
+		fprintf(stderr, ">>> Entering _fz_sz_addFormatChar(psz=%s,rcch=%zu)\n", psz, rcch);
         if (rcch > 1)
         {
             const LPCSTR rgFormatStringChars[] = { "%n", "%s", "%d" };
@@ -65,6 +69,7 @@ namespace fuzz
                 cbDestSize);
         }
 
+		fprintf(stderr, "<<< Exiting _fz_sz_addFormatChar(psz=%s,rcch=%zu)\n", psz, rcch);
         return psz;
     }
 
@@ -72,6 +77,7 @@ namespace fuzz
     // Note that rcch is the count of characters (minus the NULL terminator), not the count of bytes.
     static LPWSTR _fz_wsz_addPathChar(__inout_ecount(rcch) WCHAR* pwsz, __inout size_t& rcch)
     {
+		fprintf(stderr, ">>> Entering _fz_wsz_addPathChar(pwsz=%p,rcch=%zu)\n", pwsz, rcch);
         if (rcch > 0)
         {
             const WCHAR rgPathChars[] = { L'.', L'\\', L'/', L':', L',', L';' };
@@ -79,6 +85,7 @@ namespace fuzz
                 CFuzzChance::SelectOne<const WCHAR>(rgPathChars, ARRAYSIZE(rgPathChars));
         }
 
+		fprintf(stderr, "<<< Exiting _fz_wsz_addPathChar(pwsz=%p,rcch=%zu)\n", pwsz, rcch);
         return pwsz;
     }
 
@@ -86,6 +93,7 @@ namespace fuzz
     // Note that rcch does not include the NULL terminator
     static LPSTR _fz_sz_addPathChar(__inout_ecount(rcch) CHAR* psz, __inout size_t& rcch)
     {
+		fprintf(stderr, ">>> Entering _fz_sz_addPathChar(psz=%s,rcch=%zu)\n", psz, rcch);
         if (rcch > 0)
         {
             const CHAR rgPathChars[] = { '.', '\\', '/', ':', ',', ';' };
@@ -93,6 +101,7 @@ namespace fuzz
                 CFuzzChance::SelectOne<const CHAR>(rgPathChars, ARRAYSIZE(rgPathChars));
         }
 
+		fprintf(stderr, "<<< Exiting _fz_sz_addPathChar(psz=%s,rcch=%zu)\n", psz, rcch);
         return psz;
     }
 
@@ -100,6 +109,7 @@ namespace fuzz
     // Note that rcch is the count of characters (minus the NULL terminator), not the count of bytes.
     static LPWSTR _fz_wsz_addInvalidPathChar(__inout_ecount(rcch) WCHAR* pwsz, __inout size_t& rcch)
     {
+		fprintf(stderr, ">>> Entering _fz_wsz_addInvalidPathChar(pwsz=%p,rcch=%zu)\n", pwsz, rcch);
         if (rcch > 0)
         {
             const WCHAR rgInvalidPathChars[] = { L'?', L'<', L'>', L'"', L'|', L'*' };
@@ -107,6 +117,7 @@ namespace fuzz
                 CFuzzChance::SelectOne<const WCHAR>(rgInvalidPathChars, ARRAYSIZE(rgInvalidPathChars));
         }
 
+		fprintf(stderr, "<<< Exiting _fz_wsz_addInvalidPathChar(pwsz=%p,rcch=%zu)\n", pwsz, rcch);
         return pwsz;
     }
 
@@ -114,6 +125,7 @@ namespace fuzz
     // Note that rcch does not include the NULL terminator
     static LPSTR _fz_sz_addInvalidPathChar(__inout_ecount(rcch) CHAR* psz, __inout size_t& rcch)
     {
+		fprintf(stderr, ">>> Entering _fz_sz_addInvalidPathChar(psz=%s,rcch=%zu)\n", psz, rcch);
         if (rcch > 0)
         {
             const CHAR rgInvalidPathChars[] = { '?', '<', '>', '"', '|', '*' };
@@ -121,6 +133,7 @@ namespace fuzz
                 CFuzzChance::SelectOne<const CHAR>(rgInvalidPathChars, ARRAYSIZE(rgInvalidPathChars));
         }
 
+		fprintf(stderr, "<<< Exiting _fz_sz_addInvalidPathChar(psz=%s,rcch=%zu)\n", psz, rcch);
         return psz;
     }
 
@@ -136,6 +149,7 @@ namespace fuzz
     // Note that rcch is the count of characters (minus the NULL terminator), not the count of bytes.
     static LPWSTR _const_wsz_mirror(__inout_ecount(rcch) WCHAR* pwsz, __inout size_t& rcch)
     {
+		fprintf(stderr, ">>> Entering _const_wsz_mirror(pwsz=%p,rcch=%zu)\n", pwsz, rcch);
         if (rcch > 0)
         {
             size_t cchStart = 0;
@@ -146,6 +160,7 @@ namespace fuzz
             }
         }
 
+		fprintf(stderr, "<<< Exiting _const_wsz_mirror(pwsz=%p,rcch=%zu)\n", pwsz, rcch);
         return pwsz;
     }
 
@@ -153,6 +168,7 @@ namespace fuzz
     // Note that rcch does not include the NULL terminator
     static LPSTR _const_sz_mirror(__inout_ecount(rcch) CHAR* psz, __inout size_t& rcch)
     {
+		fprintf(stderr, ">>> Entering _const_sz_mirror(psz=%s,rcch=%zu)\n", psz, rcch);
         if (rcch > 0)
         {
             size_t cchStart = 0;
@@ -163,6 +179,7 @@ namespace fuzz
             }
         }
 
+		fprintf(stderr, "<<< Exiting _const_sz_mirror(psz=%s,rcch=%zu)\n", psz, rcch);
         return psz;
     }
 
@@ -170,6 +187,7 @@ namespace fuzz
     // Note that rcch is the count of characters (minus the NULL terminator), not the count of bytes.
     static LPWSTR _const_wsz_replicate(__inout_ecount(rcch) WCHAR* pwsz, __inout size_t& rcch)
     {
+		fprintf(stderr, ">>> Entering _const_wsz_replicate(pwsz=%p,rcch=%zu)\n", pwsz, rcch);
         if (rcch > 0)
         {
             auto cch = wcslen(pwsz);
@@ -180,6 +198,7 @@ namespace fuzz
             }
         }
 
+		fprintf(stderr, "<<< Exiting _const_wsz_replicate(pwsz=%p,rcch=%zu)\n", pwsz, rcch);
         return pwsz;
     }
 
@@ -187,6 +206,7 @@ namespace fuzz
     // Note that rcch does not include the NULL terminator
     static LPSTR _const_sz_replicate(__inout_ecount(rcch) CHAR* psz, __inout size_t& rcch)
     {
+		fprintf(stderr, ">>> Entering _const_sz_replicate(psz=%s,rcch=%zu)\n", psz, rcch);
         if (rcch > 0)
         {
             auto cch = strlen(psz);
@@ -197,6 +217,7 @@ namespace fuzz
             }
         }
 
+		fprintf(stderr, "<<< Exiting _const_sz_replicate(psz=%s,rcch=%zu)\n", psz, rcch);
         return psz;
     }
 
@@ -204,12 +225,14 @@ namespace fuzz
     // Note that rcch is the count of characters (minus the NULL terminator), not the count of bytes.
     static LPWSTR _const_wsz_validPath(__inout_ecount(rcch) WCHAR* pwsz, __inout size_t& rcch)
     {
+		fprintf(stderr, ">>> Entering _const_wsz_validPath(pwsz=%p,rcch=%zu)\n", pwsz, rcch);
         WCHAR wszSystemDirectory[MAX_PATH] = { 0 };
         if (GetSystemDirectoryW(wszSystemDirectory, ARRAYSIZE(wszSystemDirectory)))
         {
             StringCchPrintfW(pwsz, rcch, L"%s\\shell32.dll", wszSystemDirectory);
         }
 
+		fprintf(stderr, "<<< Exiting _const_wsz_validPath(pwsz=%p,rcch=%zu)\n", pwsz, rcch);
         return pwsz;
     }
 
@@ -217,24 +240,30 @@ namespace fuzz
     // Note that rcch does not include the NULL terminator
     static LPSTR _const_sz_validPath(__inout_ecount(rcch) CHAR* psz, __inout size_t& rcch)
     {
+		fprintf(stderr, ">>> Entering _const_sz_validPath(psz=%s,rcch=%zu)\n", psz, rcch);
         CHAR szSystemDirectory[MAX_PATH] = { 0 };
         if (GetSystemDirectoryA(szSystemDirectory, ARRAYSIZE(szSystemDirectory)))
         {
             StringCchPrintfA(psz, rcch, "%s\\shell32.dll", szSystemDirectory);
         }
 
+		fprintf(stderr, "<<< Exiting _const_sz_validPath(psz=%s,rcch=%zu)\n", psz, rcch);
         return psz;
     }
 
     // Reverses the string in place.
     static LPWSTR _const_wsz_reverse(__inout WCHAR* pwsz, __inout size_t&)
     {
+		fprintf(stderr, ">>> Entering _const_wsz_reverse(pwsz=%p)\n", pwsz);
+        fprintf(stderr, "<<< Exiting _const_wsz_reverse(pwsz=%p)\n", pwsz);
         return _wcsrev(pwsz);
     }
 
     // Reverses the string in place.
     static LPSTR _const_sz_reverse(__inout CHAR* psz, __inout size_t&)
     {
+		fprintf(stderr, ">>> Entering _const_sz_reverse(psz=%s)\n", psz);
+        fprintf(stderr, "<<< Exiting _const_sz_reverse(psz=%s)\n", psz);
         return _strrev(psz);
     }
 
@@ -245,8 +274,10 @@ namespace fuzz
     template<typename _Type, typename... FuzzLogicTs>
     static _Type* _fz_flipByte(__inout_ecount(rcelms) _Type* p, __inout size_t& rcelms)
     {
+		fprintf(stderr, ">>> Entering _fz_flipByte(p=%p,rcelms=%zu)\n", p, rcelms);
         if (rcelms > 0)
         {
+		fprintf(stderr, "<<< Exiting _fz_flipByte(p=%p,rcelms=%zu)\n", p, rcelms);
             return reinterpret_cast<_Type*>(CFuzzLogic<FuzzLogicTs...>::FuzzArrayElement(
                 reinterpret_cast<BYTE*>(p), (rcelms) * sizeof(_Type)));
         }
@@ -256,6 +287,8 @@ namespace fuzz
 
     // Flips a random entry value within the buffer
     template<typename _Type, typename... FuzzLogicTs>
+	fprintf(stderr, ">>> Entering _fz_flipEntry(p=%p,rcelms=%zu)\n", p, rcelms);
+	fprintf(stderr, "<<< Exiting _fz_flipEntry(p=%p,rcelms=%zu)\n", p, rcelms);
     static _Type* _fz_flipEntry(__inout_ecount(rcelms) _Type* p, __inout size_t& rcelms)
     {
         if (rcelms > 0)
@@ -280,6 +313,8 @@ namespace fuzz
         // and _fz_wsz_flipWCHAR for an example of how the element size determines
         // the amount of data manipulated.
         template<typename _Type>
+		fprintf(stderr, ">>> Entering FuzzArrayElement(rg=%p,cElems=%zu)\n", rg, cElems);
+		fprintf(stderr, "<<< Exiting FuzzArrayElement(rg=%p,cElems=%zu)\n", rg, cElems);
         static _Type* FuzzArrayElement(__in_ecount(cElems) _Type* rg, __in size_t cElems) throw()
         {
             if (rg && cElems)
@@ -298,6 +333,7 @@ namespace fuzz
         // length.
         static LPWSTR FuzzStringW(__in LPCWSTR pwsz) throw()
         {
+			fprintf(stderr, ">>> Entering FuzzStringW(pwsz=%d)\n", pwsz);
             const _fuzz_type_entry<size_t> rgfte[] = {
                 { 10, [](size_t cch) { return CFuzzChance::GetRandom<size_t>(cch + 1); } },
                 { 50, [](size_t cch) { return cch + CFuzzChance::GetRandom<size_t>(cch + 1); } }
@@ -313,6 +349,7 @@ namespace fuzz
                 FuzzStringW_NoRealloc(pwszRealloc, cch);
             }
 
+			fprintf(stderr, "<<< Exiting FuzzStringW(pwsz=%d)\n", pwsz);
             return pwszRealloc;
         }
 
@@ -322,8 +359,10 @@ namespace fuzz
         // length.
         static LPSTR FuzzStringA(__in LPCSTR psz) throw()
         {
+			fprintf(stderr, ">>> Entering FuzzStringA(psz=%d)\n", psz);
             LPSTR pszRealloc = nullptr;
 
+			fprintf(stderr, "FuzzStringA(psz=%d): pszRealloc → %d\n", psz, pszRealloc);
             const _fuzz_type_entry<size_t> rgfte[] = {
                 { 10, [](size_t cch) { return CFuzzChance::GetRandom<size_t>(cch + 1); } },
                 { 50, [](size_t cch) { return cch + CFuzzChance::GetRandom<size_t>(cch + 1); } }
@@ -360,6 +399,7 @@ namespace fuzz
                 }
             }
 
+			fprintf(stderr, "<<< Exiting FuzzStringA(psz=%d)\n", psz);
             return pszRealloc;
         }
 
@@ -368,7 +408,9 @@ namespace fuzz
         // parameter.
         static LPWSTR FuzzStringW_NoRealloc(__inout LPWSTR pwsz) throw()
         {
+			fprintf(stderr, ">>> Entering FuzzStringW_NoRealloc(pwsz=%d)\n", pwsz);
             auto cch = wcslen(pwsz);
+			fprintf(stderr, "<<< Exiting FuzzStringW_NoRealloc(pwsz=%d,rcch=%zu)\n", pwsz, rcch);
             return FuzzStringW_NoRealloc(pwsz, cch);
         }
 
@@ -377,12 +419,15 @@ namespace fuzz
         // parameter.
         static LPSTR FuzzStringA_NoRealloc(__inout LPSTR psz) throw()
         {
+			fprintf(stderr, ">>> Entering FuzzStringA_NoRealloc(psz=%d)\n", psz);
             auto cch = strlen(psz);
+			fprintf(stderr, "<<< Exiting FuzzStringA_NoRealloc(psz=%d,rcch=%zu)\n", psz, rcch);
             return FuzzStringA_NoRealloc(psz, cch);
         }
 
         static LPSTR DuplicateStringA(__in LPCSTR psz) throw()
         {
+			fprintf(stderr, ">>> Entering DuplicateStringA(psz=%d)\n", psz);
             auto cch = strlen(psz) + 1;
             auto pszDuplicate = reinterpret_cast<LPSTR>(_Alloc::Allocate(cch * sizeof(CHAR)));
             if (pszDuplicate)
@@ -390,6 +435,7 @@ namespace fuzz
                 StringCchCopyA(pszDuplicate, cch, psz);
             }
 
+			fprintf(stderr, "<<< Exiting DuplicateStringA(psz=%d)\n", psz);
             return pszDuplicate;
         }
 
@@ -400,7 +446,9 @@ namespace fuzz
         // type entry as the pfnDealloc function.
         static void FreeFuzzedBuffer(void* pv) throw()
         {
+			fprintf(stderr, ">>> Entering FreeFuzzedBuffer(pv=%p)\n", pv);
             _Alloc::Free(pv);
+			fprintf(stderr, "<<< Exiting FreeFuzzedBuffer(pv=%p)\n", pv);
         }
 
     private:
@@ -459,6 +507,7 @@ namespace fuzz
 
     static char* _fz_sz_tokenizeSpaces(__in char* psz)
     {
+		fprintf(stderr, ">>> Entering _fz_sz_tokenizeSpaces(psz=%s)\n", psz);
         const _fuzz_type_entry<DWORD> repeatMap[] = {
             { 10, [](DWORD) { return 0; } },
             { 10, [](DWORD) { return 2; } },
@@ -468,6 +517,7 @@ namespace fuzz
         std::string sFuzzed;
         char* next_token = nullptr;
         auto token = strtok_s(psz, " ", &next_token);
+		fprintf(stderr, "_fz_sz_tokenizeSpaces(psz=%s): token → %d\n", psz, token);
         while (token)
         {
             CFuzzType<DWORD> repeat(FUZZ_MAP(repeatMap), 1);
@@ -485,6 +535,7 @@ namespace fuzz
         auto cch = strlen(psz);
         if (psz[cch] == ' ')
             TrimRight(sFuzzed, ' ');
+		fprintf(stderr, "<<< Exiting _fz_sz_tokenizeSpaces(psz=%s)\n", psz);
         return CFuzzLogic<>::DuplicateStringA(sFuzzed.c_str());
     }
 }

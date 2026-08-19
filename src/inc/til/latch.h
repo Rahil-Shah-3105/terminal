@@ -1,3 +1,4 @@
+#include <stdio.h>
 // Copyright (c) Microsoft Corporation.
 // Licensed under the MIT license.
 
@@ -31,6 +32,7 @@ namespace til
 
         void count_down(const ptrdiff_t n = 1) noexcept
         {
+			fprintf(stderr, ">>> Entering count_down(n=%d)\n", n);
             assert(n >= 0);
 
             const auto old = counter.fetch_sub(n, std::memory_order_release);
@@ -41,10 +43,12 @@ namespace til
             }
 
             assert(old > n);
+			fprintf(stderr, "<<< Exiting count_down(n=%d)\n", n);
         }
 
         [[nodiscard]] bool try_wait() const noexcept
         {
+			fprintf(stderr, ">>> Entering wait()\n");
             return counter.load(std::memory_order_acquire) == 0;
         }
 
@@ -65,6 +69,7 @@ namespace til
 
         void arrive_and_wait(const ptrdiff_t n = 1) noexcept
         {
+			fprintf(stderr, ">>> Entering arrive_and_wait(n=%d)\n", n);
             assert(n >= 0);
 
             auto old = counter.fetch_sub(n, std::memory_order_acq_rel);
@@ -77,6 +82,7 @@ namespace til
             assert(old > n);
             WaitOnAddress(&counter, &old, sizeof(counter), INFINITE);
             wait();
+			fprintf(stderr, "<<< Exiting arrive_and_wait(n=%d)\n", n);
         }
 
     private:

@@ -1,3 +1,4 @@
+#include <stdio.h>
 // Copyright (c) Microsoft Corporation.
 // Licensed under the MIT license.
 
@@ -14,6 +15,8 @@ namespace fuzz
             _In_ void* p,
             _In_ size_t nBytes) throw()
         {
+			fprintf(stderr, ">>> Entering _Post_writable_byte_size_(nBytes=%d)\n", nBytes);
+            fprintf(stderr, "<<< Exiting _Post_writable_byte_size_(nBytes=%d)\n", nBytes);
             return realloc(p, nBytes);
         }
 
@@ -24,7 +27,9 @@ namespace fuzz
 
         static void Free(_In_ void* p) throw()
         {
+			fprintf(stderr, ">>> Entering Free(p=%p)\n", p);
             free(p);
+			fprintf(stderr, "<<< Exiting Free(p=%p)\n", p);
         }
     };
 }

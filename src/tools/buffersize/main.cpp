@@ -25,24 +25,33 @@ HANDLE hIn;
 
 std::string csi(std::string seq)
 {
+	std::cerr << ">>> Entering csi(seq=" << seq << ")" << std::endl;
     std::string fullSeq = "\x1b[";
     fullSeq += seq;
+	std::cerr << "csi(seq=" << seq << "): fullSeq → " << fullSeq << std::endl;
+	std::cerr << "<<< Exiting csi(seq=" << seq << ")" << std::endl;
     return fullSeq;
 }
 
 void printCSI(std::string seq)
 {
+	std::cerr << ">>> Entering printCSI(seq=" << seq << ")" << std::endl;
     printf("%s", csi(seq).c_str()); // save cursor
+	std::cerr << "<<< Exiting printCSI(seq=" << seq << ")" << std::endl;
 }
 
 void printCUP(int x, int y)
 {
+	std::cerr << ">>> Entering printCUP(x=" << x << ",y=" << y << ")" << std::endl;
     printf("\x1b[%d;%dH", y + 1, x + 1); // save cursor
+	std::cerr << "<<< Exiting printCUP(x=" << x << ",y=" << y << ")" << std::endl;
 }
 
 void print256color(int bg)
 {
+	std::cerr << ">>> Entering print256color(bg=" << bg << ")" << std::endl;
     printf("\x1b[48;5;%dm", bg); // save cursor
+	std::cerr << "<<< Exiting print256color(bg=" << bg << ")" << std::endl;
 }
 
 // bin\x64\Debug\buffersize.exe

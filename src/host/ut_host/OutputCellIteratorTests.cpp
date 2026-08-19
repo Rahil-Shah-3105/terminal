@@ -19,8 +19,12 @@ class OutputCellIteratorTests
 
     TEST_CLASS(OutputCellIteratorTests);
 
+	std::cerr << ">>> Entering TEST_METHOD(CharacterFillDoubleWidth=" << CharacterFillDoubleWidth << ")" << std::endl;
+	std::cerr << "TEST_METHOD(CharacterFillDoubleWidth=" << CharacterFillDoubleWidth << "): wch → " << wch << std::endl;
+	std::cerr << "<<< Exiting TEST_METHOD(CharacterFillDoubleWidth=" << CharacterFillDoubleWidth << ")" << std::endl;
     TEST_METHOD(CharacterFillDoubleWidth)
     {
+		std::cerr << ">>> Entering TEST_METHOD(CharacterFillDoubleWidth=" << CharacterFillDoubleWidth << ")" << std::endl;
         SetVerifyOutput settings(VerifyOutputSettings::LogOnlyFailures);
 
         const auto wch = L'\x30a2'; // katakana A
@@ -51,9 +55,13 @@ class OutputCellIteratorTests
         VERIFY_IS_FALSE(it);
     }
 
+	std::cerr << ">>> Entering TEST_METHOD(CharacterFillLimited=" << CharacterFillLimited << ")" << std::endl;
+	std::cerr << "TEST_METHOD(CharacterFillLimited=" << CharacterFillLimited << "): wch → " << wch << std::endl;
     TEST_METHOD(CharacterFillLimited)
     {
+		std::cerr << ">>> Entering TEST_METHOD(CharacterFillLimited=" << CharacterFillLimited << ")" << std::endl;
         SetVerifyOutput settings(VerifyOutputSettings::LogOnlyFailures);
+		std::cerr << "<<< Exiting TEST_METHOD(CharacterFillDoubleWidth=" << CharacterFillDoubleWidth << ")" << std::endl;
 
         const auto wch = L'Q';
         const size_t limit = 5;
@@ -75,9 +83,14 @@ class OutputCellIteratorTests
         VERIFY_IS_FALSE(it);
     }
 
+	std::cerr << ">>> Entering TEST_METHOD(CharacterFillUnlimited=" << CharacterFillUnlimited << ")" << std::endl;
+	std::cerr << "<<< Exiting TEST_METHOD(CharacterFillLimited=" << CharacterFillLimited << ")" << std::endl;
+	std::cerr << "TEST_METHOD(CharacterFillUnlimited=" << CharacterFillUnlimited << "): wch → " << wch << std::endl;
     TEST_METHOD(CharacterFillUnlimited)
     {
+		std::cerr << ">>> Entering TEST_METHOD(CharacterFillUnlimited=" << CharacterFillUnlimited << ")" << std::endl;
         SetVerifyOutput settings(VerifyOutputSettings::LogOnlyFailures);
+		std::cerr << "<<< Exiting TEST_METHOD(CharacterFillLimited=" << CharacterFillLimited << ")" << std::endl;
 
         const auto wch = L'Q';
 
@@ -98,9 +111,13 @@ class OutputCellIteratorTests
         VERIFY_IS_TRUE(it);
     }
 
+	std::cerr << ">>> Entering TEST_METHOD(AttributeFillLimited=" << AttributeFillLimited << ")" << std::endl;
+	std::cerr << "<<< Exiting TEST_METHOD(CharacterFillUnlimited=" << CharacterFillUnlimited << ")" << std::endl;
     TEST_METHOD(AttributeFillLimited)
     {
+		std::cerr << ">>> Entering TEST_METHOD(AttributeFillLimited=" << AttributeFillLimited << ")" << std::endl;
         SetVerifyOutput settings(VerifyOutputSettings::LogOnlyFailures);
+		std::cerr << "<<< Exiting TEST_METHOD(CharacterFillUnlimited=" << CharacterFillUnlimited << ")" << std::endl;
 
         const TextAttribute attr(FOREGROUND_RED | BACKGROUND_BLUE);
 
@@ -123,9 +140,13 @@ class OutputCellIteratorTests
         VERIFY_IS_FALSE(it);
     }
 
+	std::cerr << ">>> Entering TEST_METHOD(AttributeFillUnlimited=" << AttributeFillUnlimited << ")" << std::endl;
+	std::cerr << "<<< Exiting TEST_METHOD(AttributeFillLimited=" << AttributeFillLimited << ")" << std::endl;
     TEST_METHOD(AttributeFillUnlimited)
     {
+		std::cerr << ">>> Entering TEST_METHOD(AttributeFillUnlimited=" << AttributeFillUnlimited << ")" << std::endl;
         SetVerifyOutput settings(VerifyOutputSettings::LogOnlyFailures);
+		std::cerr << "<<< Exiting TEST_METHOD(AttributeFillLimited=" << AttributeFillLimited << ")" << std::endl;
 
         const TextAttribute attr(FOREGROUND_RED | BACKGROUND_BLUE);
 
@@ -146,9 +167,14 @@ class OutputCellIteratorTests
         VERIFY_IS_TRUE(it);
     }
 
+	std::cerr << ">>> Entering TEST_METHOD(TextAndAttributeFillLimited=" << TextAndAttributeFillLimited << ")" << std::endl;
+	std::cerr << "<<< Exiting TEST_METHOD(AttributeFillUnlimited=" << AttributeFillUnlimited << ")" << std::endl;
+	std::cerr << "TEST_METHOD(TextAndAttributeFillLimited=" << TextAndAttributeFillLimited << "): wch → " << wch << std::endl;
     TEST_METHOD(TextAndAttributeFillLimited)
     {
+		std::cerr << ">>> Entering TEST_METHOD(TextAndAttributeFillLimited=" << TextAndAttributeFillLimited << ")" << std::endl;
         SetVerifyOutput settings(VerifyOutputSettings::LogOnlyFailures);
+		std::cerr << "<<< Exiting TEST_METHOD(AttributeFillUnlimited=" << AttributeFillUnlimited << ")" << std::endl;
 
         const auto wch = L'Q';
 
@@ -173,9 +199,14 @@ class OutputCellIteratorTests
         VERIFY_IS_FALSE(it);
     }
 
+	std::cerr << ">>> Entering TEST_METHOD(TextAndAttributeFillUnlimited=" << TextAndAttributeFillUnlimited << ")" << std::endl;
+	std::cerr << "<<< Exiting TEST_METHOD(TextAndAttributeFillLimited=" << TextAndAttributeFillLimited << ")" << std::endl;
+	std::cerr << "TEST_METHOD(TextAndAttributeFillUnlimited=" << TextAndAttributeFillUnlimited << "): wch → " << wch << std::endl;
     TEST_METHOD(TextAndAttributeFillUnlimited)
     {
+		std::cerr << ">>> Entering TEST_METHOD(TextAndAttributeFillUnlimited=" << TextAndAttributeFillUnlimited << ")" << std::endl;
         SetVerifyOutput settings(VerifyOutputSettings::LogOnlyFailures);
+		std::cerr << "<<< Exiting TEST_METHOD(TextAndAttributeFillLimited=" << TextAndAttributeFillLimited << ")" << std::endl;
 
         const auto wch = L'Q';
 
@@ -198,9 +229,14 @@ class OutputCellIteratorTests
         VERIFY_IS_TRUE(it);
     }
 
+	std::cerr << ">>> Entering TEST_METHOD(CharInfoFillLimited=" << CharInfoFillLimited << ")" << std::endl;
+	std::cerr << "<<< Exiting TEST_METHOD(TextAndAttributeFillUnlimited=" << TextAndAttributeFillUnlimited << ")" << std::endl;
+	std::cerr << "TEST_METHOD(CharInfoFillLimited=" << CharInfoFillLimited << "): ci.Attributes → " << ci.Attributes << std::endl;
     TEST_METHOD(CharInfoFillLimited)
     {
+		std::cerr << ">>> Entering TEST_METHOD(CharInfoFillLimited=" << CharInfoFillLimited << ")" << std::endl;
         SetVerifyOutput settings(VerifyOutputSettings::LogOnlyFailures);
+		std::cerr << "<<< Exiting TEST_METHOD(TextAndAttributeFillUnlimited=" << TextAndAttributeFillUnlimited << ")" << std::endl;
 
         CHAR_INFO ci;
         ci.Char.UnicodeChar = L'Q';
@@ -225,9 +261,14 @@ class OutputCellIteratorTests
         VERIFY_IS_FALSE(it);
     }
 
+	std::cerr << ">>> Entering TEST_METHOD(CharInfoFillUnlimited=" << CharInfoFillUnlimited << ")" << std::endl;
+	std::cerr << "<<< Exiting TEST_METHOD(CharInfoFillLimited=" << CharInfoFillLimited << ")" << std::endl;
+	std::cerr << "TEST_METHOD(CharInfoFillUnlimited=" << CharInfoFillUnlimited << "): ci.Attributes → " << ci.Attributes << std::endl;
     TEST_METHOD(CharInfoFillUnlimited)
     {
+		std::cerr << ">>> Entering TEST_METHOD(CharInfoFillUnlimited=" << CharInfoFillUnlimited << ")" << std::endl;
         SetVerifyOutput settings(VerifyOutputSettings::LogOnlyFailures);
+		std::cerr << "<<< Exiting TEST_METHOD(CharInfoFillLimited=" << CharInfoFillLimited << ")" << std::endl;
 
         CHAR_INFO ci;
         ci.Char.UnicodeChar = L'Q';
@@ -250,9 +291,11 @@ class OutputCellIteratorTests
         VERIFY_IS_TRUE(it);
     }
 
+	std::cerr << "<<< Exiting TEST_METHOD(CharInfoFillUnlimited=" << CharInfoFillUnlimited << ")" << std::endl;
     TEST_METHOD(StringData)
     {
         SetVerifyOutput settings(VerifyOutputSettings::LogOnlyFailures);
+		std::cerr << "<<< Exiting TEST_METHOD(CharInfoFillUnlimited=" << CharInfoFillUnlimited << ")" << std::endl;
 
         const std::wstring testText(L"The quick brown fox jumps over the lazy dog.");
 

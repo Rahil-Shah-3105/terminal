@@ -27,10 +27,12 @@ namespace Conhost.UIA.Tests
     using Conhost.UIA.Tests.Common.NativeMethods;
     using Conhost.UIA.Tests.Elements;
     using OpenQA.Selenium;
+	using Microsoft.Extensions.Logging;
 
     [TestClass]
     public class SelectionApiTests
     {
+		private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
         public const int timeout = Globals.Timeout;
 
         public TestContext TestContext { get; set; }
@@ -39,6 +41,7 @@ namespace Conhost.UIA.Tests
         [TestMethod]
         public void TestCtrlHomeEnd()
         {
+			_logger.LogDebug(">>> Entering TestCtrlHomeEnd()");
             using (CmdApp app = new CmdApp(CreateType.ProcessOnly, TestContext))
             {
                 using (ViewportArea area = new ViewportArea(app))
@@ -154,11 +157,13 @@ namespace Conhost.UIA.Tests
                     Verify.AreEqual(text.First().Trim(), string.Empty, "Verify text is now empty after Ctrl+Home from the end of it.");
                 }
             }
+			_logger.LogDebug("<<< Exiting TestCtrlHomeEnd()");
         }
 
         [TestMethod]
         public void TestKeyboardSelection()
         {
+			_logger.LogDebug(">>> Entering TestKeyboardSelection()");
             using (RegistryHelper reg = new RegistryHelper())
             {
                 reg.BackupRegistry();
@@ -237,6 +242,8 @@ namespace Conhost.UIA.Tests
                         Verify.AreEqual(csi.Flags, WinCon.CONSOLE_SELECTION_INFO_FLAGS.CONSOLE_SELECTION_IN_PROGRESS, "Selection should be still running, but empty.");
 
                         // Select another region to ensure anchor moved.
+						var __logStart = System.Diagnostics.Stopwatch.StartNew();
+						_logger.LogInformation("TestKeyboardSelection(): find query executed in {Arg0} ms", __logStart.ElapsedMilliseconds);
                         Log.Comment("3. Select one more region from new position to verify anchor");
 
                         app.UIRoot.SendKeys(Keys.Shift + Keys.Right + Keys.Shift);
@@ -259,11 +266,13 @@ namespace Conhost.UIA.Tests
                     }
                 }
             }
+			_logger.LogDebug("<<< Exiting TestKeyboardSelection()");
         }
 
         [TestMethod]
         public void TestMouseSelection()
         {
+			_logger.LogDebug(">>> Entering TestMouseSelection()");
             using (CmdApp app = new CmdApp(CreateType.ProcessOnly, TestContext))
             {
                 using (ViewportArea area = new ViewportArea(app))
@@ -349,6 +358,7 @@ namespace Conhost.UIA.Tests
                     Verify.AreEqual(csi.Flags, flagsExpected, "Check that selection state is reset.");
                 }
             }
+			_logger.LogDebug("<<< Exiting TestMouseSelection()");
         }
     }
 }

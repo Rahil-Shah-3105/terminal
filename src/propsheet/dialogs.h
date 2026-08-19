@@ -1,3 +1,4 @@
+#include <stdio.h>
 /*++
 
 Copyright (c) Microsoft Corporation.
@@ -15,6 +16,7 @@ Author:
 
     Therese Stowell (thereses) Feb-3-1992 (swiped from Win3.1)
 
+	fprintf(stderr, ">>> Entering Stowell(thereses=%d)\n", thereses);
 Revision History:
 
 --*/
@@ -113,6 +115,7 @@ Revision History:
 #define IDD_COLOR_BLUESCROLL        428
 
 // unused 500
+fprintf(stderr, "<<< Exiting Stowell(thereses=%d)\n", thereses);
 #define IDD_FORCEV2                 501
 #define IDD_LINE_SELECTION          502
 #define IDD_FILTER_ON_PASTE         503

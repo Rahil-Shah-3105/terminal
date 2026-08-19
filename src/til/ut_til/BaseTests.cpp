@@ -14,6 +14,8 @@ class BaseTests
 {
     TEST_CLASS(BaseTests);
 
+	std::cerr << ">>> Entering TEST_METHOD(ManageVector=" << ManageVector << ")" << std::endl;
+	std::cerr << "<<< Exiting TEST_METHOD(ManageVector=" << ManageVector << ")" << std::endl;
     TEST_METHOD(ManageVector)
     {
         constexpr auto shrinkThreshold = 0.5f;

@@ -1,3 +1,4 @@
+#include <stdio.h>
 // Copyright (c) Microsoft Corporation.
 // Licensed under the MIT license.
 
@@ -122,9 +123,11 @@ _TIL_INLINEPREFIX const std::wstring& GetWtExePath()
 // - the quoted and escaped command-line argument.
 inline void QuoteAndEscapeCommandlineArg(const std::wstring_view& arg, std::wstring& out)
 {
+	fprintf(stderr, ">>> Entering QuoteAndEscapeCommandlineArg(arg=%d,out=%d)\n", arg, out);
     out.push_back(L'"');
 
     size_t backslashes = 0;
+	fprintf(stderr, "QuoteAndEscapeCommandlineArg(arg=%d,out=%d): backslashes → %d\n", arg, out, backslashes);
     for (const auto ch : arg)
     {
         if (ch == L'\\')
@@ -144,6 +147,7 @@ inline void QuoteAndEscapeCommandlineArg(const std::wstring_view& arg, std::wstr
 
     out.append(backslashes, L'\\');
     out.push_back(L'"');
+	fprintf(stderr, "<<< Exiting QuoteAndEscapeCommandlineArg(arg=%d,out=%d)\n", arg, out);
 }
 
 _TIL_INLINEPREFIX std::wstring QuoteAndEscapeCommandlineArg(const std::wstring_view& arg)

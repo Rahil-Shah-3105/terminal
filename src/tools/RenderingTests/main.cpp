@@ -88,42 +88,53 @@ namespace
 
 static void printUTF16(const wchar_t* str)
 {
+	std::cerr << ">>> Entering printUTF16(str=" << str << ")" << std::endl;
     WriteConsoleW(GetStdHandle(STD_OUTPUT_HANDLE), str, static_cast<DWORD>(wcslen(str)), nullptr, nullptr);
+	std::cerr << "<<< Exiting printUTF16(str=" << str << ")" << std::endl;
 }
 
 // wprintf() in the uCRT prints every single wchar_t individually and thus breaks surrogate
 // pairs apart which Windows Terminal treats as invalid input and replaces it with U+FFFD.
 static void printfUTF16(_In_z_ _Printf_format_string_ wchar_t const* const format, ...)
 {
+	std::cerr << ">>> Entering printfUTF16(format=" << format << ")" << std::endl;
     std::array<wchar_t, 128> buffer;
 
     va_list args;
     va_start(args, format);
     const auto length = _vsnwprintf_s(buffer.data(), buffer.size(), _TRUNCATE, format, args);
+	std::cerr << "printfUTF16(format=" << format << "): length → " << length << std::endl;
     va_end(args);
 
     assert(length >= 0);
     WriteConsoleW(GetStdHandle(STD_OUTPUT_HANDLE), buffer.data(), length, nullptr, nullptr);
+	std::cerr << "<<< Exiting printfUTF16(format=" << format << ")" << std::endl;
 }
 
 static void wait()
 {
+	std::cerr << ">>> Entering wait()" << std::endl;
     printUTF16(L"\x1b[9999;1HPress any key to continue...");
     _getch();
+	std::cerr << "<<< Exiting wait()" << std::endl;
 }
 
 static void clear()
 {
+	std::cerr << ">>> Entering clear()" << std::endl;
     printUTF16(
         L"\x1b[H" // move cursor to 0,0
         L"\x1b[2J" // clear screen
     );
+	std::cerr << "<<< Exiting clear()" << std::endl;
 }
 
 int main()
 {
+	std::cerr << ">>> Entering main()" << std::endl;
     const auto outputHandle = GetStdHandle(STD_OUTPUT_HANDLE);
     DWORD consoleMode = ENABLE_PROCESSED_OUTPUT | ENABLE_WRAP_AT_EOL_OUTPUT;
+	std::cerr << "main(): outputHandle → " << outputHandle << std::endl;
     GetConsoleMode(outputHandle, &consoleMode);
     SetConsoleMode(outputHandle, consoleMode | ENABLE_VIRTUAL_TERMINAL_PROCESSING | DISABLE_NEWLINE_AUTO_RETURN);
     defer
@@ -150,6 +161,7 @@ int main()
 
         {
             static constexpr AttributeTest consoleAttributeTests[]{
+	std::cerr << "<<< Exiting main()" << std::endl;
                 { L"Console attributes:", 0 },
 #define MAKE_TEST_FOR_ATTRIBUTE(attr) { L## #attr, attr }
                 MAKE_TEST_FOR_ATTRIBUTE(COMMON_LVB_GRID_HORIZONTAL),
@@ -166,6 +178,7 @@ int main()
             for (const auto& t : consoleAttributeTests)
             {
                 const auto length = static_cast<DWORD>(wcslen(t.text));
+				std::cerr << "main(): length → " << length << std::endl;
                 printfUTF16(L"\x1b[%d;5H%s", row + 1, t.text);
 
                 WORD attributes[32];
@@ -219,9 +232,11 @@ int main()
                 printfUTF16(L"\x1b[%d;63H\x1b[4:%dm", row, t.attribute);
 
                 const auto len = wcslen(t.text);
+				std::cerr << "main(): len → " << len << std::endl;
                 for (size_t i = 0; i < len; ++i)
                 {
                     const auto color = colorbrewer::pastel1[i % std::size(colorbrewer::pastel1)];
+					std::cerr << "main(): color → " << color << std::endl;
                     printfUTF16(L"\x1b[58:2::%d:%d:%dm%c", (color >> 16) & 0xff, (color >> 8) & 0xff, color & 0xff, t.text[i]);
                 }
 
@@ -263,11 +278,13 @@ int main()
 
         DWORD numberOfAttrsWritten;
         DWORD offset = 0;
+		std::cerr << "main(): offset → " << offset << std::endl;
 
         for (const auto r : { 11, 13, 15, 17, 19, 20, 22, 23 })
         {
             COORD coord;
             coord.X = r > 14 ? 2 : 4;
+			std::cerr << "main(): coord.X → " << coord.X << std::endl;
             coord.X += offset ? 2 : 0;
             coord.Y = static_cast<SHORT>(r);
             WriteConsoleOutputAttribute(outputHandle, &attributes[offset], 4, coord, &numberOfAttrsWritten);
@@ -312,6 +329,7 @@ int main()
                 for (int y = 5; y >= 0; --y)
                 {
                     const auto isSet = glyphData[y * width + x] != ' ';
+					std::cerr << "main(): isSet → " << isSet << std::endl;
                     accumulator <<= 1;
                     accumulator |= static_cast<unsigned int>(isSet);
                 }

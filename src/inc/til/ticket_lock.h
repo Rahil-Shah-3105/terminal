@@ -1,3 +1,4 @@
+#include <stdio.h>
 // Copyright (c) Microsoft Corporation.
 // Licensed under the MIT license.
 
@@ -21,6 +22,7 @@ namespace til
     {
         void lock() noexcept
         {
+			fprintf(stderr, ">>> Entering lock()\n");
             const auto ticket = _next_ticket.fetch_add(1, std::memory_order_relaxed);
 
             for (;;)
@@ -33,12 +35,15 @@ namespace til
 
                 til::atomic_wait(_now_serving, current);
             }
+			fprintf(stderr, "<<< Exiting lock()\n");
         }
 
         void unlock() noexcept
         {
             _now_serving.fetch_add(1, std::memory_order_release);
             til::atomic_notify_all(_now_serving);
+			fprintf(stderr, ">>> Entering unlock()\n");
+			fprintf(stderr, "<<< Exiting unlock()\n");
         }
 
     private:
@@ -137,12 +142,15 @@ namespace til
 
         uint32_t is_locked() const noexcept
         {
+			fprintf(stderr, ">>> Entering is_locked()\n");
             const auto id = GetCurrentThreadId();
             return _owner.load(std::memory_order_relaxed) == id;
         }
 
         uint32_t recursion_depth() const noexcept
         {
+			fprintf(stderr, ">>> Entering recursion_depth()\n");
+            fprintf(stderr, "<<< Exiting recursion_depth()\n");
             return is_locked() ? _recursion : 0;
         }
 

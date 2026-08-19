@@ -1,3 +1,4 @@
+#include <stdio.h>
 // Copyright (c) Microsoft Corporation.
 // Licensed under the MIT license.
 
@@ -12,6 +13,7 @@ namespace Microsoft::Terminal::Azure
     public:
         static bool IsErrorPayload(const winrt::Windows::Data::Json::JsonObject& errorObject)
         {
+			fprintf(stderr, ">>> Entering IsErrorPayload(errorObject=%d)\n", errorObject);
             if (!errorObject.HasKey(L"error"))
             {
                 return false;
@@ -19,6 +21,7 @@ namespace Microsoft::Terminal::Azure
 
             if (errorObject.GetNamedValue(L"error").ValueType() != winrt::Windows::Data::Json::JsonValueType::String)
             {
+			fprintf(stderr, "<<< Exiting IsErrorPayload(errorObject=%d)\n", errorObject);
                 return false;
             }
 
@@ -33,6 +36,8 @@ namespace Microsoft::Terminal::Azure
 
         std::wstring_view GetCode() const noexcept
         {
+			fprintf(stderr, ">>> Entering GetCode()\n");
+            fprintf(stderr, "<<< Exiting GetCode()\n");
             return _code;
         }
     };

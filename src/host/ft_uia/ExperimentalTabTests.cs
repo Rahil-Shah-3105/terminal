@@ -26,10 +26,12 @@ namespace Conhost.UIA.Tests
     using Conhost.UIA.Tests.Common.NativeMethods;
     using Conhost.UIA.Tests.Elements;
     using OpenQA.Selenium.Appium;
+	using Microsoft.Extensions.Logging;
 
     [TestClass]
     public class ExperimentalTabTests
     {
+		private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
         public TestContext TestContext { get; set; }
 
         public const int timeout = Globals.Timeout;
@@ -38,6 +40,7 @@ namespace Conhost.UIA.Tests
         [TestProperty("Ignore", "True")] // GH#7282 - investigate and reenable
         public void CheckExperimentalDisableState()
         {
+			_logger.LogDebug(">>> Entering CheckExperimentalDisableState()");
             using (RegistryHelper reg = new RegistryHelper())
             {
                 reg.BackupRegistry(); // manipulating the global v1/v2 state can affect the registry so back it up.
@@ -93,12 +96,14 @@ namespace Conhost.UIA.Tests
                     }
                 }
             }
+			_logger.LogDebug("<<< Exiting CheckExperimentalDisableState()");
         }
 
         [TestMethod]
         [TestProperty("Ignore", "True")] // GH#7282 - investigate and reenable
         public void CheckRegistryWritebacks()
         {
+			_logger.LogDebug(">>> Entering CheckRegistryWritebacks()");
             using (RegistryHelper reg = new RegistryHelper())
             {
                 reg.BackupRegistry();
@@ -109,12 +114,14 @@ namespace Conhost.UIA.Tests
                     this.CheckRegistryWritebacks(reg, app, OpenTarget.Specifics);
                 }
             }
+			_logger.LogDebug("<<< Exiting CheckRegistryWritebacks()");
         }
 
         [TestMethod]
         [TestProperty("Ignore", "True")] // GH#7282 - investigate and reenable
         public void CheckShortcutWritebacks()
         {
+			_logger.LogDebug(">>> Entering CheckShortcutWritebacks()");
             using (RegistryHelper reg = new RegistryHelper())
             {
                 // The global state changes can still impact the registry, so back up the registry anyway despite this being the shortcut test.
@@ -130,23 +137,30 @@ namespace Conhost.UIA.Tests
                     }
                 }
             }
+			_logger.LogDebug("<<< Exiting CheckShortcutWritebacks()");
         }
 
         private void CheckRegistryWritebacks(RegistryHelper reg, CmdApp app, OpenTarget target)
         {
+			_logger.LogDebug(">>> Entering CheckRegistryWritebacks(reg={Reg},app={App},target={Target})", reg, app, target);
             this.CheckWritebacks(reg, null, app, target);
+			_logger.LogDebug("<<< Exiting CheckRegistryWritebacks(reg={Reg},app={App},target={Target})", reg, app, target);
         }
 
         private void CheckShortcutWritebacks(ShortcutHelper shortcut, CmdApp app, OpenTarget target)
         {
+			_logger.LogDebug(">>> Entering CheckShortcutWritebacks(shortcut={Shortcut},app={App},target={Target})", shortcut, app, target);
             this.CheckWritebacks(null, shortcut, app, target);
+			_logger.LogDebug("<<< Exiting CheckShortcutWritebacks(shortcut={Shortcut},app={App},target={Target})", shortcut, app, target);
         }
 
         private void CheckWritebacks(RegistryHelper reg, ShortcutHelper shortcut, CmdApp app, OpenTarget target)
         {
+			_logger.LogDebug(">>> Entering CheckWritebacks(reg={Reg},shortcut={Shortcut},app={App},target={Target})", reg, shortcut, app, target);
             // either registry or shortcut are null
             if ((reg == null && shortcut == null) || (reg != null && shortcut != null))
             {
+				_logger.LogWarning("Throwing NotSupportedException from CheckWritebacks(reg={Reg},shortcut={Shortcut},app={App},target={Target})", reg, shortcut, app, target);
                 throw new NotSupportedException("Must leave either registry or shortcut null. And must supply one of the two.");
             }
 
@@ -255,18 +269,22 @@ namespace Conhost.UIA.Tests
                     CheckWritebacksVerifyValues(isRegMode, reg, shortcut, target, tabs, SliderMeta.ExpectedPosition.Minimum, true, Tabs.GlobalState.ConsoleV1);
                 }
             }
+			_logger.LogDebug("<<< Exiting CheckWritebacks(reg={Reg},shortcut={Shortcut},app={App},target={Target})", reg, shortcut, app, target);
         }
 
         private void CheckWritebacksVerifyValues(bool isRegMode, RegistryHelper reg, ShortcutHelper shortcut, OpenTarget target, Tabs tabs, SliderMeta.ExpectedPosition sliderExpected, bool checkboxValue, Tabs.GlobalState consoleVersion)
         {
+			_logger.LogDebug(">>> Entering CheckWritebacksVerifyValues(isRegMode={IsRegMode},reg={Reg},shortcut={Shortcut},target={Target},tabs={Tabs},sliderExpected={SliderExpected},checkboxValue={CheckboxValue},consoleVersion={ConsoleVersion})", isRegMode, reg, shortcut, target, tabs, sliderExpected, checkboxValue, consoleVersion);
             foreach (TabBase tab in tabs.AllTabs)
             {
                 CheckWritebacksVerifyValues(isRegMode, reg, shortcut, target, tab, sliderExpected, checkboxValue, consoleVersion);
             }
+			_logger.LogDebug("<<< Exiting CheckWritebacksVerifyValues(isRegMode={IsRegMode},reg={Reg},shortcut={Shortcut},target={Target},tabs={Tabs},sliderExpected={SliderExpected},checkboxValue={CheckboxValue},consoleVersion={ConsoleVersion})", isRegMode, reg, shortcut, target, tabs, sliderExpected, checkboxValue, consoleVersion);
         }
 
         private void CheckWritebacksVerifyValues(bool isRegMode, RegistryHelper reg, ShortcutHelper shortcut, OpenTarget target, TabBase tab, SliderMeta.ExpectedPosition sliderExpected, bool checkboxValue, Tabs.GlobalState consoleVersion)
         {
+			_logger.LogDebug(">>> Entering CheckWritebacksVerifyValues(isRegMode={IsRegMode},reg={Reg},shortcut={Shortcut},target={Target},tab={Tab},sliderExpected={SliderExpected},checkboxValue={CheckboxValue},consoleVersion={ConsoleVersion})", isRegMode, reg, shortcut, target, tab, sliderExpected, checkboxValue, consoleVersion);
             if (isRegMode)
             {
                 VerifyBoxes(tab, reg, checkboxValue, target, consoleVersion);
@@ -281,18 +299,23 @@ namespace Conhost.UIA.Tests
                 VerifyBoxes(tab, shortcut, checkboxValue, consoleVersion);
                 VerifySliders(tab, shortcut, sliderExpected, consoleVersion);
             }
+			_logger.LogDebug("<<< Exiting CheckWritebacksVerifyValues(isRegMode={IsRegMode},reg={Reg},shortcut={Shortcut},target={Target},tab={Tab},sliderExpected={SliderExpected},checkboxValue={CheckboxValue},consoleVersion={ConsoleVersion})", isRegMode, reg, shortcut, target, tab, sliderExpected, checkboxValue, consoleVersion);
         }
 
         private void VerifyBoxes(TabBase tab, RegistryHelper reg, bool inverse, OpenTarget target, Tabs.GlobalState consoleVersion)
         {
+			_logger.LogDebug(">>> Entering VerifyBoxes(tab={Tab},reg={Reg},inverse={Inverse},target={Target},consoleVersion={ConsoleVersion})", tab, reg, inverse, target, consoleVersion);
             // get the key for the current target
             RegistryKey consoleKey = reg.GetMatchingKey(target);
+			_logger.LogDebug("VerifyBoxes(tab={Tab},reg={Reg},inverse={Inverse},target={Target},consoleVersion={ConsoleVersion}): consoleKey → {ConsoleKey}", tab, reg, inverse, target, consoleVersion, consoleKey);
 
             // hold the parent console key in case we need to look things up for specifics.
             RegistryKey parentConsoleKey = reg.GetMatchingKey(OpenTarget.Defaults);
+			_logger.LogDebug("VerifyBoxes(tab={Tab},reg={Reg},inverse={Inverse},target={Target},consoleVersion={ConsoleVersion}): parentConsoleKey → {ParentConsoleKey}", tab, reg, inverse, target, consoleVersion, parentConsoleKey);
 
             // include the global checkbox in the set for verification purposes
             IEnumerable<CheckBoxMeta> boxes = tab.GetCheckboxesForVerification();
+			_logger.LogDebug("VerifyBoxes(tab={Tab},reg={Reg},inverse={Inverse},target={Target},consoleVersion={ConsoleVersion}): boxes → {Boxes}", tab, reg, inverse, target, consoleVersion, boxes);
 
             AutoHelpers.LogInvariant("Testing target: {0} in inverse {1} mode", target.ToString(), inverse.ToString());
 
@@ -317,6 +340,7 @@ namespace Conhost.UIA.Tests
                         AutoHelpers.LogInvariant("Specific setting missing. Checking defaults.");
                         storedValue = parentConsoleKey.GetValue(meta.ValueName) as int?;
                     }
+					_logger.LogDebug("VerifyBoxes(tab={Tab},reg={Reg},inverse={Inverse},target={Target},consoleVersion={ConsoleVersion}): storedValue → {StoredValue}", tab, reg, inverse, target, consoleVersion, storedValue);
                 }
                 else
                 {
@@ -342,15 +366,20 @@ namespace Conhost.UIA.Tests
                     }
                 }
             }
+			_logger.LogDebug("<<< Exiting VerifyBoxes(tab={Tab},reg={Reg},inverse={Inverse},target={Target},consoleVersion={ConsoleVersion})", tab, reg, inverse, target, consoleVersion);
         }
 
         private void VerifyBoxes(TabBase tab, ShortcutHelper shortcut, bool inverse, Tabs.GlobalState consoleVersion)
         {
+			_logger.LogDebug(">>> Entering VerifyBoxes(tab={Tab},shortcut={Shortcut},inverse={Inverse},consoleVersion={ConsoleVersion})", tab, shortcut, inverse, consoleVersion);
             IEnumerable<CheckBoxMeta> boxes = tab.GetCheckboxesForVerification();
 
+			_logger.LogDebug("VerifyBoxes(tab={Tab},shortcut={Shortcut},inverse={Inverse},consoleVersion={ConsoleVersion}): boxes → {Boxes}", tab, shortcut, inverse, consoleVersion, boxes);
             // collect up properties that we need to retrieve keys for
             IEnumerable<CheckBoxMeta> propBoxes = boxes.Where(box => box.PropKey != null);
+			_logger.LogDebug("VerifyBoxes(tab={Tab},shortcut={Shortcut},inverse={Inverse},consoleVersion={ConsoleVersion}): propBoxes → {PropBoxes}", tab, shortcut, inverse, consoleVersion, propBoxes);
             IEnumerable<Wtypes.PROPERTYKEY> keys = propBoxes.Select(box => box.PropKey).Cast<Wtypes.PROPERTYKEY>();
+			_logger.LogDebug("VerifyBoxes(tab={Tab},shortcut={Shortcut},inverse={Inverse},consoleVersion={ConsoleVersion}): keys → {Keys}", tab, shortcut, inverse, consoleVersion, keys);
 
             // fetch data for keys
             IDictionary<Wtypes.PROPERTYKEY, object> propertyData = shortcut.GetFromPropertyStore(keys);
@@ -361,6 +390,7 @@ namespace Conhost.UIA.Tests
                 string boxName = AutoHelpers.FormatInvariant("Box: {0}", meta.ValueName);
 
                 Wtypes.PROPERTYKEY key = (Wtypes.PROPERTYKEY)meta.PropKey;
+				_logger.LogWarning("VerifyBoxes(tab={Tab},shortcut={Shortcut},inverse={Inverse},consoleVersion={ConsoleVersion}): key → {Key}", tab, shortcut, inverse, consoleVersion, key);
 
                 bool? value = (bool?)propertyData[key];
 
@@ -385,17 +415,22 @@ namespace Conhost.UIA.Tests
                     }
                 }
             }
+			_logger.LogDebug("<<< Exiting VerifyBoxes(tab={Tab},shortcut={Shortcut},inverse={Inverse},consoleVersion={ConsoleVersion})", tab, shortcut, inverse, consoleVersion);
         }
 
         private void VerifySliders(TabBase tab, RegistryHelper reg, SliderMeta.ExpectedPosition expected, OpenTarget target, Tabs.GlobalState consoleVersion)
         {
+			_logger.LogDebug(">>> Entering VerifySliders(tab={Tab},reg={Reg},expected={Expected},target={Target},consoleVersion={ConsoleVersion})", tab, reg, expected, target, consoleVersion);
             // get the key for the current target
             RegistryKey consoleKey = reg.GetMatchingKey(target);
+			_logger.LogDebug("VerifySliders(tab={Tab},reg={Reg},expected={Expected},target={Target},consoleVersion={ConsoleVersion}): consoleKey → {ConsoleKey}", tab, reg, expected, target, consoleVersion, consoleKey);
 
             // hold the parent console key in case we need to look things up for specifics.
             RegistryKey parentConsoleKey = reg.GetMatchingKey(OpenTarget.Defaults);
+			_logger.LogDebug("VerifySliders(tab={Tab},reg={Reg},expected={Expected},target={Target},consoleVersion={ConsoleVersion}): parentConsoleKey → {ParentConsoleKey}", tab, reg, expected, target, consoleVersion, parentConsoleKey);
 
             IEnumerable<SliderMeta> sliders = tab.GetSlidersForVerification();
+			_logger.LogDebug("VerifySliders(tab={Tab},reg={Reg},expected={Expected},target={Target},consoleVersion={ConsoleVersion}): sliders → {Sliders}", tab, reg, expected, target, consoleVersion, sliders);
 
             foreach (SliderMeta meta in sliders)
             {
@@ -410,6 +445,7 @@ namespace Conhost.UIA.Tests
                         AutoHelpers.LogInvariant("Specific setting missing. Checking defaults.");
                         storedValue = parentConsoleKey.GetValue(meta.ValueName) as int?;
                     }
+					_logger.LogDebug("VerifySliders(tab={Tab},reg={Reg},expected={Expected},target={Target},consoleVersion={ConsoleVersion}): storedValue → {StoredValue}", tab, reg, expected, target, consoleVersion, storedValue);
                 }
                 else
                 {
@@ -417,6 +453,7 @@ namespace Conhost.UIA.Tests
                 }
 
                 int transparency = 0;
+				_logger.LogDebug("VerifySliders(tab={Tab},reg={Reg},expected={Expected},target={Target},consoleVersion={ConsoleVersion}): transparency → {Transparency}", tab, reg, expected, target, consoleVersion, transparency);
 
                 switch (expected)
                 {
@@ -427,6 +464,7 @@ namespace Conhost.UIA.Tests
                         transparency = meta.GetMinimum();
                         break;
                     default:
+						_logger.LogWarning("Throwing NotImplementedException from VerifySliders(tab={Tab},reg={Reg},expected={Expected},target={Target},consoleVersion={ConsoleVersion})", tab, reg, expected, target, consoleVersion);
                         throw new NotImplementedException();
                 }
 
@@ -439,15 +477,20 @@ namespace Conhost.UIA.Tests
                     Verify.AreEqual(storedValue.Value, RescaleSlider(transparency), sliderName);
                 }
             }
+			_logger.LogDebug("<<< Exiting VerifySliders(tab={Tab},reg={Reg},expected={Expected},target={Target},consoleVersion={ConsoleVersion})", tab, reg, expected, target, consoleVersion);
         }
 
         private void VerifySliders(TabBase tab, ShortcutHelper shortcut, SliderMeta.ExpectedPosition expected, Tabs.GlobalState consoleVersion)
         {
+			_logger.LogDebug(">>> Entering VerifySliders(tab={Tab},shortcut={Shortcut},expected={Expected},consoleVersion={ConsoleVersion})", tab, shortcut, expected, consoleVersion);
             IEnumerable<SliderMeta> sliders = tab.GetSlidersForVerification();
 
+			_logger.LogDebug("VerifySliders(tab={Tab},shortcut={Shortcut},expected={Expected},consoleVersion={ConsoleVersion}): sliders → {Sliders}", tab, shortcut, expected, consoleVersion, sliders);
             // collect up properties that we need to retrieve keys for
             IEnumerable<SliderMeta> propSliders = sliders.Where(slider => slider.PropKey != null);
+			_logger.LogDebug("VerifySliders(tab={Tab},shortcut={Shortcut},expected={Expected},consoleVersion={ConsoleVersion}): propSliders → {PropSliders}", tab, shortcut, expected, consoleVersion, propSliders);
             IEnumerable<Wtypes.PROPERTYKEY> keys = propSliders.Select(slider => slider.PropKey).Cast<Wtypes.PROPERTYKEY>();
+			_logger.LogDebug("VerifySliders(tab={Tab},shortcut={Shortcut},expected={Expected},consoleVersion={ConsoleVersion}): keys → {Keys}", tab, shortcut, expected, consoleVersion, keys);
 
             // fetch data for keys
             IDictionary<Wtypes.PROPERTYKEY, object> propertyData = shortcut.GetFromPropertyStore(keys);
@@ -458,10 +501,13 @@ namespace Conhost.UIA.Tests
                 string sliderName = AutoHelpers.FormatInvariant("Slider: {0}", meta.ValueName);
 
                 Wtypes.PROPERTYKEY key = (Wtypes.PROPERTYKEY)meta.PropKey;
+				_logger.LogWarning("VerifySliders(tab={Tab},shortcut={Shortcut},expected={Expected},consoleVersion={ConsoleVersion}): key → {Key}", tab, shortcut, expected, consoleVersion, key);
 
                 short value = (short)propertyData[key];
+				_logger.LogDebug("VerifySliders(tab={Tab},shortcut={Shortcut},expected={Expected},consoleVersion={ConsoleVersion}): value → {Value}", tab, shortcut, expected, consoleVersion, value);
 
                 int transparency = 0;
+				_logger.LogDebug("VerifySliders(tab={Tab},shortcut={Shortcut},expected={Expected},consoleVersion={ConsoleVersion}): transparency → {Transparency}", tab, shortcut, expected, consoleVersion, transparency);
 
                 switch (expected)
                 {
@@ -472,6 +518,7 @@ namespace Conhost.UIA.Tests
                         transparency = meta.GetMinimum();
                         break;
                     default:
+						_logger.LogWarning("Throwing NotImplementedException from VerifySliders(tab={Tab},shortcut={Shortcut},expected={Expected},consoleVersion={ConsoleVersion})", tab, shortcut, expected, consoleVersion);
                         throw new NotImplementedException();
                 }
 
@@ -484,10 +531,12 @@ namespace Conhost.UIA.Tests
                     Verify.AreEqual(value, RescaleSlider(transparency), sliderName);
                 }
             }
+			_logger.LogDebug("<<< Exiting VerifySliders(tab={Tab},shortcut={Shortcut},expected={Expected},consoleVersion={ConsoleVersion})", tab, shortcut, expected, consoleVersion);
         }
 
         private short RescaleSlider(int inputValue)
         {
+			_logger.LogDebug(">>> Entering RescaleSlider(inputValue={InputValue})", inputValue);
             // we go on a scale from 0x4D to 0xFF.
             int minValue = 0x4D;
             int maxValue = 0xFF;
@@ -495,9 +544,12 @@ namespace Conhost.UIA.Tests
             int valueRange = maxValue - minValue;
 
             double scaleFactor = (double)inputValue / 100.0;
+			_logger.LogDebug("RescaleSlider(inputValue={InputValue}): scaleFactor → {ScaleFactor}", inputValue, scaleFactor);
 
             short finalValue = (short)((valueRange * scaleFactor) + minValue);
+			_logger.LogDebug("RescaleSlider(inputValue={InputValue}): finalValue → {FinalValue}", inputValue, finalValue);
 
+			_logger.LogDebug("<<< Exiting RescaleSlider(inputValue={InputValue})", inputValue);
             return finalValue;
         }
     }

@@ -1,3 +1,4 @@
+#include <stdio.h>
 // Copyright (c) Microsoft Corporation.
 // Licensed under the MIT license.
 //
@@ -38,16 +39,22 @@ namespace details
 
         void Set()
         {
+			fprintf(stderr, ">>> Entering Set()\n");
             ::SetEvent(m_handle);
+			fprintf(stderr, "<<< Exiting Set()\n");
         }
 
         HRESULT Wait()
         {
+			fprintf(stderr, ">>> Entering Wait()\n");
+            fprintf(stderr, "<<< Exiting Wait()\n");
             return Thread_Wait_For(m_handle, INFINITE);
         }
 
         bool IsValid()
         {
+			fprintf(stderr, ">>> Entering IsValid()\n");
+            fprintf(stderr, "<<< Exiting IsValid()\n");
             return m_handle != nullptr;
         }
 
@@ -70,6 +77,7 @@ namespace details
 template<typename TFunction>
 HRESULT RunOnUIThread(const TFunction& function)
 {
+	fprintf(stderr, ">>> Entering RunOnUIThread(function=%d)\n", function);
     auto m = winrt::Windows::ApplicationModel::Core::CoreApplication::MainView();
     auto cw = m.CoreWindow();
     auto d = cw.Dispatcher();
@@ -97,6 +105,7 @@ HRESULT RunOnUIThread(const TFunction& function)
     auto hr = completedEvent.Wait();
     if (FAILED(hr))
     {
+	fprintf(stderr, "<<< Exiting RunOnUIThread(function=%d)\n", function);
         return hr;
     }
     return invokeResult;

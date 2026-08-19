@@ -8,6 +8,7 @@ Module Name:
 Abstract:
 - This module is used for reading/writing registry operations
 
+std::cerr << "<<< Exiting Author(s=" << s << ")" << std::endl;
 Author(s):
 - Michael Niksa (MiNiksa) 23-Jul-2014
 - Paul Campbell (PaulCam) 23-Jul-2014

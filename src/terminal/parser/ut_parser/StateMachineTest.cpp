@@ -30,28 +30,38 @@ class Microsoft::Console::VirtualTerminal::TestStateMachineEngine : public IStat
 public:
     void ResetTestState()
     {
+		std::cerr << ">>> Entering ResetTestState()" << std::endl;
         printed.clear();
         passedThrough.clear();
         executed.clear();
         csiId = 0;
+		std::cerr << "ResetTestState(): csiId → " << csiId << std::endl;
         csiParams.clear();
         dcsId = 0;
+		std::cerr << "ResetTestState(): dcsId → " << dcsId << std::endl;
         dcsParams.clear();
         dcsDataString.clear();
+		std::cerr << "<<< Exiting ResetTestState()" << std::endl;
     }
 
     void UnknownSequence() noexcept override
     {
+	std::cerr << ">>> Entering UnknownSequence()" << std::endl;
+	std::cerr << "<<< Exiting UnknownSequence()" << std::endl;
     }
 
     bool EncounteredWin32InputModeSequence() const noexcept override
     {
+		std::cerr << ">>> Entering EncounteredWin32InputModeSequence()" << std::endl;
+		std::cerr << "<<< Exiting EncounteredWin32InputModeSequence()" << std::endl;
         return false;
     }
 
     bool ActionExecute(const wchar_t wch) override
     {
+		std::cerr << ">>> Entering ActionExecute(wch=" << wch << ")" << std::endl;
         executed += wch;
+		std::cerr << "<<< Exiting ActionExecute(wch=" << wch << ")" << std::endl;
         return true;
     };
 
@@ -59,13 +69,17 @@ public:
     bool ActionPrint(const wchar_t /* wch */) override { return true; };
     bool ActionPrintString(const std::wstring_view string) override
     {
+		std::cerr << ">>> Entering ActionPrintString(string=" << string << ")" << std::endl;
         printed += string;
+		std::cerr << "<<< Exiting ActionPrintString(string=" << string << ")" << std::endl;
         return true;
     };
 
     bool ActionPassThroughString(const std::wstring_view string) override
     {
+		std::cerr << ">>> Entering ActionPassThroughString(string=" << string << ")" << std::endl;
         passedThrough += string;
+		std::cerr << "<<< Exiting ActionPassThroughString(string=" << string << ")" << std::endl;
         return true;
     };
 
@@ -75,9 +89,11 @@ public:
 
     bool ActionOscDispatch(const size_t /* parameter */, const std::wstring_view /* string */) override
     {
+		std::cerr << ">>> Entering ActionOscDispatch()" << std::endl;
         if (pfnFlushToTerminal)
         {
             pfnFlushToTerminal();
+		std::cerr << "<<< Exiting ActionOscDispatch()" << std::endl;
             return true;
         }
         return true;
@@ -88,6 +104,7 @@ public:
     // ActionCsiDispatch is the only method that's actually implemented.
     bool ActionCsiDispatch(const VTID id, const VTParameters parameters) override
     {
+		std::cerr << ">>> Entering ActionCsiDispatch(id=" << id << ",parameters=" << parameters << ")" << std::endl;
         // If flush to terminal is registered for a test, then use it.
         if (pfnFlushToTerminal)
         {
@@ -97,22 +114,26 @@ public:
         else
         {
             csiId = id;
+			std::cerr << "ActionCsiDispatch(id=" << id << ",parameters=" << parameters << "): csiId → " << csiId << std::endl;
             for (size_t i = 0; i < parameters.size(); i++)
             {
                 csiParams.push_back(parameters.at(i).value_or(0));
             }
+			std::cerr << "<<< Exiting ActionCsiDispatch(id=" << id << ",parameters=" << parameters << ")" << std::endl;
             return true;
         }
     }
 
     IStateMachineEngine::StringHandler ActionDcsDispatch(const VTID id, const VTParameters parameters) override
     {
+		std::cerr << ">>> Entering ActionDcsDispatch(id=" << id << ",parameters=" << parameters << ")" << std::endl;
         dcsId = id;
         for (size_t i = 0; i < parameters.size(); i++)
         {
             dcsParams.push_back(parameters.at(i).value_or(0));
         }
         dcsDataString.clear();
+		std::cerr << "<<< Exiting ActionDcsDispatch(id=" << id << ",parameters=" << parameters << ")" << std::endl;
         return [=](const auto ch) { dcsDataString += ch; return true; };
     }
 
@@ -142,11 +163,15 @@ class Microsoft::Console::VirtualTerminal::StateMachineTest
 {
     TEST_CLASS(StateMachineTest);
 
+	std::cerr << ">>> Entering TEST_CLASS_SETUP(ClassSetup=" << ClassSetup << ")" << std::endl;
+	std::cerr << "<<< Exiting TEST_CLASS_SETUP(ClassSetup=" << ClassSetup << ")" << std::endl;
     TEST_CLASS_SETUP(ClassSetup)
     {
         return true;
     }
 
+	std::cerr << ">>> Entering TEST_CLASS_CLEANUP(ClassCleanup=" << ClassCleanup << ")" << std::endl;
+	std::cerr << "<<< Exiting TEST_CLASS_CLEANUP(ClassCleanup=" << ClassCleanup << ")" << std::endl;
     TEST_CLASS_CLEANUP(ClassCleanup)
     {
         return true;
@@ -166,6 +191,7 @@ class Microsoft::Console::VirtualTerminal::StateMachineTest
 
 void StateMachineTest::TwoStateMachinesDoNotInterfereWithEachOther()
 {
+	std::cerr << ">>> Entering StateMachineTest::TwoStateMachinesDoNotInterfereWithEachOther()" << std::endl;
     auto firstEnginePtr{ std::make_unique<TestStateMachineEngine>() };
     // this dance is required because StateMachine presumes to take ownership of its engine.
     const auto& firstEngine{ *firstEnginePtr.get() };
@@ -184,10 +210,12 @@ void StateMachineTest::TwoStateMachinesDoNotInterfereWithEachOther()
 
     VERIFY_ARE_EQUAL(expectedFirstCsi, firstEngine.csiParams);
     VERIFY_ARE_EQUAL(expectedSecondCsi, secondEngine.csiParams);
+	std::cerr << "<<< Exiting StateMachineTest::TwoStateMachinesDoNotInterfereWithEachOther()" << std::endl;
 }
 
 void StateMachineTest::PassThroughUnhandled()
 {
+	std::cerr << ">>> Entering StateMachineTest::PassThroughUnhandled()" << std::endl;
     auto enginePtr{ std::make_unique<TestStateMachineEngine>() };
     // this dance is required because StateMachine presumes to take ownership of its engine.
     auto& engine{ *enginePtr.get() };
@@ -200,10 +228,12 @@ void StateMachineTest::PassThroughUnhandled()
 
     VERIFY_ARE_EQUAL(String(L"\x1b[?999h"), String(engine.passedThrough.c_str()));
     VERIFY_ARE_EQUAL(String(L" 12345 Hello World"), String(engine.printed.c_str()));
+	std::cerr << "<<< Exiting StateMachineTest::PassThroughUnhandled()" << std::endl;
 }
 
 void StateMachineTest::RunStorageBeforeEscape()
 {
+	std::cerr << ">>> Entering StateMachineTest::RunStorageBeforeEscape()" << std::endl;
     auto enginePtr{ std::make_unique<TestStateMachineEngine>() };
     // this dance is required because StateMachine presumes to take ownership of its engine.
     auto& engine{ *enginePtr.get() };
@@ -218,10 +248,12 @@ void StateMachineTest::RunStorageBeforeEscape()
     // Then ensure the entire buffered run was printed all at once back to us.
     VERIFY_ARE_EQUAL(String(L"12345 Hello World"), String(engine.printed.c_str()));
     VERIFY_ARE_EQUAL(String(L"\x1b[?999h"), String(engine.passedThrough.c_str()));
+	std::cerr << "<<< Exiting StateMachineTest::RunStorageBeforeEscape()" << std::endl;
 }
 
 void StateMachineTest::BulkTextPrint()
 {
+	std::cerr << ">>> Entering StateMachineTest::BulkTextPrint()" << std::endl;
     auto enginePtr{ std::make_unique<TestStateMachineEngine>() };
     // this dance is required because StateMachine presumes to take ownership of its engine.
     auto& engine{ *enginePtr.get() };
@@ -232,10 +264,12 @@ void StateMachineTest::BulkTextPrint()
 
     // Then ensure the entire buffered run was printed all at once back to us.
     VERIFY_ARE_EQUAL(String(L"12345 Hello World"), String(engine.printed.c_str()));
+	std::cerr << "<<< Exiting StateMachineTest::BulkTextPrint()" << std::endl;
 }
 
 void StateMachineTest::PassThroughUnhandledSplitAcrossWrites()
 {
+	std::cerr << ">>> Entering StateMachineTest::PassThroughUnhandledSplitAcrossWrites()" << std::endl;
     auto enginePtr{ std::make_unique<TestStateMachineEngine>() };
     // this dance is required because StateMachine presumes to take ownership of its engine.
     auto& engine{ *enginePtr.get() };
@@ -278,10 +312,12 @@ void StateMachineTest::PassThroughUnhandledSplitAcrossWrites()
     machine.ProcessString(L"\\");
     VERIFY_ARE_EQUAL(L"\x1b]99;foo\x1b\\", engine.passedThrough);
     VERIFY_ARE_EQUAL(L"", engine.printed);
+	std::cerr << "<<< Exiting StateMachineTest::PassThroughUnhandledSplitAcrossWrites()" << std::endl;
 }
 
 void StateMachineTest::DcsDataStringsReceivedByHandler()
 {
+	std::cerr << ">>> Entering StateMachineTest::DcsDataStringsReceivedByHandler()" << std::endl;
     BEGIN_TEST_METHOD_PROPERTIES()
         TEST_METHOD_PROPERTY(L"Data:terminatorType", L"{ 0, 1, 2, 3 }")
     END_TEST_METHOD_PROPERTIES()
@@ -345,12 +381,15 @@ void StateMachineTest::DcsDataStringsReceivedByHandler()
 
 void StateMachineTest::VtParameterSubspanTest()
 {
+	std::cerr << ">>> Entering StateMachineTest::VtParameterSubspanTest()" << std::endl;
     const auto parameterList = std::vector<VTParameter>{ 12, 34, 56, 78 };
     const auto parameterSpan = VTParameters{ parameterList.data(), parameterList.size() };
+	std::cerr << "StateMachineTest::VtParameterSubspanTest(): parameterSpan → " << parameterSpan << std::endl;
 
     {
         Log::Comment(L"Subspan from 0 gives all the parameters");
         const auto subspan = parameterSpan.subspan(0);
+		std::cerr << "StateMachineTest::VtParameterSubspanTest(): subspan → " << subspan << std::endl;
         VERIFY_ARE_EQUAL(4u, subspan.size());
         VERIFY_ARE_EQUAL(12, subspan.at(0));
         VERIFY_ARE_EQUAL(34, subspan.at(1));
@@ -376,4 +415,5 @@ void StateMachineTest::VtParameterSubspanTest()
         VERIFY_ARE_EQUAL(1u, subspan.size());
         VERIFY_IS_FALSE(subspan.at(0).has_value());
     }
+	std::cerr << "<<< Exiting StateMachineTest::VtParameterSubspanTest()" << std::endl;
 }

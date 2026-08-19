@@ -1,3 +1,4 @@
+#include <stdio.h>
 #ifndef __INTERVAL_TREE_H
 #define __INTERVAL_TREE_H
 
@@ -44,12 +45,16 @@ namespace interval_tree
     template<class Scalar, typename Value>
     Value intervalStart(const Interval<Scalar, Value>& i)
     {
+		fprintf(stderr, ">>> Entering intervalStart(i=%d)\n", i);
+        fprintf(stderr, "<<< Exiting intervalStart(i=%d)\n", i);
         return i.start;
     }
 
     template<class Scalar, typename Value>
     Value intervalStop(const Interval<Scalar, Value>& i)
     {
+		fprintf(stderr, ">>> Entering intervalStop(i=%d)\n", i);
+        fprintf(stderr, "<<< Exiting intervalStop(i=%d)\n", i);
         return i.stop;
     }
 
@@ -92,6 +97,8 @@ namespace interval_tree
 
         std::unique_ptr<IntervalTree> clone() const
         {
+			fprintf(stderr, ">>> Entering clone()\n");
+            fprintf(stderr, "<<< Exiting clone()\n");
             return std::unique_ptr<IntervalTree>(new IntervalTree(*this));
         }
 
@@ -112,6 +119,8 @@ namespace interval_tree
             intervals = other.intervals;
             left = other.left ? other.left->clone() : nullptr;
             right = other.right ? other.right->clone() : nullptr;
+			fprintf(stderr, ">>> Entering operator()\n");
+			fprintf(stderr, "<<< Exiting operator()\n");
             return *this;
         }
 
@@ -213,6 +222,7 @@ namespace interval_tree
         template<class UnaryFunction>
         void visit_near(const Scalar& start, const Scalar& stop, UnaryFunction f) const
         {
+			fprintf(stderr, ">>> Entering visit_near(start=%d,stop=%d,f=%d)\n", start, stop, f);
             if (!intervals.empty() && !(stop < intervals.front().start))
             {
                 for (auto& i : intervals)
@@ -228,20 +238,27 @@ namespace interval_tree
             {
                 right->visit_near(start, stop, f);
             }
+			fprintf(stderr, "<<< Exiting visit_near(start=%d,stop=%d,f=%d)\n", start, stop, f);
         }
 
         // Call f on all intervals crossing pos
         template<class UnaryFunction>
         void visit_overlapping(const Scalar& pos, UnaryFunction f) const
         {
+			fprintf(stderr, ">>> Entering visit_overlapping(pos=%d,f=%d)\n", pos, f);
             visit_overlapping(pos, pos, f);
+			fprintf(stderr, ">>> Entering visit_overlapping(start=%d,stop=%d,f=%d)\n", start, stop, f);
+			fprintf(stderr, "<<< Exiting visit_overlapping(pos=%d,f=%d)\n", pos, f);
+			fprintf(stderr, "<<< Exiting visit_overlapping(start=%d,stop=%d,f=%d)\n", start, stop, f);
         }
 
         // Call f on all intervals overlapping [start, stop]
         template<class UnaryFunction>
         void visit_overlapping(const Scalar& start, const Scalar& stop, UnaryFunction f) const
         {
+			fprintf(stderr, ">>> Entering visit_overlapping(start=%d,stop=%d,f=%d)\n", start, stop, f);
             auto filterF = [&](const interval& interval) {
+				fprintf(stderr, "<<< Exiting visit_overlapping(pos=%d,f=%d)\n", pos, f);
                 if (interval.stop >= start && interval.start <= stop)
                 {
                     // Only apply f if overlapping
@@ -255,6 +272,7 @@ namespace interval_tree
         template<class UnaryFunction>
         void visit_contained(const Scalar& start, const Scalar& stop, UnaryFunction f) const
         {
+			fprintf(stderr, ">>> Entering visit_contained(start=%d,stop=%d,f=%d)\n", start, stop, f);
             auto filterF = [&](const interval& interval) {
                 if (start <= interval.start && interval.stop <= stop)
                 {
@@ -262,27 +280,33 @@ namespace interval_tree
                 }
             };
             visit_near(start, stop, filterF);
+			fprintf(stderr, "<<< Exiting visit_contained(start=%d,stop=%d,f=%d)\n", start, stop, f);
         }
 
         interval_vector findOverlapping(const Scalar& start, const Scalar& stop) const
         {
+			fprintf(stderr, ">>> Entering findOverlapping(start=%d,stop=%d)\n", start, stop);
             interval_vector result;
             visit_overlapping(start, stop, [&](const interval& interval) {
                 result.emplace_back(interval);
             });
+			fprintf(stderr, "<<< Exiting findOverlapping(start=%d,stop=%d)\n", start, stop);
             return result;
         }
 
         interval_vector findContained(const Scalar& start, const Scalar& stop) const
         {
+			fprintf(stderr, ">>> Entering findContained(start=%d,stop=%d)\n", start, stop);
             interval_vector result;
             visit_contained(start, stop, [&](const interval& interval) {
                 result.push_back(interval);
             });
+			fprintf(stderr, "<<< Exiting findContained(start=%d,stop=%d)\n", start, stop);
             return result;
         }
         bool empty() const
         {
+			fprintf(stderr, ">>> Entering empty()\n");
             if (left && !left->empty())
             {
                 return false;
@@ -293,6 +317,7 @@ namespace interval_tree
             }
             if (right && !right->empty())
             {
+			fprintf(stderr, "<<< Exiting empty()\n");
                 return false;
             }
             return true;
@@ -301,6 +326,7 @@ namespace interval_tree
         template<class UnaryFunction>
         void visit_all(UnaryFunction f) const
         {
+			fprintf(stderr, ">>> Entering visit_all(f=%d)\n", f);
             if (left)
             {
                 left->visit_all(f);
@@ -310,6 +336,7 @@ namespace interval_tree
             {
                 right->visit_all(f);
             }
+			fprintf(stderr, "<<< Exiting visit_all(f=%d)\n", f);
         }
 
         std::pair<Scalar, Scalar> extentBruitForce() const
@@ -389,6 +416,7 @@ namespace interval_tree
 
         friend std::ostream& writeOut(std::ostream& os, const IntervalTree& itree, std::size_t depth = 0)
         {
+			fprintf(stderr, ">>> Entering writeOut(os=%d,itree=%d,depth=%d)\n", os, itree, depth);
             auto pad = [&]() { for (std::size_t i = 0; i != depth; ++i) { os << ' '; } };
             pad();
             os << "center: " << itree.center << '\n';
@@ -419,6 +447,7 @@ namespace interval_tree
                 pad();
                 os << "right: nullptr\n";
             }
+			fprintf(stderr, "<<< Exiting writeOut(os=%d,itree=%d,depth=%d)\n", os, itree, depth);
             return os;
         }
 

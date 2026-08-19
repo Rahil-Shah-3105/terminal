@@ -14,6 +14,8 @@ using InputEventQueue = til::small_vector<INPUT_RECORD, 16>;
 // (As unlikely as that is, given that the main user is the console API which will always use INPUT_RECORD.)
 constexpr INPUT_RECORD SynthesizeKeyEvent(bool bKeyDown, uint16_t wRepeatCount, uint16_t wVirtualKeyCode, uint16_t wVirtualScanCode, wchar_t UnicodeChar, uint32_t dwControlKeyState)
 {
+	std::cerr << ">>> Entering SynthesizeKeyEvent(bKeyDown=" << bKeyDown << ",wRepeatCount=" << wRepeatCount << ",wVirtualKeyCode=" << wVirtualKeyCode << ",wVirtualScanCode=" << wVirtualScanCode << ",UnicodeChar=" << UnicodeChar << ",dwControlKeyState=" << dwControlKeyState << ")" << std::endl;
+	std::cerr << "<<< Exiting SynthesizeKeyEvent(bKeyDown=" << bKeyDown << ",wRepeatCount=" << wRepeatCount << ",wVirtualKeyCode=" << wVirtualKeyCode << ",wVirtualScanCode=" << wVirtualScanCode << ",UnicodeChar=" << UnicodeChar << ",dwControlKeyState=" << dwControlKeyState << ")" << std::endl;
     return INPUT_RECORD{
         .EventType = KEY_EVENT,
         .Event = {
@@ -31,6 +33,8 @@ constexpr INPUT_RECORD SynthesizeKeyEvent(bool bKeyDown, uint16_t wRepeatCount, 
 
 constexpr INPUT_RECORD SynthesizeMouseEvent(til::point dwMousePosition, uint32_t dwButtonState, uint32_t dwControlKeyState, uint32_t dwEventFlags)
 {
+	std::cerr << ">>> Entering SynthesizeMouseEvent(dwMousePosition=" << dwMousePosition << ",dwButtonState=" << dwButtonState << ",dwControlKeyState=" << dwControlKeyState << ",dwEventFlags=" << dwEventFlags << ")" << std::endl;
+	std::cerr << "<<< Exiting SynthesizeMouseEvent(dwMousePosition=" << dwMousePosition << ",dwButtonState=" << dwButtonState << ",dwControlKeyState=" << dwControlKeyState << ",dwEventFlags=" << dwEventFlags << ")" << std::endl;
     return INPUT_RECORD{
         .EventType = MOUSE_EVENT,
         .Event = {
@@ -49,6 +53,8 @@ constexpr INPUT_RECORD SynthesizeMouseEvent(til::point dwMousePosition, uint32_t
 
 constexpr INPUT_RECORD SynthesizeWindowBufferSizeEvent(til::size dwSize)
 {
+	std::cerr << ">>> Entering SynthesizeWindowBufferSizeEvent(dwSize=" << dwSize << ")" << std::endl;
+	std::cerr << "<<< Exiting SynthesizeWindowBufferSizeEvent(dwSize=" << dwSize << ")" << std::endl;
     return INPUT_RECORD{
         .EventType = WINDOW_BUFFER_SIZE_EVENT,
         .Event = {
@@ -64,6 +70,8 @@ constexpr INPUT_RECORD SynthesizeWindowBufferSizeEvent(til::size dwSize)
 
 constexpr INPUT_RECORD SynthesizeMenuEvent(uint32_t dwCommandId)
 {
+	std::cerr << ">>> Entering SynthesizeMenuEvent(dwCommandId=" << dwCommandId << ")" << std::endl;
+	std::cerr << "<<< Exiting SynthesizeMenuEvent(dwCommandId=" << dwCommandId << ")" << std::endl;
     return INPUT_RECORD{
         .EventType = MENU_EVENT,
         .Event = {
@@ -76,6 +84,8 @@ constexpr INPUT_RECORD SynthesizeMenuEvent(uint32_t dwCommandId)
 
 constexpr INPUT_RECORD SynthesizeFocusEvent(bool bSetFocus)
 {
+	std::cerr << ">>> Entering SynthesizeFocusEvent(bSetFocus=" << bSetFocus << ")" << std::endl;
+	std::cerr << "<<< Exiting SynthesizeFocusEvent(bSetFocus=" << bSetFocus << ")" << std::endl;
     return INPUT_RECORD{
         .EventType = FOCUS_EVENT,
         .Event = {

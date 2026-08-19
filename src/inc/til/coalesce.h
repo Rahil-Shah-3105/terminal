@@ -1,3 +1,4 @@
+#include <stdio.h>
 // Copyright (c) Microsoft Corporation.
 // Licensed under the MIT license.
 
@@ -10,6 +11,8 @@ namespace til
     template<typename T>
     T coalesce_value(const T& base) noexcept
     {
+		fprintf(stderr, "<<< Exiting coalesce_value(base=%d)\n", base);
+		fprintf(stderr, "<<< Exiting coalesce_value(t1=%d,t2=%d)\n", t1, t2);
         return base;
     }
 
@@ -42,6 +45,8 @@ namespace til
     template<typename T>
     std::optional<T> coalesce(const std::optional<T>& base)
     {
+		fprintf(stderr, ">>> Entering coalesce(base=%d)\n", base);
+        fprintf(stderr, "<<< Exiting coalesce(base=%d)\n", base);
         return base;
     }
 

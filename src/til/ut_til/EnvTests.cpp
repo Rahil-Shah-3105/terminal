@@ -15,14 +15,24 @@ class EnvTests
 {
     TEST_CLASS(EnvTests);
 
+	std::cerr << ">>> Entering TEST_METHOD(Construct=" << Construct << ")" << std::endl;
+	std::cerr << "<<< Exiting TEST_METHOD(Construct=" << Construct << ")" << std::endl;
     TEST_METHOD(Construct)
     {
+		std::cerr << ">>> Entering TEST_METHOD(Construct=" << Construct << ")" << std::endl;
         til::env environment;
     }
 
+	std::cerr << ">>> Entering TEST_METHOD(Generate=" << Generate << ")" << std::endl;
+	std::cerr << "TEST_METHOD(Generate=" << Generate << "): func → " << func << std::endl;
+	std::cerr << "TEST_METHOD(Generate=" << Generate << "): expectedEnd → " << expectedEnd << std::endl;
+	std::cerr << "TEST_METHOD(Generate=" << Generate << "): expectedIt → " << expectedIt << std::endl;
+	std::cerr << "TEST_METHOD(Generate=" << Generate << "): actualIt → " << actualIt << std::endl;
     TEST_METHOD(Generate)
     {
+		std::cerr << ">>> Entering TEST_METHOD(Generate=" << Generate << ")" << std::endl;
         // Be sneaky and pull the method that @eryksun told us about to see if we've effectively recreated it.
+		std::cerr << "<<< Exiting TEST_METHOD(Construct=" << Construct << ")" << std::endl;
         wil::unique_hmodule shell32{ LoadLibraryW(L"shell32.dll") };
         auto func = GetProcAddressByFunctionDeclaration(shell32.get(), RegenerateUserEnvironment);
 
@@ -52,9 +62,11 @@ class EnvTests
         }
     }
 
+	std::cerr << "<<< Exiting TEST_METHOD(Generate=" << Generate << ")" << std::endl;
     TEST_METHOD(ToString)
     {
         til::env environment;
+		std::cerr << "<<< Exiting TEST_METHOD(Generate=" << Generate << ")" << std::endl;
         environment.as_map().insert_or_assign(L"A", L"Apple");
         environment.as_map().insert_or_assign(L"B", L"Banana");
         environment.as_map().insert_or_assign(L"C", L"Cassowary");

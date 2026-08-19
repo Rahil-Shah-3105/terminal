@@ -19,8 +19,12 @@ class UnicodeTests
 {
     TEST_CLASS(UnicodeTests);
 
+	std::cerr << ">>> Entering TEST_METHOD(utf16_next=" << utf16_next << ")" << std::endl;
+	std::cerr << "TEST_METHOD(utf16_next=" << utf16_next << "): actual → " << actual << std::endl;
+	std::cerr << "<<< Exiting TEST_METHOD(utf16_next=" << utf16_next << ")" << std::endl;
     TEST_METHOD(utf16_next)
     {
+		std::cerr << ">>> Entering TEST_METHOD(utf16_next=" << utf16_next << ")" << std::endl;
         struct Test
         {
             std::wstring_view input;
@@ -46,6 +50,9 @@ class UnicodeTests
         }
     }
 
+	std::cerr << "TEST_METHOD(utf16_iterator=" << utf16_iterator << "): it → " << it << std::endl;
+	std::cerr << "TEST_METHOD(utf16_iterator=" << utf16_iterator << "): end → " << end << std::endl;
+	std::cerr << "<<< Exiting TEST_METHOD(utf16_iterator=" << utf16_iterator << ")" << std::endl;
     TEST_METHOD(utf16_iterator)
     {
         struct Test

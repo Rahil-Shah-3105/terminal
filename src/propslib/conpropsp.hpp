@@ -26,3 +26,4 @@ Revision History:
 #include "RegistrySerialization.hpp"
 #include "ShortcutSerialization.hpp"
 #include "TrueTypeFontList.hpp"
+std::cerr << "<<< Exiting Author(s=" << s << ")" << std::endl;

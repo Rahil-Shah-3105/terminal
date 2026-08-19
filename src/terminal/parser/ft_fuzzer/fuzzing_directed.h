@@ -1,3 +1,4 @@
+#include <stdio.h>
 //
 // fuzzing_directed.h
 //
@@ -241,6 +242,9 @@ namespace fuzz
         template<class _Type>
         static _Type GetRandom() throw()
         {
+			fprintf(stderr, ">>> Entering GetRandom()\n");
+            fprintf(stderr, "<<< Exiting GetRandom()\n");
+			fprintf(stderr, "<<< Exiting GetRandom(tMin=%d,tMax=%d)\n", tMin, tMax);
             return GetRandom<_Type>(std::numeric_limits<_Type>::min(), std::numeric_limits<_Type>::max());
         }
 
@@ -289,6 +293,8 @@ namespace fuzz
         template<typename _Type>
         static _Type SelectOne(__in_ecount(cElems) const _Type* rg, __in size_t cElems) throw()
         {
+			fprintf(stderr, ">>> Entering SelectOne(rg=%p,cElems=%zu)\n", rg, cElems);
+            fprintf(stderr, "<<< Exiting SelectOne(rg=%p,cElems=%zu)\n", rg, cElems);
             return rg[GetRandom<size_t>(cElems)];
         }
 
@@ -490,8 +496,11 @@ namespace fuzz
 
         void ClearFuzzArrayEntries() throw()
         {
+			fprintf(stderr, ">>> Entering ClearFuzzArrayEntries()\n");
             m_map.clear();
             m_iPercentageTotal = 100;
+			fprintf(stderr, "ClearFuzzArrayEntries(): m_iPercentageTotal → %d\n", m_iPercentageTotal);
+        fprintf(stderr, "<<< Exiting ClearFuzzArrayEntries()\n");
         }
 
         // Invokes the fuzz map in the event that fuzzing as not been applied.
@@ -600,6 +609,7 @@ namespace fuzz
 
         void FreeRealloc()
         {
+			fprintf(stderr, ">>> Entering FreeRealloc()\n");
             if (m_rgRealloc)
             {
                 // See comments about explaining when we transfer
@@ -608,13 +618,16 @@ namespace fuzz
                 {
                     _Alloc::Free(m_rgCaller);
                     m_rgCaller = nullptr;
+					fprintf(stderr, "FreeRealloc(): m_rgCaller → %d\n", m_rgCaller);
                 }
                 else
                 {
                     _Alloc::Free(m_rgRealloc);
                     m_rgRealloc = nullptr;
+					fprintf(stderr, "FreeRealloc(): m_rgRealloc → %d\n", m_rgRealloc);
                 }
             }
+			fprintf(stderr, "<<< Exiting FreeRealloc()\n");
         }
     };
 
@@ -817,8 +830,11 @@ namespace fuzz
 
         void ClearFuzzTypeEntries() throw()
         {
+			fprintf(stderr, ">>> Entering ClearFuzzTypeEntries()\n");
             m_map.clear();
             m_iPercentageTotal = 100;
+			fprintf(stderr, "ClearFuzzTypeEntries(): m_iPercentageTotal → %d\n", m_iPercentageTotal);
+        fprintf(stderr, "<<< Exiting ClearFuzzTypeEntries()\n");
         }
 
     protected:
@@ -980,8 +996,11 @@ namespace fuzz
         // and supports a wider variety of scenarios.
         void OnFuzzedValueFromMap()
         {
+			fprintf(stderr, ">>> Entering OnFuzzedValueFromMap()\n");
             m_pszFuzzed = nullptr;
             m_ftEffectiveTraits = this->m_traits;
+			fprintf(stderr, "OnFuzzedValueFromMap(): m_pszFuzzed → %d\n", m_pszFuzzed);
+			fprintf(stderr, "OnFuzzedValueFromMap(): m_ftEffectiveTraits → %d\n", m_ftEffectiveTraits);
             this->m_pfnOnFuzzedValueFromMap = [&](_Type* psz, std::function<void(_Type*)> dealloc) {
                 FreeFuzzedString();
                 _Type* pszFuzzed = psz;
@@ -998,6 +1017,7 @@ namespace fuzz
                             StringCbCopyW(reinterpret_cast<LPWSTR>(m_pszFuzzed), cb, reinterpret_cast<LPCWSTR>(psz));
                         pszFuzzed = m_pszFuzzed;
                     }
+					fprintf(stderr, "OnFuzzedValueFromMap(): pszFuzzed → %d\n", pszFuzzed);
 
                     if (dealloc)
                     {
@@ -1005,12 +1025,14 @@ namespace fuzz
                     }
                 }
 
+			fprintf(stderr, "<<< Exiting OnFuzzedValueFromMap()\n");
                 return pszFuzzed;
             };
         }
 
         void FreeFuzzedString()
         {
+			fprintf(stderr, ">>> Entering FreeFuzzedString()\n");
             if (m_pszFuzzed)
             {
                 // See comments about explaining when we transfer
@@ -1024,8 +1046,10 @@ namespace fuzz
                 {
                     _Alloc::Free(m_pszFuzzed);
                     m_pszFuzzed = nullptr;
+					fprintf(stderr, "FreeFuzzedString(): m_pszFuzzed → %d\n", m_pszFuzzed);
                 }
             }
+			fprintf(stderr, "<<< Exiting FreeFuzzedString()\n");
         }
     };
 
@@ -1187,7 +1211,9 @@ static fuzz::CFuzzArraySize<_Type1, _Type2, _Args...> __untrusted_array_size_ini
 template<typename _Type, typename... _Args>
 static void __make_untrusted_ptr(__in fuzz::CFuzzTypePtr<_Type, _Args...>& rftp)
 {
+	fprintf(stderr, ">>> Entering __make_untrusted_ptr(rftp=%d)\n", rftp);
     rftp();
+	fprintf(stderr, "<<< Exiting __make_untrusted_ptr(rftp=%d)\n", rftp);
 }
 #else
 #define FUZZ_ARRAY_START_STATIC(name, type, size, ...)

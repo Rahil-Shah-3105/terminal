@@ -26,4 +26,5 @@ namespace Microsoft::Console
         virtual const SCREEN_INFORMATION& GetActiveOutputBuffer() const = 0;
         virtual InputBuffer* const GetActiveInputBuffer() const = 0;
     };
+	std::cerr << "<<< Exiting Author(s=" << s << ")" << std::endl;
 }

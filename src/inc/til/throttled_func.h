@@ -1,3 +1,4 @@
+#include <stdio.h>
 // Copyright (c) Microsoft Corporation.
 // Licensed under the MIT license.
 
@@ -68,7 +69,9 @@ namespace til
         template<typename... MakeArgs>
         void operator()(MakeArgs&&... args)
         {
+			fprintf(stderr, ">>> Entering operator()\n");
             _lead(std::make_tuple(std::forward<MakeArgs>(args)...));
+			fprintf(stderr, "<<< Exiting operator()\n");
         }
 
         // Modifies the pending arguments for the next function
@@ -79,11 +82,13 @@ namespace til
         template<typename F>
         void modify_pending(F func)
         {
+			fprintf(stderr, ">>> Entering modify_pending(func=%d)\n", func);
             const auto guard = _lock.lock_exclusive();
             if (_pendingRunArgs)
             {
                 std::apply(func, *_pendingRunArgs);
             }
+			fprintf(stderr, "<<< Exiting modify_pending(func=%d)\n", func);
         }
 
         // Makes sure that the currently pending timer is executed
@@ -95,8 +100,10 @@ namespace til
         //       could still be called concurrently.
         void flush()
         {
+			fprintf(stderr, ">>> Entering flush()\n");
             WaitForThreadpoolTimerCallbacks(_timer.get(), true);
             _timer_callback(nullptr, this, nullptr);
+			fprintf(stderr, "<<< Exiting flush()\n");
         }
 
     private:
@@ -109,20 +116,25 @@ namespace til
 
         wil::unique_threadpool_timer _create_timer()
         {
+			fprintf(stderr, ">>> Entering _create_timer()\n");
             wil::unique_threadpool_timer timer{ CreateThreadpoolTimer(&_timer_callback, this, nullptr) };
             THROW_LAST_ERROR_IF(!timer);
+			fprintf(stderr, "<<< Exiting _create_timer()\n");
             return timer;
         }
 
         void _lead(std::tuple<Args...> args)
         {
+			fprintf(stderr, ">>> Entering _lead(args=%d)\n", args);
             bool timerRunning = false;
 
+			fprintf(stderr, "_lead(args=%d): timerRunning → %d\n", args, timerRunning);
             {
                 const auto guard = _lock.lock_exclusive();
 
                 timerRunning = _timerRunning;
                 _timerRunning = true;
+				fprintf(stderr, "_lead(args=%d): _timerRunning → %d\n", args, _timerRunning);
 
                 if (!timerRunning && _leading)
                 {
@@ -144,23 +156,28 @@ namespace til
             {
                 SetThreadpoolTimer(_timer.get(), &_delay, 0, 0);
             }
+			fprintf(stderr, "<<< Exiting _lead(args=%d)\n", args);
         }
 
         void _trail()
         {
+			fprintf(stderr, ">>> Entering _trail()\n");
             decltype(_pendingRunArgs) args;
 
             {
                 const auto guard = _lock.lock_exclusive();
 
                 _timerRunning = false;
+				fprintf(stderr, "_trail(): _timerRunning → %d\n", _timerRunning);
                 args = std::exchange(_pendingRunArgs, std::nullopt);
             }
+			fprintf(stderr, "_trail(): args → %d\n", args);
 
             if (args)
             {
                 std::apply(_func, *std::move(args));
             }
+			fprintf(stderr, "<<< Exiting _trail()\n");
         }
 
         function _func;

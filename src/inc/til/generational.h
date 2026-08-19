@@ -1,3 +1,4 @@
+#include <stdio.h>
 // Copyright (c) Microsoft Corporation.
 // Licensed under the MIT license.
 
@@ -11,7 +12,9 @@ namespace til // Terminal Implementation Library. Also: "Today I Learned"
 
         constexpr void bump() noexcept
         {
+			fprintf(stderr, ">>> Entering bump()\n");
             _value++;
+			fprintf(stderr, "<<< Exiting bump()\n");
         }
 
         uint32_t _value = 0;
@@ -43,6 +46,8 @@ namespace til // Terminal Implementation Library. Also: "Today I Learned"
 
         constexpr generation_t generation() const noexcept
         {
+			fprintf(stderr, ">>> Entering generation()\n");
+            fprintf(stderr, "<<< Exiting generation()\n");
             return _generation;
         }
 

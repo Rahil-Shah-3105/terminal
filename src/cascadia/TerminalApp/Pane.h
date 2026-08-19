@@ -1,3 +1,4 @@
+#include <stdio.h>
 // Copyright (c) Microsoft Corporation.
 // Licensed under the MIT license.
 //
@@ -83,8 +84,10 @@ public:
     // - If this is a branch/root pane, return nullptr.
     winrt::Microsoft::Terminal::Settings::Model::Profile GetProfile() const
     {
+		fprintf(stderr, ">>> Entering GetProfile()\n");
         if (const auto& c{ _content.try_as<winrt::TerminalApp::TerminalPaneContent>() })
         {
+		fprintf(stderr, "<<< Exiting GetProfile()\n");
             return c.GetProfile();
         }
         return nullptr;
@@ -170,6 +173,7 @@ public:
     template<typename F>
     auto WalkTree(F f) -> decltype(f(shared_from_this()))
     {
+		fprintf(stderr, ">>> Entering WalkTree(f=%d)\n", f);
         using R = std::invoke_result_t<F, std::shared_ptr<Pane>>;
         static constexpr auto IsVoid = std::is_void_v<R>;
 
@@ -205,6 +209,8 @@ public:
     template<typename F>
     std::shared_ptr<Pane> _FindPane(F f)
     {
+		fprintf(stderr, ">>> Entering _FindPane(f=%d)\n", f);
+        fprintf(stderr, "<<< Exiting _FindPane(f=%d)\n", f);
         return WalkTree([f](const auto& pane) -> std::shared_ptr<Pane> {
             if (f(pane))
             {

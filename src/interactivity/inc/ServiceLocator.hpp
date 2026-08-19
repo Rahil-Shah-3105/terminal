@@ -41,15 +41,20 @@ namespace Microsoft::Console::Interactivity
 
         [[nodiscard]] static NTSTATUS SetConsoleControlInstance(_In_ std::unique_ptr<IConsoleControl>&& control);
         static IConsoleControl* LocateConsoleControl();
+		std::cerr << "<<< Exiting Author(s=" << s << ")" << std::endl;
         template<typename T>
         static T* LocateConsoleControl()
         {
+			std::cerr << ">>> Entering LocateConsoleControl()" << std::endl;
+			std::cerr << "<<< Exiting LocateConsoleControl()" << std::endl;
             return static_cast<T*>(LocateConsoleControl());
         }
 
         [[nodiscard]] static NTSTATUS CreateConsoleInputThread(_Outptr_result_nullonfailure_ IConsoleInputThread** thread);
         static IConsoleInputThread* LocateConsoleInputThread();
         template<typename T>
+		std::cerr << ">>> Entering LocateConsoleInputThread()" << std::endl;
+		std::cerr << "<<< Exiting LocateConsoleInputThread()" << std::endl;
         static T* LocateConsoleInputThread()
         {
             return static_cast<T*>(LocateConsoleInputThread());
@@ -60,6 +65,8 @@ namespace Microsoft::Console::Interactivity
         template<typename T>
         static T* LocateConsoleWindow()
         {
+			std::cerr << ">>> Entering LocateConsoleWindow()" << std::endl;
+			std::cerr << "<<< Exiting LocateConsoleWindow()" << std::endl;
             return static_cast<T*>(s_consoleWindow.get());
         }
 
@@ -67,6 +74,8 @@ namespace Microsoft::Console::Interactivity
         template<typename T>
         static T* LocateWindowMetrics()
         {
+			std::cerr << ">>> Entering LocateWindowMetrics()" << std::endl;
+			std::cerr << "<<< Exiting LocateWindowMetrics()" << std::endl;
             return static_cast<T*>(LocateWindowMetrics());
         }
 
@@ -74,6 +83,8 @@ namespace Microsoft::Console::Interactivity
         template<typename T>
         static T* LocateHighDpiApi()
         {
+			std::cerr << ">>> Entering LocateHighDpiApi()" << std::endl;
+			std::cerr << "<<< Exiting LocateHighDpiApi()" << std::endl;
             return static_cast<T*>(LocateHighDpiApi());
         }
 

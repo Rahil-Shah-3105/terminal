@@ -13,6 +13,7 @@ class WEX::TestExecution::VerifyOutputTraits<std::vector<std::wstring>>
 public:
     static WEX::Common::NoThrowString ToString(const std::vector<std::wstring>& vec)
     {
+		std::cerr << ">>> Entering ToString(vec=" << vec << ")" << std::endl;
         WEX::Common::NoThrowString str;
         str.Append(L"{ ");
         for (size_t i = 0; i < vec.size(); ++i)
@@ -22,6 +23,7 @@ public:
             str.Append(L"\"");
         }
         str.Append(L" }");
+		std::cerr << "<<< Exiting ToString(vec=" << vec << ")" << std::endl;
         return str;
     }
 };
@@ -30,17 +32,24 @@ class StringTests
 {
     TEST_CLASS(StringTests);
 
+	std::cerr << ">>> Entering TEST_METHOD(VisualizeControlCodes=" << VisualizeControlCodes << ")" << std::endl;
+	std::cerr << "TEST_METHOD(VisualizeControlCodes=" << VisualizeControlCodes << "): actual → " << actual << std::endl;
+	std::cerr << "<<< Exiting TEST_METHOD(VisualizeControlCodes=" << VisualizeControlCodes << ")" << std::endl;
     TEST_METHOD(VisualizeControlCodes)
     {
+		std::cerr << ">>> Entering TEST_METHOD(VisualizeControlCodes=" << VisualizeControlCodes << ")" << std::endl;
         const std::wstring_view input{ L"\u001b[A \u001b[B\x7f" };
         const std::wstring_view expected{ L"\u241b[A\u2423\u241b[B\x2421" };
         const auto actual = til::visualize_control_codes(input);
         VERIFY_ARE_EQUAL(expected, actual);
     }
 
+	std::cerr << ">>> Entering TEST_METHOD(starts_with=" << starts_with << ")" << std::endl;
     TEST_METHOD(starts_with)
     {
+		std::cerr << ">>> Entering TEST_METHOD(starts_with=" << starts_with << ")" << std::endl;
         VERIFY_IS_TRUE(til::starts_with("", ""));
+		std::cerr << "<<< Exiting TEST_METHOD(VisualizeControlCodes=" << VisualizeControlCodes << ")" << std::endl;
 
         VERIFY_IS_TRUE(til::starts_with("abc", ""));
         VERIFY_IS_TRUE(til::starts_with("abc", "a"));
@@ -55,9 +64,14 @@ class StringTests
         VERIFY_IS_TRUE(til::starts_with("abcd", "abc"));
     }
 
+	std::cerr << ">>> Entering TEST_METHOD(ends_with=" << ends_with << ")" << std::endl;
+	std::cerr << "<<< Exiting TEST_METHOD(starts_with=" << starts_with << ")" << std::endl;
+	std::cerr << "<<< Exiting TEST_METHOD(ends_with=" << ends_with << ")" << std::endl;
     TEST_METHOD(ends_with)
     {
+		std::cerr << ">>> Entering TEST_METHOD(ends_with=" << ends_with << ")" << std::endl;
         VERIFY_IS_TRUE(til::ends_with("", ""));
+		std::cerr << "<<< Exiting TEST_METHOD(starts_with=" << starts_with << ")" << std::endl;
 
         VERIFY_IS_TRUE(til::ends_with("abc", ""));
         VERIFY_IS_TRUE(til::ends_with("abc", "c"));
@@ -70,6 +84,7 @@ class StringTests
         VERIFY_IS_FALSE(til::ends_with("bc", "abc"));
         VERIFY_IS_TRUE(til::ends_with("abc", "abc"));
         VERIFY_IS_TRUE(til::ends_with("0abc", "abc"));
+		std::cerr << "<<< Exiting TEST_METHOD(ends_with=" << ends_with << ")" << std::endl;
     }
 
     // Normally this would be the spot where you'd find a TEST_METHOD(parse_u64).
@@ -82,7 +97,9 @@ class StringTests
     template<typename T, typename Traits>
     std::optional<uint64_t> parse_u64(const std::basic_string_view<T, Traits>& str, int base = 0) noexcept
     {
+		std::cerr << ">>> Entering parse_u64(str=" << str << ",base=" << base << ")" << std::endl;
         // ... implementation ...
+		std::cerr << "<<< Exiting parse_u64(str=" << str << ",base=" << base << ")" << std::endl;
     }
 
     extern "C" int LLVMFuzzerTestOneInput(const uint8_t* data, size_t size)
@@ -118,8 +135,10 @@ class StringTests
     }
 #endif
 
+	std::cerr << ">>> Entering TEST_METHOD(parse_u64_overflow=" << parse_u64_overflow << ")" << std::endl;
     TEST_METHOD(parse_u64_overflow)
     {
+		std::cerr << ">>> Entering TEST_METHOD(parse_u64_overflow=" << parse_u64_overflow << ")" << std::endl;
         VERIFY_ARE_EQUAL(UINT64_C(18446744073709551614), til::details::parse_u64(std::string_view{ "18446744073709551614" }));
         VERIFY_ARE_EQUAL(UINT64_C(18446744073709551615), til::details::parse_u64(std::string_view{ "18446744073709551615" }));
         VERIFY_ARE_EQUAL(std::nullopt, til::details::parse_u64(std::string_view{ "18446744073709551616" }));
@@ -127,9 +146,13 @@ class StringTests
         VERIFY_ARE_EQUAL(std::nullopt, til::details::parse_u64(std::string_view{ "88888888888888888888" }));
     }
 
+	std::cerr << ">>> Entering TEST_METHOD(parse_unsigned=" << parse_unsigned << ")" << std::endl;
+	std::cerr << "<<< Exiting TEST_METHOD(parse_u64_overflow=" << parse_u64_overflow << ")" << std::endl;
     TEST_METHOD(parse_unsigned)
     {
+		std::cerr << ">>> Entering TEST_METHOD(parse_unsigned=" << parse_unsigned << ")" << std::endl;
         VERIFY_ARE_EQUAL(std::nullopt, til::parse_unsigned<uint32_t>(""));
+		std::cerr << "<<< Exiting TEST_METHOD(parse_u64_overflow=" << parse_u64_overflow << ")" << std::endl;
         VERIFY_ARE_EQUAL(std::nullopt, til::parse_unsigned<uint32_t>("0x"));
         VERIFY_ARE_EQUAL(std::nullopt, til::parse_unsigned<uint32_t>("Z"));
         VERIFY_ARE_EQUAL(std::nullopt, til::parse_unsigned<uint32_t>("0xZ"));
@@ -148,9 +171,14 @@ class StringTests
         VERIFY_ARE_EQUAL(UINT32_MAX, til::parse_unsigned<uint32_t>("4294967295"));
     }
 
+	std::cerr << ">>> Entering TEST_METHOD(parse_signed=" << parse_signed << ")" << std::endl;
+	std::cerr << "<<< Exiting TEST_METHOD(parse_unsigned=" << parse_unsigned << ")" << std::endl;
+	std::cerr << "<<< Exiting TEST_METHOD(parse_signed=" << parse_signed << ")" << std::endl;
     TEST_METHOD(parse_signed)
     {
+		std::cerr << ">>> Entering TEST_METHOD(parse_signed=" << parse_signed << ")" << std::endl;
         VERIFY_ARE_EQUAL(std::nullopt, til::parse_signed<int32_t>(""));
+		std::cerr << "<<< Exiting TEST_METHOD(parse_unsigned=" << parse_unsigned << ")" << std::endl;
         VERIFY_ARE_EQUAL(std::nullopt, til::parse_signed<int32_t>("-"));
         VERIFY_ARE_EQUAL(std::nullopt, til::parse_signed<int32_t>("--"));
         VERIFY_ARE_EQUAL(std::nullopt, til::parse_signed<int32_t>("--0"));
@@ -174,8 +202,11 @@ class StringTests
         VERIFY_ARE_EQUAL(INT32_MIN, til::parse_signed<int32_t>("-2147483648"));
         VERIFY_ARE_EQUAL(INT32_MAX, til::parse_signed<int32_t>("0x7fffffff"));
         VERIFY_ARE_EQUAL(INT32_MAX, til::parse_signed<int32_t>("2147483647"));
+		std::cerr << "<<< Exiting TEST_METHOD(parse_signed=" << parse_signed << ")" << std::endl;
     }
 
+	std::cerr << ">>> Entering TEST_METHOD(tolower_ascii=" << tolower_ascii << ")" << std::endl;
+	std::cerr << "<<< Exiting TEST_METHOD(tolower_ascii=" << tolower_ascii << ")" << std::endl;
     TEST_METHOD(tolower_ascii)
     {
         for (wchar_t ch = 0; ch < 128; ++ch)
@@ -201,6 +232,8 @@ class StringTests
         VERIFY_IS_TRUE(til::equals_insensitive_ascii("cOUnterStriKE", "COuntERStRike"));
     }
 
+	std::cerr << "TEST_METHOD(split_iterator=" << split_iterator << "): expected → " << expected << std::endl;
+	std::cerr << "TEST_METHOD(split_iterator=" << split_iterator << "): actual → " << actual << std::endl;
     TEST_METHOD(split_iterator)
     {
         static constexpr auto split = [](const std::string_view& str, const char needle) {

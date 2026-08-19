@@ -21,6 +21,7 @@ class Utf8Utf16ConvertTests
 
 void Utf8Utf16ConvertTests::TestU8ToU16()
 {
+	std::cerr << ">>> Entering Utf8Utf16ConvertTests::TestU8ToU16()" << std::endl;
     const std::string u8String{
         '\x7E', // TILDE (1 byte)
         '\xC3', // LATIN SMALL LETTER O WITH DIAERESIS (2 bytes)
@@ -46,10 +47,12 @@ void Utf8Utf16ConvertTests::TestU8ToU16()
     const auto hRes{ til::u8u16(u8String, u16Out) };
     VERIFY_ARE_EQUAL(S_OK, hRes);
     VERIFY_ARE_EQUAL(u16StringComp, u16Out);
+	std::cerr << "<<< Exiting Utf8Utf16ConvertTests::TestU8ToU16()" << std::endl;
 }
 
 void Utf8Utf16ConvertTests::TestU16ToU8()
 {
+	std::cerr << ">>> Entering Utf8Utf16ConvertTests::TestU16ToU8()" << std::endl;
     const std::wstring u16String{
         gsl::narrow_cast<wchar_t>(0x007eU), // TILDE
         gsl::narrow_cast<wchar_t>(0x00f6U), // LATIN SMALL LETTER O WITH DIAERESIS
@@ -75,10 +78,12 @@ void Utf8Utf16ConvertTests::TestU16ToU8()
     const auto hRes{ til::u16u8(u16String, u8Out) };
     VERIFY_ARE_EQUAL(S_OK, hRes);
     VERIFY_ARE_EQUAL(u8StringComp, u8Out);
+	std::cerr << "<<< Exiting Utf8Utf16ConvertTests::TestU16ToU8()" << std::endl;
 }
 
 void Utf8Utf16ConvertTests::TestU8ToU16Partials()
 {
+	std::cerr << ">>> Entering Utf8Utf16ConvertTests::TestU8ToU16Partials()" << std::endl;
     const std::string u8String1{
         '\xF0', // CJK UNIFIED IDEOGRAPH-24F5C (4 bytes)
         '\xA4',
@@ -133,10 +138,12 @@ void Utf8Utf16ConvertTests::TestU8ToU16Partials()
     const auto hRes4{ til::u8u16(u8String4, u16Out4, state) };
     VERIFY_ARE_EQUAL(S_OK, hRes4);
     VERIFY_ARE_EQUAL(u16StringComp2, u16Out4);
+	std::cerr << "<<< Exiting Utf8Utf16ConvertTests::TestU8ToU16Partials()" << std::endl;
 }
 
 void Utf8Utf16ConvertTests::TestU16ToU8Partials()
 {
+	std::cerr << ">>> Entering Utf8Utf16ConvertTests::TestU16ToU8Partials()" << std::endl;
     const std::wstring u16String1{
         gsl::narrow_cast<wchar_t>(0xD853), // CJK UNIFIED IDEOGRAPH-24F5C (surrogate pair)
         gsl::narrow_cast<wchar_t>(0xDF5C),
@@ -165,10 +172,12 @@ void Utf8Utf16ConvertTests::TestU16ToU8Partials()
     const auto hRes2{ til::u16u8(u16String2, u8Out2, state) };
     VERIFY_ARE_EQUAL(S_OK, hRes2);
     VERIFY_ARE_EQUAL(u8StringComp, u8Out2);
+	std::cerr << "<<< Exiting Utf8Utf16ConvertTests::TestU16ToU8Partials()" << std::endl;
 }
 
 void Utf8Utf16ConvertTests::TestU8ToU16OneByOne()
 {
+	std::cerr << ">>> Entering Utf8Utf16ConvertTests::TestU8ToU16OneByOne()" << std::endl;
     const std::string u8String1_1{ '\xF0' }; // U+1F4F7 CAMERA (4 bytes)
     const std::string u8String1_2{ '\x9F' };
     const std::string u8String1_3{ '\x93' };
@@ -190,4 +199,5 @@ void Utf8Utf16ConvertTests::TestU8ToU16OneByOne()
     VERIFY_ARE_EQUAL(L"", u16Out1);
     VERIFY_SUCCEEDED(til::u8u16(u8String1_4, u16Out1, state));
     VERIFY_ARE_EQUAL(u16StringComp1, u16Out1);
+	std::cerr << "<<< Exiting Utf8Utf16ConvertTests::TestU8ToU16OneByOne()" << std::endl;
 }

@@ -1,3 +1,4 @@
+#include <stdio.h>
 // Copyright (c) Microsoft Corporation.
 // Licensed under the MIT license.
 //
@@ -22,31 +23,43 @@ namespace winrt::TerminalApp::implementation
     public:
         static winrt::Microsoft::Management::Deployment::PackageManager CreatePackageManager()
         {
+			fprintf(stderr, ">>> Entering CreatePackageManager()\n");
+            fprintf(stderr, "<<< Exiting CreatePackageManager()\n");
             return winrt::create_instance<winrt::Microsoft::Management::Deployment::PackageManager>(PackageManagerGuid, CLSCTX_ALL);
         }
 
         static winrt::Microsoft::Management::Deployment::FindPackagesOptions CreateFindPackagesOptions()
         {
+			fprintf(stderr, ">>> Entering CreateFindPackagesOptions()\n");
+            fprintf(stderr, "<<< Exiting CreateFindPackagesOptions()\n");
             return winrt::create_instance<winrt::Microsoft::Management::Deployment::FindPackagesOptions>(FindPackageOptionsGuid, CLSCTX_ALL);
         }
 
         static winrt::Microsoft::Management::Deployment::CreateCompositePackageCatalogOptions CreateCreateCompositePackageCatalogOptions()
         {
+			fprintf(stderr, ">>> Entering CreateCreateCompositePackageCatalogOptions()\n");
+            fprintf(stderr, "<<< Exiting CreateCreateCompositePackageCatalogOptions()\n");
             return winrt::create_instance<winrt::Microsoft::Management::Deployment::CreateCompositePackageCatalogOptions>(CreateCompositePackageCatalogOptionsGuid, CLSCTX_ALL);
         }
 
         static winrt::Microsoft::Management::Deployment::InstallOptions CreateInstallOptions()
         {
+			fprintf(stderr, ">>> Entering CreateInstallOptions()\n");
+            fprintf(stderr, "<<< Exiting CreateInstallOptions()\n");
             return winrt::create_instance<winrt::Microsoft::Management::Deployment::InstallOptions>(InstallOptionsGuid, CLSCTX_ALL);
         }
 
         static winrt::Microsoft::Management::Deployment::UninstallOptions CreateUninstallOptions()
         {
+			fprintf(stderr, ">>> Entering CreateUninstallOptions()\n");
+            fprintf(stderr, "<<< Exiting CreateUninstallOptions()\n");
             return winrt::create_instance<winrt::Microsoft::Management::Deployment::UninstallOptions>(UninstallOptionsGuid, CLSCTX_ALL);
         }
 
         static winrt::Microsoft::Management::Deployment::PackageMatchFilter CreatePackageMatchFilter()
         {
+			fprintf(stderr, ">>> Entering CreatePackageMatchFilter()\n");
+            fprintf(stderr, "<<< Exiting CreatePackageMatchFilter()\n");
             return winrt::create_instance<winrt::Microsoft::Management::Deployment::PackageMatchFilter>(PackageMatchFilterGuid, CLSCTX_ALL);
         }
 

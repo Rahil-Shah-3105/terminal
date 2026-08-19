@@ -17,6 +17,7 @@ Author(s):
 
 namespace Microsoft::Console::Interactivity
 {
+	std::cerr << ">>> Entering Author(s=" << s << ")" << std::endl;
     class IWindowMetrics
     {
     public:
@@ -24,4 +25,5 @@ namespace Microsoft::Console::Interactivity
         virtual til::rect GetMinClientRectInPixels() = 0;
         virtual til::rect GetMaxClientRectInPixels() = 0;
     };
+	std::cerr << "<<< Exiting Author(s=" << s << ")" << std::endl;
 }

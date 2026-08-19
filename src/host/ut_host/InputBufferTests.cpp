@@ -18,6 +18,9 @@ class InputBufferTests
 
     std::unique_ptr<CommonState> m_state;
 
+	std::cerr << ">>> Entering TEST_CLASS_SETUP(ClassSetup=" << ClassSetup << ")" << std::endl;
+	std::cerr << "TEST_CLASS_SETUP(ClassSetup=" << ClassSetup << "): m_state → " << m_state << std::endl;
+	std::cerr << "<<< Exiting TEST_CLASS_SETUP(ClassSetup=" << ClassSetup << ")" << std::endl;
     TEST_CLASS_SETUP(ClassSetup)
     {
         m_state = std::make_unique<CommonState>();
@@ -25,11 +28,15 @@ class InputBufferTests
         return true;
     }
 
+	std::cerr << ">>> Entering TEST_CLASS_CLEANUP(ClassCleanup=" << ClassCleanup << ")" << std::endl;
+	std::cerr << "<<< Exiting TEST_CLASS_CLEANUP(ClassCleanup=" << ClassCleanup << ")" << std::endl;
     TEST_CLASS_CLEANUP(ClassCleanup)
     {
         return true;
     }
 
+	std::cerr << ">>> Entering TEST_METHOD_CLEANUP(MethodCleanup=" << MethodCleanup << ")" << std::endl;
+	std::cerr << "<<< Exiting TEST_METHOD_CLEANUP(MethodCleanup=" << MethodCleanup << ")" << std::endl;
     TEST_METHOD_CLEANUP(MethodCleanup)
     {
         auto& gci = ServiceLocator::LocateGlobals().getConsoleInformation();
@@ -57,10 +64,14 @@ class InputBufferTests
         return retval;
     }
 
+	std::cerr << ">>> Entering TEST_METHOD(CanGetNumberOfReadyEvents=" << CanGetNumberOfReadyEvents << ")" << std::endl;
+	std::cerr << "TEST_METHOD(CanGetNumberOfReadyEvents=" << CanGetNumberOfReadyEvents << "): record2.EventType → " << record2.EventType << std::endl;
     TEST_METHOD(CanGetNumberOfReadyEvents)
     {
+		std::cerr << ">>> Entering TEST_METHOD(CanGetNumberOfReadyEvents=" << CanGetNumberOfReadyEvents << ")" << std::endl;
         InputBuffer inputBuffer;
         auto record = MakeKeyEvent(true, 1, L'a', 0, L'a', 0);
+		std::cerr << "TEST_METHOD(CanGetNumberOfReadyEvents=" << CanGetNumberOfReadyEvents << "): record → " << record << std::endl;
         VERIFY_IS_GREATER_THAN(inputBuffer.Write(record), 0u);
         VERIFY_ARE_EQUAL(inputBuffer.GetNumberOfReadyEvents(), 1u);
         // add another event, check again
@@ -70,9 +81,13 @@ class InputBufferTests
         VERIFY_ARE_EQUAL(inputBuffer.GetNumberOfReadyEvents(), 2u);
     }
 
+	std::cerr << ">>> Entering TEST_METHOD(CanInsertIntoInputBufferIndividually=" << CanInsertIntoInputBufferIndividually << ")" << std::endl;
+	std::cerr << "<<< Exiting TEST_METHOD(CanGetNumberOfReadyEvents=" << CanGetNumberOfReadyEvents << ")" << std::endl;
     TEST_METHOD(CanInsertIntoInputBufferIndividually)
     {
+		std::cerr << ">>> Entering TEST_METHOD(CanInsertIntoInputBufferIndividually=" << CanInsertIntoInputBufferIndividually << ")" << std::endl;
         InputBuffer inputBuffer;
+		std::cerr << "<<< Exiting TEST_METHOD(CanGetNumberOfReadyEvents=" << CanGetNumberOfReadyEvents << ")" << std::endl;
         for (size_t i = 0; i < RECORD_INSERT_COUNT; ++i)
         {
             INPUT_RECORD record;
@@ -83,9 +98,13 @@ class InputBufferTests
         VERIFY_ARE_EQUAL(inputBuffer.GetNumberOfReadyEvents(), RECORD_INSERT_COUNT);
     }
 
+	std::cerr << ">>> Entering TEST_METHOD(CanBulkInsertIntoInputBuffer=" << CanBulkInsertIntoInputBuffer << ")" << std::endl;
+	std::cerr << "<<< Exiting TEST_METHOD(CanInsertIntoInputBufferIndividually=" << CanInsertIntoInputBufferIndividually << ")" << std::endl;
     TEST_METHOD(CanBulkInsertIntoInputBuffer)
     {
+		std::cerr << ">>> Entering TEST_METHOD(CanBulkInsertIntoInputBuffer=" << CanBulkInsertIntoInputBuffer << ")" << std::endl;
         InputBuffer inputBuffer;
+		std::cerr << "<<< Exiting TEST_METHOD(CanInsertIntoInputBufferIndividually=" << CanInsertIntoInputBufferIndividually << ")" << std::endl;
         InputEventQueue events;
         INPUT_RECORD record;
         record.EventType = MENU_EVENT;
@@ -102,9 +121,15 @@ class InputBufferTests
         }
     }
 
+	std::cerr << ">>> Entering TEST_METHOD(InputBufferCoalescesMouseEvents=" << InputBufferCoalescesMouseEvents << ")" << std::endl;
+	std::cerr << "<<< Exiting TEST_METHOD(CanBulkInsertIntoInputBuffer=" << CanBulkInsertIntoInputBuffer << ")" << std::endl;
+	std::cerr << "TEST_METHOD(InputBufferCoalescesMouseEvents=" << InputBufferCoalescesMouseEvents << "): mouseRecord.EventType → " << mouseRecord.EventType << std::endl;
+	std::cerr << "TEST_METHOD(InputBufferCoalescesMouseEvents=" << InputBufferCoalescesMouseEvents << "): keyRecord.EventType → " << keyRecord.EventType << std::endl;
     TEST_METHOD(InputBufferCoalescesMouseEvents)
     {
+		std::cerr << ">>> Entering TEST_METHOD(InputBufferCoalescesMouseEvents=" << InputBufferCoalescesMouseEvents << ")" << std::endl;
         InputBuffer inputBuffer;
+		std::cerr << "<<< Exiting TEST_METHOD(CanBulkInsertIntoInputBuffer=" << CanBulkInsertIntoInputBuffer << ")" << std::endl;
 
         INPUT_RECORD mouseRecord;
         mouseRecord.EventType = MOUSE_EVENT;
@@ -136,9 +161,13 @@ class InputBufferTests
         VERIFY_ARE_EQUAL(inputBuffer.GetNumberOfReadyEvents(), 3u);
     }
 
+	std::cerr << ">>> Entering TEST_METHOD(InputBufferDoesNotCoalesceBulkMouseEvents=" << InputBufferDoesNotCoalesceBulkMouseEvents << ")" << std::endl;
+	std::cerr << "<<< Exiting TEST_METHOD(InputBufferCoalescesMouseEvents=" << InputBufferCoalescesMouseEvents << ")" << std::endl;
     TEST_METHOD(InputBufferDoesNotCoalesceBulkMouseEvents)
     {
+		std::cerr << ">>> Entering TEST_METHOD(InputBufferDoesNotCoalesceBulkMouseEvents=" << InputBufferDoesNotCoalesceBulkMouseEvents << ")" << std::endl;
         Log::Comment(L"The input buffer should not coalesce mouse events if more than one event is sent at a time");
+		std::cerr << "<<< Exiting TEST_METHOD(InputBufferCoalescesMouseEvents=" << InputBufferCoalescesMouseEvents << ")" << std::endl;
 
         InputBuffer inputBuffer;
         INPUT_RECORD mouseRecords[RECORD_INSERT_COUNT];
@@ -164,12 +193,17 @@ class InputBufferTests
         }
     }
 
+	std::cerr << ">>> Entering TEST_METHOD(InputBufferCoalescesKeyEvents=" << InputBufferCoalescesKeyEvents << ")" << std::endl;
+	std::cerr << "<<< Exiting TEST_METHOD(InputBufferDoesNotCoalesceBulkMouseEvents=" << InputBufferDoesNotCoalesceBulkMouseEvents << ")" << std::endl;
     TEST_METHOD(InputBufferCoalescesKeyEvents)
     {
+		std::cerr << ">>> Entering TEST_METHOD(InputBufferCoalescesKeyEvents=" << InputBufferCoalescesKeyEvents << ")" << std::endl;
         Log::Comment(L"The input buffer should coalesce identical key events if they are send one at a time");
+		std::cerr << "<<< Exiting TEST_METHOD(InputBufferDoesNotCoalesceBulkMouseEvents=" << InputBufferDoesNotCoalesceBulkMouseEvents << ")" << std::endl;
 
         InputBuffer inputBuffer;
         auto record = MakeKeyEvent(true, 1, L'a', 0, L'a', 0);
+		std::cerr << "TEST_METHOD(InputBufferCoalescesKeyEvents=" << InputBufferCoalescesKeyEvents << "): record → " << record << std::endl;
 
         // send a bunch of identical events
         inputBuffer.Flush();
@@ -191,9 +225,13 @@ class InputBufferTests
         VERIFY_ARE_EQUAL(pKeyEvent.wRepeatCount, RECORD_INSERT_COUNT);
     }
 
+	std::cerr << ">>> Entering TEST_METHOD(InputBufferDoesNotCoalesceBulkKeyEvents=" << InputBufferDoesNotCoalesceBulkKeyEvents << ")" << std::endl;
+	std::cerr << "<<< Exiting TEST_METHOD(InputBufferCoalescesKeyEvents=" << InputBufferCoalescesKeyEvents << ")" << std::endl;
     TEST_METHOD(InputBufferDoesNotCoalesceBulkKeyEvents)
     {
+		std::cerr << ">>> Entering TEST_METHOD(InputBufferDoesNotCoalesceBulkKeyEvents=" << InputBufferDoesNotCoalesceBulkKeyEvents << ")" << std::endl;
         Log::Comment(L"The input buffer should not coalesce key events if more than one event is sent at a time");
+		std::cerr << "<<< Exiting TEST_METHOD(InputBufferCoalescesKeyEvents=" << InputBufferCoalescesKeyEvents << ")" << std::endl;
 
         InputBuffer inputBuffer;
         INPUT_RECORD keyRecords[RECORD_INSERT_COUNT];
@@ -219,9 +257,13 @@ class InputBufferTests
         }
     }
 
+	std::cerr << ">>> Entering TEST_METHOD(InputBufferDoesNotCoalesceSurrogatePairs=" << InputBufferDoesNotCoalesceSurrogatePairs << ")" << std::endl;
+	std::cerr << "<<< Exiting TEST_METHOD(InputBufferDoesNotCoalesceBulkKeyEvents=" << InputBufferDoesNotCoalesceBulkKeyEvents << ")" << std::endl;
     TEST_METHOD(InputBufferDoesNotCoalesceSurrogatePairs)
     {
+		std::cerr << ">>> Entering TEST_METHOD(InputBufferDoesNotCoalesceSurrogatePairs=" << InputBufferDoesNotCoalesceSurrogatePairs << ")" << std::endl;
         InputBuffer inputBuffer;
+		std::cerr << "<<< Exiting TEST_METHOD(InputBufferDoesNotCoalesceBulkKeyEvents=" << InputBufferDoesNotCoalesceBulkKeyEvents << ")" << std::endl;
 
         // U+1F44D thumbs up emoji
         inputBuffer.Write(MakeKeyEvent(true, 1, 0xD83D, 0, 0xD83D, 0));
@@ -234,9 +276,13 @@ class InputBufferTests
         VERIFY_ARE_EQUAL(3u, inputBuffer.GetNumberOfReadyEvents());
     }
 
+	std::cerr << ">>> Entering TEST_METHOD(CanFlushAllOutput=" << CanFlushAllOutput << ")" << std::endl;
+	std::cerr << "<<< Exiting TEST_METHOD(InputBufferDoesNotCoalesceSurrogatePairs=" << InputBufferDoesNotCoalesceSurrogatePairs << ")" << std::endl;
     TEST_METHOD(CanFlushAllOutput)
     {
+		std::cerr << ">>> Entering TEST_METHOD(CanFlushAllOutput=" << CanFlushAllOutput << ")" << std::endl;
         InputBuffer inputBuffer;
+		std::cerr << "<<< Exiting TEST_METHOD(InputBufferDoesNotCoalesceSurrogatePairs=" << InputBufferDoesNotCoalesceSurrogatePairs << ")" << std::endl;
         InputEventQueue events;
 
         // put some events in the buffer so we can remove them
@@ -254,9 +300,13 @@ class InputBufferTests
         VERIFY_ARE_EQUAL(inputBuffer.GetNumberOfReadyEvents(), 0u);
     }
 
+	std::cerr << ">>> Entering TEST_METHOD(CanFlushAllButKeys=" << CanFlushAllButKeys << ")" << std::endl;
+	std::cerr << "<<< Exiting TEST_METHOD(CanFlushAllOutput=" << CanFlushAllOutput << ")" << std::endl;
     TEST_METHOD(CanFlushAllButKeys)
     {
+		std::cerr << ">>> Entering TEST_METHOD(CanFlushAllButKeys=" << CanFlushAllButKeys << ")" << std::endl;
         InputBuffer inputBuffer;
+		std::cerr << "<<< Exiting TEST_METHOD(CanFlushAllOutput=" << CanFlushAllOutput << ")" << std::endl;
         INPUT_RECORD records[RECORD_INSERT_COUNT] = { 0 };
         InputEventQueue inEvents;
 
@@ -290,9 +340,11 @@ class InputBufferTests
         }
     }
 
+	std::cerr << "<<< Exiting TEST_METHOD(CanFlushAllButKeys=" << CanFlushAllButKeys << ")" << std::endl;
     TEST_METHOD(CanReadInput)
     {
         InputBuffer inputBuffer;
+		std::cerr << "<<< Exiting TEST_METHOD(CanFlushAllButKeys=" << CanFlushAllButKeys << ")" << std::endl;
         INPUT_RECORD records[RECORD_INSERT_COUNT];
         InputEventQueue inEvents;
 
@@ -396,6 +448,7 @@ class InputBufferTests
         VERIFY_IS_FALSE(waitEvent.is_signaled());
     }
 
+	std::cerr << "TEST_METHOD(ReadingDbcsCharsPadsOutputArray=" << ReadingDbcsCharsPadsOutputArray << "): codepage → " << codepage << std::endl;
     TEST_METHOD(ReadingDbcsCharsPadsOutputArray)
     {
         Log::Comment(L"During a non-unicode read, the input buffer should count twice for each dbcs key event");
@@ -441,6 +494,7 @@ class InputBufferTests
         }
     }
 
+	std::cerr << "TEST_METHOD(CanPrependEvents=" << CanPrependEvents << "): eventsWritten → " << eventsWritten << std::endl;
     TEST_METHOD(CanPrependEvents)
     {
         InputBuffer inputBuffer;
@@ -498,6 +552,7 @@ class InputBufferTests
         }
     }
 
+	std::cerr << "TEST_METHOD(CanReinitializeInputBuffer=" << CanReinitializeInputBuffer << "): inputBuffer.InputMode → " << inputBuffer.InputMode << std::endl;
     TEST_METHOD(CanReinitializeInputBuffer)
     {
         InputBuffer inputBuffer;
@@ -516,6 +571,8 @@ class InputBufferTests
         VERIFY_ARE_EQUAL(inputBuffer.GetNumberOfReadyEvents(), 0u);
     }
 
+	std::cerr << "TEST_METHOD(HandleConsoleSuspensionEventsRemovesPauseKeys=" << HandleConsoleSuspensionEventsRemovesPauseKeys << "): pauseRecord → " << pauseRecord << std::endl;
+	std::cerr << "TEST_METHOD(HandleConsoleSuspensionEventsRemovesPauseKeys=" << HandleConsoleSuspensionEventsRemovesPauseKeys << "): unpauseRecord → " << unpauseRecord << std::endl;
     TEST_METHOD(HandleConsoleSuspensionEventsRemovesPauseKeys)
     {
         const auto& gci = ServiceLocator::LocateGlobals().getConsoleInformation();
@@ -540,6 +597,8 @@ class InputBufferTests
         VERIFY_ARE_EQUAL(inputBuffer.GetNumberOfReadyEvents(), 0u);
     }
 
+	std::cerr << "TEST_METHOD(SystemKeysDontUnpauseConsole=" << SystemKeysDontUnpauseConsole << "): pauseRecord → " << pauseRecord << std::endl;
+	std::cerr << "TEST_METHOD(SystemKeysDontUnpauseConsole=" << SystemKeysDontUnpauseConsole << "): systemRecord → " << systemRecord << std::endl;
     TEST_METHOD(SystemKeysDontUnpauseConsole)
     {
         const auto& gci = ServiceLocator::LocateGlobals().getConsoleInformation();
@@ -580,6 +639,7 @@ class InputBufferTests
         InputBuffer inputBuffer;
         const WORD repeatCount = 5;
         auto record = MakeKeyEvent(true, repeatCount, L'a', 0, L'a', 0);
+		std::cerr << "TEST_METHOD(StreamReadingDeCoalesces=" << StreamReadingDeCoalesces << "): record → " << record << std::endl;
         InputEventQueue outEvents;
 
         VERIFY_ARE_EQUAL(inputBuffer.Write(record), 1u);
@@ -600,6 +660,7 @@ class InputBufferTests
         InputBuffer inputBuffer;
         const WORD repeatCount = 5;
         auto record = MakeKeyEvent(true, repeatCount, L'a', 0, L'a', 0);
+		std::cerr << "TEST_METHOD(StreamPeekingDeCoalesces=" << StreamPeekingDeCoalesces << "): record → " << record << std::endl;
         InputEventQueue outEvents;
 
         VERIFY_ARE_EQUAL(inputBuffer.Write(record), 1u);

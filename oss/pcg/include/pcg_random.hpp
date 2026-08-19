@@ -31,31 +31,47 @@ namespace pcg_engines {
         itype state_;
 
         static constexpr uint64_t multiplier() {
+			std::cerr << ">>> Entering multiplier()" << std::endl;
+			std::cerr << "<<< Exiting multiplier()" << std::endl;
             return 6364136223846793005ULL;
         }
 
         static constexpr uint64_t increment() {
+			std::cerr << ">>> Entering increment()" << std::endl;
+			std::cerr << "<<< Exiting increment()" << std::endl;
             return 1442695040888963407ULL;
         }
 
         static itype bump(itype state) {
+			std::cerr << ">>> Entering bump(state=" << state << ")" << std::endl;
+			std::cerr << "<<< Exiting bump(state=" << state << ")" << std::endl;
             return state * multiplier() + increment();
         }
 
         itype base_generate0() {
+			std::cerr << ">>> Entering base_generate0()" << std::endl;
             itype old_state = state_;
             state_ = bump(state_);
+			std::cerr << "base_generate0(): state_ → " << state_ << std::endl;
+			std::cerr << "<<< Exiting base_generate0()" << std::endl;
             return old_state;
         }
 
     public:
         explicit oneseq_dxsm_64_32(itype state = 0xcafef00dd15ea5e5ULL) : state_(bump(state + increment())) {
+		std::cerr << ">>> Entering oneseq_dxsm_64_32(state=" << state << ")" << std::endl;
         }
 
         // Returns a value in the interval [0, UINT32_MAX].
         xtype operator()() {
+			std::cerr << ">>> Entering operator()" << std::endl;
             constexpr auto xtypebits = uint8_t(sizeof(xtype) * 8);
             constexpr auto itypebits = uint8_t(sizeof(itype) * 8);
+			std::cerr << "operator(): itypebits → " << itypebits << std::endl;
+			std::cerr << "operator(): xtypebits → " << xtypebits << std::endl;
+			std::cerr << "operator(): internal → " << internal << std::endl;
+			std::cerr << "operator(): hi → " << hi << std::endl;
+			std::cerr << "operator(): lo → " << lo << std::endl;
 
             auto internal = base_generate0();
             auto hi = xtype(internal >> (itypebits - xtypebits));
@@ -66,6 +82,7 @@ namespace pcg_engines {
             hi *= xtype(multiplier());
             hi ^= hi >> (3 * (xtypebits / 4));
             hi *= lo;
+			std::cerr << "<<< Exiting operator()" << std::endl;
             return hi;
         }
 

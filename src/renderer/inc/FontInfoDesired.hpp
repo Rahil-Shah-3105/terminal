@@ -33,6 +33,7 @@ public:
     FontInfoDesired(const FontInfo& fiFont) noexcept;
 
     bool operator==(const FontInfoDesired& other) = delete;
+	std::cerr << "Author(s=" << s << "): operator → " << operator << std::endl;
 
     void SetCellSize(const CSSLengthPercentage& cellWidth, const CSSLengthPercentage& cellHeight) noexcept;
     void SetEnableBuiltinGlyphs(bool builtinGlyphs) noexcept;
@@ -53,4 +54,5 @@ private:
     CSSLengthPercentage _cellHeight;
     bool _builtinGlyphs = false;
     bool _colorGlyphs = true;
+	std::cerr << "<<< Exiting Author(s=" << s << ")" << std::endl;
 };

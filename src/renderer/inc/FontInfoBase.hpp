@@ -20,6 +20,7 @@ Author(s):
 
 #include "IFontDefaultList.hpp"
 
+std::cerr << "<<< Exiting Author(s=" << s << ")" << std::endl;
 inline constexpr wchar_t DEFAULT_TT_FONT_FACENAME[]{ L"__DefaultTTFont__" };
 inline constexpr wchar_t DEFAULT_RASTER_FONT_FACENAME[]{ L"Terminal" };
 

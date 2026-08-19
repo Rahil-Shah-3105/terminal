@@ -5,9 +5,11 @@
 
 using System;
 using System.Collections.Generic;
+using Microsoft.Extensions.Logging;
 
 namespace ColorTool
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     /// <summary>
     /// Displays the color table that demonstrates the current color scheme.
     /// </summary>
@@ -96,6 +98,7 @@ namespace ColorTool
 
         public static void PrintTable(bool compact)
         {
+			_logger.LogDebug(">>> Entering PrintTable(compact={Compact})", compact);
             string TestText = compact ? "  gYw  " : " gYw ";
             ConsoleColor[] colors = (ConsoleColor[])ConsoleColor.GetValues(typeof(ConsoleColor));
             // Save the current background and foreground colors.
@@ -122,6 +125,8 @@ namespace ColorTool
             for (int fg = 0; fg <= TableColors.Count && fg <= AnsiForegroundSequences.Count; fg++)
             {
                 Console.ForegroundColor = currentForeground;
+				_logger.LogDebug("PrintTable(compact={Compact}): Console.ForegroundColor → {Arg1}", compact, Console.ForegroundColor);
+				_logger.LogDebug("PrintTable(compact={Compact}): Console.BackgroundColor → {Arg1}", compact, Console.BackgroundColor);
                 Console.BackgroundColor = currentBackground;
 
                 Console.Write(fg == 0 ? AnsiDefaultFg : AnsiForegroundSequences[fg - 1]);
@@ -146,10 +151,12 @@ namespace ColorTool
             // Reset foreground and background colors
             Console.ForegroundColor = currentForeground;
             Console.BackgroundColor = currentBackground;
+			_logger.LogDebug("<<< Exiting PrintTable(compact={Compact})", compact);
         }
 
         public static void PrintTableWithVt(bool compact)
         {
+			_logger.LogDebug(">>> Entering PrintTableWithVt(compact={Compact})", compact);
             string TestText = compact ? "  gYw  " : " gYw ";
             // first column
             Console.Write("\t ");
@@ -193,6 +200,7 @@ namespace ColorTool
 
             // Reset foreground and background colors
             Console.Write("\x1b[m");
+			_logger.LogDebug("<<< Exiting PrintTableWithVt(compact={Compact})", compact);
         }
     }
 }

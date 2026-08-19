@@ -21,6 +21,7 @@ using Conhost.UIA.Tests.Common;
 using Conhost.UIA.Tests.Common.NativeMethods;
 using Conhost.UIA.Tests.Elements;
 using OpenQA.Selenium;
+using Microsoft.Extensions.Logging;
 
 
 namespace Conhost.UIA.Tests
@@ -28,10 +29,12 @@ namespace Conhost.UIA.Tests
     [TestClass]
     class InputBufferTests
     {
+		private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
         public TestContext TestContext { get; set; }
 
         private bool IsProgramInPath(string name)
         {
+			_logger.LogDebug(">>> Entering IsProgramInPath(name={Name})", name);
             string[] pathDirs = Environment.GetEnvironmentVariable("PATH").Split(';');
             foreach (string path in pathDirs)
             {
@@ -41,12 +44,14 @@ namespace Conhost.UIA.Tests
                     return true;
                 }
             }
+			_logger.LogDebug("<<< Exiting IsProgramInPath(name={Name})", name);
             return false;
         }
 
         [TestMethod]
         public void VerifyVimInput()
         {
+			_logger.LogDebug(">>> Entering VerifyVimInput()");
             if (!IsProgramInPath("vim.exe"))
             {
                 Log.Comment("vim can't be found in path, skipping test.");
@@ -88,6 +93,7 @@ namespace Conhost.UIA.Tests
                     }
                 }
             }
+			_logger.LogDebug("<<< Exiting VerifyVimInput()");
         }
     }
 }

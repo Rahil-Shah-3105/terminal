@@ -1,3 +1,4 @@
+#include <stdio.h>
 // Copyright (c) Microsoft Corporation.
 // Licensed under the MIT license.
 
@@ -57,9 +58,12 @@ namespace til // Terminal Implementation Library. Also: "Today I Learned"
     template<typename T>
     as_view_t<T> safe_slice_abs(const T& view, size_t beg, size_t end) noexcept
     {
+		fprintf(stderr, ">>> Entering safe_slice_abs(view=%d,beg=%zu,end=%zu)\n", view, beg, end);
         const size_t len = view.size();
         end = std::min(end, len);
+		fprintf(stderr, "safe_slice_abs(view=%d,beg=%zu,end=%zu): end → %zu\n", view, beg, end, end);
         beg = std::min(beg, end);
+		fprintf(stderr, "safe_slice_abs(view=%d,beg=%zu,end=%zu): beg → %zu\n", view, beg, end, beg);
 #pragma warning(suppress : 26481) // Don't use pointer arithmetic. Use span instead (bounds.1).
         return { view.data() + beg, end - beg };
     }
@@ -67,9 +71,12 @@ namespace til // Terminal Implementation Library. Also: "Today I Learned"
     template<typename T>
     as_view_t<T> safe_slice_len(const T& view, size_t start, size_t count) noexcept
     {
+		fprintf(stderr, ">>> Entering safe_slice_len(view=%d,start=%zu,count=%zu)\n", view, start, count);
         const size_t len = view.size();
         start = std::min(start, len);
         count = std::min(count, len - start);
+		fprintf(stderr, "<<< Exiting safe_slice_len(view=%d,start=%zu,count=%zu)\n", view, start, count);
+		fprintf(stderr, "safe_slice_len(view=%d,start=%zu,count=%zu): count → %zu\n", view, start, count, count);
 #pragma warning(suppress : 26481) // Don't use pointer arithmetic. Use span instead (bounds.1).
         return { view.data() + start, count };
     }
@@ -77,6 +84,7 @@ namespace til // Terminal Implementation Library. Also: "Today I Learned"
     template<typename T>
     void manage_vector(std::vector<T>& vector, typename std::vector<T>::size_type requestedSize, float shrinkThreshold)
     {
+		fprintf(stderr, ">>> Entering manage_vector(vector=%d,requestedSize=%d,shrinkThreshold=%f)\n", vector, requestedSize, shrinkThreshold);
         const auto existingCapacity = vector.capacity();
         const auto requiredCapacity = requestedSize;
 
@@ -93,6 +101,7 @@ namespace til // Terminal Implementation Library. Also: "Today I Learned"
 
         // Reserve won't shrink on its own and won't grow if we have enough space.
         vector.reserve(requiredCapacity);
+		fprintf(stderr, "<<< Exiting manage_vector(vector=%d,requestedSize=%d,shrinkThreshold=%f)\n", vector, requestedSize, shrinkThreshold);
     }
 }
 

@@ -1,3 +1,4 @@
+#include <stdio.h>
 /*++
 Copyright (c) Microsoft Corporation
 Licensed under the MIT license.
@@ -34,6 +35,8 @@ namespace winrt::Microsoft::Terminal::Settings::Model::implementation
 
         IMediaResource Icon() const noexcept
         {
+			fprintf(stderr, ">>> Entering Icon()\n");
+            fprintf(stderr, "<<< Exiting Icon()\n");
             return _icon ? _icon : MediaResource::Empty();
         }
 

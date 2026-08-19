@@ -1,3 +1,4 @@
+#include <stdio.h>
 #pragma once
 
 namespace winrt::TerminalApp::implementation
@@ -9,6 +10,8 @@ namespace winrt::TerminalApp::implementation
 
         IXamlType GetXamlType(const ::winrt::Windows::UI::Xaml::Interop::TypeName& type)
         {
+			fprintf(stderr, ">>> Entering GetXamlType(type=%d)\n", type);
+            fprintf(stderr, "<<< Exiting GetXamlType(type=%d)\n", type);
             return AppProvider()->GetXamlType(type);
         }
 
@@ -24,7 +27,9 @@ namespace winrt::TerminalApp::implementation
 
         void AddOtherProvider(const ::winrt::Windows::UI::Xaml::Markup::IXamlMetadataProvider& provider)
         {
+			fprintf(stderr, ">>> Entering AddOtherProvider(provider=%d)\n", provider);
             AppProvider()->AddOtherProvider(provider);
+			fprintf(stderr, "<<< Exiting AddOtherProvider(provider=%d)\n", provider);
         }
 
     private:
@@ -32,9 +37,12 @@ namespace winrt::TerminalApp::implementation
         winrt::com_ptr<XamlMetaDataProvider> _appProvider;
         winrt::com_ptr<XamlMetaDataProvider> AppProvider()
         {
+			fprintf(stderr, ">>> Entering AppProvider()\n");
             if (!_appProvider)
             {
                 _appProvider = winrt::make_self<XamlMetaDataProvider>();
+				fprintf(stderr, "AppProvider(): _appProvider → %d\n", _appProvider);
+            fprintf(stderr, "<<< Exiting AppProvider()\n");
             }
             return _appProvider;
         }

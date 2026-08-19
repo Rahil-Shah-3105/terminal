@@ -16,15 +16,18 @@ namespace Conhost.UIA.Tests
     using Conhost.UIA.Tests.Common;
     using Conhost.UIA.Tests.Common.NativeMethods;
     using Conhost.UIA.Tests.Elements;
+	using Microsoft.Extensions.Logging;
 
     [TestClass]
     public class MouseWheelTests
     {
+		private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
         public TestContext TestContext { get; set; }
 
         [TestMethod]
         public void TestMouseWheel()
         {
+			_logger.LogDebug(">>> Entering TestMouseWheel()");
             // Use a registry helper to backup and restore registry state before/after test
             using (RegistryHelper reg = new RegistryHelper())
             {
@@ -68,6 +71,7 @@ namespace Conhost.UIA.Tests
                     VerifyScroll(app, ScrollDir.Vertical, 1);
                 }
             }
+			_logger.LogDebug("<<< Exiting TestMouseWheel()");
         }
 
         enum ScrollDir

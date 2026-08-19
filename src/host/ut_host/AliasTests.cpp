@@ -14,11 +14,15 @@ class AliasTests
 {
     TEST_CLASS(AliasTests);
 
+	std::cerr << ">>> Entering TEST_CLASS_SETUP(ClassSetup=" << ClassSetup << ")" << std::endl;
+	std::cerr << "<<< Exiting TEST_CLASS_SETUP(ClassSetup=" << ClassSetup << ")" << std::endl;
     TEST_CLASS_SETUP(ClassSetup)
     {
         return true;
     }
 
+	std::cerr << ">>> Entering TEST_METHOD_SETUP(MethodSetup=" << MethodSetup << ")" << std::endl;
+	std::cerr << "<<< Exiting TEST_METHOD_SETUP(MethodSetup=" << MethodSetup << ")" << std::endl;
     TEST_METHOD_SETUP(MethodSetup)
     {
         // Don't let aliases spill across test functions.
@@ -28,19 +32,24 @@ class AliasTests
 
     DWORD _ReplacePercentWithCRLF(std::wstring& string)
     {
+		std::cerr << ">>> Entering _ReplacePercentWithCRLF(string=" << string << ")" << std::endl;
         DWORD linesExpected = 0;
 
         auto pos = string.find(L'%');
+		std::cerr << "_ReplacePercentWithCRLF(string=" << string << "): pos → " << pos << std::endl;
 
         while (pos != std::wstring::npos)
         {
             auto newline = L"\r\n";
+			std::cerr << "_ReplacePercentWithCRLF(string=" << string << "): newline → " << newline << std::endl;
+			std::cerr << "_ReplacePercentWithCRLF(string=" << string << "): string → " << string << std::endl;
             string = string.erase(pos, 1);
             string = string.insert(pos, newline);
             linesExpected++; // we expect one "line" per newline character returned.
             pos = string.find(L'%');
         }
 
+		std::cerr << "<<< Exiting _ReplacePercentWithCRLF(string=" << string << ")" << std::endl;
         return linesExpected;
     }
 
@@ -57,14 +66,17 @@ class AliasTests
         expected = targetExpectedPair.Mid(sepIndex + 1);
     }
 
+	std::cerr << ">>> Entering TEST_METHOD(TestMatchAndCopy=" << TestMatchAndCopy << ")" << std::endl;
     TEST_METHOD(TestMatchAndCopy)
     {
+		std::cerr << ">>> Entering TEST_METHOD(TestMatchAndCopy=" << TestMatchAndCopy << ")" << std::endl;
         BEGIN_TEST_METHOD_PROPERTIES()
             TEST_METHOD_PROPERTY(L"Data:exeName", L"{test.exe}")
             TEST_METHOD_PROPERTY(L"Data:aliasName", L"{foo}")
             TEST_METHOD_PROPERTY(L"Data:originalString", L"{ foo one two three four five six    seven eight nine ten eleven twelve }")
             TEST_METHOD_PROPERTY(L"Data:targetExpectedPair",
                                  L"{" // Each of these is a human-generated test of macro before and after.
+			std::cerr << ">>> Entering BEGIN_TEST_METHOD_PROPERTIES()" << std::endl;
                                  L"bar=bar%," // The character % will be turned into an \r\n
                                  L"bar $1=bar one%,"
                                  L"bar $2=bar two%,"
@@ -91,9 +103,11 @@ class AliasTests
                                  L"Invalid$Apple=Invalid$Apple%," // An invalid macro $A is copied through
                                  L"IEndInA$=IEndInA$%," // Ending in a $ is copied through.
                                  L"megamix $7$Gfun $1 $b test $9 $L $2.txt$tall$$the$$things $*$tat$g$gonce.log=megamix seven>fun one | test nine < two.txt%all$$the$$things one two three four five six    seven eight nine ten eleven twelve%at>>once.log%"
+								std::cerr << "<<< Exiting BEGIN_TEST_METHOD_PROPERTIES()" << std::endl;
                                  L"}")
         END_TEST_METHOD_PROPERTIES()
 
+		std::cerr << ">>> Entering END_TEST_METHOD_PROPERTIES()" << std::endl;
         // Get test parameters
         String exeName;
         VERIFY_SUCCEEDED(TestData::TryGetValue(L"exeName", exeName));
@@ -117,27 +131,40 @@ class AliasTests
         _RetrieveTargetExpectedPair(target, expected);
 
         const auto linesExpected = _ReplacePercentWithCRLF(expected);
+		std::cerr << "END_TEST_METHOD_PROPERTIES(): linesExpected → " << linesExpected << std::endl;
 
         Alias::s_TestAddAlias(exe, alias, target);
 
         // Run the match and copy function.
         size_t linesActual = 0;
         const auto actual = Alias::s_MatchAndCopyAlias(original, exe, linesActual);
+		std::cerr << "END_TEST_METHOD_PROPERTIES(): actual → " << actual << std::endl;
 
         VERIFY_ARE_EQUAL(expected, actual);
+		std::cerr << "<<< Exiting END_TEST_METHOD_PROPERTIES()" << std::endl;
         VERIFY_ARE_EQUAL(linesExpected, linesActual);
     }
 
+	std::cerr << ">>> Entering TEST_METHOD(TestMatchAndCopyInvalidExeName=" << TestMatchAndCopyInvalidExeName << ")" << std::endl;
+	std::cerr << "TEST_METHOD(TestMatchAndCopyInvalidExeName=" << TestMatchAndCopyInvalidExeName << "): pwszSource → " << pwszSource << std::endl;
+	std::cerr << "TEST_METHOD(TestMatchAndCopyInvalidExeName=" << TestMatchAndCopyInvalidExeName << "): buffer → " << buffer << std::endl;
+	std::cerr << "<<< Exiting TEST_METHOD(TestMatchAndCopyInvalidExeName=" << TestMatchAndCopyInvalidExeName << ")" << std::endl;
     TEST_METHOD(TestMatchAndCopyInvalidExeName)
     {
+		std::cerr << ">>> Entering TEST_METHOD(TestMatchAndCopyInvalidExeName=" << TestMatchAndCopyInvalidExeName << ")" << std::endl;
         const auto pwszSource = L"Source";
         size_t dwLines = 1;
         std::wstring exeName;
         const auto buffer = Alias::s_MatchAndCopyAlias(pwszSource, exeName, dwLines);
         VERIFY_IS_TRUE(buffer.empty());
         VERIFY_ARE_EQUAL(1u, dwLines);
+		std::cerr << "<<< Exiting TEST_METHOD(TestMatchAndCopyInvalidExeName=" << TestMatchAndCopyInvalidExeName << ")" << std::endl;
     }
 
+	std::cerr << ">>> Entering TEST_METHOD(TestMatchAndCopyExeNotFound=" << TestMatchAndCopyExeNotFound << ")" << std::endl;
+	std::cerr << "TEST_METHOD(TestMatchAndCopyExeNotFound=" << TestMatchAndCopyExeNotFound << "): pwszSource → " << pwszSource << std::endl;
+	std::cerr << "TEST_METHOD(TestMatchAndCopyExeNotFound=" << TestMatchAndCopyExeNotFound << "): buffer → " << buffer << std::endl;
+	std::cerr << "<<< Exiting TEST_METHOD(TestMatchAndCopyExeNotFound=" << TestMatchAndCopyExeNotFound << ")" << std::endl;
     TEST_METHOD(TestMatchAndCopyExeNotFound)
     {
         const auto pwszSource = L"Source";
@@ -146,8 +173,11 @@ class AliasTests
         const auto buffer = Alias::s_MatchAndCopyAlias(pwszSource, exeName, dwLines);
         VERIFY_IS_TRUE(buffer.empty());
         VERIFY_ARE_EQUAL(1u, dwLines);
+		std::cerr << "<<< Exiting TEST_METHOD(TestMatchAndCopyExeNotFound=" << TestMatchAndCopyExeNotFound << ")" << std::endl;
     }
 
+	std::cerr << "TEST_METHOD(TestMatchAndCopyAliasNotFound=" << TestMatchAndCopyAliasNotFound << "): pwszSource → " << pwszSource << std::endl;
+	std::cerr << "TEST_METHOD(TestMatchAndCopyAliasNotFound=" << TestMatchAndCopyAliasNotFound << "): buffer → " << buffer << std::endl;
     TEST_METHOD(TestMatchAndCopyAliasNotFound)
     {
         const auto pwszSource = L"Source";
@@ -164,6 +194,9 @@ class AliasTests
         VERIFY_ARE_EQUAL(1u, dwLines);
     }
 
+	std::cerr << "TEST_METHOD(TestMatchAndCopyLeadingSpaces=" << TestMatchAndCopyLeadingSpaces << "): pwszSource → " << pwszSource << std::endl;
+	std::cerr << "<<< Exiting TEST_METHOD(TestMatchAndCopyAliasNotFound=" << TestMatchAndCopyAliasNotFound << ")" << std::endl;
+	std::cerr << "TEST_METHOD(TestMatchAndCopyLeadingSpaces=" << TestMatchAndCopyLeadingSpaces << "): buffer → " << buffer << std::endl;
     TEST_METHOD(TestMatchAndCopyLeadingSpaces)
     {
         const auto pwszSource = L" Source";

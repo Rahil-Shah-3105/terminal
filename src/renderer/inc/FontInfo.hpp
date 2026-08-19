@@ -36,6 +36,7 @@ public:
              const bool fSetDefaultRasterFont = false) noexcept;
 
     bool operator==(const FontInfo& other) noexcept;
+	std::cerr << "Author(s=" << s << "): operator → " << operator << std::endl;
 
     til::size GetSize() const noexcept;
     til::size GetUnscaledSize() const noexcept;
@@ -55,4 +56,5 @@ private:
     til::size _coordSize;
     til::size _coordSizeUnscaled;
     bool _didFallback;
+	std::cerr << "<<< Exiting Author(s=" << s << ")" << std::endl;
 };

@@ -7,6 +7,7 @@
 namespace Conhost.UIA.Tests.Common
 {
     using System;
+	using Microsoft.Extensions.Logging;
 
     public static class Globals
     {
@@ -19,12 +20,15 @@ namespace Conhost.UIA.Tests.Common
 
         public static void WaitForTimeout()
         {
+			_logger.LogDebug(">>> Entering WaitForTimeout()");
             System.Threading.Thread.Sleep(Globals.Timeout);
+			_logger.LogDebug("<<< Exiting WaitForTimeout()");
         }
     }
 
     public enum OpenTarget
     {
+		private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
         Defaults,
         Specifics
     }

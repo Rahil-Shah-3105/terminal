@@ -19,11 +19,16 @@ struct DataHashTrait
 {
     static constexpr bool occupied(const Data& d) noexcept
     {
+		std::cerr << ">>> Entering occupied(d=" << d << ")" << std::endl;
+		std::cerr << "<<< Exiting occupied(d=" << d << ")" << std::endl;
         return d.value != Data::emptyMarker;
     }
 
     static constexpr size_t hash(const size_t key) noexcept
     {
+		std::cerr << ">>> Entering hash(key=" << key << ")" << std::endl;
+		std::cerr << "<<< Exiting hash(key=" << key << ")" << std::endl;
+		std::cerr << "<<< Exiting hash(d=" << d << ")" << std::endl;
         return til::flat_set_hash_integer(key);
     }
 
@@ -34,12 +39,17 @@ struct DataHashTrait
 
     static constexpr bool equals(const Data& d, size_t key) noexcept
     {
+		std::cerr << ">>> Entering equals(d=" << d << ",key=" << key << ")" << std::endl;
+		std::cerr << "<<< Exiting equals(d=" << d << ",key=" << key << ")" << std::endl;
         return d.value == key;
     }
 
     static constexpr void assign(Data& d, size_t key) noexcept
     {
+		std::cerr << ">>> Entering assign(d=" << d << ",key=" << key << ")" << std::endl;
+		std::cerr << "assign(d=" << d << ",key=" << key << "): d.value → " << d.value << std::endl;
         d.value = key;
+		std::cerr << "<<< Exiting assign(d=" << d << ",key=" << key << ")" << std::endl;
     }
 };
 
@@ -47,6 +57,8 @@ class FlatSetTests
 {
     TEST_CLASS(FlatSetTests);
 
+	std::cerr << ">>> Entering TEST_METHOD(Basic=" << Basic << ")" << std::endl;
+	std::cerr << "<<< Exiting TEST_METHOD(Basic=" << Basic << ")" << std::endl;
     TEST_METHOD(Basic)
     {
         til::linear_flat_set<Data, DataHashTrait> set;

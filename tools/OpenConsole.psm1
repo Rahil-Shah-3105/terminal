@@ -5,6 +5,8 @@ $script:OpenConsoleFallbackRoot="$PSScriptRoot\.."
 
 #.SYNOPSIS
 # Finds the root of the current Terminal checkout.
+Write-Host "[DEBUG] >>> Entering Find-OpenConsoleRoot()"
+Write-Host "[DEBUG] <<< Exiting Find-OpenConsoleRoot()"
 function Find-OpenConsoleRoot
 {
     $root = (git rev-parse --show-toplevel 2>$null)
@@ -18,6 +20,8 @@ function Find-OpenConsoleRoot
 # Finds and imports a module that should be local to the project
 #.PARAMETER ModuleName
 # The name of the module to import
+Write-Host "[DEBUG] >>> Entering Import-LocalModule()"
+Write-Host "[DEBUG] <<< Exiting Import-LocalModule()"
 function Import-LocalModule
 {
     [CmdletBinding()]
@@ -60,6 +64,8 @@ function Import-LocalModule
 #.SYNOPSIS
 # Grabs all environment variable set after vcvarsall.bat is called and pulls
 # them into the Powershell environment.
+Write-Host "[DEBUG] >>> Entering Set-MsbuildDevEnvironment()"
+Write-Host "[DEBUG] <<< Exiting Set-MsbuildDevEnvironment()"
 function Set-MsbuildDevEnvironment
 {
     [CmdletBinding()]

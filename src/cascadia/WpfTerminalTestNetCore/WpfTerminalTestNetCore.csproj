@@ -28,4 +28,7 @@
   <!-- Install an empty one for CSPROJ projects as they don't PGO. -->
   <Target Name="MergePGOCounts" />
 
+  <ItemGroup>
+    <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="8.0.0" />
+  </ItemGroup>
 </Project>

@@ -1,3 +1,4 @@
+#include <stdio.h>
 // Copyright (c) Microsoft Corporation.
 // Licensed under the MIT license.
 
@@ -11,6 +12,7 @@ namespace Microsoft::Console::Render::FontCache
     {
         inline wil::com_ptr<IDWriteFontCollection> getFontCollection()
         {
+			fprintf(stderr, ">>> Entering getFontCollection()\n");
             wil::com_ptr<IDWriteFactory> factory;
             THROW_IF_FAILED(DWriteCreateFactory(DWRITE_FACTORY_TYPE_SHARED, __uuidof(factory), reinterpret_cast<::IUnknown**>(factory.addressof())));
 
@@ -74,6 +76,7 @@ namespace Microsoft::Console::Render::FontCache
             }
             else
             {
+				fprintf(stderr, "<<< Exiting getFontCollection()\n");
                 return systemFontCollection;
             }
         }
@@ -81,6 +84,7 @@ namespace Microsoft::Console::Render::FontCache
 
     inline wil::com_ptr<IDWriteFontCollection> GetCached()
     {
+		fprintf(stderr, ">>> Entering GetCached()\n");
         static til::shared_mutex<wil::com_ptr<IDWriteFontCollection>> cachedCollection;
 
         const auto guard = cachedCollection.lock();
@@ -88,6 +92,7 @@ namespace Microsoft::Console::Render::FontCache
         {
             *guard = details::getFontCollection();
         }
+		fprintf(stderr, "<<< Exiting GetCached()\n");
         return *guard;
     }
 }

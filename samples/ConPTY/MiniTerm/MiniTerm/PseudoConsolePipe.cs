@@ -1,9 +1,11 @@
 using Microsoft.Win32.SafeHandles;
 using System;
 using static MiniTerm.Native.PseudoConsoleApi;
+using Microsoft.Extensions.Logging;
 
 namespace MiniTerm
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     /// <summary>
     /// A pipe used to talk to the pseudoconsole, as described in:
     /// https://docs.microsoft.com/en-us/windows/console/creating-a-pseudoconsole-session
@@ -18,8 +20,11 @@ namespace MiniTerm
 
         public PseudoConsolePipe()
         {
+			_logger.LogDebug(">>> Entering PseudoConsolePipe()");
             if (!CreatePipe(out ReadSide, out WriteSide, IntPtr.Zero, 0))
             {
+				_logger.LogWarning("Throwing InvalidOperationException from PseudoConsolePipe()");
+			_logger.LogDebug("<<< Exiting PseudoConsolePipe()");
                 throw new InvalidOperationException("failed to create pipe");
             }
         }
@@ -33,6 +38,8 @@ namespace MiniTerm
                 ReadSide?.Dispose();
                 WriteSide?.Dispose();
             }
+			_logger.LogDebug(">>> Entering Dispose()");
+			_logger.LogDebug("<<< Exiting Dispose()");
         }
 
         public void Dispose()

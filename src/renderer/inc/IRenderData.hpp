@@ -33,6 +33,8 @@ namespace Microsoft::Console::Render
     {
         explicit operator bool() const noexcept
         {
+			std::cerr << ">>> Entering bool()" << std::endl;
+			std::cerr << "<<< Exiting bool()" << std::endl;
             return id != SIZE_T_MAX;
         }
 
@@ -82,6 +84,8 @@ namespace Microsoft::Console::Render
         // be by-value in a struct so that we can snapshot it and release the terminal lock as quickly as possible.
         const Composition& GetActiveComposition() const noexcept
         {
+			std::cerr << ">>> Entering GetActiveComposition()" << std::endl;
+			std::cerr << "<<< Exiting GetActiveComposition()" << std::endl;
             return !snippetPreview.text.empty() ? snippetPreview : tsfPreview;
         }
 

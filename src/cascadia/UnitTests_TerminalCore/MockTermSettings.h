@@ -1,3 +1,4 @@
+#include <stdio.h>
 #pragma once
 
 #include "pch.h"
@@ -34,12 +35,18 @@ namespace TerminalCoreUnitTests
 
         void SetColorTable(const std::array<winrt::Microsoft::Terminal::Core::Color, 16>& colors)
         {
+			fprintf(stderr, ">>> Entering SetColorTable(colors=%d)\n", colors);
             _ColorTable = colors;
+			fprintf(stderr, "SetColorTable(colors=%d): _ColorTable → %d\n", colors, _ColorTable);
+        fprintf(stderr, "<<< Exiting SetColorTable(colors=%d)\n", colors);
         }
 
         void GetColorTable(winrt::com_array<winrt::Microsoft::Terminal::Core::Color>& table) noexcept
         {
+			fprintf(stderr, ">>> Entering GetColorTable(table=%d)\n", table);
             table = winrt::com_array(_ColorTable.begin(), _ColorTable.end());
+			fprintf(stderr, "GetColorTable(table=%d): table → %d\n", table, table);
+        fprintf(stderr, "<<< Exiting GetColorTable(table=%d)\n", table);
         }
     };
 }
