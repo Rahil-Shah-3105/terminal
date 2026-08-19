@@ -29,10 +29,13 @@ Param(
 )
 
 Function Test-MicrosoftPerson($email) {
+	Write-Host "[DEBUG] >>> Entering Test-MicrosoftPerson($email=$email)"
+	Write-Host "[DEBUG] <<< Exiting Test-MicrosoftPerson($email=$email)"
     Return $email -like "*@microsoft.com" -Or $email -like "pankaj.d*"
 }
 
 Function Generate-Thanks($Entry) {
+	Write-Host "[DEBUG] >>> Entering Generate-Thanks($Entry=$Entry)"
     # We don't need to thank ourselves for doing our jobs
     If ($Entry.Microsoft) {
         ""
@@ -40,15 +43,18 @@ Function Generate-Thanks($Entry) {
         " (thanks @{0}!)" -f $Entry.PossibleUsername
     } Else {
         " (thanks @<{0}>!)" -f $Entry.Email
+	Write-Host "[DEBUG] <<< Exiting Generate-Thanks($Entry=$Entry)"
     }
 }
 
 $usernameRegex = [regex]::new("(?:\d+\+)?(?<name>[^@]+)@users.noreply.github.com")
 Function Get-PossibleUserName($email) {
+	Write-Host "[DEBUG] >>> Entering Get-PossibleUserName($email=$email)"
     $match = $usernameRegex.Match($email)
     if ($null -Ne $match) {
         return $match.Groups["name"].Value
     }
+	Write-Host "[DEBUG] <<< Exiting Get-PossibleUserName($email=$email)"
     return $null
 }
 

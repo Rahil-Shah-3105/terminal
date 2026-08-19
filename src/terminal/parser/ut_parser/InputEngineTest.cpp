@@ -39,25 +39,37 @@ using namespace Microsoft::Console::VirtualTerminal;
 
 bool IsShiftPressed(const DWORD modifierState)
 {
+	std::cerr << ">>> Entering IsShiftPressed(modifierState=" << modifierState << ")" << std::endl;
+	std::cerr << "<<< Exiting IsShiftPressed(modifierState=" << modifierState << ")" << std::endl;
     return WI_IsFlagSet(modifierState, SHIFT_PRESSED);
 }
 
 bool IsAltPressed(const DWORD modifierState)
 {
+	std::cerr << ">>> Entering IsAltPressed(modifierState=" << modifierState << ")" << std::endl;
+	std::cerr << "<<< Exiting IsAltPressed(modifierState=" << modifierState << ")" << std::endl;
     return WI_IsAnyFlagSet(modifierState, LEFT_ALT_PRESSED | RIGHT_ALT_PRESSED);
 }
 
 bool IsCtrlPressed(const DWORD modifierState)
 {
+	std::cerr << ">>> Entering IsCtrlPressed(modifierState=" << modifierState << ")" << std::endl;
+	std::cerr << "<<< Exiting IsCtrlPressed(modifierState=" << modifierState << ")" << std::endl;
     return WI_IsAnyFlagSet(modifierState, LEFT_CTRL_PRESSED | RIGHT_CTRL_PRESSED);
 }
 
 bool ModifiersEquivalent(DWORD a, DWORD b)
 {
+	std::cerr << ">>> Entering ModifiersEquivalent(a=" << a << ",b=" << b << ")" << std::endl;
     auto fShift = IsShiftPressed(a) == IsShiftPressed(b);
     auto fAlt = IsAltPressed(a) == IsAltPressed(b);
+	std::cerr << "ModifiersEquivalent(a=" << a << ",b=" << b << "): fAlt → " << fAlt << std::endl;
+	std::cerr << "ModifiersEquivalent(a=" << a << ",b=" << b << "): fCtrl → " << fCtrl << std::endl;
+	std::cerr << "ModifiersEquivalent(a=" << a << ",b=" << b << "): fEnhanced → " << fEnhanced << std::endl;
+	std::cerr << "ModifiersEquivalent(a=" << a << ",b=" << b << "): fShift → " << fShift << std::endl;
     auto fCtrl = IsCtrlPressed(a) == IsCtrlPressed(b);
     auto fEnhanced = WI_IsFlagSet(a, ENHANCED_KEY) == WI_IsFlagSet(b, ENHANCED_KEY);
+	std::cerr << "<<< Exiting ModifiersEquivalent(a=" << a << ",b=" << b << ")" << std::endl;
     return fShift && fCtrl && fAlt && fEnhanced;
 }
 
@@ -77,9 +89,11 @@ public:
 
     void RoundtripTerminalInputCallback(_In_ const std::span<const INPUT_RECORD>& inputRecords)
     {
+		std::cerr << ">>> Entering RoundtripTerminalInputCallback(inputRecords=" << inputRecords << ")" << std::endl;
         // Take all the characters out of the input records here, and put them into
         //  the input state machine.
         std::wstring vtseq = L"";
+		std::cerr << "RoundtripTerminalInputCallback(inputRecords=" << inputRecords << "): vtseq → " << vtseq << std::endl;
         for (auto& inRec : inputRecords)
         {
             VERIFY_ARE_EQUAL(KEY_EVENT, inRec.EventType);
@@ -93,10 +107,12 @@ public:
 
         _stateMachine->ProcessString(vtseq);
         Log::Comment(L"String processed");
+		std::cerr << "<<< Exiting RoundtripTerminalInputCallback(inputRecords=" << inputRecords << ")" << std::endl;
     }
 
     void TestInputCallback(const std::span<const INPUT_RECORD>& records)
     {
+		std::cerr << ">>> Entering TestInputCallback(records=" << records << ")" << std::endl;
         // This callback doesn't work super well for the Ctrl+C iteration of the
         // C0Test. For ^C, we always send a keydown and a key up event, however,
         // both calls to WriteCtrlKey happen in one single call to
@@ -111,6 +127,7 @@ public:
 
         auto foundEqual = false;
         auto irExpected = vExpectedInput.back();
+		std::cerr << "TestInputCallback(records=" << records << "): irExpected → " << irExpected << std::endl;
 
         Log::Comment(
             NoThrowString().Format(L"\texpected:\t") +
@@ -141,10 +158,12 @@ public:
 
         VERIFY_IS_TRUE(foundEqual);
         vExpectedInput.clear();
+		std::cerr << "<<< Exiting TestInputCallback(records=" << records << ")" << std::endl;
     }
 
     void TestInputStringCallback(const std::span<const INPUT_RECORD>& records)
     {
+		std::cerr << ">>> Entering TestInputStringCallback(records=" << records << ")" << std::endl;
         for (auto expected : vExpectedInput)
         {
             Log::Comment(
@@ -153,6 +172,7 @@ public:
         }
 
         auto irExpected = vExpectedInput.front();
+		std::cerr << "TestInputStringCallback(records=" << records << "): irExpected → " << irExpected << std::endl;
         Log::Comment(
             NoThrowString().Format(L"\tLooking for:\t") +
             VerifyOutputTraits<INPUT_RECORD>::ToString(irExpected));
@@ -188,6 +208,7 @@ public:
         }
         VERIFY_ARE_EQUAL(static_cast<size_t>(0), vExpectedInput.size(), L"Verify we found all the inputs we were expecting");
         vExpectedInput.clear();
+		std::cerr << "<<< Exiting TestInputStringCallback(records=" << records << ")" << std::endl;
     }
 
     std::deque<INPUT_RECORD> vExpectedInput;
@@ -232,16 +253,22 @@ class Microsoft::Console::VirtualTerminal::InputEngineTest
     // We need to manually call this at the end of the tests so that we know _which_ tests failed, rather than that the method cleanup failed
     void VerifyExpectedInputDrained();
 
+	std::cerr << ">>> Entering TEST_CLASS_SETUP(ClassSetup=" << ClassSetup << ")" << std::endl;
+	std::cerr << "<<< Exiting TEST_CLASS_SETUP(ClassSetup=" << ClassSetup << ")" << std::endl;
     TEST_CLASS_SETUP(ClassSetup)
     {
         return true;
     }
 
+	std::cerr << ">>> Entering TEST_CLASS_CLEANUP(ClassCleanup=" << ClassCleanup << ")" << std::endl;
+	std::cerr << "<<< Exiting TEST_CLASS_CLEANUP(ClassCleanup=" << ClassCleanup << ")" << std::endl;
     TEST_CLASS_CLEANUP(ClassCleanup)
     {
         return true;
     }
 
+	std::cerr << ">>> Entering TEST_METHOD_SETUP(MethodSetup=" << MethodSetup << ")" << std::endl;
+	std::cerr << "<<< Exiting TEST_METHOD_SETUP(MethodSetup=" << MethodSetup << ")" << std::endl;
     TEST_METHOD_SETUP(MethodSetup)
     {
         return true;
@@ -279,6 +306,7 @@ class Microsoft::Console::VirtualTerminal::InputEngineTest
 
 void InputEngineTest::VerifyExpectedInputDrained()
 {
+	std::cerr << ">>> Entering InputEngineTest::VerifyExpectedInputDrained()" << std::endl;
     if (!testState.vExpectedInput.empty())
     {
         for (const auto& exp : testState.vExpectedInput)
@@ -308,6 +336,7 @@ void InputEngineTest::VerifyExpectedInputDrained()
         VERIFY_FAIL(L"there should be no remaining un-drained expected input");
         testState.vExpectedInput.clear();
     }
+	std::cerr << "<<< Exiting InputEngineTest::VerifyExpectedInputDrained()" << std::endl;
 }
 
 class Microsoft::Console::VirtualTerminal::TestInteractDispatch final : public IInteractDispatch
@@ -345,13 +374,17 @@ TestInteractDispatch::TestInteractDispatch(_In_ std::function<void(const std::sp
 
 void TestInteractDispatch::WriteInput(_In_ const std::span<const INPUT_RECORD>& inputEvents)
 {
+	std::cerr << ">>> Entering TestInteractDispatch::WriteInput(inputEvents=" << inputEvents << ")" << std::endl;
     _pfnWriteInputCallback(inputEvents);
+	std::cerr << "<<< Exiting TestInteractDispatch::WriteInput(inputEvents=" << inputEvents << ")" << std::endl;
 }
 
 void TestInteractDispatch::WriteCtrlKey(const INPUT_RECORD& event)
 {
+	std::cerr << ">>> Entering TestInteractDispatch::WriteCtrlKey(event=" << event << ")" << std::endl;
     VERIFY_IS_TRUE(_testState->_expectSendCtrlC);
     WriteInput({ &event, 1 });
+	std::cerr << "<<< Exiting TestInteractDispatch::WriteCtrlKey(event=" << event << ")" << std::endl;
 }
 
 void TestInteractDispatch::WindowManipulation(const DispatchTypes::WindowManipulationType function,
@@ -366,6 +399,7 @@ void TestInteractDispatch::WindowManipulation(const DispatchTypes::WindowManipul
 
 void TestInteractDispatch::WriteString(const std::wstring_view string)
 {
+	std::cerr << ">>> Entering TestInteractDispatch::WriteString(string=" << string << ")" << std::endl;
     InputEventQueue keyEvents;
 
     for (const auto& wch : string)
@@ -376,10 +410,12 @@ void TestInteractDispatch::WriteString(const std::wstring_view string)
     }
 
     WriteInput(keyEvents);
+	std::cerr << "<<< Exiting TestInteractDispatch::WriteString(string=" << string << ")" << std::endl;
 }
 
 void TestInteractDispatch::WriteStringRaw(const std::wstring_view string)
 {
+	std::cerr << ">>> Entering TestInteractDispatch::WriteStringRaw(string=" << string << ")" << std::endl;
     InputEventQueue keyEvents;
 
     for (const auto& wch : string)
@@ -388,28 +424,40 @@ void TestInteractDispatch::WriteStringRaw(const std::wstring_view string)
     }
 
     WriteInput(keyEvents);
+	std::cerr << "<<< Exiting TestInteractDispatch::WriteStringRaw(string=" << string << ")" << std::endl;
 }
 
 void TestInteractDispatch::MoveCursor(const VTInt row, const VTInt col)
 {
+	std::cerr << ">>> Entering TestInteractDispatch::MoveCursor(row=" << row << ",col=" << col << ")" << std::endl;
     VERIFY_IS_TRUE(_testState->_expectCursorPosition);
     til::point received{ col, row };
     VERIFY_ARE_EQUAL(_testState->_expectedCursor, received);
+	std::cerr << "<<< Exiting TestInteractDispatch::MoveCursor(row=" << row << ",col=" << col << ")" << std::endl;
 }
 
 bool TestInteractDispatch::IsVtInputEnabled() const
 {
+	std::cerr << ">>> Entering TestInteractDispatch::IsVtInputEnabled()" << std::endl;
+	std::cerr << "<<< Exiting TestInteractDispatch::IsVtInputEnabled()" << std::endl;
     return false;
 }
 
 void TestInteractDispatch::FocusChanged(const bool /*focused*/)
 {
+std::cerr << ">>> Entering TestInteractDispatch::FocusChanged()" << std::endl;
+std::cerr << "<<< Exiting TestInteractDispatch::FocusChanged()" << std::endl;
 }
 
 void InputEngineTest::C0Test()
 {
+	std::cerr << ">>> Entering InputEngineTest::C0Test()" << std::endl;
     auto pfn = std::bind(&TestState::TestInputCallback, &testState, std::placeholders::_1);
 
+	std::cerr << "InputEngineTest::C0Test(): pfn → " << pfn << std::endl;
+	std::cerr << "InputEngineTest::C0Test(): dispatch → " << dispatch << std::endl;
+	std::cerr << "InputEngineTest::C0Test(): inputEngine → " << inputEngine << std::endl;
+	std::cerr << "InputEngineTest::C0Test(): _stateMachine → " << _stateMachine << std::endl;
     auto dispatch = std::make_unique<TestInteractDispatch>(pfn, &testState);
     auto inputEngine = std::make_unique<InputStateMachineEngine>(std::move(dispatch));
     auto _stateMachine = std::make_unique<StateMachine>(std::move(inputEngine));
@@ -421,11 +469,14 @@ void InputEngineTest::C0Test()
     for (wchar_t wch = '\x0'; wch < '\x20'; wch++)
     {
         auto inputSeq = std::wstring(&wch, 1);
+		std::cerr << "InputEngineTest::C0Test(): inputSeq → " << inputSeq << std::endl;
         // In general, he actual key that we're going to generate for a C0 char
         //      is char+0x40 and with ctrl pressed.
         wchar_t sentWch = wch;
+		std::cerr << "InputEngineTest::C0Test(): sentWch → " << sentWch << std::endl;
         wchar_t expectedWch = wch;
         auto writeCtrl = true;
+		std::cerr << "InputEngineTest::C0Test(): writeCtrl → " << writeCtrl << std::endl;
 
         // Exceptional cases.
         switch (wch)
@@ -445,11 +496,16 @@ void InputEngineTest::C0Test()
         }
 
         auto keyscan = OneCoreSafeVkKeyScanW(expectedWch);
+		std::cerr << "InputEngineTest::C0Test(): keyscan → " << keyscan << std::endl;
         short vkey = keyscan & 0xff;
+		std::cerr << "InputEngineTest::C0Test(): vkey → " << vkey << std::endl;
         short keyscanModifiers = (keyscan >> 8) & 0xff;
+		std::cerr << "InputEngineTest::C0Test(): keyscanModifiers → " << keyscanModifiers << std::endl;
         auto scanCode = (WORD)OneCoreSafeMapVirtualKeyW(vkey, MAPVK_VK_TO_VSC);
+		std::cerr << "InputEngineTest::C0Test(): scanCode → " << scanCode << std::endl;
 
         DWORD dwModifierState = 0;
+		std::cerr << "InputEngineTest::C0Test(): dwModifierState → " << dwModifierState << std::endl;
         if (writeCtrl)
         {
             dwModifierState = WI_SetFlag(dwModifierState, LEFT_CTRL_PRESSED);
@@ -481,6 +537,7 @@ void InputEngineTest::C0Test()
                 sentWch,
                 dwModifierState));
             testState._expectSendCtrlC = true;
+			std::cerr << "InputEngineTest::C0Test(): testState._expectSendCtrlC → " << testState._expectSendCtrlC << std::endl;
         }
         else
         {
@@ -489,10 +546,12 @@ void InputEngineTest::C0Test()
 
         Log::Comment(NoThrowString().Format(L"Testing char 0x%x", sentWch));
         Log::Comment(NoThrowString().Format(L"Input Sequence=\"%s\"", inputSeq.c_str()));
+		std::cerr << "InputEngineTest::C0Test(): Sequence → " << Sequence << std::endl;
 
         INPUT_RECORD inputRec;
 
         inputRec.EventType = KEY_EVENT;
+		std::cerr << "InputEngineTest::C0Test(): inputRec.EventType → " << inputRec.EventType << std::endl;
         inputRec.Event.KeyEvent.bKeyDown = TRUE;
         inputRec.Event.KeyEvent.dwControlKeyState = dwModifierState;
         inputRec.Event.KeyEvent.wRepeatCount = 1;
@@ -505,12 +564,18 @@ void InputEngineTest::C0Test()
         _stateMachine->ProcessString(inputSeq);
     }
     VerifyExpectedInputDrained();
+	std::cerr << "<<< Exiting InputEngineTest::C0Test()" << std::endl;
 }
 
 void InputEngineTest::AlphanumericTest()
 {
+	std::cerr << ">>> Entering InputEngineTest::AlphanumericTest()" << std::endl;
     auto pfn = std::bind(&TestState::TestInputCallback, &testState, std::placeholders::_1);
     auto dispatch = std::make_unique<TestInteractDispatch>(pfn, &testState);
+	std::cerr << "InputEngineTest::AlphanumericTest(): dispatch → " << dispatch << std::endl;
+	std::cerr << "InputEngineTest::AlphanumericTest(): inputEngine → " << inputEngine << std::endl;
+	std::cerr << "InputEngineTest::AlphanumericTest(): _stateMachine → " << _stateMachine << std::endl;
+	std::cerr << "InputEngineTest::AlphanumericTest(): pfn → " << pfn << std::endl;
     auto inputEngine = std::make_unique<InputStateMachineEngine>(std::move(dispatch));
     auto _stateMachine = std::make_unique<StateMachine>(std::move(inputEngine));
     VERIFY_IS_NOT_NULL(_stateMachine);
@@ -521,12 +586,16 @@ void InputEngineTest::AlphanumericTest()
     for (wchar_t wch = '\x20'; wch < '\x7f'; wch++)
     {
         auto inputSeq = std::wstring(&wch, 1);
+		std::cerr << "InputEngineTest::AlphanumericTest(): inputSeq → " << inputSeq << std::endl;
 
         auto keyscan = OneCoreSafeVkKeyScanW(wch);
+		std::cerr << "InputEngineTest::AlphanumericTest(): keyscan → " << keyscan << std::endl;
         short vkey = keyscan & 0xff;
         WORD scanCode = (wchar_t)OneCoreSafeMapVirtualKeyW(vkey, MAPVK_VK_TO_VSC);
+		std::cerr << "InputEngineTest::AlphanumericTest(): scanCode → " << scanCode << std::endl;
 
         short keyscanModifiers = (keyscan >> 8) & 0xff;
+		std::cerr << "InputEngineTest::AlphanumericTest(): keyscanModifiers → " << keyscanModifiers << std::endl;
         // Because of course, these are not the same flags.
         DWORD dwModifierState = 0 |
                                 (WI_IsFlagSet(keyscanModifiers, 1) ? SHIFT_PRESSED : 0) |
@@ -535,9 +604,11 @@ void InputEngineTest::AlphanumericTest()
 
         Log::Comment(NoThrowString().Format(L"Testing char 0x%x", wch));
         Log::Comment(NoThrowString().Format(L"Input Sequence=\"%s\"", inputSeq.c_str()));
+		std::cerr << "InputEngineTest::AlphanumericTest(): Sequence → " << Sequence << std::endl;
 
         INPUT_RECORD inputRec;
         inputRec.EventType = KEY_EVENT;
+		std::cerr << "InputEngineTest::AlphanumericTest(): inputRec.EventType → " << inputRec.EventType << std::endl;
         inputRec.Event.KeyEvent.bKeyDown = TRUE;
         inputRec.Event.KeyEvent.dwControlKeyState = dwModifierState;
         inputRec.Event.KeyEvent.wRepeatCount = 1;
@@ -550,12 +621,15 @@ void InputEngineTest::AlphanumericTest()
         _stateMachine->ProcessString(inputSeq);
     }
     VerifyExpectedInputDrained();
+	std::cerr << "<<< Exiting InputEngineTest::AlphanumericTest()" << std::endl;
 }
 
 void InputEngineTest::RoundTripTest()
 {
+	std::cerr << ">>> Entering InputEngineTest::RoundTripTest()" << std::endl;
     // TODO GH #4405: This test fails.
     Log::Result(WEX::Logging::TestResults::Skipped);
+	std::cerr << "<<< Exiting InputEngineTest::RoundTripTest()" << std::endl;
     return;
 
     /*
@@ -594,10 +668,12 @@ void InputEngineTest::RoundTripTest()
         if (vkey == UNICODE_ETX)
         {
             testState._expectSendCtrlC = true;
+			std::cerr << "InputEngineTest::RoundTripTest(): testState._expectSendCtrlC → " << testState._expectSendCtrlC << std::endl;
         }
 
         INPUT_RECORD irTest = { 0 };
         irTest.EventType = KEY_EVENT;
+		std::cerr << "InputEngineTest::RoundTripTest(): irTest.EventType → " << irTest.EventType << std::endl;
         irTest.Event.KeyEvent.dwControlKeyState = uiActualKeystate;
         irTest.Event.KeyEvent.wRepeatCount = 1;
         irTest.Event.KeyEvent.wVirtualKeyCode = vkey;
@@ -622,8 +698,13 @@ void InputEngineTest::RoundTripTest()
 
 void InputEngineTest::NonAsciiTest()
 {
+	std::cerr << ">>> Entering InputEngineTest::NonAsciiTest()" << std::endl;
     auto pfn = std::bind(&TestState::TestInputStringCallback, &testState, std::placeholders::_1);
     auto dispatch = std::make_unique<TestInteractDispatch>(pfn, &testState);
+	std::cerr << "InputEngineTest::NonAsciiTest(): dispatch → " << dispatch << std::endl;
+	std::cerr << "InputEngineTest::NonAsciiTest(): inputEngine → " << inputEngine << std::endl;
+	std::cerr << "InputEngineTest::NonAsciiTest(): _stateMachine → " << _stateMachine << std::endl;
+	std::cerr << "InputEngineTest::NonAsciiTest(): pfn → " << pfn << std::endl;
     auto inputEngine = std::make_unique<InputStateMachineEngine>(std::move(dispatch));
     auto _stateMachine = std::make_unique<StateMachine>(std::move(inputEngine));
     VERIFY_IS_NOT_NULL(_stateMachine.get());
@@ -632,6 +713,7 @@ void InputEngineTest::NonAsciiTest()
 
     INPUT_RECORD proto = { 0 };
     proto.EventType = KEY_EVENT;
+	std::cerr << "InputEngineTest::NonAsciiTest(): proto.EventType → " << proto.EventType << std::endl;
     proto.Event.KeyEvent.dwControlKeyState = 0;
     proto.Event.KeyEvent.wRepeatCount = 1;
     proto.Event.KeyEvent.wVirtualKeyCode = 0;
@@ -646,7 +728,9 @@ void InputEngineTest::NonAsciiTest()
 
     // "Л", UTF-16: 0x041B, utf8: "\xd09b"
     std::wstring utf8Input = L"\x041B";
+	std::cerr << "InputEngineTest::NonAsciiTest(): utf8Input → " << utf8Input << std::endl;
     auto test = proto;
+	std::cerr << "InputEngineTest::NonAsciiTest(): test → " << test << std::endl;
     test.Event.KeyEvent.uChar.UnicodeChar = utf8Input[0];
 
     Log::Comment(NoThrowString().Format(
@@ -672,16 +756,22 @@ void InputEngineTest::NonAsciiTest()
     testState.vExpectedInput.push_back(test);
     _stateMachine->ProcessString(utf8Input);
     VerifyExpectedInputDrained();
+	std::cerr << "<<< Exiting InputEngineTest::NonAsciiTest()" << std::endl;
 }
 
 void InputEngineTest::CursorPositioningTest()
 {
+	std::cerr << ">>> Entering InputEngineTest::CursorPositioningTest()" << std::endl;
     auto pfn = std::bind(&TestState::TestInputCallback, &testState, std::placeholders::_1);
 
+	std::cerr << "InputEngineTest::CursorPositioningTest(): pfn → " << pfn << std::endl;
+	std::cerr << "InputEngineTest::CursorPositioningTest(): dispatch → " << dispatch << std::endl;
+	std::cerr << "InputEngineTest::CursorPositioningTest(): inputEngine → " << inputEngine << std::endl;
     auto dispatch = std::make_unique<TestInteractDispatch>(pfn, &testState);
     auto inputEngine = std::make_unique<InputStateMachineEngine>(std::move(dispatch));
     inputEngine->CaptureNextCursorPositionReport();
     auto _stateMachine = std::make_unique<StateMachine>(std::move(inputEngine));
+	std::cerr << "InputEngineTest::CursorPositioningTest(): _stateMachine → " << _stateMachine << std::endl;
     testState._stateMachine = _stateMachine.get();
 
     Log::Comment(NoThrowString().Format(
@@ -691,6 +781,9 @@ void InputEngineTest::CursorPositioningTest()
         L"after that, and treat the second as an F3."));
 
     std::wstring seq = L"\x1b[1;4R";
+	std::cerr << "InputEngineTest::CursorPositioningTest(): seq → " << seq << std::endl;
+	std::cerr << "InputEngineTest::CursorPositioningTest(): testState._expectCursorPosition → " << testState._expectCursorPosition << std::endl;
+	std::cerr << "InputEngineTest::CursorPositioningTest(): testState._expectedCursor → " << testState._expectedCursor << std::endl;
     testState._expectCursorPosition = true;
     testState._expectedCursor = { 4, 1 };
 
@@ -702,6 +795,7 @@ void InputEngineTest::CursorPositioningTest()
 
     INPUT_RECORD inputRec;
     inputRec.EventType = KEY_EVENT;
+	std::cerr << "InputEngineTest::CursorPositioningTest(): inputRec.EventType → " << inputRec.EventType << std::endl;
     inputRec.Event.KeyEvent.bKeyDown = TRUE;
     inputRec.Event.KeyEvent.dwControlKeyState = LEFT_ALT_PRESSED | SHIFT_PRESSED;
     inputRec.Event.KeyEvent.wRepeatCount = 1;
@@ -714,12 +808,18 @@ void InputEngineTest::CursorPositioningTest()
         L"Processing \"%s\"", seq.c_str()));
     _stateMachine->ProcessString(seq);
     VerifyExpectedInputDrained();
+	std::cerr << "<<< Exiting InputEngineTest::CursorPositioningTest()" << std::endl;
 }
 
 void InputEngineTest::CSICursorBackTabTest()
 {
+	std::cerr << ">>> Entering InputEngineTest::CSICursorBackTabTest()" << std::endl;
     auto pfn = std::bind(&TestState::TestInputCallback, &testState, std::placeholders::_1);
     auto dispatch = std::make_unique<TestInteractDispatch>(pfn, &testState);
+	std::cerr << "InputEngineTest::CSICursorBackTabTest(): dispatch → " << dispatch << std::endl;
+	std::cerr << "InputEngineTest::CSICursorBackTabTest(): inputEngine → " << inputEngine << std::endl;
+	std::cerr << "InputEngineTest::CSICursorBackTabTest(): _stateMachine → " << _stateMachine << std::endl;
+	std::cerr << "InputEngineTest::CSICursorBackTabTest(): pfn → " << pfn << std::endl;
     auto inputEngine = std::make_unique<InputStateMachineEngine>(std::move(dispatch));
     auto _stateMachine = std::make_unique<StateMachine>(std::move(inputEngine));
     VERIFY_IS_NOT_NULL(_stateMachine);
@@ -728,6 +828,7 @@ void InputEngineTest::CSICursorBackTabTest()
     INPUT_RECORD inputRec;
 
     inputRec.EventType = KEY_EVENT;
+	std::cerr << "InputEngineTest::CSICursorBackTabTest(): inputRec.EventType → " << inputRec.EventType << std::endl;
     inputRec.Event.KeyEvent.bKeyDown = TRUE;
     inputRec.Event.KeyEvent.dwControlKeyState = SHIFT_PRESSED;
     inputRec.Event.KeyEvent.wRepeatCount = 1;
@@ -738,16 +839,23 @@ void InputEngineTest::CSICursorBackTabTest()
     testState.vExpectedInput.push_back(inputRec);
 
     const std::wstring seq = L"\x1b[Z";
+	std::cerr << "InputEngineTest::CSICursorBackTabTest(): seq → " << seq << std::endl;
     Log::Comment(NoThrowString().Format(
         L"Processing \"%s\"", seq.c_str()));
     _stateMachine->ProcessString(seq);
     VerifyExpectedInputDrained();
+	std::cerr << "<<< Exiting InputEngineTest::CSICursorBackTabTest()" << std::endl;
 }
 
 void InputEngineTest::EnhancedKeysTest()
 {
+	std::cerr << ">>> Entering InputEngineTest::EnhancedKeysTest()" << std::endl;
     auto pfn = std::bind(&TestState::TestInputCallback, &testState, std::placeholders::_1);
     auto dispatch = std::make_unique<TestInteractDispatch>(pfn, &testState);
+	std::cerr << "InputEngineTest::EnhancedKeysTest(): dispatch → " << dispatch << std::endl;
+	std::cerr << "InputEngineTest::EnhancedKeysTest(): inputEngine → " << inputEngine << std::endl;
+	std::cerr << "InputEngineTest::EnhancedKeysTest(): _stateMachine → " << _stateMachine << std::endl;
+	std::cerr << "InputEngineTest::EnhancedKeysTest(): pfn → " << pfn << std::endl;
     auto inputEngine = std::make_unique<InputStateMachineEngine>(std::move(dispatch));
     auto _stateMachine = std::make_unique<StateMachine>(std::move(inputEngine));
     VERIFY_IS_NOT_NULL(_stateMachine);
@@ -775,9 +883,12 @@ void InputEngineTest::EnhancedKeysTest()
         INPUT_RECORD inputRec;
 
         const auto wch = (wchar_t)OneCoreSafeMapVirtualKeyW(vkey, MAPVK_VK_TO_CHAR);
+		std::cerr << "InputEngineTest::EnhancedKeysTest(): wch → " << wch << std::endl;
         const auto scanCode = (WORD)OneCoreSafeMapVirtualKeyW(vkey, MAPVK_VK_TO_VSC);
+		std::cerr << "InputEngineTest::EnhancedKeysTest(): scanCode → " << scanCode << std::endl;
 
         inputRec.EventType = KEY_EVENT;
+		std::cerr << "InputEngineTest::EnhancedKeysTest(): inputRec.EventType → " << inputRec.EventType << std::endl;
         inputRec.Event.KeyEvent.bKeyDown = TRUE;
         inputRec.Event.KeyEvent.dwControlKeyState = ENHANCED_KEY;
         inputRec.Event.KeyEvent.wRepeatCount = 1;
@@ -792,12 +903,18 @@ void InputEngineTest::EnhancedKeysTest()
         _stateMachine->ProcessString(seq);
     }
     VerifyExpectedInputDrained();
+	std::cerr << "<<< Exiting InputEngineTest::EnhancedKeysTest()" << std::endl;
 }
 
 void InputEngineTest::SS3CursorKeyTest()
 {
+	std::cerr << ">>> Entering InputEngineTest::SS3CursorKeyTest()" << std::endl;
     auto pfn = std::bind(&TestState::TestInputCallback, &testState, std::placeholders::_1);
     auto dispatch = std::make_unique<TestInteractDispatch>(pfn, &testState);
+	std::cerr << "InputEngineTest::SS3CursorKeyTest(): dispatch → " << dispatch << std::endl;
+	std::cerr << "InputEngineTest::SS3CursorKeyTest(): inputEngine → " << inputEngine << std::endl;
+	std::cerr << "InputEngineTest::SS3CursorKeyTest(): _stateMachine → " << _stateMachine << std::endl;
+	std::cerr << "InputEngineTest::SS3CursorKeyTest(): pfn → " << pfn << std::endl;
     auto inputEngine = std::make_unique<InputStateMachineEngine>(std::move(dispatch));
     auto _stateMachine = std::make_unique<StateMachine>(std::move(inputEngine));
     VERIFY_IS_NOT_NULL(_stateMachine);
@@ -819,9 +936,12 @@ void InputEngineTest::SS3CursorKeyTest()
         INPUT_RECORD inputRec;
 
         const auto wch = (wchar_t)OneCoreSafeMapVirtualKeyW(vkey, MAPVK_VK_TO_CHAR);
+		std::cerr << "InputEngineTest::SS3CursorKeyTest(): wch → " << wch << std::endl;
         const auto scanCode = (WORD)OneCoreSafeMapVirtualKeyW(vkey, MAPVK_VK_TO_VSC);
+		std::cerr << "InputEngineTest::SS3CursorKeyTest(): scanCode → " << scanCode << std::endl;
 
         inputRec.EventType = KEY_EVENT;
+		std::cerr << "InputEngineTest::SS3CursorKeyTest(): inputRec.EventType → " << inputRec.EventType << std::endl;
         inputRec.Event.KeyEvent.bKeyDown = TRUE;
         inputRec.Event.KeyEvent.dwControlKeyState = 0;
         inputRec.Event.KeyEvent.wRepeatCount = 1;
@@ -836,12 +956,18 @@ void InputEngineTest::SS3CursorKeyTest()
         _stateMachine->ProcessString(seq);
     }
     VerifyExpectedInputDrained();
+	std::cerr << "<<< Exiting InputEngineTest::SS3CursorKeyTest()" << std::endl;
 }
 
 void InputEngineTest::AltBackspaceTest()
 {
+	std::cerr << ">>> Entering InputEngineTest::AltBackspaceTest()" << std::endl;
     auto pfn = std::bind(&TestState::TestInputCallback, &testState, std::placeholders::_1);
     auto dispatch = std::make_unique<TestInteractDispatch>(pfn, &testState);
+	std::cerr << "InputEngineTest::AltBackspaceTest(): dispatch → " << dispatch << std::endl;
+	std::cerr << "InputEngineTest::AltBackspaceTest(): inputEngine → " << inputEngine << std::endl;
+	std::cerr << "InputEngineTest::AltBackspaceTest(): _stateMachine → " << _stateMachine << std::endl;
+	std::cerr << "InputEngineTest::AltBackspaceTest(): pfn → " << pfn << std::endl;
     auto inputEngine = std::make_unique<InputStateMachineEngine>(std::move(dispatch));
     auto _stateMachine = std::make_unique<StateMachine>(std::move(inputEngine));
     VERIFY_IS_NOT_NULL(_stateMachine);
@@ -850,6 +976,7 @@ void InputEngineTest::AltBackspaceTest()
     INPUT_RECORD inputRec;
 
     inputRec.EventType = KEY_EVENT;
+	std::cerr << "InputEngineTest::AltBackspaceTest(): inputRec.EventType → " << inputRec.EventType << std::endl;
     inputRec.Event.KeyEvent.bKeyDown = TRUE;
     inputRec.Event.KeyEvent.dwControlKeyState = LEFT_ALT_PRESSED;
     inputRec.Event.KeyEvent.wRepeatCount = 1;
@@ -860,16 +987,23 @@ void InputEngineTest::AltBackspaceTest()
     testState.vExpectedInput.push_back(inputRec);
 
     const std::wstring seq = L"\x1b\x7f";
+	std::cerr << "InputEngineTest::AltBackspaceTest(): seq → " << seq << std::endl;
     Log::Comment(NoThrowString().Format(L"Processing \"\\x1b\\x7f\""));
     _stateMachine->ProcessString(seq);
 
     VerifyExpectedInputDrained();
+	std::cerr << "<<< Exiting InputEngineTest::AltBackspaceTest()" << std::endl;
 }
 
 void InputEngineTest::AltCtrlDTest()
 {
+	std::cerr << ">>> Entering InputEngineTest::AltCtrlDTest()" << std::endl;
     auto pfn = std::bind(&TestState::TestInputCallback, &testState, std::placeholders::_1);
     auto dispatch = std::make_unique<TestInteractDispatch>(pfn, &testState);
+	std::cerr << "InputEngineTest::AltCtrlDTest(): dispatch → " << dispatch << std::endl;
+	std::cerr << "InputEngineTest::AltCtrlDTest(): inputEngine → " << inputEngine << std::endl;
+	std::cerr << "InputEngineTest::AltCtrlDTest(): _stateMachine → " << _stateMachine << std::endl;
+	std::cerr << "InputEngineTest::AltCtrlDTest(): pfn → " << pfn << std::endl;
     auto inputEngine = std::make_unique<InputStateMachineEngine>(std::move(dispatch));
     auto _stateMachine = std::make_unique<StateMachine>(std::move(inputEngine));
     VERIFY_IS_NOT_NULL(_stateMachine);
@@ -878,6 +1012,7 @@ void InputEngineTest::AltCtrlDTest()
     INPUT_RECORD inputRec;
 
     inputRec.EventType = KEY_EVENT;
+	std::cerr << "InputEngineTest::AltCtrlDTest(): inputRec.EventType → " << inputRec.EventType << std::endl;
     inputRec.Event.KeyEvent.bKeyDown = TRUE;
     inputRec.Event.KeyEvent.dwControlKeyState = LEFT_ALT_PRESSED | LEFT_CTRL_PRESSED;
     inputRec.Event.KeyEvent.wRepeatCount = 1;
@@ -888,14 +1023,17 @@ void InputEngineTest::AltCtrlDTest()
     testState.vExpectedInput.push_back(inputRec);
 
     const std::wstring seq = L"\x1b\x04";
+	std::cerr << "InputEngineTest::AltCtrlDTest(): seq → " << seq << std::endl;
     Log::Comment(NoThrowString().Format(L"Processing \"\\x1b\\x04\""));
     _stateMachine->ProcessString(seq);
 
     VerifyExpectedInputDrained();
+	std::cerr << "<<< Exiting InputEngineTest::AltCtrlDTest()" << std::endl;
 }
 
 void InputEngineTest::AltIntermediateTest()
 {
+	std::cerr << ">>> Entering InputEngineTest::AltIntermediateTest()" << std::endl;
     // Tests GH#1209. When we process an alt+key combination where the key just
     // so happens to be an intermediate character, we should make sure that an
     // immediately subsequent ctrl character is handled correctly.
@@ -919,6 +1057,9 @@ void InputEngineTest::AltIntermediateTest()
         }
     };
     auto dispatch = std::make_unique<TestInteractDispatch>(pfnInputStateMachineCallback, &testState);
+	std::cerr << "InputEngineTest::AltIntermediateTest(): dispatch → " << dispatch << std::endl;
+	std::cerr << "InputEngineTest::AltIntermediateTest(): inputEngine → " << inputEngine << std::endl;
+	std::cerr << "InputEngineTest::AltIntermediateTest(): stateMachine → " << stateMachine << std::endl;
     auto inputEngine = std::make_unique<InputStateMachineEngine>(std::move(dispatch));
     auto stateMachine = std::make_unique<StateMachine>(std::move(inputEngine));
     VERIFY_IS_NOT_NULL(stateMachine);
@@ -928,6 +1069,7 @@ void InputEngineTest::AltIntermediateTest()
     // run it through the terminalInput translator. We should get ^[/^E back
     // out.
     std::wstring seq = L"\x1b/";
+	std::cerr << "InputEngineTest::AltIntermediateTest(): seq → " << seq << std::endl;
     translation.clear();
     Log::Comment(NoThrowString().Format(L"Processing \"\\x1b/\""));
     stateMachine->ProcessString(seq);
@@ -940,16 +1082,22 @@ void InputEngineTest::AltIntermediateTest()
     VERIFY_ARE_EQUAL(seq, translation);
 
     VerifyExpectedInputDrained();
+	std::cerr << "<<< Exiting InputEngineTest::AltIntermediateTest()" << std::endl;
 }
 
 void InputEngineTest::AltBackspaceEnterTest()
 {
+	std::cerr << ">>> Entering InputEngineTest::AltBackspaceEnterTest()" << std::endl;
     // Created as a test for microsoft/terminal#2746. See that issue for mode
     // details. We're going to send an Alt+Backspace to conpty, followed by an
     // enter. The enter should be processed as just a single VK_ENTER, not a
     // alt+enter.
 
     auto pfn = std::bind(&TestState::TestInputCallback, &testState, std::placeholders::_1);
+	std::cerr << "InputEngineTest::AltBackspaceEnterTest(): pfn → " << pfn << std::endl;
+	std::cerr << "InputEngineTest::AltBackspaceEnterTest(): dispatch → " << dispatch << std::endl;
+	std::cerr << "InputEngineTest::AltBackspaceEnterTest(): inputEngine → " << inputEngine << std::endl;
+	std::cerr << "InputEngineTest::AltBackspaceEnterTest(): _stateMachine → " << _stateMachine << std::endl;
     auto dispatch = std::make_unique<TestInteractDispatch>(pfn, &testState);
     auto inputEngine = std::make_unique<InputStateMachineEngine>(std::move(dispatch));
     auto _stateMachine = std::make_unique<StateMachine>(std::move(inputEngine));
@@ -959,6 +1107,7 @@ void InputEngineTest::AltBackspaceEnterTest()
     INPUT_RECORD inputRec;
 
     inputRec.EventType = KEY_EVENT;
+	std::cerr << "InputEngineTest::AltBackspaceEnterTest(): inputRec.EventType → " << inputRec.EventType << std::endl;
     inputRec.Event.KeyEvent.bKeyDown = TRUE;
     inputRec.Event.KeyEvent.dwControlKeyState = LEFT_ALT_PRESSED;
     inputRec.Event.KeyEvent.wRepeatCount = 1;
@@ -970,6 +1119,7 @@ void InputEngineTest::AltBackspaceEnterTest()
     testState.vExpectedInput.push_back(inputRec);
 
     std::wstring seq = L"\x1b\x7f";
+	std::cerr << "InputEngineTest::AltBackspaceEnterTest(): seq → " << seq << std::endl;
     Log::Comment(NoThrowString().Format(L"Processing \"\\x1b\\x7f\""));
     _stateMachine->ProcessString(seq);
 
@@ -992,19 +1142,24 @@ void InputEngineTest::AltBackspaceEnterTest()
     VERIFY_ARE_EQUAL(StateMachine::VTStates::Ground, _stateMachine->_state);
 
     VerifyExpectedInputDrained();
+	std::cerr << "<<< Exiting InputEngineTest::AltBackspaceEnterTest()" << std::endl;
 }
 
 void InputEngineTest::ChunkedSequence()
 {
+	std::cerr << ">>> Entering InputEngineTest::ChunkedSequence()" << std::endl;
     // This test ensures that a DSC sequence that's split up into multiple chunks isn't
     // confused with a single Alt+key combination like in the AltBackspaceEnterTest().
     // Basically, it tests the selectivity of the AltBackspaceEnterTest() fix.
 
     auto dispatch = std::make_unique<TestInteractDispatch>(nullptr, nullptr);
+	std::cerr << "InputEngineTest::ChunkedSequence(): dispatch → " << dispatch << std::endl;
+	std::cerr << "InputEngineTest::ChunkedSequence(): inputEngine → " << inputEngine << std::endl;
     auto inputEngine = std::make_unique<InputStateMachineEngine>(std::move(dispatch));
     StateMachine stateMachine{ std::move(inputEngine) };
     stateMachine.ProcessString(L"\x1b[1");
     VERIFY_ARE_EQUAL(StateMachine::VTStates::CsiParam, stateMachine._state);
+	std::cerr << "<<< Exiting InputEngineTest::ChunkedSequence()" << std::endl;
 }
 
 // Method Description:
@@ -1041,14 +1196,19 @@ std::wstring InputEngineTest::GenerateSgrMouseSequence(const CsiMouseButtonCodes
 
 void InputEngineTest::VerifySGRMouseData(const std::vector<std::tuple<SGR_PARAMS, MOUSE_EVENT_PARAMS>> testData)
 {
+	std::cerr << ">>> Entering InputEngineTest::VerifySGRMouseData(testData=" << testData << ")" << std::endl;
     auto pfn = std::bind(&TestState::TestInputCallback, &testState, std::placeholders::_1);
 
+	std::cerr << "InputEngineTest::VerifySGRMouseData(testData=" << testData << "): pfn → " << pfn << std::endl;
+	std::cerr << "InputEngineTest::VerifySGRMouseData(testData=" << testData << "): dispatch → " << dispatch << std::endl;
+	std::cerr << "InputEngineTest::VerifySGRMouseData(testData=" << testData << "): inputEngine → " << inputEngine << std::endl;
     auto dispatch = std::make_unique<TestInteractDispatch>(pfn, &testState);
     auto inputEngine = std::make_unique<InputStateMachineEngine>(std::move(dispatch));
     // The tests may be running somewhere that doesn't report anything for GetDoubleClickTime.
     // Let's force it to a high value to make the double click tests pass.
     inputEngine->_doubleClickTime = std::chrono::milliseconds(1000);
     auto _stateMachine = std::make_unique<StateMachine>(std::move(inputEngine));
+	std::cerr << "InputEngineTest::VerifySGRMouseData(testData=" << testData << "): _stateMachine → " << _stateMachine << std::endl;
     VERIFY_IS_NOT_NULL(_stateMachine);
     testState._stateMachine = _stateMachine.get();
 
@@ -1060,10 +1220,14 @@ void InputEngineTest::VerifySGRMouseData(const std::vector<std::tuple<SGR_PARAMS
         // construct test input
         input = std::get<0>(testData[i]);
         const auto seq = GenerateSgrMouseSequence(std::get<0>(input), std::get<1>(input), std::get<2>(input), std::get<3>(input));
+		std::cerr << "InputEngineTest::VerifySGRMouseData(testData=" << testData << "): seq → " << seq << std::endl;
+		std::cerr << "InputEngineTest::VerifySGRMouseData(testData=" << testData << "): input → " << input << std::endl;
 
         // construct expected result
         expected = std::get<1>(testData[i]);
         inputRec.EventType = MOUSE_EVENT;
+		std::cerr << "InputEngineTest::VerifySGRMouseData(testData=" << testData << "): expected → " << expected << std::endl;
+		std::cerr << "InputEngineTest::VerifySGRMouseData(testData=" << testData << "): inputRec.EventType → " << inputRec.EventType << std::endl;
         inputRec.Event.MouseEvent.dwButtonState = std::get<0>(expected);
         inputRec.Event.MouseEvent.dwControlKeyState = std::get<1>(expected);
         inputRec.Event.MouseEvent.dwMousePosition = til::unwrap_coord(std::get<2>(expected));
@@ -1076,10 +1240,12 @@ void InputEngineTest::VerifySGRMouseData(const std::vector<std::tuple<SGR_PARAMS
     }
 
     VerifyExpectedInputDrained();
+	std::cerr << "<<< Exiting InputEngineTest::VerifySGRMouseData(testData=" << testData << ")" << std::endl;
 }
 
 void InputEngineTest::SGRMouseTest_ButtonClick()
 {
+	std::cerr << ">>> Entering InputEngineTest::SGRMouseTest_ButtonClick()" << std::endl;
     // SGR_PARAMS serves as test input
     // - the state of the buttons (constructed via InputStateMachineEngine::CsiMouseButtonCodes)
     // - the modifiers for the mouse event (constructed via InputStateMachineEngine::CsiMouseModifierCodes)
@@ -1107,10 +1273,12 @@ void InputEngineTest::SGRMouseTest_ButtonClick()
     // clang-format on
 
     VerifySGRMouseData(testData);
+	std::cerr << "<<< Exiting InputEngineTest::SGRMouseTest_ButtonClick()" << std::endl;
 }
 
 void InputEngineTest::SGRMouseTest_Modifiers()
 {
+	std::cerr << ">>> Entering InputEngineTest::SGRMouseTest_Modifiers()" << std::endl;
     // SGR_PARAMS serves as test input
     // - the state of the buttons (constructed via InputStateMachineEngine::CsiMouseButtonCodes)
     // - the modifiers for the mouse event (constructed via InputStateMachineEngine::CsiMouseModifierCodes)
@@ -1138,10 +1306,12 @@ void InputEngineTest::SGRMouseTest_Modifiers()
     // clang-format on
 
     VerifySGRMouseData(testData);
+	std::cerr << "<<< Exiting InputEngineTest::SGRMouseTest_Modifiers()" << std::endl;
 }
 
 void InputEngineTest::SGRMouseTest_Movement()
 {
+	std::cerr << ">>> Entering InputEngineTest::SGRMouseTest_Movement()" << std::endl;
     // SGR_PARAMS serves as test input
     // - the state of the buttons (constructed via InputStateMachineEngine::CsiMouseButtonCodes)
     // - the modifiers for the mouse event (constructed via InputStateMachineEngine::CsiMouseModifierCodes)
@@ -1172,10 +1342,12 @@ void InputEngineTest::SGRMouseTest_Movement()
     // clang-format on
 
     VerifySGRMouseData(testData);
+	std::cerr << "<<< Exiting InputEngineTest::SGRMouseTest_Movement()" << std::endl;
 }
 
 void InputEngineTest::SGRMouseTest_Scroll()
 {
+	std::cerr << ">>> Entering InputEngineTest::SGRMouseTest_Scroll()" << std::endl;
     // SGR_PARAMS serves as test input
     // - the state of the buttons (constructed via InputStateMachineEngine::CsiMouseButtonCodes)
     // - the modifiers for the mouse event (constructed via InputStateMachineEngine::CsiMouseModifierCodes)
@@ -1199,10 +1371,12 @@ void InputEngineTest::SGRMouseTest_Scroll()
     };
     // clang-format on
     VerifySGRMouseData(testData);
+	std::cerr << "<<< Exiting InputEngineTest::SGRMouseTest_Scroll()" << std::endl;
 }
 
 void InputEngineTest::SGRMouseTest_DoubleClick()
 {
+	std::cerr << ">>> Entering InputEngineTest::SGRMouseTest_DoubleClick()" << std::endl;
     // SGR_PARAMS serves as test input
     // - the state of the buttons (constructed via InputStateMachineEngine::CsiMouseButtonCodes)
     // - the modifiers for the mouse event (constructed via InputStateMachineEngine::CsiMouseModifierCodes)
@@ -1248,10 +1422,12 @@ void InputEngineTest::SGRMouseTest_DoubleClick()
     // clang-format on
 
     VerifySGRMouseData(testData);
+	std::cerr << "<<< Exiting InputEngineTest::SGRMouseTest_DoubleClick()" << std::endl;
 }
 
 void InputEngineTest::SGRMouseTest_Hover()
 {
+	std::cerr << ">>> Entering InputEngineTest::SGRMouseTest_Hover()" << std::endl;
     // SGR_PARAMS serves as test input
     // - the state of the buttons (constructed via InputStateMachineEngine::CsiMouseButtonCodes)
     // - the modifiers for the mouse event (constructed via InputStateMachineEngine::CsiMouseModifierCodes)
@@ -1273,12 +1449,18 @@ void InputEngineTest::SGRMouseTest_Hover()
     // clang-format on
 
     VerifySGRMouseData(testData);
+	std::cerr << "<<< Exiting InputEngineTest::SGRMouseTest_Hover()" << std::endl;
 }
 
 void InputEngineTest::CtrlAltZCtrlAltXTest()
 {
+	std::cerr << ">>> Entering InputEngineTest::CtrlAltZCtrlAltXTest()" << std::endl;
     auto pfn = std::bind(&TestState::TestInputCallback, &testState, std::placeholders::_1);
 
+	std::cerr << "InputEngineTest::CtrlAltZCtrlAltXTest(): pfn → " << pfn << std::endl;
+	std::cerr << "InputEngineTest::CtrlAltZCtrlAltXTest(): dispatch → " << dispatch << std::endl;
+	std::cerr << "InputEngineTest::CtrlAltZCtrlAltXTest(): inputEngine → " << inputEngine << std::endl;
+	std::cerr << "InputEngineTest::CtrlAltZCtrlAltXTest(): _stateMachine → " << _stateMachine << std::endl;
     auto dispatch = std::make_unique<TestInteractDispatch>(pfn, &testState);
     auto inputEngine = std::make_unique<InputStateMachineEngine>(std::move(dispatch));
     auto _stateMachine = std::make_unique<StateMachine>(std::move(inputEngine));
@@ -1294,15 +1476,20 @@ void InputEngineTest::CtrlAltZCtrlAltXTest()
 
     {
         auto inputSeq = L"\x1b\x1a"; // ^[^Z
+		std::cerr << "InputEngineTest::CtrlAltZCtrlAltXTest(): inputSeq → " << inputSeq << std::endl;
 
         auto expectedWch = L'Z';
+		std::cerr << "InputEngineTest::CtrlAltZCtrlAltXTest(): expectedWch → " << expectedWch << std::endl;
+		std::cerr << "InputEngineTest::CtrlAltZCtrlAltXTest(): keyscan → " << keyscan << std::endl;
         auto keyscan = OneCoreSafeVkKeyScanW(expectedWch);
         short vkey = keyscan & 0xff;
         auto scanCode = (WORD)OneCoreSafeMapVirtualKeyW(vkey, MAPVK_VK_TO_VSC);
+		std::cerr << "InputEngineTest::CtrlAltZCtrlAltXTest(): scanCode → " << scanCode << std::endl;
 
         INPUT_RECORD inputRec;
 
         inputRec.EventType = KEY_EVENT;
+		std::cerr << "InputEngineTest::CtrlAltZCtrlAltXTest(): inputRec.EventType → " << inputRec.EventType << std::endl;
         inputRec.Event.KeyEvent.bKeyDown = TRUE;
         inputRec.Event.KeyEvent.dwControlKeyState = LEFT_ALT_PRESSED | LEFT_CTRL_PRESSED;
         inputRec.Event.KeyEvent.wRepeatCount = 1;
@@ -1338,12 +1525,17 @@ void InputEngineTest::CtrlAltZCtrlAltXTest()
     }
 
     VerifyExpectedInputDrained();
+	std::cerr << "<<< Exiting InputEngineTest::CtrlAltZCtrlAltXTest()" << std::endl;
 }
 
 void InputEngineTest::TestSs3Entry()
 {
+	std::cerr << ">>> Entering InputEngineTest::TestSs3Entry()" << std::endl;
     auto pfn = std::bind(&TestState::TestInputCallback, &testState, std::placeholders::_1);
     auto dispatch = std::make_unique<TestInteractDispatch>(pfn, &testState);
+	std::cerr << "InputEngineTest::TestSs3Entry(): dispatch → " << dispatch << std::endl;
+	std::cerr << "InputEngineTest::TestSs3Entry(): engine → " << engine << std::endl;
+	std::cerr << "InputEngineTest::TestSs3Entry(): pfn → " << pfn << std::endl;
     auto engine = std::make_unique<InputStateMachineEngine>(std::move(dispatch));
     StateMachine mach(std::move(engine));
 
@@ -1354,12 +1546,17 @@ void InputEngineTest::TestSs3Entry()
     VERIFY_ARE_EQUAL(mach._state, StateMachine::VTStates::Ss3Entry);
     mach.ProcessCharacter(L'm');
     VERIFY_ARE_EQUAL(mach._state, StateMachine::VTStates::Ground);
+	std::cerr << "<<< Exiting InputEngineTest::TestSs3Entry()" << std::endl;
 }
 
 void InputEngineTest::TestSs3Immediate()
 {
+	std::cerr << ">>> Entering InputEngineTest::TestSs3Immediate()" << std::endl;
     // Intermediates aren't supported by Ss3 - they just get dispatched
     auto pfn = std::bind(&TestState::TestInputCallback, &testState, std::placeholders::_1);
+	std::cerr << "InputEngineTest::TestSs3Immediate(): pfn → " << pfn << std::endl;
+	std::cerr << "InputEngineTest::TestSs3Immediate(): dispatch → " << dispatch << std::endl;
+	std::cerr << "InputEngineTest::TestSs3Immediate(): engine → " << engine << std::endl;
     auto dispatch = std::make_unique<TestInteractDispatch>(pfn, &testState);
     auto engine = std::make_unique<InputStateMachineEngine>(std::move(dispatch));
     StateMachine mach(std::move(engine));
@@ -1392,12 +1589,17 @@ void InputEngineTest::TestSs3Immediate()
     VERIFY_ARE_EQUAL(mach._state, StateMachine::VTStates::Ss3Entry);
     mach.ProcessCharacter(L'?');
     VERIFY_ARE_EQUAL(mach._state, StateMachine::VTStates::Ground);
+	std::cerr << "<<< Exiting InputEngineTest::TestSs3Immediate()" << std::endl;
 }
 
 void InputEngineTest::TestSs3Param()
 {
+	std::cerr << ">>> Entering InputEngineTest::TestSs3Param()" << std::endl;
     auto pfn = std::bind(&TestState::TestInputCallback, &testState, std::placeholders::_1);
     auto dispatch = std::make_unique<TestInteractDispatch>(pfn, &testState);
+	std::cerr << "InputEngineTest::TestSs3Param(): dispatch → " << dispatch << std::endl;
+	std::cerr << "InputEngineTest::TestSs3Param(): engine → " << engine << std::endl;
+	std::cerr << "InputEngineTest::TestSs3Param(): pfn → " << pfn << std::endl;
     auto engine = std::make_unique<InputStateMachineEngine>(std::move(dispatch));
     StateMachine mach(std::move(engine));
 
@@ -1422,17 +1624,23 @@ void InputEngineTest::TestSs3Param()
     VERIFY_ARE_EQUAL(mach._state, StateMachine::VTStates::Ss3Param);
     mach.ProcessCharacter(L'J');
     VERIFY_ARE_EQUAL(mach._state, StateMachine::VTStates::Ground);
+	std::cerr << "<<< Exiting InputEngineTest::TestSs3Param()" << std::endl;
 }
 
 void InputEngineTest::TestWin32InputParsing()
 {
+	std::cerr << ">>> Entering InputEngineTest::TestWin32InputParsing()" << std::endl;
     auto pfn = std::bind(&TestState::TestInputCallback, &testState, std::placeholders::_1);
     auto dispatch = std::make_unique<TestInteractDispatch>(pfn, &testState);
+	std::cerr << "InputEngineTest::TestWin32InputParsing(): dispatch → " << dispatch << std::endl;
+	std::cerr << "InputEngineTest::TestWin32InputParsing(): engine → " << engine << std::endl;
+	std::cerr << "InputEngineTest::TestWin32InputParsing(): pfn → " << pfn << std::endl;
     auto engine = std::make_unique<InputStateMachineEngine>(std::move(dispatch));
 
     {
         std::vector<VTParameter> params{ 1 };
         auto key = engine->_GenerateWin32Key({ params.data(), params.size() }).Event.KeyEvent;
+		std::cerr << "InputEngineTest::TestWin32InputParsing(): key → " << key << std::endl;
         VERIFY_ARE_EQUAL(1, key.wVirtualKeyCode);
         VERIFY_ARE_EQUAL(0, key.wVirtualScanCode);
         VERIFY_ARE_EQUAL(L'\0', key.uChar.UnicodeChar);
@@ -1500,11 +1708,14 @@ void InputEngineTest::TestWin32InputParsing()
         VERIFY_ARE_EQUAL(0x5u, key.dwControlKeyState);
         VERIFY_ARE_EQUAL(6, key.wRepeatCount);
     }
+	std::cerr << "<<< Exiting InputEngineTest::TestWin32InputParsing()" << std::endl;
 }
 
 void InputEngineTest::TestWin32InputOptionals()
 {
+	std::cerr << ">>> Entering InputEngineTest::TestWin32InputOptionals()" << std::endl;
     // Send a bunch of possible sets of parameters, to see if they all parse correctly.
+	std::cerr << "<<< Exiting InputEngineTest::TestWin32InputOptionals()" << std::endl;
 
     BEGIN_TEST_METHOD_PROPERTIES()
         TEST_METHOD_PROPERTY(L"Data:provideVirtualKeyCode", L"{false, true}")
@@ -1513,6 +1724,12 @@ void InputEngineTest::TestWin32InputOptionals()
         TEST_METHOD_PROPERTY(L"Data:provideKeyDown", L"{false, true}")
         TEST_METHOD_PROPERTY(L"Data:provideActiveModifierKeys", L"{false, true}")
         TEST_METHOD_PROPERTY(L"Data:provideRepeatCount", L"{false, true}")
+		std::cerr << ">>> Entering BEGIN_TEST_METHOD_PROPERTIES()" << std::endl;
+		std::cerr << "BEGIN_TEST_METHOD_PROPERTIES(): key → " << key << std::endl;
+		std::cerr << "BEGIN_TEST_METHOD_PROPERTIES(): dispatch → " << dispatch << std::endl;
+		std::cerr << "BEGIN_TEST_METHOD_PROPERTIES(): pfn → " << pfn << std::endl;
+		std::cerr << "BEGIN_TEST_METHOD_PROPERTIES(): engine → " << engine << std::endl;
+		std::cerr << "<<< Exiting BEGIN_TEST_METHOD_PROPERTIES()" << std::endl;
         TEST_METHOD_PROPERTY(L"Data:numParams", L"{0, 1, 2, 3, 4, 5, 6}")
     END_TEST_METHOD_PROPERTIES();
 

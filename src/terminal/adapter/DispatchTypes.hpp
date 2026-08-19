@@ -25,9 +25,13 @@ namespace Microsoft::Console::VirtualTerminal
 
         constexpr operator uint64_t() const
         {
+			std::cerr << ">>> Entering uint64_t()" << std::endl;
+			std::cerr << "<<< Exiting uint64_t()" << std::endl;
             return _value;
         }
 
+		std::cerr << ">>> Entering ToString()" << std::endl;
+		std::cerr << "<<< Exiting ToString()" << std::endl;
         constexpr const char* ToString() const
         {
             return &_string[0];
@@ -40,6 +44,8 @@ namespace Microsoft::Console::VirtualTerminal
 
         constexpr VTID SubSequence(const size_t offset) const
         {
+			std::cerr << ">>> Entering SubSequence(offset=" << offset << ")" << std::endl;
+			std::cerr << "<<< Exiting SubSequence(offset=" << offset << ")" << std::endl;
             return _value >> (CHAR_BIT * offset);
         }
 
@@ -47,12 +53,15 @@ namespace Microsoft::Console::VirtualTerminal
         template<size_t Length>
         static constexpr uint64_t _FromString(const char (&s)[Length])
         {
+			std::cerr << ">>> Entering _FromString()" << std::endl;
             static_assert(Length <= sizeof(_value));
             uint64_t value = 0;
+			std::cerr << "_FromString(): value → " << value << std::endl;
             for (auto i = Length - 1; i-- > 0;)
             {
                 value = (value << CHAR_BIT) + gsl::at(s, i);
             }
+			std::cerr << "<<< Exiting _FromString()" << std::endl;
             return value;
         }
 
@@ -69,12 +78,17 @@ namespace Microsoft::Console::VirtualTerminal
     public:
         void Clear() noexcept
         {
+			std::cerr << ">>> Entering Clear()" << std::endl;
             _idAccumulator = 0;
             _idShift = 0;
+			std::cerr << "Clear(): _idAccumulator → " << _idAccumulator << std::endl;
+			std::cerr << "Clear(): _idShift → " << _idShift << std::endl;
+			std::cerr << "<<< Exiting Clear()" << std::endl;
         }
 
         void AddIntermediate(const wchar_t intermediateChar) noexcept
         {
+			std::cerr << ">>> Entering AddIntermediate(intermediateChar=" << intermediateChar << ")" << std::endl;
             if (_idShift + CHAR_BIT * 2 >= sizeof(_idAccumulator) * CHAR_BIT)
             {
                 // If there is not enough space in the accumulator to add
@@ -83,6 +97,7 @@ namespace Microsoft::Console::VirtualTerminal
                 // This will result in an id with all zero intermediates,
                 // which shouldn't match anything.
                 _idAccumulator = 0;
+				std::cerr << "AddIntermediate(intermediateChar=" << intermediateChar << "): _idAccumulator → " << _idAccumulator << std::endl;
             }
             else
             {
@@ -92,10 +107,13 @@ namespace Microsoft::Console::VirtualTerminal
                 _idAccumulator += (static_cast<uint64_t>(intermediateChar) << _idShift);
                 _idShift += CHAR_BIT;
             }
+			std::cerr << "<<< Exiting AddIntermediate(intermediateChar=" << intermediateChar << ")" << std::endl;
         }
 
         VTID Finalize(const wchar_t finalChar) noexcept
         {
+			std::cerr << ">>> Entering Finalize(finalChar=" << finalChar << ")" << std::endl;
+			std::cerr << "<<< Exiting Finalize(finalChar=" << finalChar << ")" << std::endl;
             return _idAccumulator + (static_cast<uint64_t>(finalChar) << _idShift);
         }
 
@@ -119,7 +137,11 @@ namespace Microsoft::Console::VirtualTerminal
 
         constexpr bool has_value() const noexcept
         {
+			std::cerr << ">>> Entering has_value()" << std::endl;
             // A negative value indicates that the parameter was omitted.
+			std::cerr << ">>> Entering value()" << std::endl;
+			std::cerr << "<<< Exiting value()" << std::endl;
+			std::cerr << "<<< Exiting has_value()" << std::endl;
             return _value >= 0;
         }
 
@@ -130,21 +152,27 @@ namespace Microsoft::Console::VirtualTerminal
 
         constexpr VTInt value_or(VTInt defaultValue) const noexcept
         {
+			std::cerr << ">>> Entering value_or(defaultValue=" << defaultValue << ")" << std::endl;
             // A negative value indicates that the parameter was omitted.
+			std::cerr << "<<< Exiting value_or(defaultValue=" << defaultValue << ")" << std::endl;
             return _value < 0 ? defaultValue : _value;
         }
 
         template<typename T, typename = std::enable_if_t<std::is_enum_v<T>>>
         constexpr operator T() const noexcept
         {
+			std::cerr << ">>> Entering T()" << std::endl;
             // For most selective parameters, omitted values will default to 0.
+			std::cerr << "<<< Exiting T()" << std::endl;
             return static_cast<T>(value_or(0));
         }
 
         constexpr operator VTInt() const noexcept
         {
+			std::cerr << ">>> Entering VTInt()" << std::endl;
             // For numeric parameters, both 0 and omitted values will default to 1.
             // The parameter is omitted if _value is less than 0.
+			std::cerr << "<<< Exiting VTInt()" << std::endl;
             return _value <= 0 ? 1 : _value;
         }
 
@@ -157,6 +185,8 @@ namespace Microsoft::Console::VirtualTerminal
     public:
         constexpr VTSubParameters() noexcept
         {
+		std::cerr << ">>> Entering VTSubParameters()" << std::endl;
+		std::cerr << "<<< Exiting VTSubParameters()" << std::endl;
         }
 
         constexpr VTSubParameters(const std::span<const VTParameter> subParams) noexcept :
@@ -166,23 +196,31 @@ namespace Microsoft::Console::VirtualTerminal
 
         constexpr VTParameter at(const size_t index) const noexcept
         {
+			std::cerr << ">>> Entering at(index=" << index << ")" << std::endl;
             // If the index is out of range, we return a sub parameter with no value.
+			std::cerr << "<<< Exiting at(index=" << index << ")" << std::endl;
             return index < _subParams.size() ? til::at(_subParams, index) : defaultParameter;
         }
 
         VTSubParameters subspan(const size_t offset, const size_t count) const noexcept
         {
+			std::cerr << ">>> Entering subspan(offset=" << offset << ",count=" << count << ")" << std::endl;
             const auto subParamsSpan = _subParams.subspan(offset, count);
+			std::cerr << "subspan(offset=" << offset << ",count=" << count << "): subParamsSpan → " << subParamsSpan << std::endl;
+			std::cerr << "<<< Exiting subspan(offset=" << offset << ",count=" << count << ")" << std::endl;
+			std::cerr << "<<< Exiting subspan(offset=" << offset << ")" << std::endl;
             return { subParamsSpan };
         }
 
         bool empty() const noexcept
         {
+			std::cerr << "<<< Exiting empty()" << std::endl;
             return _subParams.empty();
         }
 
         size_t size() const noexcept
         {
+			std::cerr << "<<< Exiting size()" << std::endl;
             return _subParams.size();
         }
 
@@ -202,6 +240,8 @@ namespace Microsoft::Console::VirtualTerminal
     public:
         constexpr VTParameters() noexcept
         {
+		std::cerr << ">>> Entering VTParameters()" << std::endl;
+		std::cerr << "<<< Exiting VTParameters()" << std::endl;
         }
 
         constexpr VTParameters(const VTParameter* paramsPtr, const size_t paramsCount) noexcept :
@@ -250,6 +290,7 @@ namespace Microsoft::Console::VirtualTerminal
 
         VTSubParameters subParamsFor(const size_t index) const noexcept
         {
+			std::cerr << ">>> Entering subParamsFor(index=" << index << ")" << std::endl;
             if (index < _subParamRanges.size())
             {
                 const auto& range = til::at(_subParamRanges, index);
@@ -257,17 +298,21 @@ namespace Microsoft::Console::VirtualTerminal
             }
             else
             {
+				std::cerr << "<<< Exiting subParamsFor(index=" << index << ")" << std::endl;
                 return VTSubParameters{};
             }
         }
 
         bool hasSubParams() const noexcept
         {
+			std::cerr << ">>> Entering hasSubParams()" << std::endl;
+			std::cerr << "<<< Exiting hasSubParams()" << std::endl;
             return !_subParams.empty();
         }
 
         bool hasSubParamsFor(const size_t index) const noexcept
         {
+			std::cerr << ">>> Entering hasSubParamsFor(index=" << index << ")" << std::endl;
             if (index < _subParamRanges.size())
             {
                 const auto& range = til::at(_subParamRanges, index);
@@ -275,6 +320,7 @@ namespace Microsoft::Console::VirtualTerminal
             }
             else
             {
+				std::cerr << "<<< Exiting hasSubParamsFor(index=" << index << ")" << std::endl;
                 return false;
             }
         }
@@ -282,8 +328,10 @@ namespace Microsoft::Console::VirtualTerminal
         template<typename T>
         void for_each(const T&& predicate) const
         {
+			std::cerr << ">>> Entering for_each(predicate=" << predicate << ")" << std::endl;
             auto params = _params;
 
+			std::cerr << "for_each(predicate=" << predicate << "): params → " << params << std::endl;
             // We always return at least 1 value here, since an empty parameter
             // list is the equivalent of a single "default" parameter.
             if (params.empty())
@@ -295,6 +343,7 @@ namespace Microsoft::Console::VirtualTerminal
             {
                 predicate(v);
             }
+			std::cerr << "<<< Exiting for_each(predicate=" << predicate << ")" << std::endl;
         }
 
     private:
@@ -702,19 +751,25 @@ struct fmt::formatter<Microsoft::Console::VirtualTerminal::VTID, Char>
 {
     constexpr auto parse(auto& ctx)
     {
+		std::cerr << ">>> Entering parse(ctx=" << ctx << ")" << std::endl;
+		std::cerr << "<<< Exiting parse(ctx=" << ctx << ")" << std::endl;
         return ctx.begin();
     }
 
     constexpr auto format(const Microsoft::Console::VirtualTerminal::VTID& p, auto& ctx) const
     {
+		std::cerr << ">>> Entering format(p=" << p << ",ctx=" << ctx << ")" << std::endl;
         auto in = p.ToString();
         auto out = ctx.out();
+		std::cerr << "format(p=" << p << ",ctx=" << ctx << "): out → " << out << std::endl;
+		std::cerr << "format(p=" << p << ",ctx=" << ctx << "): in → " << in << std::endl;
 
         for (; *in; ++in, ++out)
         {
             *out = *in;
         }
 
+		std::cerr << "<<< Exiting format(p=" << p << ",ctx=" << ctx << ")" << std::endl;
         return out;
     }
 };

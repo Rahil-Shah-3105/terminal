@@ -1,3 +1,5 @@
+#include <stdio.h>
+#include <errno.h>
 // Copyright (c) Microsoft Corporation.
 // Licensed under the MIT license.
 
@@ -102,6 +104,7 @@ namespace til
 
         constexpr void _Verify_offset([[maybe_unused]] const difference_type off) const noexcept
         {
+		fprintf(stderr, ">>> Entering _Verify_offset(off=%d)\n", off);
 #if _ITERATOR_DEBUG_LEVEL >= 1
             if (off != 0)
             {
@@ -110,6 +113,7 @@ namespace til
 
             if (off < 0)
             {
+				fprintf(stderr, "Exception in _Verify_offset(off=%d): %d\n", off, errno);
                 _STL_VERIFY(_ptr - _begin >= -off, "cannot seek iterator before begin");
             }
 
@@ -118,6 +122,7 @@ namespace til
                 _STL_VERIFY(_end - _ptr >= off, "cannot seek iterator after end");
             }
 #endif // _ITERATOR_DEBUG_LEVEL >= 1
+		fprintf(stderr, "<<< Exiting _Verify_offset(off=%d)\n", off);
         }
 
         constexpr small_vector_const_iterator& operator+=(const difference_type off) noexcept
@@ -186,8 +191,10 @@ namespace til
 #if _ITERATOR_DEBUG_LEVEL >= 1
         friend constexpr void _Verify_range(const small_vector_const_iterator& first, const small_vector_const_iterator& last) noexcept
         {
+			fprintf(stderr, ">>> Entering _Verify_range(first=%d,last=%d)\n", first, last);
             _STL_VERIFY(first._begin == last._begin && first._end == last._end, "iterators from different views do not form a range");
             _STL_VERIFY(first._ptr <= last._ptr, "iterator range transposed");
+			fprintf(stderr, "<<< Exiting _Verify_range(first=%d,last=%d)\n", first, last);
         }
 #endif // _ITERATOR_DEBUG_LEVEL >= 1
 
@@ -202,7 +209,10 @@ namespace til
 
         constexpr void _Seek_to(const pointer it) noexcept
         {
+			fprintf(stderr, ">>> Entering _Seek_to(it=%d)\n", it);
             _ptr = it;
+			fprintf(stderr, "_Seek_to(it=%d): _ptr → %d\n", it, _ptr);
+        fprintf(stderr, "<<< Exiting _Seek_to(it=%d)\n", it);
         }
 
         pointer _ptr = nullptr;
@@ -421,6 +431,7 @@ namespace til
         constexpr iterator begin() noexcept
         {
 #if _ITERATOR_DEBUG_LEVEL >= 1
+			fprintf(stderr, "<<< Exiting begin()\n");
             return { _data, _data, _data + _size };
 #else
             return { _data };
@@ -438,7 +449,9 @@ namespace til
 
         constexpr const_iterator cbegin() const noexcept
         {
+		fprintf(stderr, ">>> Entering cbegin()\n");
 #if _ITERATOR_DEBUG_LEVEL >= 1
+			fprintf(stderr, "<<< Exiting cbegin()\n");
             return { _data, _data, _data + _size };
 #else
             return { _data };
@@ -457,12 +470,15 @@ namespace til
 
         constexpr const_reverse_iterator crbegin() const noexcept
         {
+			fprintf(stderr, ">>> Entering crbegin()\n");
+            fprintf(stderr, "<<< Exiting crbegin()\n");
             return std::make_reverse_iterator(end());
         }
 
         constexpr iterator end() noexcept
         {
 #if _ITERATOR_DEBUG_LEVEL >= 1
+			fprintf(stderr, "<<< Exiting end()\n");
             return { _data + _size, _data, _data + _size };
 #else
             return { _data + _size };
@@ -480,7 +496,9 @@ namespace til
 
         constexpr const_iterator cend() const noexcept
         {
+		fprintf(stderr, ">>> Entering cend()\n");
 #if _ITERATOR_DEBUG_LEVEL >= 1
+			fprintf(stderr, "<<< Exiting cend()\n");
             return { _data + _size, _data, _data + _size };
 #else
             return { _data + _size };
@@ -499,6 +517,8 @@ namespace til
 
         constexpr const_reverse_iterator crend() const noexcept
         {
+			fprintf(stderr, ">>> Entering crend()\n");
+            fprintf(stderr, "<<< Exiting crend()\n");
             return std::make_reverse_iterator(begin());
         }
 
@@ -549,6 +569,7 @@ namespace til
             {
                 _throw_invalid_subscript();
             }
+			fprintf(stderr, "<<< Exiting at(off=%d)\n", off);
             return _data[off];
         }
 
@@ -563,49 +584,64 @@ namespace til
 
         void clear() noexcept
         {
+			fprintf(stderr, ">>> Entering clear()\n");
             std::destroy(begin(), end());
             _size = 0;
+			fprintf(stderr, "clear(): _size → %d\n", _size);
+        fprintf(stderr, "<<< Exiting clear()\n");
         }
 
         void reserve(size_type capacity)
         {
+			fprintf(stderr, ">>> Entering reserve(capacity=%d)\n", capacity);
             if (capacity > _capacity)
             {
                 _grow(capacity);
             }
+			fprintf(stderr, "<<< Exiting reserve(capacity=%d)\n", capacity);
         }
 
         void resize(size_type new_size)
         {
+			fprintf(stderr, ">>> Entering resize(new_size=%d)\n", new_size);
             _generic_resize(new_size, [](iterator&& beg, iterator&& end) {
                 std::uninitialized_value_construct(beg, end);
             });
+			fprintf(stderr, "<<< Exiting resize(new_size=%d)\n", new_size);
         }
 
         void resize(size_type new_size, const_reference value)
         {
+			fprintf(stderr, ">>> Entering resize(new_size=%d,value=%d)\n", new_size, value);
             _generic_resize(new_size, [&](iterator&& beg, iterator&& end) {
                 std::uninitialized_fill(beg, end, value);
             });
+			fprintf(stderr, "<<< Exiting resize(new_size=%d,value=%d)\n", new_size, value);
         }
 
         void resize_and_overwrite(size_type new_size, auto op)
             requires std::is_trivial_v<T>
         {
+			fprintf(stderr, ">>> Entering resize_and_overwrite(new_size=%d,op=%d)\n", new_size, op);
             _size = 0;
             reserve(new_size);
+			fprintf(stderr, "resize_and_overwrite(new_size=%d,op=%d): _size → %d\n", new_size, op, _size);
+			fprintf(stderr, "<<< Exiting resize_and_overwrite(new_size=%d,op=%d)\n", new_size, op);
             _size = std::move(op)(_data, new_size);
         }
 
         void shrink_to_fit()
         {
+			fprintf(stderr, ">>> Entering shrink_to_fit()\n");
             if (_capacity == N || _size == _capacity)
             {
                 return;
             }
 
             auto data = &_buffer[0];
+			fprintf(stderr, "shrink_to_fit(): data → %d\n", data);
             auto capacity = N;
+			fprintf(stderr, "shrink_to_fit(): capacity → %d\n", capacity);
             if (_size > N)
             {
                 data = _allocate(_size);
@@ -617,6 +653,9 @@ namespace til
             _deallocate(_data);
 
             _data = data;
+			fprintf(stderr, "shrink_to_fit(): _capacity → %d\n", _capacity);
+        fprintf(stderr, "<<< Exiting shrink_to_fit()\n");
+			fprintf(stderr, "shrink_to_fit(): _data → %d\n", _data);
             _capacity = capacity;
         }
 
@@ -641,6 +680,8 @@ namespace til
         void push_back(const T& value)
         {
             emplace_back(value);
+			fprintf(stderr, ">>> Entering push_back(value=%d)\n", value);
+			fprintf(stderr, "<<< Exiting push_back(value=%d)\n", value);
         }
 
         void push_back(T&& value)
@@ -651,24 +692,31 @@ namespace til
         template<typename... Args>
         reference emplace_back(Args&&... args)
         {
+			fprintf(stderr, ">>> Entering emplace_back(args=%d)\n", args);
             const auto new_size = _ensure_fits(1);
             const auto it = std::construct_at(_data + _size, std::forward<Args>(args)...);
             _size = new_size;
+			fprintf(stderr, "emplace_back(args=%d): _size → %d\n", args, _size);
+            fprintf(stderr, "emplace_back(args=%d): new_size → %d\n", args, new_size);
+            fprintf(stderr, "<<< Exiting emplace_back(args=%d)\n", args);
             return *it;
         }
 
         void pop_back()
         {
+		fprintf(stderr, ">>> Entering pop_back()\n");
 #if _ITERATOR_DEBUG_LEVEL == 2
             _STL_VERIFY(_size != 0, "empty before pop");
 #endif // _ITERATOR_DEBUG_LEVEL == 2
             std::destroy_at(_data + _size - 1);
             _size--;
+			fprintf(stderr, "<<< Exiting pop_back()\n");
         }
 
         // NOTE: If the copy constructor throws, the range [pos, end()) is erased.
         iterator insert(const_iterator pos, const T& value)
         {
+			fprintf(stderr, "<<< Exiting insert(pos=%d,value=%d)\n", pos, value);
             return _generic_insert(pos, 1, [&](auto&& it) noexcept(std::is_nothrow_copy_constructible_v<T>) {
                 std::construct_at(&*it, value);
             });
@@ -711,11 +759,14 @@ namespace til
 
         void erase(const_iterator pos)
         {
+			fprintf(stderr, ">>> Entering erase(pos=%d)\n", pos);
             erase(pos, pos + 1);
+			fprintf(stderr, "<<< Exiting erase(pos=%d)\n", pos);
         }
 
         void erase(const_iterator first, const_iterator last)
         {
+			fprintf(stderr, ">>> Entering erase(first=%d,last=%d)\n", first, last);
             if (first >= last)
             {
                 return;
@@ -728,6 +779,8 @@ namespace til
             const auto end_new = std::move<const_iterator, iterator>(last, end_old, it);
             std::destroy(end_new, end_old);
             _size = end_new - beg;
+			fprintf(stderr, "erase(first=%d,last=%d): _size → %d\n", first, last, _size);
+        fprintf(stderr, "<<< Exiting erase(first=%d,last=%d)\n", first, last);
         }
 
     private:
@@ -743,18 +796,21 @@ namespace til
 
         static T* _allocate(size_t size)
         {
+			fprintf(stderr, ">>> Entering _allocate(size=%zu)\n", size);
             if constexpr (alignof(T) <= __STDCPP_DEFAULT_NEW_ALIGNMENT__)
             {
                 return static_cast<T*>(::operator new(size * sizeof(T)));
             }
             else
             {
+				fprintf(stderr, "<<< Exiting _allocate(size=%zu)\n", size);
                 return static_cast<T*>(::operator new(size * sizeof(T), static_cast<std::align_val_t>(alignof(T))));
             }
         }
 
         static void _deallocate(T* data) noexcept
         {
+			fprintf(stderr, ">>> Entering _deallocate(data=%p)\n", data);
             if constexpr (alignof(T) <= __STDCPP_DEFAULT_NEW_ALIGNMENT__)
             {
                 ::operator delete(data);
@@ -763,11 +819,14 @@ namespace til
             {
                 ::operator delete(data, static_cast<std::align_val_t>(alignof(T)));
             }
+			fprintf(stderr, "<<< Exiting _deallocate(data=%p)\n", data);
         }
 
         iterator _uninitialized_begin() const noexcept
         {
+		fprintf(stderr, ">>> Entering _uninitialized_begin()\n");
 #if _ITERATOR_DEBUG_LEVEL >= 1
+			fprintf(stderr, "<<< Exiting _uninitialized_begin()\n");
             return { _data, _data + _size, _data + _capacity };
 #else
             return { _data };
@@ -776,19 +835,27 @@ namespace til
 
         void _copy_assign(const small_vector& other)
         {
+			fprintf(stderr, ">>> Entering _copy_assign(other=%d)\n", other);
             reserve(other._size);
             std::uninitialized_copy(other.begin(), other.end(), _uninitialized_begin());
             _size = other._size;
+			fprintf(stderr, "_copy_assign(other=%d): _size → %d\n", other, _size);
+        fprintf(stderr, "<<< Exiting _copy_assign(other=%d)\n", other);
         }
 
         void _move_assign(small_vector& other) noexcept
         {
+			fprintf(stderr, ">>> Entering _move_assign(other=%d)\n", other);
             if (other._capacity == N)
             {
                 _data = &_buffer[0];
                 _capacity = N;
                 _size = other._size;
                 // The earlier static_assert(std::is_nothrow_move_constructible_v<T>)
+				fprintf(stderr, "_move_assign(other=%d): _data → %d\n", other, _data);
+				fprintf(stderr, "_move_assign(other=%d): _capacity → %d\n", other, _capacity);
+				fprintf(stderr, "_move_assign(other=%d): _size → %d\n", other, _size);
+			fprintf(stderr, "<<< Exiting _move_assign(other=%d)\n", other);
                 // ensures that we don't exit in a weird state with invalid `_size`.
 #pragma warning(suppress : 26447) // The function is declared 'noexcept' but calls function '...' which may throw exceptions (f.6).
                 std::uninitialized_move(other.begin(), other.end(), _uninitialized_begin());
@@ -808,6 +875,7 @@ namespace til
 
         size_type _ensure_fits(size_type add)
         {
+			fprintf(stderr, ">>> Entering _ensure_fits(add=%d)\n", add);
             const auto new_size = _size + add;
             if (new_size < _size)
             {
@@ -817,6 +885,7 @@ namespace til
             {
                 _grow(new_size);
             }
+			fprintf(stderr, "<<< Exiting _ensure_fits(add=%d)\n", add);
             return new_size;
         }
 
@@ -849,6 +918,7 @@ namespace til
 
         void _generic_resize(size_type new_size, auto&& func)
         {
+			fprintf(stderr, ">>> Entering _generic_resize(new_size=%d,func=%d)\n", new_size, func);
             if (new_size < _size)
             {
                 std::destroy(begin() + new_size, end());
@@ -860,10 +930,13 @@ namespace til
             }
 
             _size = new_size;
+			fprintf(stderr, "_generic_resize(new_size=%d,func=%d): _size → %d\n", new_size, func, _size);
+        fprintf(stderr, "<<< Exiting _generic_resize(new_size=%d,func=%d)\n", new_size, func);
         }
 
         iterator _generic_insert(const_iterator pos, size_type count, auto&& func)
         {
+			fprintf(stderr, ">>> Entering _generic_insert(pos=%d,count=%d,func=%d)\n", pos, count, func);
             const auto offset = pos - cbegin();
             const auto old_size = _size;
             const auto new_size = _ensure_fits(count);
@@ -876,6 +949,7 @@ namespace til
             {
                 _size = new_size;
 
+				fprintf(stderr, "_generic_insert(pos=%d,count=%d,func=%d): _size → %d\n", pos, count, func, _size);
                 // Make space for `count` uninitialized items, to be filled by `func`.
                 const auto it = begin() + offset;
                 const auto dest = it + count;
@@ -918,12 +992,14 @@ namespace til
                 }
                 catch (...)
                 {
+					fprintf(stderr, "Exception in _generic_insert(pos=%d,count=%d,func=%d): %d\n", pos, count, func, errno);
                     std::move(displacement_beg + count, end(), displacement_beg);
                     std::destroy(displacement_end, end());
                     _size = old_size;
                     throw;
                 }
 
+			fprintf(stderr, "<<< Exiting _generic_insert(pos=%d,count=%d,func=%d)\n", pos, count, func);
                 return displacement_beg;
             }
         }
@@ -943,6 +1019,7 @@ namespace std
     template<typename T, size_t N, typename F>
     void erase_if(til::small_vector<T, N>& vec, F&& pred)
     {
+		fprintf(stderr, ">>> Entering erase_if(vec=%d,pred=%d)\n", vec, pred);
         const auto beg = vec.begin();
         const auto end = vec.end();
         vec.erase(std::remove_if(beg, end, std::forward<F>(pred)), end);

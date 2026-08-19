@@ -27,10 +27,12 @@ namespace Conhost.UIA.Tests
     using Conhost.UIA.Tests.Common.NativeMethods;
     using Conhost.UIA.Tests.Elements;
     using OpenQA.Selenium;
+	using Microsoft.Extensions.Logging;
 
     [TestClass]
     public class VirtualTerminalTests
     {
+		private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
         private static string VIRTUAL_TERMINAL_KEY_NAME = "VirtualTerminalLevel";
         private static int VIRTUAL_TERMINAL_ON_VALUE = 100;
 
@@ -43,15 +45,19 @@ namespace Conhost.UIA.Tests
         [ClassInitialize]
         public static void ClassSetup(TestContext context)
         {
+			_logger.LogDebug(">>> Entering ClassSetup(context={Context})", context);
             Log.Comment("Searching for VtApp.exe in the same directory where this test was launched from...");
             vtAppLocation = Path.Combine(context.TestDeploymentDir, "VtApp.exe");
             Verify.IsFalse(string.IsNullOrEmpty(vtAppLocation));
+			_logger.LogDebug("ClassSetup(context={Context}): vtAppLocation → {VtAppLocation}", context, vtAppLocation);
             Verify.IsTrue(File.Exists(vtAppLocation));
+			_logger.LogDebug("<<< Exiting ClassSetup(context={Context})", context);
         }
 
         [TestMethod]
         public void RunVtAppTester()
         {
+			_logger.LogDebug(">>> Entering RunVtAppTester()");
             using (RegistryHelper reg = new RegistryHelper())
             {
                 reg.BackupRegistry(); // we're going to modify the virtual terminal state for this, so back it up first.
@@ -104,17 +110,22 @@ namespace Conhost.UIA.Tests
                     }
                 }
             }
+			_logger.LogDebug("<<< Exiting RunVtAppTester()");
         }
 
         private static void TestInsertDelete(CmdApp app, ViewportArea area, IntPtr hConsole)
         {
+			_logger.LogDebug(">>> Entering TestInsertDelete(app={App},area={Area},hConsole={HConsole})", app, area, hConsole);
             Log.Comment("--Insert/Delete Commands");
             ScreenFillHelper(app, area, hConsole);
 
             Log.Comment("Move cursor to the middle-ish");
             Point cursorExpected = new Point();
+			_logger.LogDebug("TestInsertDelete(app={App},area={Area},hConsole={HConsole}): cursorExpected → {CursorExpected}", app, area, hConsole, cursorExpected);
             // H is at 5, 1. VT coords are 1-based and buffer is 0-based so adjust.
             cursorExpected.Y = 5 - 1;
+			_logger.LogDebug("TestInsertDelete(app={App},area={Area},hConsole={HConsole}): cursorExpected.Y → {Arg3}", app, area, hConsole, cursorExpected.Y);
+			_logger.LogDebug("TestInsertDelete(app={App},area={Area},hConsole={HConsole}): cursorExpected.X → {Arg3}", app, area, hConsole, cursorExpected.X);
             cursorExpected.X = 1 - 1;
             app.UIRoot.SendKeys("H");
 
@@ -127,16 +138,20 @@ namespace Conhost.UIA.Tests
             }
 
             WinCon.SMALL_RECT viewport = app.GetViewport(hConsole);
+			_logger.LogDebug("TestInsertDelete(app={App},area={Area},hConsole={HConsole}): viewport → {Viewport}", app, area, hConsole, viewport);
 
             // The entire buffer should be Zs except for what we're about to insert and delete.
             app.UIRoot.SendKeys("O"); // insert
             WinCon.CHAR_INFO ciCursor = area.GetCharInfoAt(hConsole, cursorExpected);
+			_logger.LogDebug("TestInsertDelete(app={App},area={Area},hConsole={HConsole}): ciCursor → {CiCursor}", app, area, hConsole, ciCursor);
             Verify.AreEqual(' ', ciCursor.UnicodeChar);
 
             Point endOfCursorLine = new Point(viewport.Right, cursorExpected.Y);
+			_logger.LogDebug("TestInsertDelete(app={App},area={Area},hConsole={HConsole}): endOfCursorLine → {EndOfCursorLine}", app, area, hConsole, endOfCursorLine);
 
             app.UIRoot.SendKeys("P"); // delete
             WinCon.CHAR_INFO ciEndOfLine = area.GetCharInfoAt(hConsole, endOfCursorLine);
+			_logger.LogDebug("TestInsertDelete(app={App},area={Area},hConsole={HConsole}): ciEndOfLine → {CiEndOfLine}", app, area, hConsole, ciEndOfLine);
             Verify.AreEqual(' ', ciEndOfLine.UnicodeChar);
             ciCursor = area.GetCharInfoAt(hConsole, cursorExpected);
             Verify.AreEqual('Z', ciCursor.UnicodeChar);
@@ -163,10 +178,12 @@ namespace Conhost.UIA.Tests
             app.UIRoot.SendKeys("P"); // delete at end of line
             ciCursor = area.GetCharInfoAt(hConsole, cursorExpected);
             Verify.AreEqual(' ', ciCursor.UnicodeChar);
+			_logger.LogDebug("<<< Exiting TestInsertDelete(app={App},area={Area},hConsole={HConsole})", app, area, hConsole);
         }
 
         private static void TestVtToggle(CmdApp app, IntPtr hConsole)
         {
+			_logger.LogDebug(">>> Entering TestVtToggle(app={App},hConsole={HConsole})", app, hConsole);
             WinCon.COORD cursorPos;
             Log.Comment("--Test VT Toggle--");
 
@@ -176,39 +193,49 @@ namespace Conhost.UIA.Tests
 
             cursorPos = app.GetCursorPosition(hConsole);
 
+			_logger.LogDebug("TestVtToggle(app={App},hConsole={HConsole}): cursorPos → {CursorPos}", app, hConsole, cursorPos);
             Verify.IsFalse(app.IsVirtualTerminalEnabled(hConsole), "Verify VT was turned off.");
 
             app.UIRoot.SendKeys("-");
             Verify.IsTrue(app.IsVirtualTerminalEnabled(hConsole), "Verify VT was turned back on .");
+			_logger.LogDebug("<<< Exiting TestVtToggle(app={App},hConsole={HConsole})", app, hConsole);
         }
 
         private static void TestQueryResponses(CmdApp app, IntPtr hConsole)
         {
+			_logger.LogDebug(">>> Entering TestQueryResponses(app={App},hConsole={HConsole})", app, hConsole);
             WinCon.COORD cursorPos;
             Log.Comment("---Status Request Commands---");
             Globals.WaitForTimeout();
             app.UIRoot.SendKeys("c");
             string expectedTitle = string.Format("Response Received: {0}", "\x1b[?61;4;6;7;14;21;22;23;24;28;32;42;52c");
+			_logger.LogDebug("TestQueryResponses(app={App},hConsole={HConsole}): expectedTitle → {ExpectedTitle}", app, hConsole, expectedTitle);
 
             Globals.WaitForTimeout();
             string title = app.GetWindowTitle();
+			_logger.LogDebug("TestQueryResponses(app={App},hConsole={HConsole}): title → {Title}", app, hConsole, title);
             Verify.AreEqual(expectedTitle, title, "Verify that we received the proper response to the Device Attributes request.");
 
             app.UIRoot.SendKeys("R");
             cursorPos = app.GetCursorPosition(hConsole);
             expectedTitle = string.Format("Response Received: {0}", string.Format("\x1b[{0};{1}R", cursorPos.Y + 1, cursorPos.X + 1));
 
+			_logger.LogDebug("TestQueryResponses(app={App},hConsole={HConsole}): cursorPos → {CursorPos}", app, hConsole, cursorPos);
             Globals.WaitForTimeout();
             title = app.GetWindowTitle();
             Verify.AreEqual(expectedTitle, title, "Verify that we received the proper response to the Cursor Position request.");
+			_logger.LogDebug("<<< Exiting TestQueryResponses(app={App},hConsole={HConsole})", app, hConsole);
         }
 
         private static void TestGraphicsCommands(CmdApp app, ViewportArea area, IntPtr hConsole)
         {
+			_logger.LogDebug(">>> Entering TestGraphicsCommands(app={App},area={Area},hConsole={HConsole})", app, area, hConsole);
             Log.Comment("---Graphics Commands---");
             ScreenFillHelper(app, area, hConsole);
 
             WinCon.CHAR_INFO ciExpected = new WinCon.CHAR_INFO();
+			_logger.LogDebug("TestGraphicsCommands(app={App},area={Area},hConsole={HConsole}): ciExpected → {CiExpected}", app, area, hConsole, ciExpected);
+			_logger.LogDebug("TestGraphicsCommands(app={App},area={Area},hConsole={HConsole}): ciExpected.UnicodeChar → {Arg3}", app, area, hConsole, ciExpected.UnicodeChar);
             ciExpected.UnicodeChar = 'z';
             ciExpected.Attributes = app.GetCurrentAttributes(hConsole);
 
@@ -216,6 +243,7 @@ namespace Conhost.UIA.Tests
 
             WinCon.CHAR_INFO ciActual;
             Point pt = new Point();
+			_logger.LogDebug("TestGraphicsCommands(app={App},area={Area},hConsole={HConsole}): pt → {Pt}", app, area, hConsole, pt);
 
             Log.Comment("Set foreground brightness (SGR.1)");
             app.FillCursorPosition(hConsole, ref pt);
@@ -229,6 +257,7 @@ namespace Conhost.UIA.Tests
             Log.Comment("Set foreground green (SGR.32)");
             app.FillCursorPosition(hConsole, ref pt);
             app.UIRoot.SendKeys("2`");
+			_logger.LogDebug("TestGraphicsCommands(app={App},area={Area},hConsole={HConsole}): ciActual → {CiActual}", app, area, hConsole, ciActual);
 
             ciExpected.Attributes &= ~WinCon.CONSOLE_ATTRIBUTES.FOREGROUND_ALL;
             ciExpected.Attributes |= WinCon.CONSOLE_ATTRIBUTES.FOREGROUND_GREEN;
@@ -458,10 +487,12 @@ namespace Conhost.UIA.Tests
 
             ciActual = area.GetCharInfoAt(hConsole, pt);
             Verify.AreEqual(ciExpected, ciActual, "Verify that we set the background only back to the default.");
+			_logger.LogDebug("<<< Exiting TestGraphicsCommands(app={App},area={Area},hConsole={HConsole})", app, area, hConsole);
         }
 
         private static void TestCursorPositioningCommands(CmdApp app, IntPtr hConsole, WinCon.COORD cursorExpected)
         {
+			_logger.LogDebug(">>> Entering TestCursorPositioningCommands(app={App},hConsole={HConsole},cursorExpected={CursorExpected})", app, hConsole, cursorExpected);
             WinCon.COORD cursorPos;
             Log.Comment("---Cursor Positioning Commands---");
             // Try cursor commands
@@ -470,6 +501,7 @@ namespace Conhost.UIA.Tests
             cursorExpected.Y++;
             cursorPos = app.GetCursorPosition(hConsole);
             Verify.AreEqual(cursorExpected, cursorPos, "Check cursor has moved down by 1.");
+			_logger.LogDebug("TestCursorPositioningCommands(app={App},hConsole={HConsole},cursorExpected={CursorExpected}): cursorPos → {CursorPos}", app, hConsole, cursorExpected, cursorPos);
 
             Log.Comment("Press A key (cursor up)");
             app.UIRoot.SendKeys("A");
@@ -498,6 +530,7 @@ namespace Conhost.UIA.Tests
             app.UIRoot.SendKeys("E");
             cursorExpected.Y++;
             cursorExpected.X = 0;
+			_logger.LogDebug("TestCursorPositioningCommands(app={App},hConsole={HConsole},cursorExpected={CursorExpected}): cursorExpected.X → {Arg3}", app, hConsole, cursorExpected, cursorExpected.X);
             cursorPos = app.GetCursorPosition(hConsole);
             Verify.AreEqual(cursorExpected, cursorPos, "Check cursor has moved down by 1 line and reset X position to 0.");
 
@@ -522,6 +555,7 @@ namespace Conhost.UIA.Tests
             Log.Comment("Check move directly to position 14 vertically (v key mapped to d)");
             app.UIRoot.SendKeys("v");
             cursorExpected.Y = 14 - 1; // 14 is the VT position which starts at array offset 1. 13 is the buffer position starting at array offset 0.
+			_logger.LogDebug("TestCursorPositioningCommands(app={App},hConsole={HConsole},cursorExpected={CursorExpected}): cursorExpected.Y → {Arg3}", app, hConsole, cursorExpected, cursorExpected.Y);
             cursorPos = app.GetCursorPosition(hConsole);
             Verify.AreEqual(cursorExpected, cursorPos, "Check cursor has moved to vertical position 14.");
 
@@ -532,10 +566,12 @@ namespace Conhost.UIA.Tests
             cursorExpected.X = 1 - 1;
             cursorPos = app.GetCursorPosition(hConsole);
             Verify.AreEqual(cursorExpected, cursorPos, "Check cursor has moved to row 5, column 1.");
+			_logger.LogDebug("<<< Exiting TestCursorPositioningCommands(app={App},hConsole={HConsole},cursorExpected={CursorExpected})", app, hConsole, cursorExpected);
         }
 
         private static void TestCursorVisibilityCommands(CmdApp app, IntPtr hConsole)
         {
+			_logger.LogDebug(">>> Entering TestCursorVisibilityCommands(app={App},hConsole={HConsole})", app, hConsole);
             WinCon.COORD cursorExpected;
             Log.Comment("---Cursor Visibility Commands---");
             Log.Comment("Turn cursor display off. (l)");
@@ -551,6 +587,7 @@ namespace Conhost.UIA.Tests
             app.UIRoot.SendKeys("7");
             cursorExpected = app.GetCursorPosition(hConsole);
 
+			_logger.LogDebug("TestCursorVisibilityCommands(app={App},hConsole={HConsole}): cursorExpected → {CursorExpected}", app, hConsole, cursorExpected);
             Log.Comment("Move the cursor a bit away from the saved position.");
             app.UIRoot.SendKeys("BBBBCCCCC");
 
@@ -578,10 +615,12 @@ namespace Conhost.UIA.Tests
             Log.Comment("Restore existing position with DEC restore.");
             app.UIRoot.SendKeys("8");
             Verify.AreEqual(cursorExpected, app.GetCursorPosition(hConsole), "Check that cursor restored back to the saved position.");
+			_logger.LogDebug("<<< Exiting TestCursorVisibilityCommands(app={App},hConsole={HConsole})", app, hConsole);
         }
 
         private static void TestAreaEraseCommands(CmdApp app, ViewportArea area, IntPtr hConsole)
         {
+			_logger.LogDebug(">>> Entering TestAreaEraseCommands(app={App},area={Area},hConsole={HConsole})", app, area, hConsole);
             WinCon.COORD cursorPos;
             Log.Comment("---Area Erase Commands---");
             ScreenFillHelper(app, area, hConsole);
@@ -592,9 +631,11 @@ namespace Conhost.UIA.Tests
 
             cursorPos = app.GetCursorPosition(hConsole);
 
+			_logger.LogDebug("TestAreaEraseCommands(app={App},area={Area},hConsole={HConsole}): cursorPos → {CursorPos}", app, area, hConsole, cursorPos);
             GetExpectedChar expectedCharAlgorithm;
             expectedCharAlgorithm = (int rowId, int colId, int height, int width) =>
             {
+			_logger.LogDebug("TestAreaEraseCommands(app={App},area={Area},hConsole={HConsole}): expectedCharAlgorithm → {ExpectedCharAlgorithm}", app, area, hConsole, expectedCharAlgorithm);
                 if (rowId == (height - 1) && colId == (width - 1))
                 {
                     return ' ';
@@ -712,12 +753,14 @@ namespace Conhost.UIA.Tests
             };
 
             BufferVerificationHelper(app, area, hConsole, expectedCharAlgorithm);
+			_logger.LogDebug("<<< Exiting TestAreaEraseCommands(app={App},area={Area},hConsole={HConsole})", app, area, hConsole);
         }
 
         delegate char GetExpectedChar(int rowId, int colId, int height, int width);
 
         private static void ScreenFillHelper(CmdApp app, ViewportArea area, IntPtr hConsole)
         {
+			_logger.LogDebug(">>> Entering ScreenFillHelper(app={App},area={Area},hConsole={HConsole})", app, area, hConsole);
             Log.Comment("Fill screen with junk");
             app.UIRoot.SendKeys(Keys.Shift + "`" + Keys.Shift);
 

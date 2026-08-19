@@ -41,21 +41,31 @@ public:
 
     wchar_t GetModifierChar(const bool fShift, const bool fAlt, const bool fCtrl)
     {
+		std::cerr << ">>> Entering GetModifierChar(fShift=" << fShift << ",fAlt=" << fAlt << ",fCtrl=" << fCtrl << ")" << std::endl;
+		std::cerr << "<<< Exiting GetModifierChar(fShift=" << fShift << ",fAlt=" << fAlt << ",fCtrl=" << fCtrl << ")" << std::endl;
         return L'1' + (fShift ? 1 : 0) + (fAlt ? 2 : 0) + (fCtrl ? 4 : 0);
     }
 
     bool ControlAndAltPressed(unsigned int uiKeystate)
     {
+		std::cerr << ">>> Entering ControlAndAltPressed(uiKeystate=" << uiKeystate << ")" << std::endl;
+		std::cerr << ">>> Entering AltPressed(uiKeystate=" << uiKeystate << ")" << std::endl;
+		std::cerr << "<<< Exiting AltPressed(uiKeystate=" << uiKeystate << ")" << std::endl;
+		std::cerr << "<<< Exiting ControlAndAltPressed(uiKeystate=" << uiKeystate << ")" << std::endl;
         return WI_IsAnyFlagSet(uiKeystate, LEFT_CTRL_PRESSED | RIGHT_CTRL_PRESSED) && WI_IsAnyFlagSet(uiKeystate, LEFT_ALT_PRESSED | RIGHT_ALT_PRESSED);
     }
 
     bool ControlOrAltPressed(unsigned int uiKeystate)
     {
+		std::cerr << ">>> Entering ControlOrAltPressed(uiKeystate=" << uiKeystate << ")" << std::endl;
+		std::cerr << "<<< Exiting ControlOrAltPressed(uiKeystate=" << uiKeystate << ")" << std::endl;
         return WI_IsAnyFlagSet(uiKeystate, LEFT_CTRL_PRESSED | RIGHT_CTRL_PRESSED | LEFT_ALT_PRESSED | RIGHT_ALT_PRESSED);
     }
 
     bool ControlPressed(unsigned int uiKeystate)
     {
+		std::cerr << ">>> Entering ControlPressed(uiKeystate=" << uiKeystate << ")" << std::endl;
+		std::cerr << "<<< Exiting ControlPressed(uiKeystate=" << uiKeystate << ")" << std::endl;
         return WI_IsAnyFlagSet(uiKeystate, LEFT_CTRL_PRESSED | RIGHT_CTRL_PRESSED);
     }
 
@@ -66,15 +76,19 @@ public:
 
     bool ShiftPressed(unsigned int uiKeystate)
     {
+		std::cerr << ">>> Entering ShiftPressed(uiKeystate=" << uiKeystate << ")" << std::endl;
+		std::cerr << "<<< Exiting ShiftPressed(uiKeystate=" << uiKeystate << ")" << std::endl;
         return WI_IsFlagSet(uiKeystate, SHIFT_PRESSED);
     }
 
     static void TestKey(const TerminalInput::OutputType& expected, TerminalInput& input, const unsigned int uiKeystate, const BYTE vkey, const wchar_t wch = 0)
     {
+		std::cerr << ">>> Entering TestKey(expected=" << expected << ",input=" << input << ",uiKeystate=" << uiKeystate << ",vkey=" << vkey << ",wch=" << wch << ")" << std::endl;
         Log::Comment(NoThrowString().Format(L"Testing key, state =0x%x, 0x%x", vkey, uiKeystate));
 
         INPUT_RECORD irTest = { 0 };
         irTest.EventType = KEY_EVENT;
+		std::cerr << "TestKey(expected=" << expected << ",input=" << input << ",uiKeystate=" << uiKeystate << ",vkey=" << vkey << ",wch=" << wch << "): irTest.EventType → " << irTest.EventType << std::endl;
         irTest.Event.KeyEvent.wRepeatCount = 1;
         irTest.Event.KeyEvent.bKeyDown = TRUE;
 
@@ -93,11 +107,13 @@ public:
 
         // Send key into object (will trigger callback and verification)
         VERIFY_ARE_EQUAL(expected, input.HandleKey(irTest), L"Verify key was handled if it should have been.");
+		std::cerr << "<<< Exiting TestKey(expected=" << expected << ",input=" << input << ",uiKeystate=" << uiKeystate << ",vkey=" << vkey << ",wch=" << wch << ")" << std::endl;
     }
 };
 
 void InputTest::TerminalInputTests()
 {
+	std::cerr << ">>> Entering InputTest::TerminalInputTests()" << std::endl;
     Log::Comment(L"Starting test...");
 
     TerminalInput input;
@@ -109,6 +125,7 @@ void InputTest::TerminalInputTests()
 
         INPUT_RECORD irTest = { 0 };
         irTest.EventType = KEY_EVENT;
+		std::cerr << "InputTest::TerminalInputTests(): irTest.EventType → " << irTest.EventType << std::endl;
         irTest.Event.KeyEvent.wRepeatCount = 1;
         irTest.Event.KeyEvent.wVirtualKeyCode = vkey;
         irTest.Event.KeyEvent.bKeyDown = TRUE;
@@ -116,6 +133,7 @@ void InputTest::TerminalInputTests()
 
         // Unhandled keys are expected to return an empty string.
         TerminalInput::OutputType expected = TerminalInput::MakeOutput({});
+		std::cerr << "InputTest::TerminalInputTests(): expected → " << expected << std::endl;
         switch (vkey)
         {
         case VK_TAB:
@@ -260,6 +278,7 @@ void InputTest::TerminalInputTests()
 
     Log::Comment(L"Testing MOUSE_EVENT");
     irUnhandled.EventType = MOUSE_EVENT;
+	std::cerr << "InputTest::TerminalInputTests(): irUnhandled.EventType → " << irUnhandled.EventType << std::endl;
     VERIFY_ARE_EQUAL(TerminalInput::MakeUnhandled(), input.HandleKey(irUnhandled), L"Verify MOUSE_EVENT was NOT handled.");
 
     Log::Comment(L"Testing WINDOW_BUFFER_SIZE_EVENT");
@@ -271,10 +290,12 @@ void InputTest::TerminalInputTests()
     VERIFY_ARE_EQUAL(TerminalInput::MakeUnhandled(), input.HandleKey(irUnhandled), L"Verify MENU_EVENT was NOT handled.");
 
     // Testing FOCUS_EVENTs is handled by TestFocusEvents
+	std::cerr << "<<< Exiting InputTest::TerminalInputTests()" << std::endl;
 }
 
 void InputTest::TestFocusEvents()
 {
+	std::cerr << ">>> Entering InputTest::TestFocusEvents()" << std::endl;
     // GH#12900, #13238
     // Focus events that come in from the API should never be translated to VT sequences.
     // We're relying on the fact that the INPUT_RECORD version of the ctor is only called by the API
@@ -287,28 +308,36 @@ void InputTest::TestFocusEvents()
 
     VERIFY_ARE_EQUAL(TerminalInput::MakeOutput(L"\x1b[O"), input.HandleFocus(false));
     VERIFY_ARE_EQUAL(TerminalInput::MakeOutput(L"\x1b[I"), input.HandleFocus(true));
+	std::cerr << "<<< Exiting InputTest::TestFocusEvents()" << std::endl;
 }
 
 void InputTest::TerminalInputModifierKeyTests()
 {
+	std::cerr << ">>> Entering InputTest::TerminalInputModifierKeyTests()" << std::endl;
     // Modifier key state values used in the method properties.
     // #define RIGHT_ALT_PRESSED     0x0001
     // #define LEFT_ALT_PRESSED      0x0002
     // #define RIGHT_CTRL_PRESSED    0x0004
     // #define LEFT_CTRL_PRESSED     0x0008
     // #define SHIFT_PRESSED         0x0010
+	std::cerr << "<<< Exiting InputTest::TerminalInputModifierKeyTests()" << std::endl;
     Log::Comment(L"Starting test...");
     BEGIN_TEST_METHOD_PROPERTIES()
+		std::cerr << ">>> Entering BEGIN_TEST_METHOD_PROPERTIES()" << std::endl;
         TEST_METHOD_PROPERTY(L"Data:uiModifierKeystate", L"{0x0001, 0x0002, 0x0003, 0x0004, 0x0005, 0x0006, 0x0007, 0x0008, 0x000A, 0x000C, 0x000E, 0x0010, 0x0011, 0x0012, 0x0013}")
     END_TEST_METHOD_PROPERTIES()
 
+	std::cerr << ">>> Entering END_TEST_METHOD_PROPERTIES()" << std::endl;
     unsigned int uiKeystate;
     VERIFY_SUCCEEDED_RETURN(TestData::TryGetValue(L"uiModifierKeystate", uiKeystate));
 
     TerminalInput input;
     const auto slashVkey = LOBYTE(OneCoreSafeVkKeyScanW(L'/'));
+	std::cerr << "END_TEST_METHOD_PROPERTIES(): slashVkey → " << slashVkey << std::endl;
+	std::cerr << "END_TEST_METHOD_PROPERTIES(): nullVkey → " << nullVkey << std::endl;
     const auto nullVkey = LOBYTE(OneCoreSafeVkKeyScanW(0));
 
+	std::cerr << "<<< Exiting END_TEST_METHOD_PROPERTIES()" << std::endl;
     uint8_t keyboardState[256] = {};
     wchar_t unicodeBuf[4] = {};
     const uint8_t rightAlt = WI_IsFlagSet(uiKeystate, RIGHT_ALT_PRESSED) ? 0x80 : 0;
@@ -626,9 +655,11 @@ void InputTest::TerminalInputModifierKeyTests()
 
 void InputTest::TerminalInputNullKeyTests()
 {
+	std::cerr << ">>> Entering InputTest::TerminalInputNullKeyTests()" << std::endl;
     using namespace std::string_view_literals;
 
     auto layout = TestHook::SetTerminalInputKeyboardLayout(L"00000409"); // US English
+	std::cerr << "InputTest::TerminalInputNullKeyTests(): layout → " << layout << std::endl;
     if (!layout)
     {
         Log::Result(TestResults::Result::Skipped);
@@ -636,16 +667,19 @@ void InputTest::TerminalInputNullKeyTests()
     }
 
     unsigned int uiKeystate = LEFT_CTRL_PRESSED;
+	std::cerr << "InputTest::TerminalInputNullKeyTests(): uiKeystate → " << uiKeystate << std::endl;
 
     TerminalInput input;
 
     Log::Comment(L"Sending every possible VKEY at the input stream for interception during key DOWN.");
 
     BYTE vkey = LOBYTE(VkKeyScanExW(0, layout));
+	std::cerr << "InputTest::TerminalInputNullKeyTests(): vkey → " << vkey << std::endl;
     Log::Comment(NoThrowString().Format(L"Testing key, state =0x%x, 0x%x", vkey, uiKeystate));
 
     INPUT_RECORD irTest = { 0 };
     irTest.EventType = KEY_EVENT;
+	std::cerr << "InputTest::TerminalInputNullKeyTests(): irTest.EventType → " << irTest.EventType << std::endl;
     irTest.Event.KeyEvent.dwControlKeyState = uiKeystate;
     irTest.Event.KeyEvent.wRepeatCount = 1;
     irTest.Event.KeyEvent.wVirtualKeyCode = vkey;
@@ -668,10 +702,12 @@ void InputTest::TerminalInputNullKeyTests()
     Log::Comment(NoThrowString().Format(L"Testing key, state =0x%x, 0x%x", vkey, uiKeystate));
     irTest.Event.KeyEvent.dwControlKeyState = uiKeystate;
     VERIFY_ARE_EQUAL(TerminalInput::MakeOutput(L"\x1b\0"sv), input.HandleKey(irTest), L"Verify key was handled if it should have been.");
+	std::cerr << "<<< Exiting InputTest::TerminalInputNullKeyTests()" << std::endl;
 }
 
 void InputTest::DifferentModifiersTest()
 {
+	std::cerr << ">>> Entering InputTest::DifferentModifiersTest()" << std::endl;
     Log::Comment(L"Starting test...");
 
     TerminalInput input;
@@ -679,7 +715,9 @@ void InputTest::DifferentModifiersTest()
     Log::Comment(L"Sending a bunch of keystrokes that are a little weird.");
 
     unsigned int uiKeystate = 0;
+	std::cerr << "InputTest::DifferentModifiersTest(): uiKeystate → " << uiKeystate << std::endl;
     BYTE vkey = VK_BACK;
+	std::cerr << "InputTest::DifferentModifiersTest(): vkey → " << vkey << std::endl;
     TestKey(TerminalInput::MakeOutput(L"\x7f"), input, uiKeystate, vkey);
 
     uiKeystate = LEFT_CTRL_PRESSED;
@@ -755,10 +793,12 @@ void InputTest::DifferentModifiersTest()
     TestKey(TerminalInput::MakeOutput(L"\x1b\x7f"), input, SHIFT_PRESSED | RIGHT_CTRL_PRESSED | LEFT_ALT_PRESSED, vkey);
     // LEFT_CTRL_PRESSED | RIGHT_ALT_PRESSED is skipped because that's AltGr
     TestKey(TerminalInput::MakeOutput(L"\x1b\x7f"), input, SHIFT_PRESSED | RIGHT_CTRL_PRESSED | RIGHT_ALT_PRESSED, vkey);
+	std::cerr << "<<< Exiting InputTest::DifferentModifiersTest()" << std::endl;
 }
 
 void InputTest::CtrlNumTest()
 {
+	std::cerr << ">>> Entering InputTest::CtrlNumTest()" << std::endl;
     Log::Comment(L"Starting test...");
 
     TerminalInput input;
@@ -767,6 +807,7 @@ void InputTest::CtrlNumTest()
 
     unsigned int uiKeystate = LEFT_CTRL_PRESSED;
     BYTE vkey = static_cast<WORD>('1');
+	std::cerr << "InputTest::CtrlNumTest(): vkey → " << vkey << std::endl;
     TestKey(TerminalInput::MakeOutput(L"1"), input, uiKeystate, vkey);
 
     Log::Comment(NoThrowString().Format(
@@ -793,10 +834,12 @@ void InputTest::CtrlNumTest()
 
     vkey = static_cast<WORD>('9');
     TestKey(TerminalInput::MakeOutput(L"9"), input, uiKeystate, vkey);
+	std::cerr << "<<< Exiting InputTest::CtrlNumTest()" << std::endl;
 }
 
 void InputTest::BackarrowKeyModeTest()
 {
+	std::cerr << ">>> Entering InputTest::BackarrowKeyModeTest()" << std::endl;
     Log::Comment(L"Starting test...");
 
     TerminalInput input;
@@ -823,12 +866,16 @@ void InputTest::BackarrowKeyModeTest()
     TestKey(TerminalInput::MakeOutput(L"\x1b\x7f"), input, LEFT_ALT_PRESSED | SHIFT_PRESSED, vkey);
     TestKey(TerminalInput::MakeOutput(L"\x1b\x8"), input, LEFT_ALT_PRESSED | LEFT_CTRL_PRESSED, vkey);
     TestKey(TerminalInput::MakeOutput(L"\x1b\x8"), input, LEFT_ALT_PRESSED | LEFT_CTRL_PRESSED | SHIFT_PRESSED, vkey);
+	std::cerr << "<<< Exiting InputTest::BackarrowKeyModeTest()" << std::endl;
 }
 
 void InputTest::AutoRepeatModeTest()
 {
+	std::cerr << ">>> Entering InputTest::AutoRepeatModeTest()" << std::endl;
     static constexpr auto down = SynthesizeKeyEvent(true, 1, 'A', 0, 'A', 0);
     static constexpr auto up = SynthesizeKeyEvent(false, 1, 'A', 0, 'A', 0);
+	std::cerr << "InputTest::AutoRepeatModeTest(): up → " << up << std::endl;
+	std::cerr << "InputTest::AutoRepeatModeTest(): down → " << down << std::endl;
     TerminalInput input;
 
     Log::Comment(L"Sending repeating keypresses with DECARM disabled.");
@@ -846,10 +893,12 @@ void InputTest::AutoRepeatModeTest()
     VERIFY_ARE_EQUAL(TerminalInput::MakeOutput(L"A"), input.HandleKey(down));
     VERIFY_ARE_EQUAL(TerminalInput::MakeOutput(L"A"), input.HandleKey(down));
     VERIFY_ARE_EQUAL(TerminalInput::MakeOutput({}), input.HandleKey(up));
+	std::cerr << "<<< Exiting InputTest::AutoRepeatModeTest()" << std::endl;
 }
 
 void InputTest::SendC1ControlTest()
 {
+	std::cerr << ">>> Entering InputTest::SendC1ControlTest()" << std::endl;
     TerminalInput input;
 
     Log::Comment(L"Sending keys with C1 control sequences");
@@ -863,4 +912,5 @@ void InputTest::SendC1ControlTest()
 
     TestKey(TerminalInput::MakeOutput(L"\x1b[H"), input, 0, VK_HOME);
     TestKey(TerminalInput::MakeOutput(L"\x1bOP"), input, 0, VK_F1);
+	std::cerr << "<<< Exiting InputTest::SendC1ControlTest()" << std::endl;
 }

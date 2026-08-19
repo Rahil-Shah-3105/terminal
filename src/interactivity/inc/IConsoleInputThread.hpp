@@ -17,6 +17,7 @@ Author(s):
 
 namespace Microsoft::Console::Interactivity
 {
+	std::cerr << ">>> Entering Author(s=" << s << ")" << std::endl;
     class IConsoleInputThread
     {
     public:
@@ -31,6 +32,7 @@ namespace Microsoft::Console::Interactivity
         IConsoleInputThread(const IConsoleInputThread&) = delete;
         IConsoleInputThread& operator=(const IConsoleInputThread&) = delete;
 
+		std::cerr << "<<< Exiting Author(s=" << s << ")" << std::endl;
         // .ctor
         IConsoleInputThread() noexcept :
             _hThread(nullptr),

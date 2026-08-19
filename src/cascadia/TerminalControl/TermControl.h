@@ -1,3 +1,4 @@
+#include <stdio.h>
 // Copyright (c) Microsoft Corporation.
 // Licensed under the MIT license.
 
@@ -330,6 +331,7 @@ namespace winrt::Microsoft::Terminal::Control::implementation
 
         inline bool _IsClosing() const noexcept
         {
+		fprintf(stderr, ">>> Entering _IsClosing()\n");
 #ifndef NDEBUG
             // _closing isn't atomic and may only be accessed from the main thread.
             if (const auto dispatcher = Dispatcher())
@@ -337,6 +339,7 @@ namespace winrt::Microsoft::Terminal::Control::implementation
                 assert(dispatcher.HasThreadAccess());
             }
 #endif
+			fprintf(stderr, "<<< Exiting _IsClosing()\n");
             return _closing;
         }
 

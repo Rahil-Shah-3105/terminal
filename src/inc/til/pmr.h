@@ -1,3 +1,4 @@
+#include <stdio.h>
 // Copyright (c) Microsoft Corporation.
 // Licensed under the MIT license.
 
@@ -32,13 +33,17 @@ namespace til::pmr
         {
             bool do_is_equal(const std::pmr::memory_resource& other) const noexcept override
             {
+				fprintf(stderr, ">>> Entering do_is_equal(other=%d)\n", other);
+                fprintf(stderr, "<<< Exiting do_is_equal(other=%d)\n", other);
                 return this == &other;
             }
 
             void* do_allocate(const size_t bytes, const size_t align) override
             {
+				fprintf(stderr, ">>> Entering do_allocate(bytes=%zu,align=%zu)\n", bytes, align);
                 if (align > __STDCPP_DEFAULT_NEW_ALIGNMENT__)
                 {
+				fprintf(stderr, "<<< Exiting do_allocate(bytes=%zu,align=%zu)\n", bytes, align);
                     return ::operator new(bytes, std::align_val_t{ align });
                 }
 
@@ -47,12 +52,14 @@ namespace til::pmr
 
             void do_deallocate(void* const ptr, const size_t bytes, const size_t align) noexcept override
             {
+				fprintf(stderr, ">>> Entering do_deallocate(ptr=%p,bytes=%zu,align=%zu)\n", ptr, bytes, align);
                 if (align > __STDCPP_DEFAULT_NEW_ALIGNMENT__)
                 {
                     return ::operator delete(ptr, bytes, std::align_val_t{ align });
                 }
 
                 ::operator delete(ptr, bytes);
+				fprintf(stderr, "<<< Exiting do_deallocate(ptr=%p,bytes=%zu,align=%zu)\n", ptr, bytes, align);
             }
         };
 

@@ -1,3 +1,4 @@
+#include <stdio.h>
 // Copyright (c) Microsoft Corporation.
 // Licensed under the MIT license.
 
@@ -26,6 +27,8 @@ namespace Microsoft::Console::Render::Atlas::BuiltinGlyphs
     // This is just an extra. It's not actually implemented as part of BuiltinGlyphs.cpp.
     constexpr bool IsSoftFontChar(char32_t ch) noexcept
     {
+		fprintf(stderr, ">>> Entering IsSoftFontChar(ch=%d)\n", ch);
+        fprintf(stderr, "<<< Exiting IsSoftFontChar(ch=%d)\n", ch);
         return ch >= 0xEF20 && ch < 0xEF80;
     }
 }

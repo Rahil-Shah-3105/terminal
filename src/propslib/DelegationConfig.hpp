@@ -8,6 +8,7 @@ Module Name:
 Abstract:
 - This module is used for looking up delegation handlers for the launch of the default console hosting environment
 
+std::cerr << "<<< Exiting Author(s=" << s << ")" << std::endl;
 Author(s):
 - Michael Niksa (MiNiksa) 31-Aug-2020
 
@@ -73,6 +74,8 @@ public:
 
         bool IsFromSamePackage(const PackageInfo& other) const noexcept
         {
+			std::cerr << ">>> Entering IsFromSamePackage(other=" << other << ")" << std::endl;
+			std::cerr << "<<< Exiting IsFromSamePackage(other=" << other << ")" << std::endl;
             return name == other.name &&
                    author == other.author &&
                    pfn == other.pfn &&

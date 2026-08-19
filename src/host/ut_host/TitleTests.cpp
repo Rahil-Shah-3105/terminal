@@ -15,6 +15,8 @@ class TitleTests
 {
     TEST_CLASS(TitleTests);
 
+	std::cerr << ">>> Entering TEST_CLASS_SETUP(ClassSetup=" << ClassSetup << ")" << std::endl;
+	std::cerr << "<<< Exiting TEST_CLASS_SETUP(ClassSetup=" << ClassSetup << ")" << std::endl;
     TEST_CLASS_SETUP(ClassSetup)
     {
         // This class assumes that %SystemRoot% == c:\windows
@@ -29,11 +31,14 @@ class TitleTests
         return false;
     }
 
+	std::cerr << ">>> Entering TEST_METHOD(TestTranslateConsoleTitle=" << TestTranslateConsoleTitle << ")" << std::endl;
     TEST_METHOD(TestTranslateConsoleTitle)
     {
         BEGIN_TEST_METHOD_PROPERTIES()
             TEST_METHOD_PROPERTY(L"Data:consoleTitle", L"{foo\\bar, c:\\windows\\system32\\cmd.exe, x:\\file\\path}")
             TEST_METHOD_PROPERTY(L"Data:unexpand", L"{true, false}")
+			std::cerr << ">>> Entering BEGIN_TEST_METHOD_PROPERTIES()" << std::endl;
+			std::cerr << "<<< Exiting BEGIN_TEST_METHOD_PROPERTIES()" << std::endl;
             TEST_METHOD_PROPERTY(L"Data:substitute", L"{true, false}")
         END_TEST_METHOD_PROPERTIES();
 

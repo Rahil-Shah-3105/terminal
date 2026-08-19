@@ -1,3 +1,4 @@
+#include <stdio.h>
 /*++
 Copyright (c) Microsoft Corporation
 Licensed under the MIT license.
@@ -20,21 +21,25 @@ class JsonTestClass
 public:
     static Json::Value VerifyParseSucceeded(const std::string_view& content)
     {
+		fprintf(stderr, ">>> Entering VerifyParseSucceeded(content=%d)\n", content);
         static const std::unique_ptr<Json::CharReader> reader{ Json::CharReaderBuilder{}.newCharReader() };
 
         Json::Value root;
         std::string errs;
         const auto parseResult = reader->parse(content.data(), content.data() + content.size(), &root, &errs);
         VERIFY_IS_TRUE(parseResult, winrt::to_hstring(errs).c_str());
+		fprintf(stderr, "<<< Exiting VerifyParseSucceeded(content=%d)\n", content);
         return root;
     };
 
     static std::string toString(const Json::Value& json)
     {
+		fprintf(stderr, ">>> Entering toString(json=%d)\n", json);
         static const std::unique_ptr<Json::StreamWriter> writer{ Json::StreamWriterBuilder{}.newStreamWriter() };
 
         std::stringstream s;
         writer->write(json, &s);
+		fprintf(stderr, "<<< Exiting toString(json=%d)\n", json);
         return s.str();
     }
 };

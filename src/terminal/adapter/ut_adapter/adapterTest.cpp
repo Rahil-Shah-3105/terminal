@@ -62,10 +62,13 @@ class TestGetSet final : public ITerminalApi
 public:
     void UnknownSequence() noexcept override
     {
+	std::cerr << ">>> Entering UnknownSequence()" << std::endl;
+	std::cerr << "<<< Exiting UnknownSequence()" << std::endl;
     }
 
     void ReturnResponse(const std::wstring_view response) override
     {
+		std::cerr << ">>> Entering ReturnResponse(response=" << response << ")" << std::endl;
         Log::Comment(L"ReturnResponse MOCK called...");
 
         THROW_HR_IF(E_FAIL, !_returnResponseResult);
@@ -78,58 +81,79 @@ public:
         {
             _response = response;
         }
+		std::cerr << "ReturnResponse(response=" << response << "): _response → " << _response << std::endl;
+		std::cerr << "<<< Exiting ReturnResponse(response=" << response << ")" << std::endl;
     }
 
     bool IsConPTY() const noexcept override
     {
+		std::cerr << ">>> Entering IsConPTY()" << std::endl;
+		std::cerr << "<<< Exiting IsConPTY()" << std::endl;
         return false;
     }
 
     StateMachine& GetStateMachine() override
     {
+		std::cerr << ">>> Entering GetStateMachine()" << std::endl;
+		std::cerr << "<<< Exiting GetStateMachine()" << std::endl;
         return *_stateMachine;
     }
 
     BufferState GetBufferAndViewport() override
     {
+		std::cerr << ">>> Entering GetBufferAndViewport()" << std::endl;
         const auto viewport = til::rect{ _viewport.left, _viewport.top, _viewport.right, _viewport.bottom };
+		std::cerr << "<<< Exiting GetBufferAndViewport()" << std::endl;
         return { *_textBuffer.get(), viewport, true };
     }
 
     void SetViewportPosition(const til::point /*position*/) override
     {
+		std::cerr << ">>> Entering SetViewportPosition()" << std::endl;
         Log::Comment(L"SetViewportPosition MOCK called...");
+		std::cerr << "<<< Exiting SetViewportPosition()" << std::endl;
     }
 
     bool IsVtInputEnabled() const override
     {
+		std::cerr << ">>> Entering IsVtInputEnabled()" << std::endl;
+		std::cerr << "<<< Exiting IsVtInputEnabled()" << std::endl;
         return false;
     }
 
     void SetSystemMode(const Mode mode, const bool enabled)
     {
+		std::cerr << ">>> Entering SetSystemMode(mode=" << mode << ",enabled=" << enabled << ")" << std::endl;
         Log::Comment(L"SetSystemMode MOCK called...");
         _systemMode.set(mode, enabled);
+		std::cerr << "<<< Exiting SetSystemMode(mode=" << mode << ",enabled=" << enabled << ")" << std::endl;
     }
 
     bool GetSystemMode(const Mode mode) const
     {
+		std::cerr << ">>> Entering GetSystemMode(mode=" << mode << ")" << std::endl;
         Log::Comment(L"GetSystemMode MOCK called...");
+		std::cerr << "<<< Exiting GetSystemMode(mode=" << mode << ")" << std::endl;
         return _systemMode.test(mode);
     }
 
     void ReturnAnswerback()
     {
+		std::cerr << ">>> Entering ReturnAnswerback()" << std::endl;
         Log::Comment(L"ReturnAnswerback MOCK called...");
+		std::cerr << "<<< Exiting ReturnAnswerback()" << std::endl;
     }
 
     void WarningBell() override
     {
+		std::cerr << ">>> Entering WarningBell()" << std::endl;
         Log::Comment(L"WarningBell MOCK called...");
+		std::cerr << "<<< Exiting WarningBell()" << std::endl;
     }
 
     void SetWindowTitle(const std::wstring_view title)
     {
+		std::cerr << ">>> Entering SetWindowTitle(title=" << title << ")" << std::endl;
         Log::Comment(L"SetWindowTitle MOCK called...");
 
         if (_setWindowTitleResult)
@@ -138,109 +162,149 @@ public:
             VERIFY_ARE_EQUAL(String(_expectedWindowTitle.data(), gsl::narrow<int>(_expectedWindowTitle.size())),
                              String(title.data(), gsl::narrow<int>(title.size())));
         }
+		std::cerr << "<<< Exiting SetWindowTitle(title=" << title << ")" << std::endl;
     }
 
     void UseAlternateScreenBuffer(const TextAttribute& /*attr*/) override
     {
+		std::cerr << ">>> Entering UseAlternateScreenBuffer()" << std::endl;
         Log::Comment(L"UseAlternateScreenBuffer MOCK called...");
+		std::cerr << "<<< Exiting UseAlternateScreenBuffer()" << std::endl;
     }
 
     void UseMainScreenBuffer() override
     {
+		std::cerr << ">>> Entering UseMainScreenBuffer()" << std::endl;
         Log::Comment(L"UseMainScreenBuffer MOCK called...");
+		std::cerr << "<<< Exiting UseMainScreenBuffer()" << std::endl;
     }
 
     CursorType GetUserDefaultCursorStyle() const override
     {
+		std::cerr << ">>> Entering GetUserDefaultCursorStyle()" << std::endl;
+		std::cerr << "<<< Exiting GetUserDefaultCursorStyle()" << std::endl;
         return CursorType::Legacy;
     }
 
     void ShowWindow(bool showOrHide) override
     {
+		std::cerr << ">>> Entering ShowWindow(showOrHide=" << showOrHide << ")" << std::endl;
         Log::Comment(L"ShowWindow MOCK called...");
         VERIFY_ARE_EQUAL(_expectedShowWindow, showOrHide);
+		std::cerr << "<<< Exiting ShowWindow(showOrHide=" << showOrHide << ")" << std::endl;
     }
 
     bool ResizeWindow(const til::CoordType /*width*/, const til::CoordType /*height*/) override
     {
+		std::cerr << ">>> Entering ResizeWindow()" << std::endl;
         Log::Comment(L"ResizeWindow MOCK called...");
+		std::cerr << "<<< Exiting ResizeWindow()" << std::endl;
         return true;
     }
 
     void SetCodePage(const unsigned int codepage) override
     {
+		std::cerr << ">>> Entering SetCodePage(codepage=" << codepage << ")" << std::endl;
         Log::Comment(L"SetCodePage MOCK called...");
         THROW_HR_IF(E_FAIL, !_setCodePageResult);
         VERIFY_ARE_EQUAL(_expectedCodePage, codepage);
+		std::cerr << "<<< Exiting SetCodePage(codepage=" << codepage << ")" << std::endl;
     }
 
     void ResetCodePage() override
     {
+		std::cerr << ">>> Entering ResetCodePage()" << std::endl;
         Log::Comment(L"ResetCodePage MOCK called...");
+		std::cerr << "<<< Exiting ResetCodePage()" << std::endl;
     }
 
     unsigned int GetOutputCodePage() const override
     {
+		std::cerr << ">>> Entering GetOutputCodePage()" << std::endl;
         Log::Comment(L"GetOutputCodePage MOCK called...");
+		std::cerr << "<<< Exiting GetOutputCodePage()" << std::endl;
         return _expectedCodePage;
     }
 
     unsigned int GetInputCodePage() const override
     {
+		std::cerr << ">>> Entering GetInputCodePage()" << std::endl;
         Log::Comment(L"GetInputCodePage MOCK called...");
+		std::cerr << "<<< Exiting GetInputCodePage()" << std::endl;
         return _expectedCodePage;
     }
 
     void CopyToClipboard(const wil::zwstring_view /*content*/)
     {
+		std::cerr << ">>> Entering CopyToClipboard()" << std::endl;
         Log::Comment(L"CopyToClipboard MOCK called...");
+		std::cerr << "<<< Exiting CopyToClipboard()" << std::endl;
     }
 
     void SetTaskbarProgress(const DispatchTypes::TaskbarState /*state*/, const size_t /*progress*/)
     {
+		std::cerr << ">>> Entering SetTaskbarProgress()" << std::endl;
         Log::Comment(L"SetTaskbarProgress MOCK called...");
+		std::cerr << "<<< Exiting SetTaskbarProgress()" << std::endl;
     }
 
     void SetWorkingDirectory(const std::wstring_view /*uri*/)
     {
+		std::cerr << ">>> Entering SetWorkingDirectory()" << std::endl;
         Log::Comment(L"SetWorkingDirectory MOCK called...");
+		std::cerr << "<<< Exiting SetWorkingDirectory()" << std::endl;
     }
 
     void PlayMidiNote(const int /*noteNumber*/, const int /*velocity*/, const std::chrono::microseconds /*duration*/) override
     {
+		std::cerr << ">>> Entering PlayMidiNote()" << std::endl;
         Log::Comment(L"PlayMidiNote MOCK called...");
+		std::cerr << "<<< Exiting PlayMidiNote()" << std::endl;
     }
 
     void NotifyBufferRotation(const int /*delta*/) override
     {
+		std::cerr << ">>> Entering NotifyBufferRotation()" << std::endl;
         Log::Comment(L"NotifyBufferRotation MOCK called...");
+		std::cerr << "<<< Exiting NotifyBufferRotation()" << std::endl;
     }
 
     void NotifyShellIntegrationMark() override
     {
+		std::cerr << ">>> Entering NotifyShellIntegrationMark()" << std::endl;
         Log::Comment(L"NotifyShellIntegrationMark MOCK called...");
+		std::cerr << "<<< Exiting NotifyShellIntegrationMark()" << std::endl;
     }
 
     void InvokeCompletions(std::wstring_view menuJson, unsigned int replaceLength) override
     {
+		std::cerr << ">>> Entering InvokeCompletions(menuJson=" << menuJson << ",replaceLength=" << replaceLength << ")" << std::endl;
         Log::Comment(L"InvokeCompletions MOCK called...");
         VERIFY_ARE_EQUAL(_expectedMenuJson, menuJson);
         VERIFY_ARE_EQUAL(_expectedReplaceLength, replaceLength);
+		std::cerr << "<<< Exiting InvokeCompletions(menuJson=" << menuJson << ",replaceLength=" << replaceLength << ")" << std::endl;
     }
 
     void SearchMissingCommand(const std::wstring_view /*command*/) override
     {
+		std::cerr << ">>> Entering SearchMissingCommand()" << std::endl;
         Log::Comment(L"SearchMissingCommand MOCK called...");
+		std::cerr << "<<< Exiting SearchMissingCommand()" << std::endl;
     }
 
     void ShowNotification(const std::wstring_view /*title*/, const std::wstring_view /*body*/) override
     {
+		std::cerr << ">>> Entering ShowNotification()" << std::endl;
         Log::Comment(L"ShowNotification MOCK called...");
+		std::cerr << "<<< Exiting ShowNotification()" << std::endl;
     }
 
     void PrepData()
     {
+		std::cerr << ">>> Entering PrepData()" << std::endl;
         PrepData(CursorDirection::UP); // if called like this, the cursor direction doesn't matter.
+		std::cerr << ">>> Entering PrepData(dir=" << dir << ")" << std::endl;
+		std::cerr << "<<< Exiting PrepData()" << std::endl;
     }
 
     void PrepData(CursorDirection dir)
@@ -260,6 +324,14 @@ public:
         case CursorDirection::PREVLINE:
             return PrepData(CursorX::LEFT, CursorY::TOP);
         }
+		std::cerr << ">>> Entering PrepData(xact=" << xact << ",yact=" << yact << ")" << std::endl;
+		std::cerr << "<<< Exiting PrepData(dir=" << dir << ")" << std::endl;
+		std::cerr << "PrepData(xact=" << xact << ",yact=" << yact << "): _textBuffer → " << _textBuffer << std::endl;
+		std::cerr << "PrepData(xact=" << xact << ",yact=" << yact << "): _viewport.top → " << _viewport.top << std::endl;
+		std::cerr << "PrepData(xact=" << xact << ",yact=" << yact << "): _viewport.bottom → " << _viewport.bottom << std::endl;
+		std::cerr << "PrepData(xact=" << xact << ",yact=" << yact << "): _viewport.left → " << _viewport.left << std::endl;
+		std::cerr << "PrepData(xact=" << xact << ",yact=" << yact << "): _viewport.right → " << _viewport.right << std::endl;
+		std::cerr << "PrepData(xact=" << xact << ",yact=" << yact << "): _retainResponse → " << _retainResponse << std::endl;
     }
 
     void PrepData(CursorX xact, CursorY yact)
@@ -268,6 +340,7 @@ public:
 
         // APIs succeed by default
         _returnResponseResult = TRUE;
+		std::cerr << "PrepData(xact=" << xact << ",yact=" << yact << "): _returnResponseResult → " << _returnResponseResult << std::endl;
 
         _textBuffer = std::make_unique<TextBuffer>(til::size{ 100, 600 }, TextAttribute{}, 0, false, &_renderer);
 
@@ -284,16 +357,20 @@ public:
         _textBuffer->SetCurrentAttributes(TextAttribute{ FOREGROUND_BLUE | FOREGROUND_GREEN | FOREGROUND_RED });
         _expectedAttribute = _textBuffer->GetCurrentAttributes();
 
+		std::cerr << "PrepData(xact=" << xact << ",yact=" << yact << "): _expectedAttribute → " << _expectedAttribute << std::endl;
         _response.clear();
         _retainResponse = false;
+		std::cerr << "<<< Exiting PrepData(xact=" << xact << ",yact=" << yact << ")" << std::endl;
     }
 
     void PrepCursor(CursorX xact, CursorY yact)
     {
+		std::cerr << ">>> Entering PrepCursor(xact=" << xact << ",yact=" << yact << ")" << std::endl;
         Log::Comment(L"Adjusting cursor within viewport... Expected will match actual when done.");
 
         til::point cursorPos;
         const auto bufferSize = _textBuffer->GetSize().Dimensions();
+		std::cerr << "PrepCursor(xact=" << xact << ",yact=" << yact << "): bufferSize → " << bufferSize << std::endl;
 
         switch (xact)
         {
@@ -329,10 +406,13 @@ public:
 
         _textBuffer->GetCursor().SetPosition(cursorPos);
         _expectedCursorPos = cursorPos;
+		std::cerr << "PrepCursor(xact=" << xact << ",yact=" << yact << "): _expectedCursorPos → " << _expectedCursorPos << std::endl;
+		std::cerr << "<<< Exiting PrepCursor(xact=" << xact << ",yact=" << yact << ")" << std::endl;
     }
 
     static void MakeSubParamsAndRanges(std::initializer_list<std::initializer_list<const VTParameter>> subParamList, _Out_ std::vector<VTParameter>& subParams, _Out_ std::vector<std::pair<BYTE, BYTE>>& subParamRanges)
     {
+		std::cerr << ">>> Entering MakeSubParamsAndRanges(subParamList=" << subParamList << ",subParams=" << subParams << ",subParamRanges=" << subParamRanges << ")" << std::endl;
         // Args are a list of lists of VTParameters:
         //    { {P1S1, P1S2, P1S3, ... }, { P2S1, P2S2, P2S3, ... } ... }
         //
@@ -347,21 +427,28 @@ public:
             subParamRanges.push_back({ gsl::narrow_cast<BYTE>(totalSubParams), gsl::narrow_cast<BYTE>(it.size() + totalSubParams) });
             totalSubParams += it.size();
         }
+		std::cerr << "<<< Exiting MakeSubParamsAndRanges(subParamList=" << subParamList << ",subParams=" << subParams << ",subParamRanges=" << subParamRanges << ")" << std::endl;
     }
 
     void ValidateExpectedCursorPos()
     {
+		std::cerr << ">>> Entering ValidateExpectedCursorPos()" << std::endl;
         VERIFY_ARE_EQUAL(_expectedCursorPos, _textBuffer->GetCursor().GetPosition());
+		std::cerr << "<<< Exiting ValidateExpectedCursorPos()" << std::endl;
     }
 
     void ValidateExpectedAttributes()
     {
+		std::cerr << ">>> Entering ValidateExpectedAttributes()" << std::endl;
         VERIFY_ARE_EQUAL(_expectedAttribute, _textBuffer->GetCurrentAttributes());
+		std::cerr << "<<< Exiting ValidateExpectedAttributes()" << std::endl;
     }
 
     void ValidateInputEvent(_In_ PCWSTR pwszExpectedResponse)
     {
+		std::cerr << ">>> Entering ValidateInputEvent(pwszExpectedResponse=" << pwszExpectedResponse << ")" << std::endl;
         VERIFY_ARE_EQUAL(pwszExpectedResponse, _response);
+		std::cerr << "<<< Exiting ValidateInputEvent(pwszExpectedResponse=" << pwszExpectedResponse << ")" << std::endl;
     }
 
     ~TestGetSet() = default;
@@ -377,8 +464,11 @@ public:
 
     auto EnableInputRetentionInScope()
     {
+		std::cerr << ">>> Entering EnableInputRetentionInScope()" << std::endl;
         auto oldRetainValue{ _retainResponse };
         _retainResponse = true;
+		std::cerr << "EnableInputRetentionInScope(): _retainResponse → " << _retainResponse << std::endl;
+		std::cerr << "<<< Exiting EnableInputRetentionInScope()" << std::endl;
         return wil::scope_exit([oldRetainValue, this] {
             _retainResponse = oldRetainValue;
         });
@@ -416,6 +506,16 @@ class AdapterTest
 public:
     TEST_CLASS(AdapterTest);
 
+	std::cerr << ">>> Entering TEST_METHOD_SETUP(SetupMethods=" << SetupMethods << ")" << std::endl;
+	std::cerr << "TEST_METHOD_SETUP(SetupMethods=" << SetupMethods << "): fSuccess → " << fSuccess << std::endl;
+	std::cerr << "TEST_METHOD_SETUP(SetupMethods=" << SetupMethods << "): api → " << api << std::endl;
+	std::cerr << "TEST_METHOD_SETUP(SetupMethods=" << SetupMethods << "): _testGetSet → " << _testGetSet << std::endl;
+	std::cerr << "TEST_METHOD_SETUP(SetupMethods=" << SetupMethods << "): _terminalInput → " << _terminalInput << std::endl;
+	std::cerr << "TEST_METHOD_SETUP(SetupMethods=" << SetupMethods << "): adapter → " << adapter << std::endl;
+	std::cerr << "TEST_METHOD_SETUP(SetupMethods=" << SetupMethods << "): engine → " << engine << std::endl;
+	std::cerr << "TEST_METHOD_SETUP(SetupMethods=" << SetupMethods << "): _pDispatch → " << _pDispatch << std::endl;
+	std::cerr << "TEST_METHOD_SETUP(SetupMethods=" << SetupMethods << "): _stateMachine → " << _stateMachine << std::endl;
+	std::cerr << "<<< Exiting TEST_METHOD_SETUP(SetupMethods=" << SetupMethods << ")" << std::endl;
     TEST_METHOD_SETUP(SetupMethods)
     {
         auto fSuccess = true;
@@ -442,6 +542,10 @@ public:
         return fSuccess;
     }
 
+	std::cerr << ">>> Entering TEST_METHOD_CLEANUP(CleanupMethods=" << CleanupMethods << ")" << std::endl;
+	std::cerr << "TEST_METHOD_CLEANUP(CleanupMethods=" << CleanupMethods << "): _pDispatch → " << _pDispatch << std::endl;
+	std::cerr << "TEST_METHOD_CLEANUP(CleanupMethods=" << CleanupMethods << "): _testGetSet → " << _testGetSet << std::endl;
+	std::cerr << "<<< Exiting TEST_METHOD_CLEANUP(CleanupMethods=" << CleanupMethods << ")" << std::endl;
     TEST_METHOD_CLEANUP(CleanupMethods)
     {
         _stateMachine.reset();
@@ -450,8 +554,10 @@ public:
         return true;
     }
 
+	std::cerr << ">>> Entering TEST_METHOD(CursorMovementTest=" << CursorMovementTest << ")" << std::endl;
     TEST_METHOD(CursorMovementTest)
     {
+		std::cerr << ">>> Entering TEST_METHOD(CursorMovementTest=" << CursorMovementTest << ")" << std::endl;
         BEGIN_TEST_METHOD_PROPERTIES()
             TEST_METHOD_PROPERTY(L"Data:uiDirection", L"{0, 1, 2, 3, 4, 5}") // These values align with the CursorDirection enum class to try all the directions.
         END_TEST_METHOD_PROPERTIES()
@@ -600,8 +706,10 @@ public:
 
         (_pDispatch->*moveFunc)(100);
         _testGetSet->ValidateExpectedCursorPos();
+		std::cerr << ">>> Entering TEST_METHOD(CursorPositionTest=" << CursorPositionTest << ")" << std::endl;
     }
 
+	std::cerr << ">>> Entering TEST_METHOD(CursorPositionTest=" << CursorPositionTest << ")" << std::endl;
     TEST_METHOD(CursorPositionTest)
     {
         Log::Comment(L"Starting test...");
@@ -610,7 +718,9 @@ public:
         _testGetSet->PrepData(CursorX::LEFT, CursorY::TOP);
 
         auto sCol = (_testGetSet->_viewport.right - _testGetSet->_viewport.left) / 2;
+		std::cerr << "TEST_METHOD(CursorPositionTest=" << CursorPositionTest << "): sCol → " << sCol << std::endl;
         auto sRow = (_testGetSet->_viewport.bottom - _testGetSet->_viewport.top) / 2;
+		std::cerr << "TEST_METHOD(CursorPositionTest=" << CursorPositionTest << "): sRow → " << sRow << std::endl;
 
         // The X coordinate is unaffected by the viewport.
         _testGetSet->_expectedCursorPos.x = sCol - 1;
@@ -642,8 +752,10 @@ public:
         _testGetSet->ValidateExpectedCursorPos();
     }
 
+	std::cerr << ">>> Entering TEST_METHOD(CursorSingleDimensionMoveTest=" << CursorSingleDimensionMoveTest << ")" << std::endl;
     TEST_METHOD(CursorSingleDimensionMoveTest)
     {
+		std::cerr << ">>> Entering TEST_METHOD(CursorSingleDimensionMoveTest=" << CursorSingleDimensionMoveTest << ")" << std::endl;
         BEGIN_TEST_METHOD_PROPERTIES()
             TEST_METHOD_PROPERTY(L"Data:uiDirection", L"{0, 1}") // These values align with the CursorDirection enum class to try all the directions.
         END_TEST_METHOD_PROPERTIES()
@@ -718,8 +830,11 @@ public:
         _testGetSet->ValidateExpectedCursorPos();
     }
 
+	std::cerr << ">>> Entering TEST_METHOD(CursorSaveRestoreTest=" << CursorSaveRestoreTest << ")" << std::endl;
+	std::cerr << "TEST_METHOD(CursorSaveRestoreTest=" << CursorSaveRestoreTest << "): coordExpected → " << coordExpected << std::endl;
     TEST_METHOD(CursorSaveRestoreTest)
     {
+		std::cerr << ">>> Entering TEST_METHOD(CursorSaveRestoreTest=" << CursorSaveRestoreTest << ")" << std::endl;
         Log::Comment(L"Starting test...");
 
         til::point coordExpected;
@@ -761,8 +876,10 @@ public:
         _testGetSet->ValidateExpectedAttributes();
     }
 
+	std::cerr << ">>> Entering TEST_METHOD(CursorHideShowTest=" << CursorHideShowTest << ")" << std::endl;
     TEST_METHOD(CursorHideShowTest)
     {
+		std::cerr << ">>> Entering TEST_METHOD(CursorHideShowTest=" << CursorHideShowTest << ")" << std::endl;
         BEGIN_TEST_METHOD_PROPERTIES()
             TEST_METHOD_PROPERTY(L"Data:fStartingVis", L"{TRUE, FALSE}")
             TEST_METHOD_PROPERTY(L"Data:fEndingVis", L"{TRUE, FALSE}")
@@ -790,8 +907,10 @@ public:
         VERIFY_ARE_EQUAL(fEnd, _testGetSet->_textBuffer->GetCursor().IsVisible());
     }
 
+	std::cerr << ">>> Entering TEST_METHOD(GraphicsBaseTests=" << GraphicsBaseTests << ")" << std::endl;
     TEST_METHOD(GraphicsBaseTests)
     {
+		std::cerr << ">>> Entering TEST_METHOD(GraphicsBaseTests=" << GraphicsBaseTests << ")" << std::endl;
         Log::Comment(L"Starting test...");
 
         Log::Comment(L"Test 1: Send no options.");
@@ -805,12 +924,16 @@ public:
         _testGetSet->ValidateExpectedAttributes();
     }
 
+	std::cerr << ">>> Entering TEST_METHOD(GraphicsSingleTests=" << GraphicsSingleTests << ")" << std::endl;
     TEST_METHOD(GraphicsSingleTests)
     {
+		std::cerr << ">>> Entering TEST_METHOD(GraphicsSingleTests=" << GraphicsSingleTests << ")" << std::endl;
         BEGIN_TEST_METHOD_PROPERTIES()
+			std::cerr << ">>> Entering BEGIN_TEST_METHOD_PROPERTIES()" << std::endl;
             TEST_METHOD_PROPERTY(L"Data:uiGraphicsOptions", L"{0, 1, 2, 4, 7, 8, 9, 21, 22, 24, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 39, 40, 41, 42, 43, 44, 45, 46, 47, 49, 53, 55, 90, 91, 92, 93, 94, 95, 96, 97, 100, 101, 102, 103, 104, 105, 106, 107}") // corresponds to options in DispatchTypes::GraphicsOptions
         END_TEST_METHOD_PROPERTIES()
 
+		std::cerr << ">>> Entering END_TEST_METHOD_PROPERTIES()" << std::endl;
         Log::Comment(L"Starting test...");
         _testGetSet->PrepData();
 
@@ -820,6 +943,7 @@ public:
         VERIFY_SUCCEEDED_RETURN(TestData::TryGetValue(L"uiGraphicsOptions", uiGraphicsOption));
         graphicsOption = (DispatchTypes::GraphicsOptions)uiGraphicsOption;
 
+		std::cerr << "END_TEST_METHOD_PROPERTIES(): graphicsOption → " << graphicsOption << std::endl;
         VTParameter rgOptions[16];
         size_t cOptions = 1;
         rgOptions[0] = graphicsOption;
@@ -831,6 +955,7 @@ public:
             Log::Comment(L"Testing graphics 'Off/Reset'");
             startingAttribute = TextAttribute{ (WORD)~_testGetSet->s_defaultFill };
             _testGetSet->_expectedAttribute = TextAttribute{};
+			std::cerr << "END_TEST_METHOD_PROPERTIES(): startingAttribute → " << startingAttribute << std::endl;
             break;
         case DispatchTypes::GraphicsOptions::Intense:
             Log::Comment(L"Testing graphics 'Intense'");
@@ -1121,6 +1246,7 @@ public:
             break;
         default:
             VERIFY_FAIL(L"Test not implemented yet!");
+			std::cerr << "<<< Exiting END_TEST_METHOD_PROPERTIES()" << std::endl;
             break;
         }
 
@@ -1129,8 +1255,10 @@ public:
         _testGetSet->ValidateExpectedAttributes();
     }
 
+	std::cerr << ">>> Entering TEST_METHOD(GraphicsSingleWithSubParamTests=" << GraphicsSingleWithSubParamTests << ")" << std::endl;
     TEST_METHOD(GraphicsSingleWithSubParamTests)
     {
+		std::cerr << ">>> Entering TEST_METHOD(GraphicsSingleWithSubParamTests=" << GraphicsSingleWithSubParamTests << ")" << std::endl;
         BEGIN_TEST_METHOD_PROPERTIES()
             TEST_METHOD_PROPERTY(L"Data:uiGraphicsOptions", L"{4, 38, 48, 58}") // corresponds to options in DispatchTypes::GraphicsOptions
         END_TEST_METHOD_PROPERTIES()
@@ -1190,8 +1318,10 @@ public:
         _testGetSet->ValidateExpectedAttributes();
     }
 
+	std::cerr << ">>> Entering TEST_METHOD(GraphicsPushPopTests=" << GraphicsPushPopTests << ")" << std::endl;
     TEST_METHOD(GraphicsPushPopTests)
     {
+		std::cerr << ">>> Entering TEST_METHOD(GraphicsPushPopTests=" << GraphicsPushPopTests << ")" << std::endl;
         Log::Comment(L"Starting test...");
 
         _testGetSet->PrepData(); // default color from here is gray on black, FOREGROUND_BLUE | FOREGROUND_GREEN | FOREGROUND_RED
@@ -1201,6 +1331,7 @@ public:
         std::vector<std::pair<BYTE, BYTE>> subParamRanges;
         VTParameter rgStackOptions[16];
         size_t cOptions = 1;
+		std::cerr << "TEST_METHOD(GraphicsPushPopTests=" << GraphicsPushPopTests << "): cOptions → " << cOptions << std::endl;
 
         Log::Comment(L"Test 1: Basic push and pop");
 
@@ -1424,8 +1555,10 @@ public:
         _testGetSet->ValidateExpectedAttributes();
     }
 
+	std::cerr << ">>> Entering TEST_METHOD(GraphicsPersistBrightnessTests=" << GraphicsPersistBrightnessTests << ")" << std::endl;
     TEST_METHOD(GraphicsPersistBrightnessTests)
     {
+		std::cerr << ">>> Entering TEST_METHOD(GraphicsPersistBrightnessTests=" << GraphicsPersistBrightnessTests << ")" << std::endl;
         Log::Comment(L"Starting test...");
 
         _testGetSet->PrepData(); // default color from here is gray on black, FOREGROUND_BLUE | FOREGROUND_GREEN | FOREGROUND_RED
@@ -1528,8 +1661,10 @@ public:
         _testGetSet->ValidateExpectedAttributes();
     }
 
+	std::cerr << ">>> Entering TEST_METHOD(DeviceStatus_OperatingStatusTests=" << DeviceStatus_OperatingStatusTests << ")" << std::endl;
     TEST_METHOD(DeviceStatus_OperatingStatusTests)
     {
+		std::cerr << ">>> Entering TEST_METHOD(DeviceStatus_OperatingStatusTests=" << DeviceStatus_OperatingStatusTests << ")" << std::endl;
         Log::Comment(L"Starting test...");
 
         Log::Comment(L"Test 1: Verify good operating condition.");
@@ -1539,8 +1674,10 @@ public:
         _testGetSet->ValidateInputEvent(L"\x1b[0n");
     }
 
+	std::cerr << ">>> Entering TEST_METHOD(DeviceStatus_CursorPositionReportTests=" << DeviceStatus_CursorPositionReportTests << ")" << std::endl;
     TEST_METHOD(DeviceStatus_CursorPositionReportTests)
     {
+		std::cerr << ">>> Entering TEST_METHOD(DeviceStatus_CursorPositionReportTests=" << DeviceStatus_CursorPositionReportTests << ")" << std::endl;
         Log::Comment(L"Starting test...");
 
         {
@@ -1584,6 +1721,7 @@ public:
             _pDispatch->DeviceStatusReport(DispatchTypes::StatusType::CursorPositionReport, {});
 
             auto cursorPos = _testGetSet->_textBuffer->GetCursor().GetPosition();
+			std::cerr << "TEST_METHOD(DeviceStatus_CursorPositionReportTests=" << DeviceStatus_CursorPositionReportTests << "): cursorPos → " << cursorPos << std::endl;
             cursorPos.x++;
             cursorPos.y++;
             _testGetSet->_textBuffer->GetCursor().SetPosition(cursorPos);
@@ -1600,8 +1738,10 @@ public:
         }
     }
 
+	std::cerr << ">>> Entering TEST_METHOD(DeviceStatus_ExtendedCursorPositionReportTests=" << DeviceStatus_ExtendedCursorPositionReportTests << ")" << std::endl;
     TEST_METHOD(DeviceStatus_ExtendedCursorPositionReportTests)
     {
+		std::cerr << ">>> Entering TEST_METHOD(DeviceStatus_ExtendedCursorPositionReportTests=" << DeviceStatus_ExtendedCursorPositionReportTests << ")" << std::endl;
         Log::Comment(L"Starting test...");
 
         Log::Comment(L"Test 1: Verify extended cursor position report.");
@@ -1619,6 +1759,7 @@ public:
 
         // By default, the initial page number should be 1.
         auto pageExpected = 1;
+		std::cerr << "TEST_METHOD(DeviceStatus_ExtendedCursorPositionReportTests=" << DeviceStatus_ExtendedCursorPositionReportTests << "): pageExpected → " << pageExpected << std::endl;
 
         _pDispatch->DeviceStatusReport(DispatchTypes::StatusType::ExtendedCursorPositionReport, {});
 
@@ -1636,8 +1777,10 @@ public:
         _testGetSet->ValidateInputEvent(pwszBuffer);
     }
 
+	std::cerr << ">>> Entering TEST_METHOD(DeviceStatus_MacroSpaceReportTest=" << DeviceStatus_MacroSpaceReportTest << ")" << std::endl;
     TEST_METHOD(DeviceStatus_MacroSpaceReportTest)
     {
+		std::cerr << ">>> Entering TEST_METHOD(DeviceStatus_MacroSpaceReportTest=" << DeviceStatus_MacroSpaceReportTest << ")" << std::endl;
         Log::Comment(L"Starting test...");
 
         // Space is measured in blocks of 16 bytes.
@@ -1672,8 +1815,11 @@ public:
         _testGetSet->ValidateInputEvent(pwszBuffer);
     }
 
+	std::cerr << ">>> Entering TEST_METHOD(DeviceStatus_MemoryChecksumReportTest=" << DeviceStatus_MemoryChecksumReportTest << ")" << std::endl;
+	std::cerr << "TEST_METHOD(DeviceStatus_MemoryChecksumReportTest=" << DeviceStatus_MemoryChecksumReportTest << "): checksum → " << checksum << std::endl;
     TEST_METHOD(DeviceStatus_MemoryChecksumReportTest)
     {
+		std::cerr << ">>> Entering TEST_METHOD(DeviceStatus_MemoryChecksumReportTest=" << DeviceStatus_MemoryChecksumReportTest << ")" << std::endl;
         Log::Comment(L"Starting test...");
 
         Log::Comment(L"Test 1: Verify initial checksum is 0");
@@ -1703,8 +1849,10 @@ public:
         _testGetSet->ValidateInputEvent(L"\033P56!~0000\033\\");
     }
 
+	std::cerr << ">>> Entering TEST_METHOD(DeviceStatus_PrivateStatusTests=" << DeviceStatus_PrivateStatusTests << ")" << std::endl;
     TEST_METHOD(DeviceStatus_PrivateStatusTests)
     {
+		std::cerr << ">>> Entering TEST_METHOD(DeviceStatus_PrivateStatusTests=" << DeviceStatus_PrivateStatusTests << ")" << std::endl;
         Log::Comment(L"Starting test...");
 
         Log::Comment(L"Test 1: Verify printer is not connected.");
@@ -1743,8 +1891,10 @@ public:
         _testGetSet->ValidateInputEvent(L"\x1b[?83n");
     }
 
+	std::cerr << ">>> Entering TEST_METHOD(DeviceAttributesTests=" << DeviceAttributesTests << ")" << std::endl;
     TEST_METHOD(DeviceAttributesTests)
     {
+		std::cerr << ">>> Entering TEST_METHOD(DeviceAttributesTests=" << DeviceAttributesTests << ")" << std::endl;
         Log::Comment(L"Starting test...");
 
         Log::Comment(L"Test 1: Verify normal response.");
@@ -1765,8 +1915,10 @@ public:
         VERIFY_THROWS(_pDispatch->DeviceAttributes(), std::exception);
     }
 
+	std::cerr << ">>> Entering TEST_METHOD(SecondaryDeviceAttributesTests=" << SecondaryDeviceAttributesTests << ")" << std::endl;
     TEST_METHOD(SecondaryDeviceAttributesTests)
     {
+		std::cerr << ">>> Entering TEST_METHOD(SecondaryDeviceAttributesTests=" << SecondaryDeviceAttributesTests << ")" << std::endl;
         Log::Comment(L"Starting test...");
 
         Log::Comment(L"Test 1: Verify normal response.");
@@ -1774,6 +1926,7 @@ public:
         _pDispatch->SecondaryDeviceAttributes();
 
         auto pwszExpectedResponse = L"\x1b[>0;10;1c";
+		std::cerr << "TEST_METHOD(SecondaryDeviceAttributesTests=" << SecondaryDeviceAttributesTests << "): pwszExpectedResponse → " << pwszExpectedResponse << std::endl;
         _testGetSet->ValidateInputEvent(pwszExpectedResponse);
 
         Log::Comment(L"Test 2: Verify failure when ReturnResponse doesn't work.");
@@ -1783,8 +1936,10 @@ public:
         VERIFY_THROWS(_pDispatch->SecondaryDeviceAttributes(), std::exception);
     }
 
+	std::cerr << ">>> Entering TEST_METHOD(TertiaryDeviceAttributesTests=" << TertiaryDeviceAttributesTests << ")" << std::endl;
     TEST_METHOD(TertiaryDeviceAttributesTests)
     {
+		std::cerr << ">>> Entering TEST_METHOD(TertiaryDeviceAttributesTests=" << TertiaryDeviceAttributesTests << ")" << std::endl;
         Log::Comment(L"Starting test...");
 
         Log::Comment(L"Test 1: Verify normal response.");
@@ -1792,6 +1947,7 @@ public:
         _pDispatch->TertiaryDeviceAttributes();
 
         auto pwszExpectedResponse = L"\x1bP!|00000000\x1b\\";
+		std::cerr << "TEST_METHOD(TertiaryDeviceAttributesTests=" << TertiaryDeviceAttributesTests << "): pwszExpectedResponse → " << pwszExpectedResponse << std::endl;
         _testGetSet->ValidateInputEvent(pwszExpectedResponse);
 
         Log::Comment(L"Test 2: Verify failure when ReturnResponse doesn't work.");
@@ -1801,8 +1957,10 @@ public:
         VERIFY_THROWS(_pDispatch->TertiaryDeviceAttributes(), std::exception);
     }
 
+	std::cerr << ">>> Entering TEST_METHOD(RequestDisplayedExtentTests=" << RequestDisplayedExtentTests << ")" << std::endl;
     TEST_METHOD(RequestDisplayedExtentTests)
     {
+		std::cerr << ">>> Entering TEST_METHOD(RequestDisplayedExtentTests=" << RequestDisplayedExtentTests << ")" << std::endl;
         Log::Comment(L"Starting test...");
 
         Log::Comment(L"Test 1: Verify DECRQDE response in home position");
@@ -1837,8 +1995,10 @@ public:
         _testGetSet->ValidateInputEvent(L"\x1b[24;80;6;1;1\"w");
     }
 
+	std::cerr << ">>> Entering TEST_METHOD(RequestTerminalParametersTests=" << RequestTerminalParametersTests << ")" << std::endl;
     TEST_METHOD(RequestTerminalParametersTests)
     {
+		std::cerr << ">>> Entering TEST_METHOD(RequestTerminalParametersTests=" << RequestTerminalParametersTests << ")" << std::endl;
         Log::Comment(L"Starting test...");
 
         Log::Comment(L"Test 1: Verify response for unsolicited permission.");
@@ -1857,8 +2017,11 @@ public:
         VERIFY_THROWS(_pDispatch->RequestTerminalParameters(DispatchTypes::ReportingPermission::Unsolicited), std::exception);
     }
 
+	std::cerr << ">>> Entering TEST_METHOD(RequestSettingsTests=" << RequestSettingsTests << ")" << std::endl;
+	std::cerr << "TEST_METHOD(RequestSettingsTests=" << RequestSettingsTests << "): stringHandler → " << stringHandler << std::endl;
     TEST_METHOD(RequestSettingsTests)
     {
+		std::cerr << ">>> Entering TEST_METHOD(RequestSettingsTests=" << RequestSettingsTests << ")" << std::endl;
         const auto requestSetting = [=](const std::wstring_view settingId = {}) {
             const auto stringHandler = _pDispatch->RequestSetting();
             for (auto ch : settingId)
@@ -1901,6 +2064,7 @@ public:
         Log::Comment(L"Requesting SGR attributes (default).");
         _testGetSet->PrepData();
         TextAttribute attribute = {};
+		std::cerr << "TEST_METHOD(RequestSettingsTests=" << RequestSettingsTests << "): attribute → " << attribute << std::endl;
         _testGetSet->_textBuffer->SetCurrentAttributes(attribute);
         requestSetting(L"m");
         _testGetSet->ValidateInputEvent(L"\033P1$r0m\033\\");
@@ -2083,8 +2247,10 @@ public:
         _testGetSet->ValidateInputEvent(L"\033P0$r\033\\");
     }
 
+	std::cerr << ">>> Entering TEST_METHOD(RequestStandardModeTests=" << RequestStandardModeTests << ")" << std::endl;
     TEST_METHOD(RequestStandardModeTests)
     {
+		std::cerr << ">>> Entering TEST_METHOD(RequestStandardModeTests=" << RequestStandardModeTests << ")" << std::endl;
         // The mode numbers below correspond to the ANSIStandardMode values
         // in the ModeParams enum in DispatchTypes.hpp.
 
@@ -2115,8 +2281,11 @@ public:
         _testGetSet->ValidateInputEvent(expectedResponse);
     }
 
+	std::cerr << ">>> Entering TEST_METHOD(RequestPrivateModeTests=" << RequestPrivateModeTests << ")" << std::endl;
+	std::cerr << "TEST_METHOD(RequestPrivateModeTests=" << RequestPrivateModeTests << "): mode → " << mode << std::endl;
     TEST_METHOD(RequestPrivateModeTests)
     {
+		std::cerr << ">>> Entering TEST_METHOD(RequestPrivateModeTests=" << RequestPrivateModeTests << ")" << std::endl;
         // The mode numbers below correspond to the DECPrivateMode values
         // in the ModeParams enum in DispatchTypes.hpp. We don't include
         // AnsiMode (2), because once that's disabled we'd be in VT52 mode,
@@ -2154,8 +2323,10 @@ public:
         _testGetSet->ValidateInputEvent(expectedResponse);
     }
 
+	std::cerr << ">>> Entering TEST_METHOD(RequestPermanentModeTests=" << RequestPermanentModeTests << ")" << std::endl;
     TEST_METHOD(RequestPermanentModeTests)
     {
+		std::cerr << ">>> Entering TEST_METHOD(RequestPermanentModeTests=" << RequestPermanentModeTests << ")" << std::endl;
         BEGIN_TEST_METHOD_PROPERTIES()
             TEST_METHOD_PROPERTY(L"Data:modeNumber", L"{2027}")
         END_TEST_METHOD_PROPERTIES()
@@ -2173,8 +2344,10 @@ public:
         _testGetSet->ValidateInputEvent(expectedResponse);
     }
 
+	std::cerr << ">>> Entering TEST_METHOD(RequestChecksumReportTests=" << RequestChecksumReportTests << ")" << std::endl;
     TEST_METHOD(RequestChecksumReportTests)
     {
+		std::cerr << ">>> Entering TEST_METHOD(RequestChecksumReportTests=" << RequestChecksumReportTests << ")" << std::endl;
         if (!Feature_VtChecksumReport::IsEnabled())
         {
             Log::Result(WEX::Logging::TestResults::Skipped);
@@ -2286,6 +2459,11 @@ public:
         verifyChecksumReport(L"FF8B");
     }
 
+	std::cerr << ">>> Entering TEST_METHOD(ColorTableReportTests=" << ColorTableReportTests << ")" << std::endl;
+	std::cerr << "TEST_METHOD(ColorTableReportTests=" << ColorTableReportTests << "): DECCTR → " << DECCTR << std::endl;
+	std::cerr << "TEST_METHOD(ColorTableReportTests=" << ColorTableReportTests << "): ST → " << ST << std::endl;
+	std::cerr << "TEST_METHOD(ColorTableReportTests=" << ColorTableReportTests << "): hlsColorModel → " << hlsColorModel << std::endl;
+	std::cerr << "TEST_METHOD(ColorTableReportTests=" << ColorTableReportTests << "): rgbColorModel → " << rgbColorModel << std::endl;
     TEST_METHOD(ColorTableReportTests)
     {
         _testGetSet->PrepData();
@@ -2326,6 +2504,7 @@ public:
         _pDispatch->RequestTerminalStateReport(DispatchTypes::ReportFormat::ColorTableReport, hlsColorModel);
 
         std::wstring expectedResponse = DECCTR;
+		std::cerr << "TEST_METHOD(ColorTableReportTests=" << ColorTableReportTests << "): expectedResponse → " << expectedResponse << std::endl;
         // RGB(0,0,0) -> HLS(0°,0%,0%)
         expectedResponse += L"0;1;0;0;0/";
         // RGB(204,36,36) -> HLS(120°,47%,70%)
@@ -2421,6 +2600,8 @@ public:
         _testGetSet->ValidateInputEvent(expectedResponse.c_str());
     }
 
+	std::cerr << "TEST_METHOD(Osc4ColorPaletteReportTests=" << Osc4ColorPaletteReportTests << "): OSC → " << OSC << std::endl;
+	std::cerr << "TEST_METHOD(Osc4ColorPaletteReportTests=" << Osc4ColorPaletteReportTests << "): ST → " << ST << std::endl;
     TEST_METHOD(Osc4ColorPaletteReportTests)
     {
         _testGetSet->PrepData();
@@ -2454,6 +2635,7 @@ public:
 
         _pDispatch->RequestColorTableEntry(0);
         std::wstring expectedResponse = OSC;
+		std::cerr << "TEST_METHOD(Osc4ColorPaletteReportTests=" << Osc4ColorPaletteReportTests << "): expectedResponse → " << expectedResponse << std::endl;
         expectedResponse += L"4;0;rgb:0000/0000/0000";
         expectedResponse += ST;
         _testGetSet->ValidateInputEvent(expectedResponse.c_str());
@@ -2549,6 +2731,9 @@ public:
         _testGetSet->ValidateInputEvent(expectedResponse.c_str());
     }
 
+	std::cerr << "TEST_METHOD(XtermColorResourceReportTests=" << XtermColorResourceReportTests << "): OSC → " << OSC << std::endl;
+	std::cerr << "TEST_METHOD(XtermColorResourceReportTests=" << XtermColorResourceReportTests << "): ST → " << ST << std::endl;
+	std::cerr << "TEST_METHOD(XtermColorResourceReportTests=" << XtermColorResourceReportTests << "): retentionScope → " << retentionScope << std::endl;
     TEST_METHOD(XtermColorResourceReportTests)
     {
         _testGetSet->PrepData();
@@ -2583,6 +2768,7 @@ public:
         // Foreground mapped to DARK_WHITE
         _pDispatch->RequestXtermColorResource(10);
         std::wstring expectedResponse = OSC;
+		std::cerr << "TEST_METHOD(XtermColorResourceReportTests=" << XtermColorResourceReportTests << "): expectedResponse → " << expectedResponse << std::endl;
         expectedResponse += L"10;rgb:7878/7878/7878";
         expectedResponse += ST;
         _testGetSet->ValidateInputEvent(expectedResponse.c_str());
@@ -2709,6 +2895,7 @@ public:
         auto& termOutput = _pDispatch->_termOutput;
         const auto viewportTop = _testGetSet->_viewport.top;
         auto attributes = TextAttribute{};
+		std::cerr << "TEST_METHOD(CursorInformationReportTests=" << CursorInformationReportTests << "): attributes → " << attributes << std::endl;
 
         Log::Comment(L"Initial state");
         _pDispatch->RequestPresentationStateReport(DispatchTypes::PresentationReportFormat::CursorInformationReport);
@@ -2855,6 +3042,7 @@ public:
         VERIFY_ARE_EQUAL(VTID("F"), termOutput.GetCharsetId(3));
     }
 
+	std::cerr << "TEST_METHOD(CursorKeysModeTest=" << CursorKeysModeTest << "): mode → " << mode << std::endl;
     TEST_METHOD(CursorKeysModeTest)
     {
         Log::Comment(L"Starting test...");
@@ -2872,6 +3060,7 @@ public:
         VERIFY_IS_TRUE(_terminalInput.GetInputMode(TerminalInput::Mode::CursorKey));
     }
 
+	std::cerr << "TEST_METHOD(KeypadModeTest=" << KeypadModeTest << "): mode → " << mode << std::endl;
     TEST_METHOD(KeypadModeTest)
     {
         Log::Comment(L"Starting test...");
@@ -2889,6 +3078,7 @@ public:
         VERIFY_IS_TRUE(_terminalInput.GetInputMode(TerminalInput::Mode::Keypad));
     }
 
+	std::cerr << "TEST_METHOD(AnsiModeTest=" << AnsiModeTest << "): mode → " << mode << std::endl;
     TEST_METHOD(AnsiModeTest)
     {
         Log::Comment(L"Starting test...");
@@ -2906,6 +3096,7 @@ public:
         VERIFY_IS_FALSE(_stateMachine->GetParserMode(StateMachine::Mode::Ansi));
     }
 
+	std::cerr << "TEST_METHOD(AllowBlinkingTest=" << AllowBlinkingTest << "): blinking → " << blinking << std::endl;
     TEST_METHOD(AllowBlinkingTest)
     {
         Log::Comment(L"Starting test...");
@@ -3296,6 +3487,7 @@ public:
         _testGetSet->ValidateExpectedAttributes();
     }
 
+	std::cerr << "TEST_METHOD(SetColorTableValue=" << SetColorTableValue << "): testColor → " << testColor << std::endl;
     TEST_METHOD(SetColorTableValue)
     {
         _testGetSet->PrepData();
@@ -3310,6 +3502,28 @@ public:
         }
     }
 
+	std::cerr << "TEST_METHOD(SoftFontSizeDetection=" << SoftFontSizeDetection << "): cellMatrix → " << cellMatrix << std::endl;
+	std::cerr << "TEST_METHOD(SoftFontSizeDetection=" << SoftFontSizeDetection << "): cellSize → " << cellSize << std::endl;
+	std::cerr << "TEST_METHOD(SoftFontSizeDetection=" << SoftFontSizeDetection << "): expectedCellSize → " << expectedCellSize << std::endl;
+	std::cerr << "TEST_METHOD(SoftFontSizeDetection=" << SoftFontSizeDetection << "): bitmapOf8x12 → " << bitmapOf8x12 << std::endl;
+	std::cerr << "TEST_METHOD(SoftFontSizeDetection=" << SoftFontSizeDetection << "): bitmapOf12x12 → " << bitmapOf12x12 << std::endl;
+	std::cerr << "TEST_METHOD(SoftFontSizeDetection=" << SoftFontSizeDetection << "): bitmapOf9x24 → " << bitmapOf9x24 << std::endl;
+	std::cerr << "TEST_METHOD(SoftFontSizeDetection=" << SoftFontSizeDetection << "): bitmapOf10x30 → " << bitmapOf10x30 << std::endl;
+	std::cerr << "TEST_METHOD(SoftFontSizeDetection=" << SoftFontSizeDetection << "): bitmapOf8x18 → " << bitmapOf8x18 << std::endl;
+	std::cerr << "TEST_METHOD(SoftFontSizeDetection=" << SoftFontSizeDetection << "): bitmapOf5x12 → " << bitmapOf5x12 << std::endl;
+	std::cerr << "TEST_METHOD(SoftFontSizeDetection=" << SoftFontSizeDetection << "): bitmapOf7x12 → " << bitmapOf7x12 << std::endl;
+	std::cerr << "TEST_METHOD(SoftFontSizeDetection=" << SoftFontSizeDetection << "): bitmapOf5x24 → " << bitmapOf5x24 << std::endl;
+	std::cerr << "TEST_METHOD(SoftFontSizeDetection=" << SoftFontSizeDetection << "): bitmapOf6x30 → " << bitmapOf6x30 << std::endl;
+	std::cerr << "TEST_METHOD(SoftFontSizeDetection=" << SoftFontSizeDetection << "): bitmapOf5x18 → " << bitmapOf5x18 << std::endl;
+	std::cerr << "TEST_METHOD(SoftFontSizeDetection=" << SoftFontSizeDetection << "): bitmapOf15x12 → " << bitmapOf15x12 << std::endl;
+	std::cerr << "TEST_METHOD(SoftFontSizeDetection=" << SoftFontSizeDetection << "): bitmapOf10x24 → " << bitmapOf10x24 << std::endl;
+	std::cerr << "TEST_METHOD(SoftFontSizeDetection=" << SoftFontSizeDetection << "): bitmapOf12x30 → " << bitmapOf12x30 << std::endl;
+	std::cerr << "TEST_METHOD(SoftFontSizeDetection=" << SoftFontSizeDetection << "): bitmapOf10x18 → " << bitmapOf10x18 << std::endl;
+	std::cerr << "TEST_METHOD(SoftFontSizeDetection=" << SoftFontSizeDetection << "): bitmapOf6x12 → " << bitmapOf6x12 << std::endl;
+	std::cerr << "TEST_METHOD(SoftFontSizeDetection=" << SoftFontSizeDetection << "): bitmapOf9x12 → " << bitmapOf9x12 << std::endl;
+	std::cerr << "TEST_METHOD(SoftFontSizeDetection=" << SoftFontSizeDetection << "): bitmapOf6x24 → " << bitmapOf6x24 << std::endl;
+	std::cerr << "TEST_METHOD(SoftFontSizeDetection=" << SoftFontSizeDetection << "): bitmapOf7x30 → " << bitmapOf7x30 << std::endl;
+	std::cerr << "TEST_METHOD(SoftFontSizeDetection=" << SoftFontSizeDetection << "): bitmapOf6x18 → " << bitmapOf6x18 << std::endl;
     TEST_METHOD(SoftFontSizeDetection)
     {
         using CellMatrix = DispatchTypes::DrcsCellMatrix;
@@ -3578,6 +3792,7 @@ public:
         VERIFY_IS_FALSE(_stateMachine->GetParserMode(StateMachine::Mode::AcceptC1));
     }
 
+	std::cerr << "TEST_METHOD(AssignUserPreferenceCharsets=" << AssignUserPreferenceCharsets << "): stringHandler → " << stringHandler << std::endl;
     TEST_METHOD(AssignUserPreferenceCharsets)
     {
         const auto assignCharset = [=](const auto charsetSize, const std::wstring_view charsetId = {}) {
@@ -3821,6 +4036,7 @@ public:
         const auto getBufferOutput = [&]() {
             const auto& textBuffer = _testGetSet->GetBufferAndViewport().buffer;
             const auto cursorPos = textBuffer.GetCursor().GetPosition();
+			std::cerr << "TEST_METHOD(MacroInvokes=" << MacroInvokes << "): cursorPos → " << cursorPos << std::endl;
             return textBuffer.GetRowByOffset(cursorPos.y).GetText().substr(0, cursorPos.x);
         };
 
@@ -3877,6 +4093,7 @@ public:
 
         _pDispatch->WindowManipulation(DispatchTypes::WindowManipulationType::ReportTextSizeInCharacters, NULL, NULL);
         std::wstring expectedResponse = fmt::format(L"\033[8;{};{}t", viewport.height(), textBuffer.GetSize().Width());
+		std::cerr << "TEST_METHOD(WindowManipulationTypeTests=" << WindowManipulationTypeTests << "): expectedResponse → " << expectedResponse << std::endl;
         _testGetSet->ValidateInputEvent(expectedResponse.c_str());
 
         _pDispatch->WindowManipulation(DispatchTypes::WindowManipulationType::ReportTextSizeInPixels, NULL, NULL);
@@ -3915,6 +4132,8 @@ public:
         _pDispatch->DoVsCodeAction(LR"(Completions;10;20;30;{ "foo": "what;ever", "bar": 2 })");
     }
 
+	std::cerr << "TEST_METHOD(PageMovementTests=" << PageMovementTests << "): startPos → " << startPos << std::endl;
+	std::cerr << "TEST_METHOD(PageMovementTests=" << PageMovementTests << "): homePos → " << homePos << std::endl;
     TEST_METHOD(PageMovementTests)
     {
         _testGetSet->PrepData(CursorX::XCENTER, CursorY::YCENTER);
@@ -3998,6 +4217,8 @@ public:
         _pDispatch->PagePositionAbsolute(1);
     }
 
+	std::cerr << "TEST_METHOD(SendC1ControlTest=" << SendC1ControlTest << "): S8C1T → " << S8C1T << std::endl;
+	std::cerr << "TEST_METHOD(SendC1ControlTest=" << SendC1ControlTest << "): S7C1T → " << S7C1T << std::endl;
     TEST_METHOD(SendC1ControlTest)
     {
         const auto S7C1T = L"\033 F";

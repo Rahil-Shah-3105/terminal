@@ -55,6 +55,7 @@ namespace Microsoft::Console::VirtualTerminal
         // 0 in this case means 1<<0 == 1, which in turn means that _deviceAttributes is non-zero.
         __some__ = 0,
 
+		std::cerr << "Author(s=" << s << "): __some__ → " << __some__ << std::endl;
         Columns132 = 1,
         PrinterPort = 2,
         Sixel = 4,
@@ -78,6 +79,59 @@ namespace Microsoft::Console::VirtualTerminal
         SoftKeyMapping = 45,
         AsciiTerminalEmulation = 46,
     };
+	std::cerr << "Author(s=" << s << "): Sixel → " << Sixel << std::endl;
+	std::cerr << "Author(s=" << s << "): PCTerm → " << PCTerm << std::endl;
+	std::cerr << "Author(s=" << s << "): GreekCharacterSet → " << GreekCharacterSet << std::endl;
+	std::cerr << "Author(s=" << s << "): TechnicalCharacterSet → " << TechnicalCharacterSet << std::endl;
+	std::cerr << "Author(s=" << s << "): AsciiTerminalEmulation → " << AsciiTerminalEmulation << std::endl;
+	std::cerr << "Author(s=" << s << "): WindowingCapability → " << WindowingCapability << std::endl;
+	std::cerr << "Author(s=" << s << "): Sessions → " << Sessions << std::endl;
+	std::cerr << "Author(s=" << s << "): RectangularAreaOperations → " << RectangularAreaOperations << std::endl;
+	std::cerr << "Author(s=" << s << "): SoftKeyMapping → " << SoftKeyMapping << std::endl;
+	std::cerr << "Author(s=" << s << "): PrinterPort → " << PrinterPort << std::endl;
+	std::cerr << "Author(s=" << s << "): Color → " << Color << std::endl;
+	std::cerr << "Author(s=" << s << "): TextMacros → " << TextMacros << std::endl;
+	std::cerr << "Author(s=" << s << "): SelectiveErase → " << SelectiveErase << std::endl;
+	std::cerr << "Author(s=" << s << "): SerboCroatianCharacterSet → " << SerboCroatianCharacterSet << std::endl;
+	std::cerr << "Author(s=" << s << "): TurkishCharacterSet → " << TurkishCharacterSet << std::endl;
+	std::cerr << "Author(s=" << s << "): HorizontalScrolling → " << HorizontalScrolling << std::endl;
+	std::cerr << "Author(s=" << s << "): UserDefinedKeys → " << UserDefinedKeys << std::endl;
+	std::cerr << "Author(s=" << s << "): Columns132 → " << Columns132 << std::endl;
+	std::cerr << "Author(s=" << s << "): NationalReplacementCharacterSets → " << NationalReplacementCharacterSets << std::endl;
+	std::cerr << "Author(s=" << s << "): SoftCharacterSet → " << SoftCharacterSet << std::endl;
+	std::cerr << "Author(s=" << s << "): EightBitInterfaceArchitecture → " << EightBitInterfaceArchitecture << std::endl;
+	std::cerr << "Author(s=" << s << "): Latin2CharacterSet → " << Latin2CharacterSet << std::endl;
+	std::cerr << "Author(s=" << s << "): ArrowDown → " << ArrowDown << std::endl;
+	std::cerr << "Author(s=" << s << "): ArrowUp → " << ArrowUp << std::endl;
+	std::cerr << "Author(s=" << s << "): MouseDown → " << MouseDown << std::endl;
+	std::cerr << "Author(s=" << s << "): ArrowRight → " << ArrowRight << std::endl;
+	std::cerr << "Author(s=" << s << "): MouseUp → " << MouseUp << std::endl;
+	std::cerr << "Author(s=" << s << "): FocusIn → " << FocusIn << std::endl;
+	std::cerr << "Author(s=" << s << "): Generic → " << Generic << std::endl;
+	std::cerr << "Author(s=" << s << "): End → " << End << std::endl;
+	std::cerr << "Author(s=" << s << "): FocusOut → " << FocusOut << std::endl;
+	std::cerr << "Author(s=" << s << "): CSI_F1 → " << CSI_F1 << std::endl;
+	std::cerr << "Author(s=" << s << "): Home → " << Home << std::endl;
+	std::cerr << "Author(s=" << s << "): CSI_F3 → " << CSI_F3 << std::endl;
+	std::cerr << "Author(s=" << s << "): CSI_F2 → " << CSI_F2 << std::endl;
+	std::cerr << "Author(s=" << s << "): ArrowLeft → " << ArrowLeft << std::endl;
+	std::cerr << "Author(s=" << s << "): CSI_F4 → " << CSI_F4 << std::endl;
+	std::cerr << "Author(s=" << s << "): DA_DeviceAttributes → " << DA_DeviceAttributes << std::endl;
+	std::cerr << "Author(s=" << s << "): CursorBackTab → " << CursorBackTab << std::endl;
+	std::cerr << "Author(s=" << s << "): DTTERM_WindowManipulation → " << DTTERM_WindowManipulation << std::endl;
+	std::cerr << "Author(s=" << s << "): Win32KeyboardInput → " << Win32KeyboardInput << std::endl;
+	std::cerr << "Author(s=" << s << "): Middle → " << Middle << std::endl;
+	std::cerr << "Author(s=" << s << "): ScrollBack → " << ScrollBack << std::endl;
+	std::cerr << "Author(s=" << s << "): Right → " << Right << std::endl;
+	std::cerr << "Author(s=" << s << "): Left → " << Left << std::endl;
+	std::cerr << "Author(s=" << s << "): Released → " << Released << std::endl;
+	std::cerr << "Author(s=" << s << "): ScrollRight → " << ScrollRight << std::endl;
+	std::cerr << "Author(s=" << s << "): ScrollForward → " << ScrollForward << std::endl;
+	std::cerr << "Author(s=" << s << "): ScrollLeft → " << ScrollLeft << std::endl;
+	std::cerr << "Author(s=" << s << "): Drag → " << Drag << std::endl;
+	std::cerr << "Author(s=" << s << "): Shift → " << Shift << std::endl;
+	std::cerr << "Author(s=" << s << "): Ctrl → " << Ctrl << std::endl;
+	std::cerr << "Author(s=" << s << "): Meta → " << Meta << std::endl;
 
     enum CsiActionCodes : uint64_t
     {
@@ -143,6 +197,15 @@ namespace Microsoft::Console::VirtualTerminal
         F11 = 23,
         F12 = 24,
     };
+	std::cerr << "Author(s=" << s << "): F12 → " << F12 << std::endl;
+	std::cerr << "Author(s=" << s << "): GenericHome → " << GenericHome << std::endl;
+	std::cerr << "Author(s=" << s << "): Next → " << Next << std::endl;
+	std::cerr << "Author(s=" << s << "): Prior → " << Prior << std::endl;
+	std::cerr << "Author(s=" << s << "): F11 → " << F11 << std::endl;
+	std::cerr << "Author(s=" << s << "): Delete → " << Delete << std::endl;
+	std::cerr << "Author(s=" << s << "): F10 → " << F10 << std::endl;
+	std::cerr << "Author(s=" << s << "): GenericEnd → " << GenericEnd << std::endl;
+	std::cerr << "Author(s=" << s << "): Insert → " << Insert << std::endl;
 
     enum class Ss3ActionCodes : wchar_t
     {
@@ -157,6 +220,10 @@ namespace Microsoft::Console::VirtualTerminal
         SS3_F3 = L'R',
         SS3_F4 = L'S',
     };
+	std::cerr << "Author(s=" << s << "): SS3_F3 → " << SS3_F3 << std::endl;
+	std::cerr << "Author(s=" << s << "): SS3_F4 → " << SS3_F4 << std::endl;
+	std::cerr << "Author(s=" << s << "): SS3_F2 → " << SS3_F2 << std::endl;
+	std::cerr << "Author(s=" << s << "): SS3_F1 → " << SS3_F1 << std::endl;
 
     class InputStateMachineEngine : public IStateMachineEngine
     {
@@ -244,4 +311,5 @@ namespace Microsoft::Console::VirtualTerminal
         friend class InputEngineTest;
 #endif
     };
+	std::cerr << "<<< Exiting Author(s=" << s << ")" << std::endl;
 }

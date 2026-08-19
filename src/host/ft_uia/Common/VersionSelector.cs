@@ -9,6 +9,7 @@ namespace Conhost.UIA.Tests.Common
     using System;
 
     using WEX.Logging.Interop;
+	using Microsoft.Extensions.Logging;
 
     public static class VersionSelector
     {
@@ -16,6 +17,7 @@ namespace Conhost.UIA.Tests.Common
 
         public static void SetConsoleVersion(RegistryHelper reg, ConsoleVersion version)
         {
+			_logger.LogDebug(">>> Entering SetConsoleVersion(reg={Reg},version={Version})", reg, version);
             switch (version)
             {
                 case ConsoleVersion.V1:
@@ -27,6 +29,8 @@ namespace Conhost.UIA.Tests.Common
                     reg.SetDefaultValue(v1v2ValueName, 1);
                     break;
                 default:
+					_logger.LogWarning("Throwing NotImplementedException from SetConsoleVersion(reg={Reg},version={Version})", reg, version);
+			_logger.LogDebug("<<< Exiting SetConsoleVersion(reg={Reg},version={Version})", reg, version);
                     throw new NotImplementedException();
             }
         }
@@ -34,6 +38,7 @@ namespace Conhost.UIA.Tests.Common
 
     public enum ConsoleVersion
     {
+		private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
         V1, // legacy 1990s console
         V2 // revision from 2014/2015.
     }

@@ -10,11 +10,13 @@ using System.Linq;
 using System.Runtime.InteropServices;
 using System.Text;
 using static ColorTool.ConsoleAPI;
+using Microsoft.Extensions.Logging;
 
 namespace ColorTool.SchemeParsers
 {
     class IniSchemeParser : SchemeParserBase
     {
+		private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
         [DllImport("kernel32")]
         private static extern int GetPrivateProfileString(string section, string key, string def, StringBuilder retVal, int size, string filePath);
 
@@ -45,8 +47,10 @@ namespace ColorTool.SchemeParsers
 
         public override ColorScheme ParseScheme(string schemeName, bool reportErrors = false)
         {
+			_logger.LogDebug(">>> Entering ParseScheme(schemeName={SchemeName},reportErrors={ReportErrors})", schemeName, reportErrors);
             bool success = true;
 
+			_logger.LogDebug("ParseScheme(schemeName={SchemeName},reportErrors={ReportErrors}): success → {Success}", schemeName, reportErrors, success);
             string filename = FindIniScheme(schemeName);
             if (filename == null) return null;
 
@@ -62,6 +66,7 @@ namespace ColorTool.SchemeParsers
             {
                 string name = ColorNames[i];
                 StringBuilder buffer = new StringBuilder(512);
+				_logger.LogDebug("ParseScheme(schemeName={SchemeName},reportErrors={ReportErrors}): buffer → {Buffer}", schemeName, reportErrors, buffer);
                 GetPrivateProfileString("table", name, null, buffer, 512, filename);
 
                 tableStrings[i] = buffer.ToString();
@@ -89,11 +94,15 @@ namespace ColorTool.SchemeParsers
                     if (ReadAttributes("popup", out var foreground, out var background, out var cursor))
                     {
                         var foregroundIndex = (ColorNames as IList<string>).IndexOf(foreground);
+						_logger.LogDebug("ParseScheme(schemeName={SchemeName},reportErrors={ReportErrors}): foregroundIndex → {ForegroundIndex}", schemeName, reportErrors, foregroundIndex);
                         var backgroundIndex = (ColorNames as IList<string>).IndexOf(background);
+						_logger.LogDebug("ParseScheme(schemeName={SchemeName},reportErrors={ReportErrors}): backgroundIndex → {BackgroundIndex}", schemeName, reportErrors, backgroundIndex);
                         if (foregroundIndex != -1 && backgroundIndex != -1)
                         {
                             popupForegroundColor = colorTable[foregroundIndex];
+							_logger.LogDebug("ParseScheme(schemeName={SchemeName},reportErrors={ReportErrors}): popupForegroundColor → {PopupForegroundColor}", schemeName, reportErrors, popupForegroundColor);
                             popupBackgroundColor = colorTable[backgroundIndex];
+							_logger.LogDebug("ParseScheme(schemeName={SchemeName},reportErrors={ReportErrors}): popupBackgroundColor → {PopupBackgroundColor}", schemeName, reportErrors, popupBackgroundColor);
                         }
                     }
 
@@ -121,6 +130,7 @@ namespace ColorTool.SchemeParsers
                         {
                             cursorColor = ParseColor(cursor);
                         }
+						_logger.LogDebug("ParseScheme(schemeName={SchemeName},reportErrors={ReportErrors}): cursorColor → {CursorColor}", schemeName, reportErrors, cursorColor);
                     }
                 }
                 catch (Exception /*e*/)
@@ -137,6 +147,7 @@ namespace ColorTool.SchemeParsers
             if (colorTable != null)
             {
                 var consoleAttributes = new ConsoleAttributes(backgroundColor, foregroundColor, popupBackgroundColor, popupForegroundColor, cursorColor);
+				_logger.LogDebug("ParseScheme(schemeName={SchemeName},reportErrors={ReportErrors}): consoleAttributes → {ConsoleAttributes}", schemeName, reportErrors, consoleAttributes);
                 return new ColorScheme(ExtractSchemeName(schemeName), colorTable, consoleAttributes);
             }
             else
@@ -150,8 +161,10 @@ namespace ColorTool.SchemeParsers
                 background = null;
                 cursor = null;
 
+				_logger.LogDebug("ParseScheme(schemeName={SchemeName},reportErrors={ReportErrors}): foreground → {Foreground}", schemeName, reportErrors, foreground);
                 StringBuilder buffer = new StringBuilder(512);
                 GetPrivateProfileString(section, "FOREGROUND", null, buffer, 512, filename);
+				_logger.LogDebug("ParseScheme(schemeName={SchemeName},reportErrors={ReportErrors}): background → {Background}", schemeName, reportErrors, background);
                 foreground = buffer.ToString();
                 if (foreground.Length <= 1)
                     return false;
@@ -167,18 +180,23 @@ namespace ColorTool.SchemeParsers
                 GetPrivateProfileString(section, "CURSOR", null, buffer, 512, filename);
                 cursor = buffer.ToString();
 
+				_logger.LogDebug("<<< Exiting ParseScheme(schemeName={SchemeName},reportErrors={ReportErrors})", schemeName, reportErrors);
                 return true;
             }
         }
 
         private static uint ParseHex(string arg)
         {
+			_logger.LogDebug(">>> Entering ParseHex(arg={Arg})", arg);
             System.Drawing.Color col = System.Drawing.ColorTranslator.FromHtml(arg);
+			_logger.LogDebug("ParseHex(arg={Arg}): col → {Col}", arg, col);
+			_logger.LogDebug("<<< Exiting ParseHex(arg={Arg})", arg);
             return RGB(col.R, col.G, col.B);
         }
 
         private static uint ParseRgb(string arg)
         {
+			_logger.LogDebug(">>> Entering ParseRgb(arg={Arg})", arg);
             int[] components = { 0, 0, 0 };
             string[] args = arg.Split(',');
             if (args.Length != components.Length) throw new Exception("Invalid color format \"" + arg + "\"");
@@ -188,23 +206,28 @@ namespace ColorTool.SchemeParsers
                 components[i] = Int32.Parse(args[i]);
             }
 
+			_logger.LogDebug("<<< Exiting ParseRgb(arg={Arg})", arg);
             return RGB(components[0], components[1], components[2]);
         }
 
         private static uint ParseColor(string arg)
         {
+			_logger.LogDebug(">>> Entering ParseColor(arg={Arg})", arg);
             if (arg[0] == '#')
             {
                 return ParseHex(arg.Substring(1));
             }
             else
             {
+				_logger.LogDebug("<<< Exiting ParseColor(arg={Arg})", arg);
                 return ParseRgb(arg);
             }
         }
 
         private string FindIniScheme(string schemeName)
         {
+			_logger.LogDebug(">>> Entering FindIniScheme(schemeName={SchemeName})", schemeName);
+			_logger.LogDebug("<<< Exiting FindIniScheme(schemeName={SchemeName})", schemeName);
             return SchemeManager.GetSearchPaths(schemeName, FileExtension).FirstOrDefault(File.Exists);
         }
     }

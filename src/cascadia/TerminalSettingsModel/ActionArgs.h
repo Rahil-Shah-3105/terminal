@@ -1,3 +1,4 @@
+#include <stdio.h>
 // Copyright (c) Microsoft Corporation.
 // Licensed under the MIT license.
 
@@ -345,12 +346,15 @@ namespace winrt::Microsoft::Terminal::Settings::Model::implementation
     public:
         bool Equals(INewContentArgs other) const
         {
+			fprintf(stderr, "<<< Exiting Equals(other=%d)\n", other);
             return other.Type() == _Type;
         }
         size_t Hash() const
         {
             til::hasher h;
             Hash(h);
+			fprintf(stderr, "<<< Exiting Hash(h=%d)\n", h);
+			fprintf(stderr, "<<< Exiting Hash()\n");
             return h.finalize();
         }
         void Hash(til::hasher& h) const
@@ -361,11 +365,14 @@ namespace winrt::Microsoft::Terminal::Settings::Model::implementation
         {
             auto copy{ winrt::make_self<BaseContentArgs>() };
             copy->_Type = _Type;
+			fprintf(stderr, "<<< Exiting Copy()\n");
             return *copy;
         }
         winrt::hstring GenerateName() const { return GenerateName(GetLibraryResourceLoader().ResourceContext()); }
         winrt::hstring GenerateName(const winrt::Windows::ApplicationModel::Resources::Core::ResourceContext&) const
         {
+			fprintf(stderr, ">>> Entering GenerateName()\n");
+            fprintf(stderr, "<<< Exiting GenerateName()\n");
             return winrt::hstring{ L"type: " } + Type();
         }
         static Json::Value ToJson(const Model::BaseContentArgs& val)
@@ -377,6 +384,7 @@ namespace winrt::Microsoft::Terminal::Settings::Model::implementation
             auto args{ get_self<BaseContentArgs>(val) };
             Json::Value json{ Json::ValueType::objectValue };
             JsonUtils::SetValueForKey(json, TypeKey, args->_Type);
+			fprintf(stderr, "<<< Exiting ToJson(val=%d)\n", val);
             return json;
         }
     };
@@ -425,6 +433,7 @@ namespace winrt::Microsoft::Terminal::Settings::Model::implementation
         };
         static Model::NewTerminalArgs FromJson(const Json::Value& json)
         {
+			fprintf(stderr, ">>> Entering FromJson(json=%d)\n", json);
             // LOAD BEARING: Not using make_self here _will_ break you in the future!
             auto args = winrt::make_self<NewTerminalArgs>();
             JsonUtils::GetValueForKey(json, CommandlineKey, args->_Commandline);
@@ -439,6 +448,7 @@ namespace winrt::Microsoft::Terminal::Settings::Model::implementation
             JsonUtils::GetValueForKey(json, ElevateKey, args->_Elevate);
             JsonUtils::GetValueForKey(json, ReloadEnvironmentVariablesKey, args->_ReloadEnvironmentVariables);
             JsonUtils::GetValueForKey(json, ContentKey, args->_ContentId);
+			fprintf(stderr, "<<< Exiting FromJson(json=%d)\n", json);
             return *args;
         }
         static Json::Value ToJson(const Model::NewTerminalArgs& val)
@@ -484,6 +494,7 @@ namespace winrt::Microsoft::Terminal::Settings::Model::implementation
         {
             til::hasher h;
             Hash(h);
+			fprintf(stderr, ">>> Entering Hash(h=%d)\n", h);
             return h.finalize();
         }
         void Hash(til::hasher& h) const
@@ -524,6 +535,7 @@ namespace winrt::Microsoft::Terminal::Settings::Model::implementation
     }
     static Json::Value ContentArgsToJson(const Model::INewContentArgs& contentArgs)
     {
+		fprintf(stderr, ">>> Entering ContentArgsToJson(contentArgs=%d)\n", contentArgs);
         if (contentArgs == nullptr)
         {
             return {};
@@ -537,6 +549,7 @@ namespace winrt::Microsoft::Terminal::Settings::Model::implementation
         // For now, we don't support any other concrete types of content
         // with args. Just return a placeholder.
         auto base{ winrt::make_self<BaseContentArgs>(contentArgs.Type()) };
+		fprintf(stderr, "<<< Exiting ContentArgsToJson(contentArgs=%d)\n", contentArgs);
         return BaseContentArgs::ToJson(*base);
     }
 
@@ -554,6 +567,8 @@ struct til::hash_trait<winrt::Microsoft::Terminal::Settings::Model::NewTerminalA
         {
             winrt::get_self<I>(value)->Hash(h);
         }
+		fprintf(stderr, ">>> Entering operator()\n");
+		fprintf(stderr, "<<< Exiting operator()\n");
     }
 };
 template<>
@@ -638,6 +653,7 @@ namespace winrt::Microsoft::Terminal::Settings::Model::implementation
         {
             til::hasher h;
             h.write(ContentArgs());
+			fprintf(stderr, ">>> Entering Hash()\n");
             return h.finalize();
         }
         winrt::Windows::Foundation::Collections::IVectorView<ArgDescriptor> GetArgDescriptors()
@@ -649,6 +665,7 @@ namespace winrt::Microsoft::Terminal::Settings::Model::implementation
                     return contentArgs.GetArgDescriptors();
                 }
             }
+			fprintf(stderr, "<<< Exiting GetArgDescriptors()\n");
             return {};
         }
         IInspectable GetArgAt(uint32_t index) const
@@ -660,6 +677,7 @@ namespace winrt::Microsoft::Terminal::Settings::Model::implementation
                     return contentArgs.GetArgAt(index);
                 }
             }
+			fprintf(stderr, "<<< Exiting GetArgAt(index=%d)\n", index);
             return nullptr;
         }
         void SetArgAt(uint32_t index, IInspectable value)
@@ -671,6 +689,8 @@ namespace winrt::Microsoft::Terminal::Settings::Model::implementation
                     contentArgs.SetArgAt(index, value);
                 }
             }
+			fprintf(stderr, ">>> Entering SetArgAt(index=%d,value=%d)\n", index, value);
+			fprintf(stderr, "<<< Exiting SetArgAt(index=%d,value=%d)\n", index, value);
         }
     };
 
@@ -880,6 +900,9 @@ namespace winrt::Microsoft::Terminal::Settings::Model::implementation
         void SetArgAt(uint32_t index, IInspectable value)
         {
             _ContentArgs.as<IActionArgsDescriptorAccess>().SetArgAt(index, value);
+			fprintf(stderr, ">>> Entering SetArgAt()\n");
+			fprintf(stderr, "Throwing winrt from SetArgAt()\n");
+        fprintf(stderr, "<<< Exiting SetArgAt()\n");
         }
     };
 
@@ -957,12 +980,14 @@ namespace winrt::Microsoft::Terminal::Settings::Model::implementation
         // default values for quakeMode
         static FromJsonResult QuakeModeFromJson(const Json::Value& /*json*/)
         {
+			fprintf(stderr, ">>> Entering QuakeModeFromJson()\n");
             // LOAD BEARING: Not using make_self here _will_ break you in the future!
             auto args = winrt::make_self<GlobalSummonArgs>();
             // We want to summon the window with the name "_quake" specifically.
             args->_Name = L"_quake";
             // We want the window to dropdown, with a 200ms duration.
             args->_DropdownDuration = 200;
+			fprintf(stderr, "<<< Exiting QuakeModeFromJson()\n");
             return { *args, {} };
         }
     };

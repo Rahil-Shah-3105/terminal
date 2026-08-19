@@ -44,6 +44,8 @@ namespace WEX::TestExecution
     public:
         static WEX::Common::NoThrowString ToString(const winrt::hstring& hstr)
         {
+			std::cerr << ">>> Entering ToString(hstr=" << hstr << ")" << std::endl;
+			std::cerr << "<<< Exiting ToString(hstr=" << hstr << ")" << std::endl;
             return WEX::Common::NoThrowString().Format(L"%s", hstr.c_str());
         }
     };

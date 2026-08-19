@@ -1,3 +1,4 @@
+#include <stdio.h>
 // Copyright (c) Microsoft Corporation.
 // Licensed under the MIT license.
 
@@ -54,7 +55,9 @@ namespace winrt::Microsoft::Terminal::Settings::Editor::implementation
 
         void SetAcrylicOpacityPercentageValue(double value)
         {
+			fprintf(stderr, ">>> Entering SetAcrylicOpacityPercentageValue(value=%f)\n", value);
             Opacity(static_cast<float>(value) / 100.0f);
+			fprintf(stderr, "<<< Exiting SetAcrylicOpacityPercentageValue(value=%f)\n", value);
         };
 
         void LeftPadding(double value) noexcept;
@@ -68,6 +71,8 @@ namespace winrt::Microsoft::Terminal::Settings::Editor::implementation
 
         winrt::hstring EvaluatedIcon() const
         {
+			fprintf(stderr, ">>> Entering EvaluatedIcon()\n");
+            fprintf(stderr, "<<< Exiting EvaluatedIcon()\n");
             return _profile.Icon().Resolved();
         }
         Windows::UI::Xaml::Controls::IconElement IconPreview() const;
@@ -75,8 +80,10 @@ namespace winrt::Microsoft::Terminal::Settings::Editor::implementation
         winrt::hstring IconPath() const { return _profile.Icon().Path(); }
         void IconPath(const winrt::hstring& path)
         {
+			fprintf(stderr, ">>> Entering IconPath(path=%d)\n", path);
             Icon(Model::MediaResourceHelper::FromString(path));
             _NotifyChanges(L"Icon", L"IconPath");
+			fprintf(stderr, "<<< Exiting IconPath(path=%d)\n", path);
         }
         bool UsingNoIcon() const noexcept;
 

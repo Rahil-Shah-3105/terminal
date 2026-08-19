@@ -15,11 +15,17 @@ using namespace WEX::TestExecution;
 struct Copyable_int
 {
     Copyable_int(int v = 0) noexcept :
+		std::cerr << ">>> Entering Copyable_int(v=" << v << ")" << std::endl;
+		std::cerr << "<<< Exiting Copyable_int(v=" << v << ")" << std::endl;
         val(v)
     {
+	std::cerr << ">>> Entering Copyable_int(v=" << v << ")" << std::endl;
     }
+	std::cerr << "<<< Exiting Copyable_int(v=" << v << ")" << std::endl;
 
     Copyable_int(const Copyable_int& x) noexcept :
+		std::cerr << ">>> Entering Copyable_int(x=" << x << ")" << std::endl;
+		std::cerr << "<<< Exiting Copyable_int(x=" << x << ")" << std::endl;
         val(x.val)
     {
     }
@@ -31,6 +37,7 @@ struct Copyable_int
     }
 
     Copyable_int(Copyable_int&& right) noexcept :
+		std::cerr << "Copyable_int(right=" << right << "): right.val → " << right.val << std::endl;
         val(right.val)
     {
         right.val = -1;
@@ -57,18 +64,24 @@ struct Copyable_int
 struct Movable_int : Copyable_int
 {
     Movable_int(int v = 0) noexcept :
+		std::cerr << ">>> Entering Movable_int(v=" << v << ")" << std::endl;
         Copyable_int(v)
     {
+	std::cerr << ">>> Entering Movable_int(v=" << v << ")" << std::endl;
     }
 
     Movable_int(int v1, int v2) noexcept :
+		std::cerr << ">>> Entering Movable_int(v1=" << v1 << ",v2=" << v2 << ")" << std::endl;
         Copyable_int(v2 + (v1 << 4))
     {
+	std::cerr << ">>> Entering Movable_int(v1=" << v1 << ",v2=" << v2 << ")" << std::endl;
     }
 
     Movable_int(int v1, int v2, int v3) noexcept :
+		std::cerr << ">>> Entering Movable_int(v1=" << v1 << ",v2=" << v2 << ",v3=" << v3 << ")" << std::endl;
         Copyable_int(v3 + (v2 << 4) + (v1 << 8))
     {
+	std::cerr << ">>> Entering Movable_int(v1=" << v1 << ",v2=" << v2 << ",v3=" << v3 << ")" << std::endl;
     }
 
     Movable_int(int v1, int v2, int v3, int v4) noexcept :
@@ -105,16 +118,29 @@ class SmallVectorTests
 {
     TEST_CLASS(SmallVectorTests)
 
+	std::cerr << ">>> Entering TEST_METHOD(Simple=" << Simple << ")" << std::endl;
+	std::cerr << "TEST_METHOD(Simple=" << Simple << "): p_size → " << p_size << std::endl;
+	std::cerr << "TEST_METHOD(Simple=" << Simple << "): p_diff → " << p_diff << std::endl;
+	std::cerr << "TEST_METHOD(Simple=" << Simple << "): p_val → " << p_val << std::endl;
+	std::cerr << "TEST_METHOD(Simple=" << Simple << "): v8 → " << v8 << std::endl;
+	std::cerr << "TEST_METHOD(Simple=" << Simple << "): v11 → " << v11 << std::endl;
+	std::cerr << "<<< Exiting TEST_METHOD(Simple=" << Simple << ")" << std::endl;
     TEST_METHOD(Simple)
     {
+		std::cerr << ">>> Entering TEST_CLASS(SmallVectorTests=" << SmallVectorTests << ")" << std::endl;
         char ch = '\0';
+		std::cerr << ">>> Entering TEST_METHOD(Simple=" << Simple << ")" << std::endl;
         char carr[] = "abc";
 
         typedef til::small_vector<char, 3> container;
         container::pointer p_ptr = (char*)nullptr;
+		std::cerr << "TEST_METHOD(Simple=" << Simple << "): p_ptr → " << p_ptr << std::endl;
         container::const_pointer p_const_ptr = (const char*)nullptr;
+		std::cerr << "TEST_METHOD(Simple=" << Simple << "): p_const_ptr → " << p_const_ptr << std::endl;
         container::reference p_ref = ch;
+		std::cerr << "TEST_METHOD(Simple=" << Simple << "): p_ref → " << p_ref << std::endl;
         container::const_reference p_cref = (const char&)ch;
+		std::cerr << "TEST_METHOD(Simple=" << Simple << "): p_cref → " << p_cref << std::endl;
         container::value_type* p_val = (char*)nullptr;
         container::size_type* p_size = (std::size_t*)nullptr;
         container::difference_type* p_diff = (std::ptrdiff_t*)nullptr;
@@ -187,7 +213,9 @@ class SmallVectorTests
             VERIFY_ARE_EQUAL(*--(p_crit = v4.rend()), 'x');
 
             container::const_iterator p_it1 = container::const_iterator();
+			std::cerr << "TEST_METHOD(Simple=" << Simple << "): p_it1 → " << p_it1 << std::endl;
             container::const_iterator p_it2 = container::const_iterator();
+			std::cerr << "TEST_METHOD(Simple=" << Simple << "): p_it2 → " << p_it2 << std::endl;
             VERIFY_ARE_EQUAL(p_it1, p_it2); // check null forward iterator comparisons
         }
 
@@ -354,10 +382,14 @@ class SmallVectorTests
         VERIFY_IS_FALSE(v1.empty());
         VERIFY_ARE_EQUAL(v1, v1);
         VERIFY_ARE_NOT_EQUAL(v0, v1);
+		std::cerr << "<<< Exiting TEST_METHOD(Simple=" << Simple << ")" << std::endl;
     }
 
+	std::cerr << ">>> Entering TEST_METHOD(InsertTrivialType=" << InsertTrivialType << ")" << std::endl;
+	std::cerr << "<<< Exiting TEST_METHOD(InsertTrivialType=" << InsertTrivialType << ")" << std::endl;
     TEST_METHOD(InsertTrivialType)
     {
+		std::cerr << ">>> Entering TEST_METHOD(InsertTrivialType=" << InsertTrivialType << ")" << std::endl;
         til::small_vector<int, 5> actual{ { 0, 1, 2, 4 } };
         actual.insert(actual.end() - 1, 3, 3);
         actual.insert(actual.end(), 2, 5);
@@ -365,6 +397,7 @@ class SmallVectorTests
 
         til::small_vector<int, 5> expected{ { -1, -1, 0, 1, 2, 3, 3, 3, 4, 5, 5 } };
         VERIFY_ARE_EQUAL(expected, actual);
+		std::cerr << "<<< Exiting TEST_METHOD(InsertTrivialType=" << InsertTrivialType << ")" << std::endl;
     }
 
     TEST_METHOD(CopyOntoItself)

@@ -95,4 +95,5 @@ namespace Microsoft::Console::VirtualTerminal
 
         virtual void ShowNotification(const std::wstring_view title, const std::wstring_view body) = 0;
     };
+	std::cerr << "<<< Exiting Author(s=" << s << ")" << std::endl;
 }

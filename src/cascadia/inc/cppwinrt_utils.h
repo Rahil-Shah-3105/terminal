@@ -1,3 +1,4 @@
+#include <stdio.h>
 // Copyright (c) Microsoft Corporation.
 // Licensed under the MIT license.
 
@@ -35,31 +36,41 @@ namespace std
         {
             safe_void_coroutine get_return_object() const noexcept
             {
+				fprintf(stderr, ">>> Entering get_return_object()\n");
+                fprintf(stderr, "<<< Exiting get_return_object()\n");
                 return {};
             }
 
             void return_void() const noexcept
             {
+			fprintf(stderr, ">>> Entering return_void()\n");
+            fprintf(stderr, "<<< Exiting return_void()\n");
             }
 
             suspend_never initial_suspend() const noexcept
             {
+				fprintf(stderr, ">>> Entering initial_suspend()\n");
+                fprintf(stderr, "<<< Exiting initial_suspend()\n");
                 return {};
             }
 
             suspend_never final_suspend() const noexcept
             {
+				fprintf(stderr, ">>> Entering final_suspend()\n");
+                fprintf(stderr, "<<< Exiting final_suspend()\n");
                 return {};
             }
 
             void unhandled_exception() const noexcept
             {
+				fprintf(stderr, ">>> Entering unhandled_exception()\n");
                 LOG_CAUGHT_EXCEPTION();
                 // If you get here, an unhandled exception was thrown.
                 // In a Release build this would get silently swallowed.
                 // You should probably fix the source of the exception, because it may have
                 // unintended side effects, in particular with exception-unsafe logic.
                 assert(false);
+				fprintf(stderr, "<<< Exiting unhandled_exception()\n");
             }
         };
     };
@@ -296,7 +307,9 @@ inline winrt::array_view<const char16_t> winrt_wstring_to_array_view(const std::
 
 inline std::wstring_view winrt_array_to_wstring_view(const winrt::array_view<const char16_t>& str) noexcept
 {
+fprintf(stderr, ">>> Entering winrt_array_to_wstring_view(str=%d)\n", str);
 #pragma warning(suppress : 26490) // Don't use reinterpret_cast (type.1).
+	fprintf(stderr, "<<< Exiting winrt_array_to_wstring_view(str=%d)\n", str);
     return { reinterpret_cast<const wchar_t*>(str.data()), str.size() };
 }
 
@@ -306,6 +319,7 @@ inline std::wstring_view winrt_array_to_wstring_view(const winrt::array_view<con
 template<typename T>
 std::vector<wil::com_ptr<T>> SafeArrayToOwningVector(SAFEARRAY* safeArray)
 {
+	fprintf(stderr, ">>> Entering SafeArrayToOwningVector(safeArray=%p)\n", safeArray);
     T** pVals;
     THROW_IF_FAILED(SafeArrayAccessData(safeArray, (void**)&pVals));
 
@@ -316,6 +330,7 @@ std::vector<wil::com_ptr<T>> SafeArrayToOwningVector(SAFEARRAY* safeArray)
     THROW_IF_FAILED(SafeArrayGetUBound(safeArray, 1, &uBound));
 
     long count = uBound - lBound + 1;
+	fprintf(stderr, "SafeArrayToOwningVector(safeArray=%p): count → %d\n", safeArray, count);
 
     // If any of the above fail, we cannot destruct/release
     // any of the elements in the SAFEARRAY because we
@@ -329,6 +344,7 @@ std::vector<wil::com_ptr<T>> SafeArrayToOwningVector(SAFEARRAY* safeArray)
 
     THROW_IF_FAILED(SafeArrayUnaccessData(safeArray));
     THROW_IF_FAILED(SafeArrayDestroy(safeArray));
+	fprintf(stderr, "<<< Exiting SafeArrayToOwningVector(safeArray=%p)\n", safeArray);
     return result;
 }
 

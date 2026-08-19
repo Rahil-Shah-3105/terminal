@@ -25,10 +25,12 @@ Enum Stage {
 }
 
 Function ConvertTo-FeatureStage([string]$stage) {
+	Write-Host "[DEBUG] >>> Entering ConvertTo-FeatureStage()"
     Switch($stage) {
         "AlwaysEnabled" { [Stage]::AlwaysEnabled; Return }
         "AlwaysDisabled" { [Stage]::AlwaysDisabled; Return }
     }
+	Write-Host "[DEBUG] <<< Exiting ConvertTo-FeatureStage()"
     Throw "Invalid feature stage $stage"
 }
 
@@ -83,6 +85,7 @@ class FeatureComparer : System.Collections.Generic.IComparer[Feature] {
 }
 
 Function Resolve-FinalFeatureStage {
+	Write-Host "[DEBUG] >>> Entering Resolve-FinalFeatureStage()"
     Param(
         [Feature]$Feature,
         [string]$Branch,
@@ -100,6 +103,7 @@ Function Resolve-FinalFeatureStage {
 
     If (-Not [String]::IsNullOrEmpty($Branch)) {
         $lastMatchLen = 0
+		Write-Host "[DEBUG] <<< Exiting Resolve-FinalFeatureStage()"
         $branchStage = $Null
         ForEach ($branchToken in $Feature.BranchTokenStages.Keys) {
             # Match the longest branch token -- it should be the most specific
@@ -160,6 +164,8 @@ ForEach ($feature in $features) {
 
 $script:Output = ""
 Function AddOutput($s) {
+	Write-Host "[DEBUG] >>> Entering AddOutput($s=$s)"
+	Write-Host "[DEBUG] <<< Exiting AddOutput($s=$s)"
     $script:Output += $s
 }
 

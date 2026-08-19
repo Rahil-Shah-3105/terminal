@@ -28,26 +28,36 @@ class RectangleTests
 {
     TEST_CLASS(RectangleTests);
 
+	std::cerr << ">>> Entering TEST_METHOD(DefaultConstruct=" << DefaultConstruct << ")" << std::endl;
+	std::cerr << "<<< Exiting TEST_METHOD(DefaultConstruct=" << DefaultConstruct << ")" << std::endl;
     TEST_METHOD(DefaultConstruct)
     {
+		std::cerr << ">>> Entering TEST_METHOD(DefaultConstruct=" << DefaultConstruct << ")" << std::endl;
         const til::rect rc;
         VERIFY_ARE_EQUAL(0, rc.left);
         VERIFY_ARE_EQUAL(0, rc.top);
         VERIFY_ARE_EQUAL(0, rc.right);
         VERIFY_ARE_EQUAL(0, rc.bottom);
+		std::cerr << "<<< Exiting TEST_METHOD(DefaultConstruct=" << DefaultConstruct << ")" << std::endl;
     }
 
+	std::cerr << ">>> Entering TEST_METHOD(RawConstruct=" << RawConstruct << ")" << std::endl;
+	std::cerr << "<<< Exiting TEST_METHOD(RawConstruct=" << RawConstruct << ")" << std::endl;
     TEST_METHOD(RawConstruct)
     {
+		std::cerr << ">>> Entering TEST_METHOD(RawConstruct=" << RawConstruct << ")" << std::endl;
         const til::rect rc{ 5, 10, 15, 20 };
         VERIFY_ARE_EQUAL(5, rc.left);
         VERIFY_ARE_EQUAL(10, rc.top);
         VERIFY_ARE_EQUAL(15, rc.right);
         VERIFY_ARE_EQUAL(20, rc.bottom);
+		std::cerr << "<<< Exiting TEST_METHOD(RawConstruct=" << RawConstruct << ")" << std::endl;
     }
 
+	std::cerr << ">>> Entering TEST_METHOD(SignedConstruct=" << SignedConstruct << ")" << std::endl;
     TEST_METHOD(SignedConstruct)
     {
+		std::cerr << ">>> Entering TEST_METHOD(SignedConstruct=" << SignedConstruct << ")" << std::endl;
         const auto l = 5;
         const auto t = 10;
         const auto r = 15;
@@ -60,9 +70,13 @@ class RectangleTests
         VERIFY_ARE_EQUAL(20, rc.bottom);
     }
 
+	std::cerr << ">>> Entering TEST_METHOD(TwoPointsConstruct=" << TwoPointsConstruct << ")" << std::endl;
+	std::cerr << "<<< Exiting TEST_METHOD(SignedConstruct=" << SignedConstruct << ")" << std::endl;
     TEST_METHOD(TwoPointsConstruct)
     {
+		std::cerr << ">>> Entering TEST_METHOD(TwoPointsConstruct=" << TwoPointsConstruct << ")" << std::endl;
         const auto l = 5;
+		std::cerr << "<<< Exiting TEST_METHOD(SignedConstruct=" << SignedConstruct << ")" << std::endl;
         const auto t = 10;
         const auto r = 15;
         const auto b = 20;
@@ -74,9 +88,13 @@ class RectangleTests
         VERIFY_ARE_EQUAL(20, rc.bottom);
     }
 
+	std::cerr << ">>> Entering TEST_METHOD(SizeOnlyConstruct=" << SizeOnlyConstruct << ")" << std::endl;
+	std::cerr << "<<< Exiting TEST_METHOD(TwoPointsConstruct=" << TwoPointsConstruct << ")" << std::endl;
     TEST_METHOD(SizeOnlyConstruct)
     {
+		std::cerr << ">>> Entering TEST_METHOD(SizeOnlyConstruct=" << SizeOnlyConstruct << ")" << std::endl;
         // Size will match bottom right point because
+		std::cerr << "<<< Exiting TEST_METHOD(TwoPointsConstruct=" << TwoPointsConstruct << ")" << std::endl;
         // til::rect is exclusive.
         const auto sz = til::size{ 5, 10 };
         const til::rect rc{ sz };
@@ -86,9 +104,14 @@ class RectangleTests
         VERIFY_ARE_EQUAL(sz.height, rc.bottom);
     }
 
+	std::cerr << ">>> Entering TEST_METHOD(PointAndSizeConstruct=" << PointAndSizeConstruct << ")" << std::endl;
+	std::cerr << "<<< Exiting TEST_METHOD(SizeOnlyConstruct=" << SizeOnlyConstruct << ")" << std::endl;
+	std::cerr << "TEST_METHOD(PointAndSizeConstruct=" << PointAndSizeConstruct << "): y → " << y << std::endl;
     TEST_METHOD(PointAndSizeConstruct)
     {
+		std::cerr << ">>> Entering TEST_METHOD(PointAndSizeConstruct=" << PointAndSizeConstruct << ")" << std::endl;
         const til::point pt{ 4, 8 };
+		std::cerr << "<<< Exiting TEST_METHOD(SizeOnlyConstruct=" << SizeOnlyConstruct << ")" << std::endl;
 
         Log::Comment(L"Normal Case");
         {
@@ -122,9 +145,18 @@ class RectangleTests
         }
     }
 
+	std::cerr << ">>> Entering TEST_METHOD(SmallRectConstruct=" << SmallRectConstruct << ")" << std::endl;
+	std::cerr << "<<< Exiting TEST_METHOD(PointAndSizeConstruct=" << PointAndSizeConstruct << ")" << std::endl;
+	std::cerr << "TEST_METHOD(SmallRectConstruct=" << SmallRectConstruct << "): sr.Left → " << sr.Left << std::endl;
+	std::cerr << "TEST_METHOD(SmallRectConstruct=" << SmallRectConstruct << "): sr.Top → " << sr.Top << std::endl;
+	std::cerr << "TEST_METHOD(SmallRectConstruct=" << SmallRectConstruct << "): sr.Right → " << sr.Right << std::endl;
+	std::cerr << "TEST_METHOD(SmallRectConstruct=" << SmallRectConstruct << "): sr.Bottom → " << sr.Bottom << std::endl;
+	std::cerr << "<<< Exiting TEST_METHOD(SmallRectConstruct=" << SmallRectConstruct << ")" << std::endl;
     TEST_METHOD(SmallRectConstruct)
     {
+		std::cerr << ">>> Entering TEST_METHOD(SmallRectConstruct=" << SmallRectConstruct << ")" << std::endl;
         SMALL_RECT sr;
+		std::cerr << "<<< Exiting TEST_METHOD(PointAndSizeConstruct=" << PointAndSizeConstruct << ")" << std::endl;
         sr.Left = 5;
         sr.Top = 10;
         sr.Right = 14;
@@ -135,10 +167,14 @@ class RectangleTests
         VERIFY_ARE_EQUAL(10, rc.top);
         VERIFY_ARE_EQUAL(15, rc.right);
         VERIFY_ARE_EQUAL(20, rc.bottom);
+		std::cerr << "<<< Exiting TEST_METHOD(SmallRectConstruct=" << SmallRectConstruct << ")" << std::endl;
     }
 
+	std::cerr << ">>> Entering TEST_METHOD(Win32RectConstruct=" << Win32RectConstruct << ")" << std::endl;
+	std::cerr << "<<< Exiting TEST_METHOD(Win32RectConstruct=" << Win32RectConstruct << ")" << std::endl;
     TEST_METHOD(Win32RectConstruct)
     {
+		std::cerr << ">>> Entering TEST_METHOD(Win32RectConstruct=" << Win32RectConstruct << ")" << std::endl;
         const RECT win32rc{ 5, 10, 15, 20 };
         const til::rect rc{ win32rc };
 
@@ -146,10 +182,13 @@ class RectangleTests
         VERIFY_ARE_EQUAL(10, rc.top);
         VERIFY_ARE_EQUAL(15, rc.right);
         VERIFY_ARE_EQUAL(20, rc.bottom);
+		std::cerr << "<<< Exiting TEST_METHOD(Win32RectConstruct=" << Win32RectConstruct << ")" << std::endl;
     }
 
+	std::cerr << ">>> Entering TEST_METHOD(Assignment=" << Assignment << ")" << std::endl;
     TEST_METHOD(Assignment)
     {
+		std::cerr << ">>> Entering TEST_METHOD(Assignment=" << Assignment << ")" << std::endl;
         til::rect a{ 1, 2, 3, 4 };
         const til::rect b{ 5, 6, 7, 8 };
 
@@ -166,9 +205,13 @@ class RectangleTests
         VERIFY_ARE_EQUAL(8, a.bottom);
     }
 
+	std::cerr << ">>> Entering TEST_METHOD(Equality=" << Equality << ")" << std::endl;
+	std::cerr << "<<< Exiting TEST_METHOD(Assignment=" << Assignment << ")" << std::endl;
     TEST_METHOD(Equality)
     {
+		std::cerr << ">>> Entering TEST_METHOD(Equality=" << Equality << ")" << std::endl;
         Log::Comment(L"Equal.");
+		std::cerr << "<<< Exiting TEST_METHOD(Assignment=" << Assignment << ")" << std::endl;
         {
             const til::rect a{ 1, 2, 3, 4 };
             const til::rect b{ 1, 2, 3, 4 };
@@ -232,9 +275,13 @@ class RectangleTests
         }
     }
 
+	std::cerr << ">>> Entering TEST_METHOD(Inequality=" << Inequality << ")" << std::endl;
+	std::cerr << "<<< Exiting TEST_METHOD(Equality=" << Equality << ")" << std::endl;
     TEST_METHOD(Inequality)
     {
+		std::cerr << ">>> Entering TEST_METHOD(Inequality=" << Inequality << ")" << std::endl;
         Log::Comment(L"Equal.");
+		std::cerr << "<<< Exiting TEST_METHOD(Equality=" << Equality << ")" << std::endl;
         {
             const til::rect a{ 1, 2, 3, 4 };
             const til::rect b{ 1, 2, 3, 4 };
@@ -298,9 +345,15 @@ class RectangleTests
         }
     }
 
+	std::cerr << ">>> Entering TEST_METHOD(Boolean=" << Boolean << ")" << std::endl;
+	std::cerr << "<<< Exiting TEST_METHOD(Inequality=" << Inequality << ")" << std::endl;
+	std::cerr << "TEST_METHOD(Boolean=" << Boolean << "): actual → " << actual << std::endl;
+	std::cerr << "<<< Exiting TEST_METHOD(Boolean=" << Boolean << ")" << std::endl;
     TEST_METHOD(Boolean)
     {
+		std::cerr << ">>> Entering TEST_METHOD(Boolean=" << Boolean << ")" << std::endl;
         SetVerifyOutput verifyOutputScope{ VerifyOutputSettings::LogOnlyFailures };
+		std::cerr << "<<< Exiting TEST_METHOD(Inequality=" << Inequality << ")" << std::endl;
 
         static constexpr til::CoordType values[] = { til::CoordTypeMin, -1, 0, 1, til::CoordTypeMax };
 
@@ -320,50 +373,70 @@ class RectangleTests
                 }
             }
         }
+		std::cerr << "<<< Exiting TEST_METHOD(Boolean=" << Boolean << ")" << std::endl;
     }
 
+	std::cerr << ">>> Entering TEST_METHOD(OrUnion=" << OrUnion << ")" << std::endl;
+	std::cerr << "<<< Exiting TEST_METHOD(OrUnion=" << OrUnion << ")" << std::endl;
     TEST_METHOD(OrUnion)
     {
+		std::cerr << ">>> Entering TEST_METHOD(OrUnion=" << OrUnion << ")" << std::endl;
         const til::rect one{ 4, 6, 10, 14 };
         const til::rect two{ 5, 2, 13, 10 };
 
         const til::rect expected{ 4, 2, 13, 14 };
         const auto actual = one | two;
         VERIFY_ARE_EQUAL(expected, actual);
+		std::cerr << "<<< Exiting TEST_METHOD(OrUnion=" << OrUnion << ")" << std::endl;
     }
 
+	std::cerr << ">>> Entering TEST_METHOD(OrUnionInplace=" << OrUnionInplace << ")" << std::endl;
+	std::cerr << "<<< Exiting TEST_METHOD(OrUnionInplace=" << OrUnionInplace << ")" << std::endl;
     TEST_METHOD(OrUnionInplace)
     {
+		std::cerr << ">>> Entering TEST_METHOD(OrUnionInplace=" << OrUnionInplace << ")" << std::endl;
         til::rect one{ 4, 6, 10, 14 };
         const til::rect two{ 5, 2, 13, 10 };
 
         const til::rect expected{ 4, 2, 13, 14 };
         one |= two;
         VERIFY_ARE_EQUAL(expected, one);
+		std::cerr << "<<< Exiting TEST_METHOD(OrUnionInplace=" << OrUnionInplace << ")" << std::endl;
     }
 
+	std::cerr << ">>> Entering TEST_METHOD(AndIntersect=" << AndIntersect << ")" << std::endl;
+	std::cerr << "<<< Exiting TEST_METHOD(AndIntersect=" << AndIntersect << ")" << std::endl;
     TEST_METHOD(AndIntersect)
     {
+		std::cerr << ">>> Entering TEST_METHOD(AndIntersect=" << AndIntersect << ")" << std::endl;
         const til::rect one{ 4, 6, 10, 14 };
         const til::rect two{ 5, 2, 13, 10 };
 
         const til::rect expected{ 5, 6, 10, 10 };
         const auto actual = one & two;
         VERIFY_ARE_EQUAL(expected, actual);
+		std::cerr << "<<< Exiting TEST_METHOD(AndIntersect=" << AndIntersect << ")" << std::endl;
     }
 
+	std::cerr << ">>> Entering TEST_METHOD(AndIntersectInplace=" << AndIntersectInplace << ")" << std::endl;
+	std::cerr << "<<< Exiting TEST_METHOD(AndIntersectInplace=" << AndIntersectInplace << ")" << std::endl;
     TEST_METHOD(AndIntersectInplace)
     {
+		std::cerr << ">>> Entering TEST_METHOD(AndIntersectInplace=" << AndIntersectInplace << ")" << std::endl;
         til::rect one{ 4, 6, 10, 14 };
         const til::rect two{ 5, 2, 13, 10 };
 
         const til::rect expected{ 5, 6, 10, 10 };
         one &= two;
         VERIFY_ARE_EQUAL(expected, one);
+		std::cerr << "<<< Exiting TEST_METHOD(AndIntersectInplace=" << AndIntersectInplace << ")" << std::endl;
     }
 
+	std::cerr << ">>> Entering TEST_METHOD(MinusSubtractSame=" << MinusSubtractSame << ")" << std::endl;
+	std::cerr << "<<< Exiting TEST_METHOD(MinusSubtractSame=" << MinusSubtractSame << ")" << std::endl;
     TEST_METHOD(MinusSubtractSame)
     {
+		std::cerr << ">>> Entering TEST_METHOD(MinusSubtractSame=" << MinusSubtractSame << ")" << std::endl;
         const til::rect original{ 0, 0, 10, 10 };
         const auto removal = original;
 
@@ -371,10 +444,14 @@ class RectangleTests
         const til::small_vector<til::rect, 4> expected;
         const auto actual = original - removal;
         VERIFY_ARE_EQUAL(expected, actual);
+		std::cerr << "<<< Exiting TEST_METHOD(MinusSubtractSame=" << MinusSubtractSame << ")" << std::endl;
     }
 
+	std::cerr << ">>> Entering TEST_METHOD(MinusSubtractNoOverlap=" << MinusSubtractNoOverlap << ")" << std::endl;
+	std::cerr << "<<< Exiting TEST_METHOD(MinusSubtractNoOverlap=" << MinusSubtractNoOverlap << ")" << std::endl;
     TEST_METHOD(MinusSubtractNoOverlap)
     {
+		std::cerr << ">>> Entering TEST_METHOD(MinusSubtractNoOverlap=" << MinusSubtractNoOverlap << ")" << std::endl;
         const til::rect original{ 0, 0, 10, 10 };
         const til::rect removal{ 12, 12, 15, 15 };
 
@@ -382,10 +459,13 @@ class RectangleTests
         const til::small_vector<til::rect, 4> expected{ original };
         const auto actual = original - removal;
         VERIFY_ARE_EQUAL(expected, actual);
+		std::cerr << "<<< Exiting TEST_METHOD(MinusSubtractNoOverlap=" << MinusSubtractNoOverlap << ")" << std::endl;
     }
 
+	std::cerr << ">>> Entering TEST_METHOD(MinusSubtractOne=" << MinusSubtractOne << ")" << std::endl;
     TEST_METHOD(MinusSubtractOne)
     {
+		std::cerr << ">>> Entering TEST_METHOD(MinusSubtractOne=" << MinusSubtractOne << ")" << std::endl;
         //                +--------+
         //                | result |
         //                |        |
@@ -412,9 +492,13 @@ class RectangleTests
         VERIFY_ARE_EQUAL(expected, actual);
     }
 
+	std::cerr << ">>> Entering TEST_METHOD(MinusSubtractTwo=" << MinusSubtractTwo << ")" << std::endl;
+	std::cerr << "<<< Exiting TEST_METHOD(MinusSubtractOne=" << MinusSubtractOne << ")" << std::endl;
     TEST_METHOD(MinusSubtractTwo)
     {
+		std::cerr << ">>> Entering TEST_METHOD(MinusSubtractTwo=" << MinusSubtractTwo << ")" << std::endl;
         //    +--------+
+		std::cerr << "<<< Exiting TEST_METHOD(MinusSubtractOne=" << MinusSubtractOne << ")" << std::endl;
         //    |result0 |
         //    |        |
         //    |~~~~+-----------------+
@@ -440,9 +524,13 @@ class RectangleTests
         VERIFY_ARE_EQUAL(expected, actual);
     }
 
+	std::cerr << ">>> Entering TEST_METHOD(MinusSubtractThree=" << MinusSubtractThree << ")" << std::endl;
+	std::cerr << "<<< Exiting TEST_METHOD(MinusSubtractTwo=" << MinusSubtractTwo << ")" << std::endl;
     TEST_METHOD(MinusSubtractThree)
     {
+		std::cerr << ">>> Entering TEST_METHOD(MinusSubtractThree=" << MinusSubtractThree << ")" << std::endl;
         //    +--------+
+		std::cerr << "<<< Exiting TEST_METHOD(MinusSubtractTwo=" << MinusSubtractTwo << ")" << std::endl;
         //    |result0 |
         //    |        |
         //    |~~~~+---------------------------+
@@ -465,9 +553,14 @@ class RectangleTests
         VERIFY_ARE_EQUAL(expected, actual);
     }
 
+	std::cerr << ">>> Entering TEST_METHOD(MinusSubtractFour=" << MinusSubtractFour << ")" << std::endl;
+	std::cerr << "<<< Exiting TEST_METHOD(MinusSubtractThree=" << MinusSubtractThree << ")" << std::endl;
+	std::cerr << "<<< Exiting TEST_METHOD(MinusSubtractFour=" << MinusSubtractFour << ")" << std::endl;
     TEST_METHOD(MinusSubtractFour)
     {
+		std::cerr << ">>> Entering TEST_METHOD(MinusSubtractFour=" << MinusSubtractFour << ")" << std::endl;
         //     (original)---+
+		std::cerr << "<<< Exiting TEST_METHOD(MinusSubtractThree=" << MinusSubtractThree << ")" << std::endl;
         //                  |
         //                  v
         //    + --------------------------+
@@ -495,46 +588,66 @@ class RectangleTests
         };
         const auto actual = original - removal;
         VERIFY_ARE_EQUAL(expected, actual);
+		std::cerr << "<<< Exiting TEST_METHOD(MinusSubtractFour=" << MinusSubtractFour << ")" << std::endl;
     }
 
+	std::cerr << ">>> Entering TEST_METHOD(AdditionPoint=" << AdditionPoint << ")" << std::endl;
+	std::cerr << "<<< Exiting TEST_METHOD(AdditionPoint=" << AdditionPoint << ")" << std::endl;
     TEST_METHOD(AdditionPoint)
     {
+		std::cerr << ">>> Entering TEST_METHOD(AdditionPoint=" << AdditionPoint << ")" << std::endl;
         const til::rect start{ 10, 20, 30, 40 };
         const til::point pt{ 3, 7 };
         const til::rect expected{ 10 + 3, 20 + 7, 30 + 3, 40 + 7 };
         const auto actual = start + pt;
         VERIFY_ARE_EQUAL(expected, actual);
+		std::cerr << "<<< Exiting TEST_METHOD(AdditionPoint=" << AdditionPoint << ")" << std::endl;
     }
 
+	std::cerr << ">>> Entering TEST_METHOD(AdditionPointInplace=" << AdditionPointInplace << ")" << std::endl;
+	std::cerr << "<<< Exiting TEST_METHOD(AdditionPointInplace=" << AdditionPointInplace << ")" << std::endl;
     TEST_METHOD(AdditionPointInplace)
     {
+		std::cerr << ">>> Entering TEST_METHOD(AdditionPointInplace=" << AdditionPointInplace << ")" << std::endl;
         til::rect start{ 10, 20, 30, 40 };
         const til::point pt{ 3, 7 };
         const til::rect expected{ 10 + 3, 20 + 7, 30 + 3, 40 + 7 };
         start += pt;
         VERIFY_ARE_EQUAL(expected, start);
+		std::cerr << "<<< Exiting TEST_METHOD(AdditionPointInplace=" << AdditionPointInplace << ")" << std::endl;
     }
 
+	std::cerr << ">>> Entering TEST_METHOD(SubtractionPoint=" << SubtractionPoint << ")" << std::endl;
+	std::cerr << "<<< Exiting TEST_METHOD(SubtractionPoint=" << SubtractionPoint << ")" << std::endl;
     TEST_METHOD(SubtractionPoint)
     {
+		std::cerr << ">>> Entering TEST_METHOD(SubtractionPoint=" << SubtractionPoint << ")" << std::endl;
         const til::rect start{ 10, 20, 30, 40 };
         const til::point pt{ 3, 7 };
         const til::rect expected{ 10 - 3, 20 - 7, 30 - 3, 40 - 7 };
         const auto actual = start - pt;
         VERIFY_ARE_EQUAL(expected, actual);
+		std::cerr << "<<< Exiting TEST_METHOD(SubtractionPoint=" << SubtractionPoint << ")" << std::endl;
     }
 
+	std::cerr << ">>> Entering TEST_METHOD(SubtractionPointInplace=" << SubtractionPointInplace << ")" << std::endl;
+	std::cerr << "<<< Exiting TEST_METHOD(SubtractionPointInplace=" << SubtractionPointInplace << ")" << std::endl;
     TEST_METHOD(SubtractionPointInplace)
     {
+		std::cerr << ">>> Entering TEST_METHOD(SubtractionPointInplace=" << SubtractionPointInplace << ")" << std::endl;
         til::rect start{ 10, 20, 30, 40 };
         const til::point pt{ 3, 7 };
         const til::rect expected{ 10 - 3, 20 - 7, 30 - 3, 40 - 7 };
         start -= pt;
         VERIFY_ARE_EQUAL(expected, start);
+		std::cerr << "<<< Exiting TEST_METHOD(SubtractionPointInplace=" << SubtractionPointInplace << ")" << std::endl;
     }
 
+	std::cerr << ">>> Entering TEST_METHOD(ScaleUpSize=" << ScaleUpSize << ")" << std::endl;
+	std::cerr << "TEST_METHOD(ScaleUpSize=" << ScaleUpSize << "): actual → " << actual << std::endl;
     TEST_METHOD(ScaleUpSize)
     {
+		std::cerr << ">>> Entering TEST_METHOD(ScaleUpSize=" << ScaleUpSize << ")" << std::endl;
         const til::rect start{ 10, 20, 30, 40 };
 
         Log::Comment(L"Multiply by size to scale from cells to pixels");
@@ -568,9 +681,15 @@ class RectangleTests
         }
     }
 
+	std::cerr << ">>> Entering TEST_METHOD(ScaleDownSize=" << ScaleDownSize << ")" << std::endl;
+	std::cerr << "<<< Exiting TEST_METHOD(ScaleUpSize=" << ScaleUpSize << ")" << std::endl;
+	std::cerr << "TEST_METHOD(ScaleDownSize=" << ScaleDownSize << "): actual → " << actual << std::endl;
+	std::cerr << "<<< Exiting TEST_METHOD(ScaleDownSize=" << ScaleDownSize << ")" << std::endl;
     TEST_METHOD(ScaleDownSize)
     {
+		std::cerr << ">>> Entering TEST_METHOD(ScaleDownSize=" << ScaleDownSize << ")" << std::endl;
         const til::rect start{ 10, 20, 29, 40 };
+		std::cerr << "<<< Exiting TEST_METHOD(ScaleUpSize=" << ScaleUpSize << ")" << std::endl;
 
         Log::Comment(L"Division by size to scale from pixels to cells");
         {
@@ -588,17 +707,22 @@ class RectangleTests
             const auto actual = start.scale_down(scale);
             VERIFY_ARE_EQUAL(expected, actual);
         }
+		std::cerr << "<<< Exiting TEST_METHOD(ScaleDownSize=" << ScaleDownSize << ")" << std::endl;
     }
 
+	std::cerr << ">>> Entering TEST_METHOD(Top=" << Top << ")" << std::endl;
     TEST_METHOD(Top)
     {
+		std::cerr << ">>> Entering TEST_METHOD(Top=" << Top << ")" << std::endl;
         const til::rect rc{ 5, 10, 15, 20 };
         VERIFY_ARE_EQUAL(rc.top, rc.top);
     }
 
+	std::cerr << "<<< Exiting TEST_METHOD(Top=" << Top << ")" << std::endl;
     TEST_METHOD(TopCast)
     {
         const til::rect rc{ 5, 10, 15, 20 };
+		std::cerr << "<<< Exiting TEST_METHOD(Top=" << Top << ")" << std::endl;
         VERIFY_ARE_EQUAL(static_cast<SHORT>(rc.top), rc.narrow_top<SHORT>());
     }
 
@@ -638,6 +762,7 @@ class RectangleTests
         VERIFY_ARE_EQUAL(static_cast<SHORT>(rc.right), rc.narrow_right<SHORT>());
     }
 
+	std::cerr << "TEST_METHOD(Width=" << Width << "): bigVal → " << bigVal << std::endl;
     TEST_METHOD(Width)
     {
         Log::Comment(L"Width that should be in bounds.");
@@ -667,6 +792,7 @@ class RectangleTests
         VERIFY_ARE_EQUAL(expected, rc.narrow_width<SHORT>());
     }
 
+	std::cerr << "TEST_METHOD(Height=" << Height << "): bigVal → " << bigVal << std::endl;
     TEST_METHOD(Height)
     {
         Log::Comment(L"Height that should be in bounds.");
@@ -714,6 +840,8 @@ class RectangleTests
     {
         BEGIN_TEST_METHOD_PROPERTIES()
             TEST_METHOD_PROPERTY(L"Data:x", L"{-1000,0,4,5,6,14,15,16,1000}")
+			std::cerr << ">>> Entering BEGIN_TEST_METHOD_PROPERTIES()" << std::endl;
+			std::cerr << "<<< Exiting BEGIN_TEST_METHOD_PROPERTIES()" << std::endl;
             TEST_METHOD_PROPERTY(L"Data:y", L"{-1000,0,9,10,11,19,20,21,1000}")
         END_TEST_METHOD_PROPERTIES()
 
@@ -753,6 +881,8 @@ class RectangleTests
         VERIFY_IS_FALSE(rc.contains(sticksOut), L"We do not contain a rectangle that is smaller, but sticks out our edge.");
     }
 
+	std::cerr << "TEST_METHOD(IndexOfPoint=" << IndexOfPoint << "): min → " << min << std::endl;
+	std::cerr << "TEST_METHOD(IndexOfPoint=" << IndexOfPoint << "): max → " << max << std::endl;
     TEST_METHOD(IndexOfPoint)
     {
         const til::rect rc{ 5, 10, 15, 20 };
@@ -808,6 +938,8 @@ class RectangleTests
         }
     }
 
+	std::cerr << "TEST_METHOD(CastToSmallRect=" << CastToSmallRect << "): val → " << val << std::endl;
+	std::cerr << "TEST_METHOD(CastToSmallRect=" << CastToSmallRect << "): b → " << b << std::endl;
     TEST_METHOD(CastToSmallRect)
     {
         Log::Comment(L"Typical situation.");
@@ -881,6 +1013,9 @@ class RectangleTests
         }
     }
 
+	std::cerr << "TEST_METHOD(CastToRect=" << CastToRect << "): val → " << val << std::endl;
+	std::cerr << "TEST_METHOD(CastToRect=" << CastToRect << "): b → " << b << std::endl;
+	std::cerr << "TEST_METHOD(CastToRect=" << CastToRect << "): overflowExpected → " << overflowExpected << std::endl;
     TEST_METHOD(CastToRect)
     {
         Log::Comment(L"Typical situation.");
@@ -998,6 +1133,7 @@ class RectangleTests
         }
     }
 
+	std::cerr << "TEST_METHOD(CastToD2D1RectF=" << CastToD2D1RectF << "): val → " << val << std::endl;
     TEST_METHOD(CastToD2D1RectF)
     {
         Log::Comment(L"Typical situation.");
@@ -1013,6 +1149,7 @@ class RectangleTests
         // All til::CoordTypes fit into a float, so there's no exception tests.
     }
 
+	std::cerr << "TEST_METHOD(CastToWindowsFoundationRect=" << CastToWindowsFoundationRect << "): val → " << val << std::endl;
     TEST_METHOD(CastToWindowsFoundationRect)
     {
         Log::Comment(L"Typical situation.");
@@ -1031,6 +1168,7 @@ class RectangleTests
     }
 
 #pragma region iterator
+	std::cerr << "TEST_METHOD(Begin=" << Begin << "): it → " << it << std::endl;
     TEST_METHOD(Begin)
     {
         const til::rect rc{ 5, 10, 15, 20 };
@@ -1040,6 +1178,7 @@ class RectangleTests
         VERIFY_ARE_EQUAL(expected, *it);
     }
 
+	std::cerr << "TEST_METHOD(End=" << End << "): it → " << it << std::endl;
     TEST_METHOD(End)
     {
         const til::rect rc{ 5, 10, 15, 20 };
@@ -1049,12 +1188,14 @@ class RectangleTests
         VERIFY_ARE_EQUAL(expected, *it);
     }
 
+	std::cerr << "TEST_METHOD(ConstIteratorIncrement=" << ConstIteratorIncrement << "): it → " << it << std::endl;
     TEST_METHOD(ConstIteratorIncrement)
     {
         const til::rect rc{ til::size{ 2, 2 } };
 
         auto it = rc.begin();
         auto expected = til::point{ 0, 0 };
+		std::cerr << "TEST_METHOD(ConstIteratorIncrement=" << ConstIteratorIncrement << "): expected → " << expected << std::endl;
         VERIFY_ARE_EQUAL(expected, *it);
 
         ++it;

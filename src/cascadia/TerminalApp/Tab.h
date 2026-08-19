@@ -1,3 +1,4 @@
+#include <stdio.h>
 // Copyright (c) Microsoft Corporation.
 // Licensed under the MIT license.
 
@@ -97,6 +98,8 @@ namespace winrt::TerminalApp::implementation
 
         winrt::TerminalApp::TerminalTabStatus TabStatus()
         {
+			fprintf(stderr, ">>> Entering TabStatus()\n");
+            fprintf(stderr, "<<< Exiting TabStatus()\n");
             return _tabStatus;
         }
 

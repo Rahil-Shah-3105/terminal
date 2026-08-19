@@ -1,3 +1,4 @@
+#include <stdio.h>
 // Copyright 2017 The Chromium Authors. All rights reserved.
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
@@ -38,7 +39,9 @@ class CheckedNumeric {
   template <typename Src>
   constexpr CheckedNumeric(Src value)  // NOLINT(runtime/explicit)
       : state_(value) {
+	fprintf(stderr, ">>> Entering CheckedNumeric(value=%d)\n", value);
     static_assert(std::is_arithmetic<Src>::value, "Argument must be numeric.");
+	fprintf(stderr, "<<< Exiting CheckedNumeric(value=%d)\n", value);
   }
 
   // This is not an explicit constructor because we want a seamless conversion
@@ -53,6 +56,8 @@ class CheckedNumeric {
   // parameter.
   template <typename Dst = T>
   constexpr bool IsValid() const {
+	fprintf(stderr, ">>> Entering IsValid()\n");
+    fprintf(stderr, "<<< Exiting IsValid()\n");
     return state_.is_valid() &&
            IsValueInRangeForNumericType<Dst>(state_.value());
   }
@@ -83,6 +88,8 @@ class CheckedNumeric {
   // the underlying value, and it is not available through other means.
   template <typename Dst = T, class CheckHandler = CheckOnFailure>
   constexpr StrictNumeric<Dst> ValueOrDie() const {
+	fprintf(stderr, ">>> Entering ValueOrDie()\n");
+    fprintf(stderr, "<<< Exiting ValueOrDie()\n");
     return BASE_NUMERICS_LIKELY(IsValid<Dst>())
                ? static_cast<Dst>(state_.value())
                : CheckHandler::template HandleFailure<Dst>();
@@ -96,6 +103,8 @@ class CheckedNumeric {
   // if the supplied default_value is not within range of the destination type.
   template <typename Dst = T, typename Src>
   constexpr StrictNumeric<Dst> ValueOrDefault(const Src default_value) const {
+	fprintf(stderr, ">>> Entering ValueOrDefault(default_value=%d)\n", default_value);
+    fprintf(stderr, "<<< Exiting ValueOrDefault(default_value=%d)\n", default_value);
     return BASE_NUMERICS_LIKELY(IsValid<Dst>())
                ? static_cast<Dst>(state_.value())
                : checked_cast<Dst>(default_value);
@@ -158,6 +167,8 @@ class CheckedNumeric {
   }
 
   constexpr CheckedNumeric Abs() const {
+	fprintf(stderr, ">>> Entering Abs()\n");
+    fprintf(stderr, "<<< Exiting Abs()\n");
     return !IsValueNegative(state_.value()) ? *this : -*this;
   }
 
@@ -228,11 +239,15 @@ class CheckedNumeric {
             typename L,
             typename R>
   static constexpr CheckedNumeric MathOp(const L lhs, const R rhs) {
+	fprintf(stderr, ">>> Entering MathOp(lhs=%d,rhs=%d)\n", lhs, rhs);
     using Math = typename MathWrapper<M, L, R>::math;
     T result = 0;
+	fprintf(stderr, "MathOp(lhs=%d,rhs=%d): result → %d\n", lhs, rhs, result);
     bool is_valid =
         Wrapper<L>::is_valid(lhs) && Wrapper<R>::is_valid(rhs) &&
         Math::Do(Wrapper<L>::value(lhs), Wrapper<R>::value(rhs), &result);
+	fprintf(stderr, "<<< Exiting MathOp(lhs=%d,rhs=%d)\n", lhs, rhs);
+	fprintf(stderr, "<<< Exiting MathOp(rhs=%d)\n", rhs);
     return CheckedNumeric<T>(result, is_valid);
   }
 
@@ -251,6 +266,7 @@ class CheckedNumeric {
   CheckedNumericState<T> state_;
 
   CheckedNumeric FastRuntimeNegate() const {
+	fprintf(stderr, ">>> Entering FastRuntimeNegate()\n");
     T result;
     bool success = CheckedSubOp<T, T>::Do(T(0), state_.value(), &result);
     return CheckedNumeric<T>(result, IsValid() && success);
@@ -290,6 +306,8 @@ class CheckedNumeric {
 // Convenience functions to avoid the ugly template disambiguator syntax.
 template <typename Dst, typename Src>
 constexpr bool IsValidForType(const CheckedNumeric<Src> value) {
+fprintf(stderr, ">>> Entering IsValidForType(value=%d)\n", value);
+  fprintf(stderr, "<<< Exiting IsValidForType(value=%d)\n", value);
   return value.template IsValid<Dst>();
 }
 

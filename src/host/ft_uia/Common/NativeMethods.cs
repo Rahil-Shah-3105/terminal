@@ -16,17 +16,22 @@ namespace Conhost.UIA.Tests.Common.NativeMethods
     using Microsoft.Win32;
     using WEX.TestExecution;
     using WEX.Logging.Interop;
+	using Microsoft.Extensions.Logging;
 
     // Small extension method helpers to make C# feel closer to native.
     public static class NativeExtensions
     {
         public static int LoWord(this int val)
         {
+			_logger.LogDebug(">>> Entering LoWord(val={Val})", val);
+			_logger.LogDebug("<<< Exiting LoWord(val={Val})", val);
             return val & 0xffff;
         }
 
         public static int HiWord(this int val)
         {
+			_logger.LogDebug(">>> Entering HiWord(val={Val})", val);
+			_logger.LogDebug("<<< Exiting HiWord(val={Val})", val);
             return (val >> 16) & 0xffff;
         }
     }
@@ -35,6 +40,7 @@ namespace Conhost.UIA.Tests.Common.NativeMethods
     {
         public static void Win32BoolHelper(bool result, string actionMessage)
         {
+			_logger.LogDebug(">>> Entering Win32BoolHelper(result={Result},actionMessage={ActionMessage})", result, actionMessage);
             if (!result)
             {
                 string errorMsg = string.Format("Win32 error occurred: 0x{0:X}", Marshal.GetLastWin32Error());
@@ -42,10 +48,12 @@ namespace Conhost.UIA.Tests.Common.NativeMethods
             }
 
             Verify.IsTrue(result, actionMessage);
+			_logger.LogDebug("<<< Exiting Win32BoolHelper(result={Result},actionMessage={ActionMessage})", result, actionMessage);
         }
 
         public static void Win32NullHelper(IntPtr result, string actionMessage)
         {
+			_logger.LogDebug(">>> Entering Win32NullHelper(result={Result},actionMessage={ActionMessage})", result, actionMessage);
             if (result == IntPtr.Zero)
             {
                 string errorMsg = string.Format("Win32 error occurred: 0x{0:X}", Marshal.GetLastWin32Error());
@@ -53,6 +61,7 @@ namespace Conhost.UIA.Tests.Common.NativeMethods
             }
 
             Verify.IsNotNull(result, actionMessage);
+			_logger.LogDebug("<<< Exiting Win32NullHelper(result={Result},actionMessage={ActionMessage})", result, actionMessage);
         }
     }
 
@@ -61,6 +70,7 @@ namespace Conhost.UIA.Tests.Common.NativeMethods
         [Flags()]
         public enum CONSOLE_SELECTION_INFO_FLAGS : uint
         {
+			private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
             CONSOLE_NO_SELECTION = 0x0,
             CONSOLE_SELECTION_IN_PROGRESS = 0x1,
             CONSOLE_SELECTION_NOT_EMPTY = 0x2,
@@ -133,6 +143,7 @@ namespace Conhost.UIA.Tests.Common.NativeMethods
 
             public override string ToString()
             {
+				_logger.LogDebug("<<< Exiting ToString()");
                 return string.Format("(X:{0} Y:{1})", X, Y);
             }
         }
@@ -246,23 +257,34 @@ namespace Conhost.UIA.Tests.Common.NativeMethods
 
             public COLORREF(Color color)
             {
+				_logger.LogDebug(">>> Entering COLORREF(color={Color})", color);
                 ColorDWORD = (uint)color.R + (((uint)color.G) << 8) + (((uint)color.B) << 16);
+				_logger.LogDebug("COLORREF(r={R},g={G},b={B}): ColorDWORD → {ColorDWORD}", r, g, b, ColorDWORD);
+				_logger.LogDebug("<<< Exiting COLORREF(color={Color})", color);
+				_logger.LogDebug("COLORREF(color={Color}): ColorDWORD → {ColorDWORD}", color, ColorDWORD);
             }
 
             public COLORREF(uint r, uint g, uint b)
             {
+				_logger.LogDebug(">>> Entering COLORREF(r={R},g={G},b={B})", r, g, b);
                 ColorDWORD = r + (g << 8) + (b << 16);
+				_logger.LogDebug("<<< Exiting COLORREF(r={R},g={G},b={B})", r, g, b);
             }
 
             public Color GetColor()
             {
+				_logger.LogDebug(">>> Entering GetColor()");
+				_logger.LogDebug("<<< Exiting GetColor()");
                 return Color.FromArgb((int)(0x000000FFU & ColorDWORD),
                    (int)(0x0000FF00U & ColorDWORD) >> 8, (int)(0x00FF0000U & ColorDWORD) >> 16);
             }
 
             public void SetColor(Color color)
             {
+				_logger.LogDebug(">>> Entering SetColor(color={Color})", color);
                 ColorDWORD = (uint)color.R + (((uint)color.G) << 8) + (((uint)color.B) << 16);
+				_logger.LogDebug("SetColor(color={Color}): ColorDWORD → {ColorDWORD}", color, ColorDWORD);
+				_logger.LogDebug("<<< Exiting SetColor(color={Color})", color);
             }
         }
 

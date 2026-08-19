@@ -1,3 +1,4 @@
+#include <stdio.h>
 // Copyright (c) Microsoft Corporation.
 // Licensed under the MIT license.
 
@@ -121,6 +122,8 @@ namespace Microsoft::Console::Render::Atlas
 
             static constexpr size_t hash(const u16 glyphIndex) noexcept
             {
+				fprintf(stderr, ">>> Entering hash(glyphIndex=%d)\n", glyphIndex);
+                fprintf(stderr, "<<< Exiting hash(glyphIndex=%d)\n", glyphIndex);
                 return til::flat_set_hash_integer(glyphIndex);
             }
 
@@ -131,13 +134,19 @@ namespace Microsoft::Console::Render::Atlas
 
             static constexpr bool equals(const AtlasGlyphEntry& entry, u16 glyphIndex) noexcept
             {
+				fprintf(stderr, ">>> Entering equals(entry=%d,glyphIndex=%d)\n", entry, glyphIndex);
+                fprintf(stderr, "<<< Exiting equals(entry=%d,glyphIndex=%d)\n", entry, glyphIndex);
                 return entry.glyphIndex == glyphIndex;
             }
 
             static constexpr void assign(AtlasGlyphEntry& entry, u16 glyphIndex) noexcept
             {
+				fprintf(stderr, ">>> Entering assign(entry=%d,glyphIndex=%d)\n", entry, glyphIndex);
                 entry.glyphIndex = glyphIndex;
                 entry.occupied = 1;
+				fprintf(stderr, ">>> Entering assign(entry=%d,fontFace=%p)\n", entry, fontFace);
+				fprintf(stderr, "assign(entry=%d,fontFace=%d): entry.fontFace → %d\n", entry, fontFace, entry.fontFace);
+            fprintf(stderr, "<<< Exiting assign(entry=%d,fontFace=%p)\n", entry, fontFace);
             }
         };
 
@@ -177,6 +186,7 @@ namespace Microsoft::Console::Render::Atlas
             static void assign(AtlasFontFaceEntry& entry, IDWriteFontFace2* fontFace) noexcept
             {
                 entry.fontFace = fontFace;
+				fprintf(stderr, ">>> Entering assign(entry=%d,key=%d)\n", entry, key);
             }
         };
 

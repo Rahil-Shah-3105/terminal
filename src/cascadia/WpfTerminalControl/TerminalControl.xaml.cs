@@ -13,12 +13,14 @@ namespace Microsoft.Terminal.Wpf
     using System.Windows.Input;
     using System.Windows.Media;
     using Task = System.Threading.Tasks.Task;
+	using Microsoft.Extensions.Logging;
 
     /// <summary>
     /// A basic terminal control. This control can receive and render standard VT100 sequences.
     /// </summary>
     public partial class TerminalControl : UserControl
     {
+		private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
         private int accumulatedDelta = 0;
 
         /// <summary>
@@ -26,6 +28,7 @@ namespace Microsoft.Terminal.Wpf
         /// </summary>
         public TerminalControl()
         {
+			_logger.LogDebug(">>> Entering TerminalControl()");
             this.InitializeComponent();
 
             this.termContainer.TerminalScrolled += this.TermControl_TerminalScrolled;
@@ -33,6 +36,7 @@ namespace Microsoft.Terminal.Wpf
             this.scrollbar.MouseWheel += this.Scrollbar_MouseWheel;
 
             this.GotFocus += this.TerminalControl_GotFocus;
+			_logger.LogDebug("<<< Exiting TerminalControl()");
         }
 
         /// <summary>
@@ -80,8 +84,10 @@ namespace Microsoft.Terminal.Wpf
         /// <param name="externalBackground">Color for the control background when the terminal window is smaller than the hosting WPF window.</param>
         public void SetTheme(TerminalTheme theme, string fontFamily, short fontSize, Color externalBackground = default)
         {
+			_logger.LogDebug(">>> Entering SetTheme(theme={Theme},fontFamily={FontFamily},fontSize={FontSize},externalBackground={ExternalBackground})", theme, fontFamily, fontSize, externalBackground);
             PresentationSource source = PresentationSource.FromVisual(this);
 
+			_logger.LogDebug("SetTheme(theme={Theme},fontFamily={FontFamily},fontSize={FontSize},externalBackground={ExternalBackground}): source → {Source}", theme, fontFamily, fontSize, externalBackground, source);
             if (source == null)
             {
                 return;
@@ -91,8 +97,11 @@ namespace Microsoft.Terminal.Wpf
 
             // DefaultBackground uses Win32 COLORREF syntax which is BGR instead of RGB.
             byte b = Convert.ToByte((theme.DefaultBackground >> 16) & 0xff);
+			_logger.LogDebug("SetTheme(theme={Theme},fontFamily={FontFamily},fontSize={FontSize},externalBackground={ExternalBackground}): b → {B}", theme, fontFamily, fontSize, externalBackground, b);
             byte g = Convert.ToByte((theme.DefaultBackground >> 8) & 0xff);
+			_logger.LogDebug("SetTheme(theme={Theme},fontFamily={FontFamily},fontSize={FontSize},externalBackground={ExternalBackground}): g → {G}", theme, fontFamily, fontSize, externalBackground, g);
             byte r = Convert.ToByte(theme.DefaultBackground & 0xff);
+			_logger.LogDebug("SetTheme(theme={Theme},fontFamily={FontFamily},fontSize={FontSize},externalBackground={ExternalBackground}): r → {R}", theme, fontFamily, fontSize, externalBackground, r);
 
             // Set the background color for the control only if one is provided.
             // This is only shown when the terminal renderer is smaller than the enclosing WPF window.
@@ -100,6 +109,7 @@ namespace Microsoft.Terminal.Wpf
             {
                 this.Background = new SolidColorBrush(externalBackground);
             }
+			_logger.LogDebug("<<< Exiting SetTheme(theme={Theme},fontFamily={FontFamily},fontSize={FontSize},externalBackground={ExternalBackground})", theme, fontFamily, fontSize, externalBackground);
         }
 
         /// <summary>
@@ -108,6 +118,8 @@ namespace Microsoft.Terminal.Wpf
         /// <returns>Selected text, empty string if no content is selected.</returns>
         public string GetSelectedText()
         {
+			_logger.LogDebug(">>> Entering GetSelectedText()");
+			_logger.LogDebug("<<< Exiting GetSelectedText()");
             return this.termContainer.GetSelectedText();
         }
 
@@ -120,6 +132,8 @@ namespace Microsoft.Terminal.Wpf
         /// <returns>A <see cref="Task"/> representing the asynchronous operation.</returns>
         public async Task ResizeAsync(uint rows, uint columns, CancellationToken cancellationToken)
         {
+			_logger.LogDebug(">>> Entering ResizeAsync(rows={Rows},columns={Columns},cancellationToken=<redacted>)", rows, columns);
+			_logger.LogDebug("<<< Exiting ResizeAsync(rows={Rows},columns={Columns},cancellationToken=<redacted>)", rows, columns);
             this.termContainer.Resize(rows, columns);
 
 #pragma warning disable VSTHRD001 // Avoid legacy thread switching APIs
@@ -136,8 +150,10 @@ namespace Microsoft.Terminal.Wpf
         /// <returns>A tuple of (int, int) representing the number of rows and columns in the terminal.</returns>
         public (int rows, int columns) TriggerResize(Size rendersize)
         {
+			_logger.LogDebug(">>> Entering TriggerResize(rows={Rows},columns={Columns})", rows, columns);
             var dpiScale = VisualTreeHelper.GetDpi(this);
             rendersize.Width *= dpiScale.DpiScaleX;
+			_logger.LogDebug("TriggerResize(rows={Rows},columns={Columns}): dpiScale → {DpiScale}", rows, columns, dpiScale);
             rendersize.Height *= dpiScale.DpiScaleY;
 
             if (rendersize.Width == 0 || rendersize.Height == 0)
@@ -147,12 +163,14 @@ namespace Microsoft.Terminal.Wpf
 
             this.termContainer.Resize(rendersize);
 
+			_logger.LogDebug("<<< Exiting TriggerResize(rows={Rows},columns={Columns})", rows, columns);
             return (this.Rows, this.Columns);
         }
 
         /// <inheritdoc/>
         protected override AutomationPeer OnCreateAutomationPeer()
         {
+			_logger.LogDebug(">>> Entering OnCreateAutomationPeer()");
             var peer = FrameworkElementAutomationPeer.FromElement(this);
             if (peer == null)
             {
@@ -161,18 +179,23 @@ namespace Microsoft.Terminal.Wpf
                 peer = new TermControlAutomationPeer(this);
             }
 
+			_logger.LogDebug("<<< Exiting OnCreateAutomationPeer()");
             return peer;
         }
 
         /// <inheritdoc/>
         protected override void OnRenderSizeChanged(SizeChangedInfo sizeInfo)
         {
+			_logger.LogDebug(">>> Entering OnRenderSizeChanged(sizeInfo={SizeInfo})", sizeInfo);
             var dpiScale = VisualTreeHelper.GetDpi(this);
 
+			_logger.LogDebug("OnRenderSizeChanged(sizeInfo={SizeInfo}): dpiScale → {DpiScale}", sizeInfo, dpiScale);
             var newSizeWidth = (sizeInfo.NewSize.Width - this.scrollbar.ActualWidth) * dpiScale.DpiScaleX;
+			_logger.LogDebug("OnRenderSizeChanged(sizeInfo={SizeInfo}): newSizeWidth → {NewSizeWidth}", sizeInfo, newSizeWidth);
             newSizeWidth = newSizeWidth < 0 ? 0 : newSizeWidth;
 
             var newSizeHeight = sizeInfo.NewSize.Height * dpiScale.DpiScaleY;
+			_logger.LogDebug("OnRenderSizeChanged(sizeInfo={SizeInfo}): newSizeHeight → {NewSizeHeight}", sizeInfo, newSizeHeight);
             newSizeHeight = newSizeHeight < 0 ? 0 : newSizeHeight;
 
             this.termContainer.TerminalControlSize = new Size
@@ -192,6 +215,7 @@ namespace Microsoft.Terminal.Wpf
             }
 
             base.OnRenderSizeChanged(sizeInfo);
+			_logger.LogDebug("<<< Exiting OnRenderSizeChanged(sizeInfo={SizeInfo})", sizeInfo);
         }
 
         /// <summary>
@@ -201,8 +225,10 @@ namespace Microsoft.Terminal.Wpf
         /// <returns>The new terminal control margin thickness in device independent units.</returns>
         private Thickness CalculateMargins(Size controlSize = default)
         {
+			_logger.LogDebug(">>> Entering CalculateMargins(controlSize={ControlSize})", controlSize);
             var dpiScale = VisualTreeHelper.GetDpi(this);
             double width = 0, height = 0;
+			_logger.LogDebug("CalculateMargins(controlSize={ControlSize}): width → {Width}", controlSize, width);
 
             if (controlSize == default)
             {
@@ -224,6 +250,7 @@ namespace Microsoft.Terminal.Wpf
             {
                 height = controlSize.Height - (this.TerminalRendererSize.Height / dpiScale.DpiScaleY);
             }
+			_logger.LogDebug("CalculateMargins(controlSize={ControlSize}): height → {Height}", controlSize, height);
 
             width -= this.scrollbar.ActualWidth;
 
@@ -231,22 +258,29 @@ namespace Microsoft.Terminal.Wpf
             width = width < 0 ? 0 : width;
             height = height < 0 ? 0 : height;
 
+			_logger.LogDebug("<<< Exiting CalculateMargins(controlSize={ControlSize})", controlSize);
             return new Thickness(0, 0, width, height);
         }
 
         private void TerminalControl_GotFocus(object sender, RoutedEventArgs e)
         {
+			_logger.LogDebug(">>> Entering TerminalControl_GotFocus(sender={Sender},e={E})", sender, e);
             e.Handled = true;
             this.termContainer.Focus();
+			_logger.LogDebug("TerminalControl_GotFocus(sender={Sender},e={E}): e.Handled → {Arg2}", sender, e, e.Handled);
+			_logger.LogDebug("<<< Exiting TerminalControl_GotFocus(sender={Sender},e={E})", sender, e);
         }
 
         private void Scrollbar_MouseWheel(object sender, MouseWheelEventArgs e)
         {
+			_logger.LogDebug(">>> Entering Scrollbar_MouseWheel(sender={Sender},e={E})", sender, e);
             this.TermControl_UserScrolled(sender, e.Delta);
+			_logger.LogDebug("<<< Exiting Scrollbar_MouseWheel(sender={Sender},e={E})", sender, e);
         }
 
         private void TermControl_UserScrolled(object sender, int delta)
         {
+			_logger.LogDebug(">>> Entering TermControl_UserScrolled(sender={Sender},delta={Delta})", sender, delta);
             var lineDelta = 120 / SystemParameters.WheelScrollLines;
             this.accumulatedDelta += delta;
 
@@ -260,13 +294,17 @@ namespace Microsoft.Terminal.Wpf
                 var lines = -this.accumulatedDelta / lineDelta;
                 this.scrollbar.Value += lines;
                 this.accumulatedDelta = 0;
+				_logger.LogDebug("TermControl_UserScrolled(sender={Sender},delta={Delta}): accumulatedDelta → {AccumulatedDelta}", sender, delta, accumulatedDelta);
+				_logger.LogDebug("TermControl_UserScrolled(sender={Sender},delta={Delta}): this.accumulatedDelta → {Arg2}", sender, delta, this.accumulatedDelta);
 
                 this.termContainer.UserScroll((int)this.scrollbar.Value);
             });
+			_logger.LogDebug("<<< Exiting TermControl_UserScrolled(sender={Sender},delta={Delta})", sender, delta);
         }
 
         private void TermControl_TerminalScrolled(object sender, (int viewTop, int viewHeight, int bufferSize) e)
         {
+			_logger.LogDebug(">>> Entering TermControl_TerminalScrolled(sender={Sender},e={E})", sender, e);
             this.Dispatcher.InvokeAsync(() =>
             {
                 this.scrollbar.Minimum = 0;
@@ -274,12 +312,16 @@ namespace Microsoft.Terminal.Wpf
                 this.scrollbar.Value = e.viewTop;
                 this.scrollbar.ViewportSize = e.viewHeight;
             });
+			_logger.LogDebug("<<< Exiting TermControl_TerminalScrolled(sender={Sender},e={E})", sender, e);
         }
 
         private void Scrollbar_Scroll(object sender, System.Windows.Controls.Primitives.ScrollEventArgs e)
         {
+			_logger.LogDebug(">>> Entering Scrollbar_Scroll(sender={Sender},e={E})", sender, e);
             var viewTop = (int)e.NewValue;
             this.termContainer.UserScroll(viewTop);
+			_logger.LogDebug("Scrollbar_Scroll(sender={Sender},e={E}): viewTop → {ViewTop}", sender, e, viewTop);
+			_logger.LogDebug("<<< Exiting Scrollbar_Scroll(sender={Sender},e={E})", sender, e);
         }
 
         private class TermControlAutomationPeer : UserControlAutomationPeer
@@ -287,15 +329,21 @@ namespace Microsoft.Terminal.Wpf
             public TermControlAutomationPeer(UserControl owner)
                 : base(owner)
             {
+			_logger.LogDebug(">>> Entering TermControlAutomationPeer(owner={Owner})", owner);
+			_logger.LogDebug("<<< Exiting TermControlAutomationPeer(owner={Owner})", owner);
             }
 
             protected override bool IsContentElementCore()
             {
+				_logger.LogDebug(">>> Entering IsContentElementCore()");
+				_logger.LogDebug("<<< Exiting IsContentElementCore()");
                 return false;
             }
 
             protected override bool IsControlElementCore()
             {
+				_logger.LogDebug(">>> Entering IsControlElementCore()");
+				_logger.LogDebug("<<< Exiting IsControlElementCore()");
                 return false;
             }
         }

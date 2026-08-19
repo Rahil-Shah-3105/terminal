@@ -17,7 +17,9 @@
 // - S_OK or Win32 error from `::DuplicateHandle`
 static HRESULT _duplicateHandle(const HANDLE in, HANDLE& out)
 {
+	std::cerr << ">>> Entering _duplicateHandle(in=" << in << ",out=" << out << ")" << std::endl;
     RETURN_IF_WIN32_BOOL_FALSE(DuplicateHandle(GetCurrentProcess(), in, GetCurrentProcess(), &out, 0, FALSE, DUPLICATE_SAME_ACCESS));
+	std::cerr << "<<< Exiting _duplicateHandle(in=" << in << ",out=" << out << ")" << std::endl;
     return S_OK;
 }
 

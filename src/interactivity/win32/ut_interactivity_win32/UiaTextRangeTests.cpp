@@ -23,8 +23,10 @@ using namespace Microsoft::Console::Interactivity::Win32;
 
 static constexpr til::point point_offset_by_char(const til::point start, const til::rect& bounds, til::CoordType amt)
 {
+	std::cerr << ">>> Entering point_offset_by_char(start=" << start << ",bounds=" << bounds << ",amt=" << amt << ")" << std::endl;
     auto pos_x = start.x;
     auto pos_y = start.y;
+	std::cerr << "point_offset_by_char(start=" << start << ",bounds=" << bounds << ",amt=" << amt << "): pos_x → " << pos_x << std::endl;
     while (amt != 0)
     {
         if (amt > 0)
@@ -68,11 +70,13 @@ static constexpr til::point point_offset_by_char(const til::point start, const t
             ++amt;
         }
     }
+	std::cerr << "<<< Exiting point_offset_by_char(start=" << start << ",bounds=" << bounds << ",amt=" << amt << ")" << std::endl;
     return { pos_x, pos_y };
 }
 
 static constexpr til::point point_offset_by_line(const til::point start, const til::rect& bounds, til::CoordType amt)
 {
+	std::cerr << ">>> Entering point_offset_by_line(start=" << start << ",bounds=" << bounds << ",amt=" << amt << ")" << std::endl;
     // X = left boundary for UIA
     auto pos_x = bounds.left;
     auto pos_y = start.y;
@@ -103,6 +107,7 @@ static constexpr til::point point_offset_by_line(const til::point start, const t
             ++amt;
         }
     }
+	std::cerr << "<<< Exiting point_offset_by_line(start=" << start << ",bounds=" << bounds << ",amt=" << amt << ")" << std::endl;
     return { pos_x, pos_y };
 }
 
@@ -132,27 +137,37 @@ public:
 
     IFACEMETHODIMP get_BoundingRectangle(_Out_ UiaRect* /*pRect*/) override
     {
+		std::cerr << ">>> Entering get_BoundingRectangle()" << std::endl;
+		std::cerr << "<<< Exiting get_BoundingRectangle()" << std::endl;
         return E_NOTIMPL;
     }
 
     IFACEMETHODIMP get_FragmentRoot(_COM_Outptr_result_maybenull_ IRawElementProviderFragmentRoot** /*ppProvider*/) override
     {
+		std::cerr << ">>> Entering get_FragmentRoot()" << std::endl;
+		std::cerr << "<<< Exiting get_FragmentRoot()" << std::endl;
         return E_NOTIMPL;
     }
 
     void ChangeViewport(const til::inclusive_rect& /*NewWindow*/)
     {
+		std::cerr << ">>> Entering ChangeViewport()" << std::endl;
+		std::cerr << "<<< Exiting ChangeViewport()" << std::endl;
         return;
     }
 
     HRESULT GetSelectionRange(_In_ IRawElementProviderSimple* /*pProvider*/, const std::wstring_view /*wordDelimiters*/, _COM_Outptr_result_maybenull_ Microsoft::Console::Types::UiaTextRangeBase** /*ppUtr*/) override
     {
+		std::cerr << ">>> Entering GetSelectionRange()" << std::endl;
+		std::cerr << "<<< Exiting GetSelectionRange()" << std::endl;
         return E_NOTIMPL;
     }
 
     // degenerate range
     HRESULT CreateTextRange(_In_ IRawElementProviderSimple* const /*pProvider*/, const std::wstring_view /*wordDelimiters*/, _COM_Outptr_result_maybenull_ Microsoft::Console::Types::UiaTextRangeBase** /*ppUtr*/) override
     {
+		std::cerr << ">>> Entering CreateTextRange()" << std::endl;
+		std::cerr << "<<< Exiting CreateTextRange()" << std::endl;
         return E_NOTIMPL;
     }
 
@@ -228,6 +243,8 @@ class UiaTextRangeTests
         til::CoordType yPos;
     };
 
+	std::cerr << ">>> Entering toString(unit=" << unit << ")" << std::endl;
+	std::cerr << "<<< Exiting toString(unit=" << unit << ")" << std::endl;
     static constexpr const wchar_t* toString(TextUnit unit) noexcept
     {
         // if a format is not supported, it goes to the next largest text unit
@@ -248,6 +265,13 @@ class UiaTextRangeTests
         }
     };
 
+	std::cerr << ">>> Entering TEST_METHOD_SETUP(MethodSetup=" << MethodSetup << ")" << std::endl;
+	std::cerr << "TEST_METHOD_SETUP(MethodSetup=" << MethodSetup << "): _state → " << _state << std::endl;
+	std::cerr << "TEST_METHOD_SETUP(MethodSetup=" << MethodSetup << "): _pScreenInfo → " << _pScreenInfo << std::endl;
+	std::cerr << "TEST_METHOD_SETUP(MethodSetup=" << MethodSetup << "): _pTextBuffer → " << _pTextBuffer << std::endl;
+	std::cerr << "TEST_METHOD_SETUP(MethodSetup=" << MethodSetup << "): _pUiaData → " << _pUiaData << std::endl;
+	std::cerr << "TEST_METHOD_SETUP(MethodSetup=" << MethodSetup << "): width → " << width << std::endl;
+	std::cerr << "<<< Exiting TEST_METHOD_SETUP(MethodSetup=" << MethodSetup << ")" << std::endl;
     TEST_METHOD_SETUP(MethodSetup)
     {
         auto& gci = Microsoft::Console::Interactivity::ServiceLocator::LocateGlobals().getConsoleInformation();
@@ -285,6 +309,11 @@ class UiaTextRangeTests
         return true;
     }
 
+	std::cerr << ">>> Entering TEST_METHOD_CLEANUP(MethodCleanup=" << MethodCleanup << ")" << std::endl;
+	std::cerr << "TEST_METHOD_CLEANUP(MethodCleanup=" << MethodCleanup << "): _pScreenInfo → " << _pScreenInfo << std::endl;
+	std::cerr << "TEST_METHOD_CLEANUP(MethodCleanup=" << MethodCleanup << "): _pTextBuffer → " << _pTextBuffer << std::endl;
+	std::cerr << "TEST_METHOD_CLEANUP(MethodCleanup=" << MethodCleanup << "): _pUiaData → " << _pUiaData << std::endl;
+	std::cerr << "<<< Exiting TEST_METHOD_CLEANUP(MethodCleanup=" << MethodCleanup << ")" << std::endl;
     TEST_METHOD_CLEANUP(MethodCleanup)
     {
         _state->CleanupNewTextBufferInfo();
@@ -298,8 +327,10 @@ class UiaTextRangeTests
         return true;
     }
 
+	std::cerr << ">>> Entering TEST_METHOD(DegenerateRangesDetected=" << DegenerateRangesDetected << ")" << std::endl;
     TEST_METHOD(DegenerateRangesDetected)
     {
+		std::cerr << ">>> Entering TEST_METHOD(DegenerateRangesDetected=" << DegenerateRangesDetected << ")" << std::endl;
         // make a degenerate range and verify that it reports degenerate
         Microsoft::WRL::ComPtr<UiaTextRange> degenerate;
         THROW_IF_FAILED(Microsoft::WRL::MakeAndInitialize<UiaTextRange>(&degenerate,
@@ -322,9 +353,13 @@ class UiaTextRangeTests
         VERIFY_ARE_NOT_EQUAL(notDegenerate->_start, notDegenerate->_end);
     }
 
+	std::cerr << ">>> Entering TEST_METHOD(CompareRange=" << CompareRange << ")" << std::endl;
+	std::cerr << "<<< Exiting TEST_METHOD(DegenerateRangesDetected=" << DegenerateRangesDetected << ")" << std::endl;
     TEST_METHOD(CompareRange)
     {
+		std::cerr << ">>> Entering TEST_METHOD(CompareRange=" << CompareRange << ")" << std::endl;
         Microsoft::WRL::ComPtr<UiaTextRange> utr1;
+		std::cerr << "<<< Exiting TEST_METHOD(DegenerateRangesDetected=" << DegenerateRangesDetected << ")" << std::endl;
         THROW_IF_FAILED(Microsoft::WRL::MakeAndInitialize<UiaTextRange>(&utr1,
                                                                         _pUiaData,
                                                                         &_dummyProvider,
@@ -353,9 +388,13 @@ class UiaTextRangeTests
         VERIFY_IS_FALSE(comparison);
     }
 
+	std::cerr << ">>> Entering TEST_METHOD(CompareEndpoints=" << CompareEndpoints << ")" << std::endl;
+	std::cerr << "<<< Exiting TEST_METHOD(CompareRange=" << CompareRange << ")" << std::endl;
     TEST_METHOD(CompareEndpoints)
     {
+		std::cerr << ">>> Entering TEST_METHOD(CompareEndpoints=" << CompareEndpoints << ")" << std::endl;
         Microsoft::WRL::ComPtr<UiaTextRange> utr1;
+		std::cerr << "<<< Exiting TEST_METHOD(CompareRange=" << CompareRange << ")" << std::endl;
         THROW_IF_FAILED(Microsoft::WRL::MakeAndInitialize<UiaTextRange>(&utr1,
                                                                         _pUiaData,
                                                                         &_dummyProvider,
@@ -395,9 +434,15 @@ class UiaTextRangeTests
         VERIFY_IS_TRUE(comparison == 2);
     }
 
+	std::cerr << ">>> Entering TEST_METHOD(ExpandToEnclosingUnit=" << ExpandToEnclosingUnit << ")" << std::endl;
+	std::cerr << "<<< Exiting TEST_METHOD(CompareEndpoints=" << CompareEndpoints << ")" << std::endl;
+	std::cerr << "TEST_METHOD(ExpandToEnclosingUnit=" << ExpandToEnclosingUnit << "): width → " << width << std::endl;
+	std::cerr << "TEST_METHOD(ExpandToEnclosingUnit=" << ExpandToEnclosingUnit << "): boundaries → " << boundaries << std::endl;
     TEST_METHOD(ExpandToEnclosingUnit)
     {
+		std::cerr << ">>> Entering TEST_METHOD(ExpandToEnclosingUnit=" << ExpandToEnclosingUnit << ")" << std::endl;
         // Let's start by filling the text buffer with something useful:
+		std::cerr << "<<< Exiting TEST_METHOD(CompareEndpoints=" << CompareEndpoints << ")" << std::endl;
         for (auto i = 0; i < _pTextBuffer->TotalRowCount(); ++i)
         {
             auto& row = _pTextBuffer->GetMutableRowByOffset(i);
@@ -540,9 +585,14 @@ class UiaTextRangeTests
         }
     }
 
+	std::cerr << ">>> Entering TEST_METHOD(MoveEndpointByRange=" << MoveEndpointByRange << ")" << std::endl;
+	std::cerr << "<<< Exiting TEST_METHOD(ExpandToEnclosingUnit=" << ExpandToEnclosingUnit << ")" << std::endl;
+	std::cerr << "TEST_METHOD(MoveEndpointByRange=" << MoveEndpointByRange << "): target → " << target << std::endl;
     TEST_METHOD(MoveEndpointByRange)
     {
+		std::cerr << ">>> Entering TEST_METHOD(MoveEndpointByRange=" << MoveEndpointByRange << ")" << std::endl;
         const til::point start{ 0, 1 };
+		std::cerr << "<<< Exiting TEST_METHOD(ExpandToEnclosingUnit=" << ExpandToEnclosingUnit << ")" << std::endl;
         const til::point end{ 1, 2 };
         Microsoft::WRL::ComPtr<UiaTextRange> utr;
         THROW_IF_FAILED(Microsoft::WRL::MakeAndInitialize<UiaTextRange>(&utr,
@@ -630,11 +680,16 @@ class UiaTextRangeTests
         }
     }
 
+	std::cerr << ">>> Entering TEST_METHOD(CanMoveByCharacter=" << CanMoveByCharacter << ")" << std::endl;
+	std::cerr << "TEST_METHOD(CanMoveByCharacter=" << CanMoveByCharacter << "): lastColumnIndex → " << lastColumnIndex << std::endl;
+	std::cerr << "<<< Exiting TEST_METHOD(MoveEndpointByRange=" << MoveEndpointByRange << ")" << std::endl;
     TEST_METHOD(CanMoveByCharacter)
     {
+		std::cerr << ">>> Entering TEST_METHOD(CanMoveByCharacter=" << CanMoveByCharacter << ")" << std::endl;
         const auto lastColumnIndex = _pScreenInfo->GetBufferSize().RightInclusive();
 
         // GH#6986: This is used as the "end of the buffer" to help screen readers run faster
+		std::cerr << "<<< Exiting TEST_METHOD(MoveEndpointByRange=" << MoveEndpointByRange << ")" << std::endl;
         //          instead of parsing through thousands of empty lines of text.
         const til::point documentEnd{ _pTextBuffer->GetSize().Left(), _pTextBuffer->GetLastNonSpaceCharacter().y + 1 };
 
@@ -718,11 +773,16 @@ class UiaTextRangeTests
         }
     }
 
+	std::cerr << ">>> Entering TEST_METHOD(CanMoveByLine=" << CanMoveByLine << ")" << std::endl;
+	std::cerr << "TEST_METHOD(CanMoveByLine=" << CanMoveByLine << "): lastColumnIndex → " << lastColumnIndex << std::endl;
+	std::cerr << "<<< Exiting TEST_METHOD(CanMoveByCharacter=" << CanMoveByCharacter << ")" << std::endl;
     TEST_METHOD(CanMoveByLine)
     {
+		std::cerr << ">>> Entering TEST_METHOD(CanMoveByLine=" << CanMoveByLine << ")" << std::endl;
         const auto lastColumnIndex = _pScreenInfo->GetBufferSize().Width() - 1;
 
         // GH#6986: This is used as the "end of the buffer" to help screen readers run faster
+		std::cerr << "<<< Exiting TEST_METHOD(CanMoveByCharacter=" << CanMoveByCharacter << ")" << std::endl;
         //          instead of parsing through thousands of empty lines of text.
         const til::point documentEnd{ _pTextBuffer->GetSize().Left(), _pTextBuffer->GetLastNonSpaceCharacter().y + 1 };
 
@@ -806,11 +866,16 @@ class UiaTextRangeTests
         }
     }
 
+	std::cerr << ">>> Entering TEST_METHOD(CanMoveEndpointByUnitCharacter=" << CanMoveEndpointByUnitCharacter << ")" << std::endl;
+	std::cerr << "TEST_METHOD(CanMoveEndpointByUnitCharacter=" << CanMoveEndpointByUnitCharacter << "): lastColumnIndex → " << lastColumnIndex << std::endl;
+	std::cerr << "<<< Exiting TEST_METHOD(CanMoveByLine=" << CanMoveByLine << ")" << std::endl;
     TEST_METHOD(CanMoveEndpointByUnitCharacter)
     {
+		std::cerr << ">>> Entering TEST_METHOD(CanMoveEndpointByUnitCharacter=" << CanMoveEndpointByUnitCharacter << ")" << std::endl;
         const auto lastColumnIndex = _pScreenInfo->GetBufferSize().Width() - 1;
 
         // GH#6986: This is used as the "end of the buffer" to help screen readers run faster
+		std::cerr << "<<< Exiting TEST_METHOD(CanMoveByLine=" << CanMoveByLine << ")" << std::endl;
         //          instead of parsing through thousands of empty lines of text.
         const til::point documentEnd{ _pTextBuffer->GetSize().RightInclusive(), _pTextBuffer->GetLastNonSpaceCharacter().y };
 
@@ -951,12 +1016,18 @@ class UiaTextRangeTests
         }
     }
 
+	std::cerr << ">>> Entering TEST_METHOD(CanMoveEndpointByUnitLine=" << CanMoveEndpointByUnitLine << ")" << std::endl;
+	std::cerr << "TEST_METHOD(CanMoveEndpointByUnitLine=" << CanMoveEndpointByUnitLine << "): bottomRow → " << bottomRow << std::endl;
+	std::cerr << "TEST_METHOD(CanMoveEndpointByUnitLine=" << CanMoveEndpointByUnitLine << "): lastColumnIndex → " << lastColumnIndex << std::endl;
+	std::cerr << "<<< Exiting TEST_METHOD(CanMoveEndpointByUnitCharacter=" << CanMoveEndpointByUnitCharacter << ")" << std::endl;
     TEST_METHOD(CanMoveEndpointByUnitLine)
     {
+		std::cerr << ">>> Entering TEST_METHOD(CanMoveEndpointByUnitLine=" << CanMoveEndpointByUnitLine << ")" << std::endl;
         const auto lastColumnIndex = _pScreenInfo->GetBufferSize().Width() - 1;
         const auto bottomRow = _pTextBuffer->TotalRowCount() - 1;
 
         // GH#6986: This is used as the "end of the buffer" to help screen readers run faster
+		std::cerr << "<<< Exiting TEST_METHOD(CanMoveEndpointByUnitCharacter=" << CanMoveEndpointByUnitCharacter << ")" << std::endl;
         //          instead of parsing through thousands of empty lines of text.
         const til::point documentEnd{ _pTextBuffer->GetSize().Left(), _pTextBuffer->GetLastNonSpaceCharacter().y + 1 };
 
@@ -1090,11 +1161,15 @@ class UiaTextRangeTests
         }
     }
 
+	std::cerr << ">>> Entering TEST_METHOD(CanMoveEndpointByUnitDocument=" << CanMoveEndpointByUnitDocument << ")" << std::endl;
+	std::cerr << "TEST_METHOD(CanMoveEndpointByUnitDocument=" << CanMoveEndpointByUnitDocument << "): bottomRow → " << bottomRow << std::endl;
+	std::cerr << "<<< Exiting TEST_METHOD(CanMoveEndpointByUnitLine=" << CanMoveEndpointByUnitLine << ")" << std::endl;
     TEST_METHOD(CanMoveEndpointByUnitDocument)
     {
         const auto bottomRow = _pTextBuffer->TotalRowCount() - 1;
 
         // GH#6986: This is used as the "end of the buffer" to help screen readers run faster
+		std::cerr << "<<< Exiting TEST_METHOD(CanMoveEndpointByUnitLine=" << CanMoveEndpointByUnitLine << ")" << std::endl;
         //          instead of parsing through thousands of empty lines of text.
         const til::point documentEnd{ _pTextBuffer->GetSize().Left(), _pTextBuffer->GetLastNonSpaceCharacter().y + 1 };
 
@@ -1196,6 +1271,7 @@ class UiaTextRangeTests
         }
     }
 
+	std::cerr << "<<< Exiting TEST_METHOD(CanMoveEndpointByUnitDocument=" << CanMoveEndpointByUnitDocument << ")" << std::endl;
     TEST_METHOD(ExpansionAtExclusiveEnd)
     {
         // GH#7664: When attempting to expand to an enclosing unit
@@ -1208,6 +1284,8 @@ class UiaTextRangeTests
         // the given TextUnit, we're supposed to fallback
         // to the last one that was defined anyways.
         BEGIN_TEST_METHOD_PROPERTIES()
+			std::cerr << ">>> Entering BEGIN_TEST_METHOD_PROPERTIES()" << std::endl;
+			std::cerr << "<<< Exiting BEGIN_TEST_METHOD_PROPERTIES()" << std::endl;
             TEST_METHOD_PROPERTY(L"Data:textUnit", L"{0, 1, 2, 3, 4, 5, 6}")
         END_TEST_METHOD_PROPERTIES();
 
@@ -1615,6 +1693,8 @@ class UiaTextRangeTests
         }
     }
 
+	std::cerr << "TEST_METHOD(FindAttribute=" << FindAttribute << "): var.vt → " << var.vt << std::endl;
+	std::cerr << "TEST_METHOD(FindAttribute=" << FindAttribute << "): var.boolVal → " << var.boolVal << std::endl;
     TEST_METHOD(FindAttribute)
     {
         Microsoft::WRL::ComPtr<UiaTextRange> utr;
@@ -1718,6 +1798,8 @@ class UiaTextRangeTests
         }
     }
 
+	std::cerr << "TEST_METHOD(BlockRange=" << BlockRange << "): cloneUtr1 → " << cloneUtr1 << std::endl;
+	std::cerr << "TEST_METHOD(BlockRange=" << BlockRange << "): cloneUtr2 → " << cloneUtr2 << std::endl;
     TEST_METHOD(BlockRange)
     {
         // This test replicates GH#7960.
@@ -1741,6 +1823,7 @@ class UiaTextRangeTests
         VERIFY_IS_TRUE(cloneUtr2->_blockRange);
     }
 
+	std::cerr << "TEST_METHOD(Movement=" << Movement << "): fill → " << fill << std::endl;
     TEST_METHOD(Movement)
     {
         // Helpful variables
@@ -1808,6 +1891,7 @@ class UiaTextRangeTests
         };
     }
 
+	std::cerr << "TEST_METHOD(GeneratedMovementTests=" << GeneratedMovementTests << "): fill → " << fill << std::endl;
     TEST_METHOD(GeneratedMovementTests)
     {
         // Populate the buffer with...

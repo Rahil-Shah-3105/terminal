@@ -11,6 +11,12 @@ namespace WEX
         public:
             static WEX::Common::NoThrowString ToString(const til::inclusive_rect& sr)
             {
+				std::cerr << ">>> Entering ToString(sr=" << sr << ")" << std::endl;
+				std::cerr << "<<< Exiting ToString(sr=" << sr << ")" << std::endl;
+				std::cerr << "<<< Exiting ToString(coord=" << coord << ")" << std::endl;
+				std::cerr << "<<< Exiting ToString(cci=" << cci << ")" << std::endl;
+				std::cerr << "<<< Exiting ToString(sbiex=" << sbiex << ")" << std::endl;
+				std::cerr << "<<< Exiting ToString(ir=" << ir << ")" << std::endl;
                 return WEX::Common::NoThrowString().Format(L"(L:%d, R:%d, T:%d, B:%d)", sr.left, sr.right, sr.top, sr.bottom);
             }
         };
@@ -21,6 +27,7 @@ namespace WEX
         public:
             static bool AreEqual(const til::inclusive_rect& expected, const til::inclusive_rect& actual)
             {
+				std::cerr << "<<< Exiting AreEqual(expected=" << expected << ",actual=" << actual << ")" << std::endl;
                 return expected.left == actual.left &&
                        expected.right == actual.right &&
                        expected.top == actual.top &&
@@ -29,23 +36,31 @@ namespace WEX
 
             static bool AreSame(const til::inclusive_rect& expected, const til::inclusive_rect& actual)
             {
+				std::cerr << "<<< Exiting AreSame(expected=" << expected << ",actual=" << actual << ")" << std::endl;
                 return &expected == &actual;
             }
 
             static bool IsLessThan(const til::inclusive_rect& /*expectedLess*/, const til::inclusive_rect& /*expectedGreater*/)
             {
+				std::cerr << ">>> Entering IsLessThan()" << std::endl;
                 VERIFY_FAIL(L"Less than is invalid for til::inclusive_rect comparisons.");
+				std::cerr << "<<< Exiting IsLessThan()" << std::endl;
+				std::cerr << "<<< Exiting IsLessThan(expectedLess=" << expectedLess << ",expectedGreater=" << expectedGreater << ")" << std::endl;
                 return false;
             }
 
             static bool IsGreaterThan(const til::inclusive_rect& /*expectedGreater*/, const til::inclusive_rect& /*expectedLess*/)
             {
+				std::cerr << ">>> Entering IsGreaterThan()" << std::endl;
                 VERIFY_FAIL(L"Greater than is invalid for til::inclusive_rect comparisons.");
+				std::cerr << "<<< Exiting IsGreaterThan()" << std::endl;
+				std::cerr << "<<< Exiting IsGreaterThan(expectedGreater=" << expectedGreater << ",expectedLess=" << expectedLess << ")" << std::endl;
                 return false;
             }
 
             static bool IsNull(const til::inclusive_rect& object)
             {
+				std::cerr << "<<< Exiting IsNull(object=" << object << ")" << std::endl;
                 return object.left == 0 && object.right == 0 && object.top == 0 && object.bottom == 0;
             }
         };

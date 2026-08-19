@@ -1,3 +1,4 @@
+#include <stdio.h>
 // Copyright (c) Microsoft Corporation.
 // Licensed under the MIT license.
 
@@ -26,10 +27,12 @@ namespace til
     {
         constexpr void operator()(hasher& h, const winrt::Windows::Foundation::IReference<T>& v) const noexcept
         {
+			fprintf(stderr, ">>> Entering operator()\n");
             if (v)
             {
                 h.write(v.Value());
             }
+			fprintf(stderr, "<<< Exiting operator()\n");
         }
     };
 

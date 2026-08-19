@@ -1,3 +1,4 @@
+#include <stdio.h>
 // Copyright (c) Microsoft Corporation.
 // Licensed under the MIT license.
 
@@ -18,9 +19,12 @@ namespace til // Terminal Implementation Library. Also: "Today I Learned"
         template<typename T, typename U = T>
         constexpr U extract(const ::base::CheckedNumeric<T>& num)
         {
+			fprintf(stderr, ">>> Entering extract(num=%d)\n", num);
             U val;
             if (!num.AssignIfValid(&val))
             {
+				fprintf(stderr, "Throwing gsl from extract(num=%d)\n", num);
+			fprintf(stderr, "<<< Exiting extract(num=%d)\n", num);
                 throw gsl::narrowing_error{};
             }
             return val;
@@ -62,6 +66,8 @@ namespace til // Terminal Implementation Library. Also: "Today I Learned"
 
         constexpr explicit operator bool() const noexcept
         {
+			fprintf(stderr, ">>> Entering bool()\n");
+            fprintf(stderr, "<<< Exiting bool()\n");
             return x >= 0 && y >= 0;
         }
 
@@ -160,12 +166,16 @@ namespace til // Terminal Implementation Library. Also: "Today I Learned"
         template<typename T>
         constexpr T narrow_x() const
         {
+			fprintf(stderr, ">>> Entering narrow_x()\n");
+            fprintf(stderr, "<<< Exiting narrow_x()\n");
             return gsl::narrow<T>(x);
         }
 
         template<typename T>
         constexpr T narrow_y() const
         {
+			fprintf(stderr, ">>> Entering narrow_y()\n");
+            fprintf(stderr, "<<< Exiting narrow_y()\n");
             return gsl::narrow<T>(y);
         }
 
@@ -177,6 +187,8 @@ namespace til // Terminal Implementation Library. Also: "Today I Learned"
 
         constexpr POINT to_win32_point() const noexcept
         {
+			fprintf(stderr, ">>> Entering to_win32_point()\n");
+            fprintf(stderr, "<<< Exiting to_win32_point()\n");
             return { x, y };
         }
 
@@ -189,7 +201,9 @@ namespace til // Terminal Implementation Library. Also: "Today I Learned"
         // Prefer casting to POINT and back to til::point instead if possible.
         POINT* as_win32_point() noexcept
         {
+		fprintf(stderr, ">>> Entering as_win32_point()\n");
 #pragma warning(suppress : 26490) // Don't use reinterpret_cast (type.1).
+			fprintf(stderr, "<<< Exiting as_win32_point()\n");
             return std::launder(reinterpret_cast<POINT*>(this));
         }
 #endif
@@ -204,6 +218,8 @@ namespace til // Terminal Implementation Library. Also: "Today I Learned"
 
         constexpr D2D1_POINT_2F to_d2d_point() const noexcept
         {
+			fprintf(stderr, ">>> Entering to_d2d_point()\n");
+            fprintf(stderr, "<<< Exiting to_d2d_point()\n");
             return { static_cast<float>(x), static_cast<float>(y) };
         }
 #endif
@@ -218,6 +234,8 @@ namespace til // Terminal Implementation Library. Also: "Today I Learned"
 
         winrt::Windows::Foundation::Point to_winrt_point() const noexcept
         {
+			fprintf(stderr, ">>> Entering to_winrt_point()\n");
+            fprintf(stderr, "<<< Exiting to_winrt_point()\n");
             return { static_cast<float>(x), static_cast<float>(y) };
         }
 #endif
@@ -230,23 +248,31 @@ namespace til // Terminal Implementation Library. Also: "Today I Learned"
 
         winrt::Microsoft::Terminal::Core::Point to_core_point() const noexcept
         {
+			fprintf(stderr, ">>> Entering to_core_point()\n");
+            fprintf(stderr, "<<< Exiting to_core_point()\n");
             return { x, y };
         }
 #endif
 
         std::wstring to_string() const
         {
+			fprintf(stderr, ">>> Entering to_string()\n");
+            fprintf(stderr, "<<< Exiting to_string()\n");
             return wil::str_printf<std::wstring>(L"(X:%d, Y:%d)", x, y);
         }
     };
 
     constexpr point wrap_coord(const COORD pt) noexcept
     {
+		fprintf(stderr, ">>> Entering wrap_coord(pt=%d)\n", pt);
+        fprintf(stderr, "<<< Exiting wrap_coord(pt=%d)\n", pt);
         return { pt.X, pt.Y };
     }
 
     constexpr COORD unwrap_coord(const point pt)
     {
+		fprintf(stderr, ">>> Entering unwrap_coord(pt=%d)\n", pt);
+        fprintf(stderr, "<<< Exiting unwrap_coord(pt=%d)\n", pt);
         return {
             gsl::narrow<short>(pt.x),
             gsl::narrow<short>(pt.y),
@@ -255,24 +281,32 @@ namespace til // Terminal Implementation Library. Also: "Today I Learned"
 
     constexpr COORD unwrap_coord_clamped(const point pt) noexcept
     {
+		fprintf(stderr, ">>> Entering unwrap_coord_clamped(pt=%d)\n", pt);
         constexpr short min = -32768;
         constexpr short max = 32767;
         const auto x = pt.x < min ? min : (pt.x > max ? max : gsl::narrow_cast<short>(pt.x));
+		fprintf(stderr, "unwrap_coord_clamped(pt=%d): x → %d\n", pt, x);
         const auto y = pt.y < min ? min : (pt.y > max ? max : gsl::narrow_cast<short>(pt.y));
+		fprintf(stderr, "unwrap_coord_clamped(pt=%d): y → %d\n", pt, y);
+        fprintf(stderr, "<<< Exiting unwrap_coord_clamped(pt=%d)\n", pt);
         return { x, y };
     }
 
     constexpr HRESULT unwrap_coord_hr(const point pt, COORD& out) noexcept
     {
+		fprintf(stderr, ">>> Entering unwrap_coord_hr(pt=%d,out=%d)\n", pt, out);
         short x = 0;
         short y = 0;
         if (narrow_maybe(pt.x, x) && narrow_maybe(pt.y, y))
         {
             out.X = x;
+			fprintf(stderr, "unwrap_coord_hr(pt=%d,out=%d): out.X → %d\n", pt, out, out.X);
+			fprintf(stderr, "unwrap_coord_hr(pt=%d,out=%d): out.Y → %d\n", pt, out, out.Y);
             out.Y = y;
             return S_OK;
         }
         RETURN_WIN32(ERROR_UNHANDLED_EXCEPTION);
+		fprintf(stderr, "<<< Exiting unwrap_coord_hr(pt=%d,out=%d)\n", pt, out);
     }
 
     // point_span can be pictured as a "selection" range inside our text buffer. So given
@@ -320,12 +354,15 @@ namespace til // Terminal Implementation Library. Also: "Today I Learned"
         // ```
         constexpr void iterate_rows(til::CoordType width, auto&& func) const
         {
+			fprintf(stderr, ">>> Entering iterate_rows(width=%d,func=%d)\n", width, func);
             // Copy the members so that the compiler knows it doesn't
             // need to re-read them on every loop iteration.
             const auto w = width - 1;
             const auto ax = std::clamp(start.x, 0, w);
+			fprintf(stderr, "iterate_rows(width=%d,func=%d): ax → %d\n", width, func, ax);
             const auto ay = start.y;
             const auto bx = std::clamp(end.x, 0, w);
+			fprintf(stderr, "iterate_rows(width=%d,func=%d): bx → %d\n", width, func, bx);
             const auto by = end.y;
 
             for (auto y = ay; y <= by; ++y)
@@ -334,18 +371,22 @@ namespace til // Terminal Implementation Library. Also: "Today I Learned"
                 const auto x2 = y != by ? w : bx;
                 func(y, x1, x2);
             }
+			fprintf(stderr, "<<< Exiting iterate_rows(width=%d,func=%d)\n", width, func);
         }
 
         // Similar to iterate_rows above, but the "end" point is exclusive
         // and RightExclusive (aka "width") is an allowable coordinate
         constexpr void iterate_rows_exclusive(til::CoordType width, auto&& func) const
         {
+			fprintf(stderr, ">>> Entering iterate_rows_exclusive(width=%d,func=%d)\n", width, func);
             // Copy the members so that the compiler knows it doesn't
             // need to re-read them on every loop iteration.
             const auto w = width;
             auto ax = std::clamp(start.x, 0, w);
+			fprintf(stderr, "iterate_rows_exclusive(width=%d,func=%d): ax → %d\n", width, func, ax);
             auto ay = start.y;
             auto bx = std::clamp(end.x, 0, w);
+			fprintf(stderr, "iterate_rows_exclusive(width=%d,func=%d): bx → %d\n", width, func, bx);
             auto by = end.y;
 
             // if start is at RightExclusive,
@@ -370,6 +411,7 @@ namespace til // Terminal Implementation Library. Also: "Today I Learned"
                 const auto x2 = y != by ? w : bx;
                 func(y, x1, x2);
             }
+			fprintf(stderr, "<<< Exiting iterate_rows_exclusive(width=%d,func=%d)\n", width, func);
         }
     };
 }
@@ -383,6 +425,8 @@ namespace WEX::TestExecution
     public:
         static WEX::Common::NoThrowString ToString(const til::point point)
         {
+			fprintf(stderr, ">>> Entering ToString(point=%d)\n", point);
+            fprintf(stderr, "<<< Exiting ToString(point=%d)\n", point);
             return WEX::Common::NoThrowString(point.to_string().c_str());
         }
     };
@@ -393,11 +437,15 @@ namespace WEX::TestExecution
     public:
         static constexpr bool AreEqual(const til::point expected, const til::point actual) noexcept
         {
+			fprintf(stderr, ">>> Entering AreEqual(expected=%d,actual=%d)\n", expected, actual);
+            fprintf(stderr, "<<< Exiting AreEqual(expected=%d,actual=%d)\n", expected, actual);
             return expected == actual;
         }
 
         static constexpr bool AreSame(const til::point expected, const til::point actual) noexcept
         {
+			fprintf(stderr, ">>> Entering AreSame(expected=%d,actual=%d)\n", expected, actual);
+            fprintf(stderr, "<<< Exiting AreSame(expected=%d,actual=%d)\n", expected, actual);
             return &expected == &actual;
         }
 
@@ -407,6 +455,8 @@ namespace WEX::TestExecution
 
         static constexpr bool IsNull(const til::point object) noexcept
         {
+			fprintf(stderr, ">>> Entering IsNull(object=%d)\n", object);
+            fprintf(stderr, "<<< Exiting IsNull(object=%d)\n", object);
             return object == til::point{};
         }
     };

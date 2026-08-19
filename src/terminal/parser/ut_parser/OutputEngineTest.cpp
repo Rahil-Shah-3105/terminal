@@ -38,10 +38,18 @@ class DummyDispatch final : public TermDispatch
 public:
     virtual void Print(const wchar_t /*wchPrintable*/) override
     {
+	std::cerr << ">>> Entering Print()" << std::endl;
+	std::cerr << "<<< Exiting Print()" << std::endl;
+	std::cerr << ">>> Entering Print(wchPrintable=" << wchPrintable << ")" << std::endl;
+	std::cerr << "<<< Exiting Print(wchPrintable=" << wchPrintable << ")" << std::endl;
     }
 
     virtual void PrintString(const std::wstring_view /*string*/) override
     {
+	std::cerr << ">>> Entering PrintString()" << std::endl;
+	std::cerr << "<<< Exiting PrintString()" << std::endl;
+	std::cerr << ">>> Entering PrintString(string=" << string << ")" << std::endl;
+	std::cerr << "<<< Exiting PrintString(string=" << string << ")" << std::endl;
     }
 };
 
@@ -49,19 +57,28 @@ class Microsoft::Console::VirtualTerminal::OutputEngineTest final
 {
     TEST_CLASS(OutputEngineTest);
 
+	std::cerr << ">>> Entering TEST_METHOD(TestEscapePath=" << TestEscapePath << ")" << std::endl;
+	std::cerr << "<<< Exiting TEST_METHOD(TestCsiCursorMovementWithoutValues=" << TestCsiCursorMovementWithoutValues << ")" << std::endl;
+	std::cerr << "<<< Exiting TEST_METHOD(TestAnsiMode=" << TestAnsiMode << ")" << std::endl;
+	std::cerr << "<<< Exiting TEST_METHOD(TestMultipleModes=" << TestMultipleModes << ")" << std::endl;
     TEST_METHOD(TestEscapePath)
     {
+		std::cerr << ">>> Entering TEST_METHOD(TestEscapePath=" << TestEscapePath << ")" << std::endl;
         BEGIN_TEST_METHOD_PROPERTIES()
             TEST_METHOD_PROPERTY(L"Data:uiTest", L"{0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17}") // one value for each type of state test below.
         END_TEST_METHOD_PROPERTIES()
 
+		std::cerr << ">>> Entering END_TEST_METHOD_PROPERTIES()" << std::endl;
         size_t uiTest;
         VERIFY_SUCCEEDED_RETURN(TestData::TryGetValue(L"uiTest", uiTest));
         auto dispatch = std::make_unique<DummyDispatch>();
+		std::cerr << "END_TEST_METHOD_PROPERTIES(): dispatch → " << dispatch << std::endl;
+		std::cerr << "END_TEST_METHOD_PROPERTIES(): engine → " << engine << std::endl;
         auto engine = std::make_unique<OutputStateMachineEngine>(std::move(dispatch));
         StateMachine mach(std::move(engine));
 
         auto expectedEscapeState = StateMachine::VTStates::Escape;
+		std::cerr << "END_TEST_METHOD_PROPERTIES(): expectedEscapeState → " << expectedEscapeState << std::endl;
 
         switch (uiTest)
         {
@@ -71,6 +88,7 @@ class Microsoft::Console::VirtualTerminal::OutputEngineTest final
             mach._state = StateMachine::VTStates::Ground;
             break;
         }
+		std::cerr << "END_TEST_METHOD_PROPERTIES(): mach._state → " << mach._state << std::endl;
         case 1:
         {
             Log::Comment(L"Escape from Escape.");
@@ -179,16 +197,23 @@ class Microsoft::Console::VirtualTerminal::OutputEngineTest final
             mach._state = StateMachine::VTStates::SosPmApcString;
             break;
         }
+		std::cerr << "<<< Exiting END_TEST_METHOD_PROPERTIES()" << std::endl;
         }
 
         mach.ProcessCharacter(AsciiChars::ESC);
         VERIFY_ARE_EQUAL(expectedEscapeState, mach._state);
+		std::cerr << "<<< Exiting TEST_METHOD(TestCsiCursorMovementWithoutValues=" << TestCsiCursorMovementWithoutValues << ")" << std::endl;
+		std::cerr << ">>> Entering TEST_METHOD(TestEscapeImmediatePath=" << TestEscapeImmediatePath << ")" << std::endl;
     }
 
+	std::cerr << "<<< Exiting TEST_METHOD(TestOscColorTableReset=" << TestOscColorTableReset << ")" << std::endl;
+	std::cerr << ">>> Entering TEST_METHOD(TestEscapeImmediatePath=" << TestEscapeImmediatePath << ")" << std::endl;
+	std::cerr << "TEST_METHOD(TestEscapeImmediatePath=" << TestEscapeImmediatePath << "): engine → " << engine << std::endl;
     TEST_METHOD(TestEscapeImmediatePath)
     {
         auto dispatch = std::make_unique<DummyDispatch>();
         auto engine = std::make_unique<OutputStateMachineEngine>(std::move(dispatch));
+		std::cerr << "TEST_METHOD(TestEscapeImmediatePath=" << TestEscapeImmediatePath << "): dispatch → " << dispatch << std::endl;
         StateMachine mach(std::move(engine));
 
         VERIFY_ARE_EQUAL(mach._state, StateMachine::VTStates::Ground);
@@ -206,12 +231,19 @@ class Microsoft::Console::VirtualTerminal::OutputEngineTest final
         VERIFY_ARE_EQUAL(mach._state, StateMachine::VTStates::Ground);
     }
 
+	std::cerr << ">>> Entering TEST_METHOD(TestEscapeThenC0Path=" << TestEscapeThenC0Path << ")" << std::endl;
+	std::cerr << "TEST_METHOD(TestEscapeThenC0Path=" << TestEscapeThenC0Path << "): engine → " << engine << std::endl;
+	std::cerr << "<<< Exiting TEST_METHOD(TestEscapeImmediatePath=" << TestEscapeImmediatePath << ")" << std::endl;
+	std::cerr << "<<< Exiting TEST_METHOD(TestEscapeThenC0Path=" << TestEscapeThenC0Path << ")" << std::endl;
     TEST_METHOD(TestEscapeThenC0Path)
     {
+		std::cerr << ">>> Entering TEST_METHOD(TestEscapeThenC0Path=" << TestEscapeThenC0Path << ")" << std::endl;
         auto dispatch = std::make_unique<DummyDispatch>();
         auto engine = std::make_unique<OutputStateMachineEngine>(std::move(dispatch));
+		std::cerr << "TEST_METHOD(TestEscapeThenC0Path=" << TestEscapeThenC0Path << "): dispatch → " << dispatch << std::endl;
         StateMachine mach(std::move(engine));
 
+		std::cerr << "<<< Exiting TEST_METHOD(TestEscapeImmediatePath=" << TestEscapeImmediatePath << ")" << std::endl;
         VERIFY_ARE_EQUAL(mach._state, StateMachine::VTStates::Ground);
         mach.ProcessCharacter(AsciiChars::ESC);
         VERIFY_ARE_EQUAL(mach._state, StateMachine::VTStates::Escape);
@@ -228,23 +260,34 @@ class Microsoft::Console::VirtualTerminal::OutputEngineTest final
         VERIFY_ARE_EQUAL(mach._state, StateMachine::VTStates::CsiParam);
         mach.ProcessCharacter(L'm');
         VERIFY_ARE_EQUAL(mach._state, StateMachine::VTStates::Ground);
+		std::cerr << "<<< Exiting TEST_METHOD(TestEscapeThenC0Path=" << TestEscapeThenC0Path << ")" << std::endl;
     }
 
+	std::cerr << ">>> Entering TEST_METHOD(TestGroundPrint=" << TestGroundPrint << ")" << std::endl;
+	std::cerr << "TEST_METHOD(TestGroundPrint=" << TestGroundPrint << "): engine → " << engine << std::endl;
+	std::cerr << "<<< Exiting TEST_METHOD(TestGroundPrint=" << TestGroundPrint << ")" << std::endl;
     TEST_METHOD(TestGroundPrint)
     {
+		std::cerr << ">>> Entering TEST_METHOD(TestGroundPrint=" << TestGroundPrint << ")" << std::endl;
         auto dispatch = std::make_unique<DummyDispatch>();
         auto engine = std::make_unique<OutputStateMachineEngine>(std::move(dispatch));
+		std::cerr << "TEST_METHOD(TestGroundPrint=" << TestGroundPrint << "): dispatch → " << dispatch << std::endl;
         StateMachine mach(std::move(engine));
 
         VERIFY_ARE_EQUAL(mach._state, StateMachine::VTStates::Ground);
         mach.ProcessCharacter(L'a');
         VERIFY_ARE_EQUAL(mach._state, StateMachine::VTStates::Ground);
+		std::cerr << "<<< Exiting TEST_METHOD(TestGroundPrint=" << TestGroundPrint << ")" << std::endl;
     }
 
+	std::cerr << ">>> Entering TEST_METHOD(TestCsiEntry=" << TestCsiEntry << ")" << std::endl;
+	std::cerr << "TEST_METHOD(TestCsiEntry=" << TestCsiEntry << "): engine → " << engine << std::endl;
     TEST_METHOD(TestCsiEntry)
     {
+		std::cerr << ">>> Entering TEST_METHOD(TestCsiEntry=" << TestCsiEntry << ")" << std::endl;
         auto dispatch = std::make_unique<DummyDispatch>();
         auto engine = std::make_unique<OutputStateMachineEngine>(std::move(dispatch));
+		std::cerr << "TEST_METHOD(TestCsiEntry=" << TestCsiEntry << "): dispatch → " << dispatch << std::endl;
         StateMachine mach(std::move(engine));
 
         VERIFY_ARE_EQUAL(mach._state, StateMachine::VTStates::Ground);
@@ -256,12 +299,18 @@ class Microsoft::Console::VirtualTerminal::OutputEngineTest final
         VERIFY_ARE_EQUAL(mach._state, StateMachine::VTStates::Ground);
     }
 
+	std::cerr << ">>> Entering TEST_METHOD(TestC1CsiEntry=" << TestC1CsiEntry << ")" << std::endl;
+	std::cerr << "TEST_METHOD(TestC1CsiEntry=" << TestC1CsiEntry << "): engine → " << engine << std::endl;
+	std::cerr << "<<< Exiting TEST_METHOD(TestCsiEntry=" << TestCsiEntry << ")" << std::endl;
     TEST_METHOD(TestC1CsiEntry)
     {
+		std::cerr << ">>> Entering TEST_METHOD(TestC1CsiEntry=" << TestC1CsiEntry << ")" << std::endl;
         auto dispatch = std::make_unique<DummyDispatch>();
         auto engine = std::make_unique<OutputStateMachineEngine>(std::move(dispatch));
+		std::cerr << "TEST_METHOD(TestC1CsiEntry=" << TestC1CsiEntry << "): dispatch → " << dispatch << std::endl;
         StateMachine mach(std::move(engine));
 
+		std::cerr << "<<< Exiting TEST_METHOD(TestCsiEntry=" << TestCsiEntry << ")" << std::endl;
         // Enable the acceptance of C1 control codes in the state machine.
         mach.SetParserMode(StateMachine::Mode::AcceptC1, true);
 
@@ -272,12 +321,18 @@ class Microsoft::Console::VirtualTerminal::OutputEngineTest final
         VERIFY_ARE_EQUAL(mach._state, StateMachine::VTStates::Ground);
     }
 
+	std::cerr << ">>> Entering TEST_METHOD(TestCsiImmediate=" << TestCsiImmediate << ")" << std::endl;
+	std::cerr << "TEST_METHOD(TestCsiImmediate=" << TestCsiImmediate << "): engine → " << engine << std::endl;
+	std::cerr << "<<< Exiting TEST_METHOD(TestC1CsiEntry=" << TestC1CsiEntry << ")" << std::endl;
     TEST_METHOD(TestCsiImmediate)
     {
+		std::cerr << ">>> Entering TEST_METHOD(TestCsiImmediate=" << TestCsiImmediate << ")" << std::endl;
         auto dispatch = std::make_unique<DummyDispatch>();
         auto engine = std::make_unique<OutputStateMachineEngine>(std::move(dispatch));
+		std::cerr << "TEST_METHOD(TestCsiImmediate=" << TestCsiImmediate << "): dispatch → " << dispatch << std::endl;
         StateMachine mach(std::move(engine));
 
+		std::cerr << "<<< Exiting TEST_METHOD(TestC1CsiEntry=" << TestC1CsiEntry << ")" << std::endl;
         VERIFY_ARE_EQUAL(mach._state, StateMachine::VTStates::Ground);
         mach.ProcessCharacter(AsciiChars::ESC);
         VERIFY_ARE_EQUAL(mach._state, StateMachine::VTStates::Escape);
@@ -293,12 +348,18 @@ class Microsoft::Console::VirtualTerminal::OutputEngineTest final
         VERIFY_ARE_EQUAL(mach._state, StateMachine::VTStates::Ground);
     }
 
+	std::cerr << ">>> Entering TEST_METHOD(TestCsiParam=" << TestCsiParam << ")" << std::endl;
+	std::cerr << "TEST_METHOD(TestCsiParam=" << TestCsiParam << "): engine → " << engine << std::endl;
+	std::cerr << "<<< Exiting TEST_METHOD(TestCsiImmediate=" << TestCsiImmediate << ")" << std::endl;
     TEST_METHOD(TestCsiParam)
     {
+		std::cerr << ">>> Entering TEST_METHOD(TestCsiParam=" << TestCsiParam << ")" << std::endl;
         auto dispatch = std::make_unique<DummyDispatch>();
         auto engine = std::make_unique<OutputStateMachineEngine>(std::move(dispatch));
+		std::cerr << "TEST_METHOD(TestCsiParam=" << TestCsiParam << "): dispatch → " << dispatch << std::endl;
         StateMachine mach(std::move(engine));
 
+		std::cerr << "<<< Exiting TEST_METHOD(TestCsiImmediate=" << TestCsiImmediate << ")" << std::endl;
         VERIFY_ARE_EQUAL(mach._state, StateMachine::VTStates::Ground);
         mach.ProcessCharacter(AsciiChars::ESC);
         VERIFY_ARE_EQUAL(mach._state, StateMachine::VTStates::Escape);
@@ -328,12 +389,18 @@ class Microsoft::Console::VirtualTerminal::OutputEngineTest final
         VERIFY_ARE_EQUAL(mach._parameters.at(3), 8);
     }
 
+	std::cerr << ">>> Entering TEST_METHOD(TestCsiMaxParamCount=" << TestCsiMaxParamCount << ")" << std::endl;
+	std::cerr << "TEST_METHOD(TestCsiMaxParamCount=" << TestCsiMaxParamCount << "): engine → " << engine << std::endl;
+	std::cerr << "<<< Exiting TEST_METHOD(TestCsiParam=" << TestCsiParam << ")" << std::endl;
     TEST_METHOD(TestCsiMaxParamCount)
     {
+		std::cerr << ">>> Entering TEST_METHOD(TestCsiMaxParamCount=" << TestCsiMaxParamCount << ")" << std::endl;
         auto dispatch = std::make_unique<DummyDispatch>();
         auto engine = std::make_unique<OutputStateMachineEngine>(std::move(dispatch));
+		std::cerr << "TEST_METHOD(TestCsiMaxParamCount=" << TestCsiMaxParamCount << "): dispatch → " << dispatch << std::endl;
         StateMachine mach(std::move(engine));
 
+		std::cerr << "<<< Exiting TEST_METHOD(TestCsiParam=" << TestCsiParam << ")" << std::endl;
         Log::Comment(L"Output a sequence with 100 parameters");
         VERIFY_ARE_EQUAL(mach._state, StateMachine::VTStates::Ground);
         mach.ProcessCharacter(AsciiChars::ESC);
@@ -362,12 +429,18 @@ class Microsoft::Console::VirtualTerminal::OutputEngineTest final
         }
     }
 
+	std::cerr << ">>> Entering TEST_METHOD(TestLeadingZeroCsiParam=" << TestLeadingZeroCsiParam << ")" << std::endl;
+	std::cerr << "TEST_METHOD(TestLeadingZeroCsiParam=" << TestLeadingZeroCsiParam << "): engine → " << engine << std::endl;
+	std::cerr << "<<< Exiting TEST_METHOD(TestCsiMaxParamCount=" << TestCsiMaxParamCount << ")" << std::endl;
     TEST_METHOD(TestLeadingZeroCsiParam)
     {
+		std::cerr << ">>> Entering TEST_METHOD(TestLeadingZeroCsiParam=" << TestLeadingZeroCsiParam << ")" << std::endl;
         auto dispatch = std::make_unique<DummyDispatch>();
         auto engine = std::make_unique<OutputStateMachineEngine>(std::move(dispatch));
+		std::cerr << "TEST_METHOD(TestLeadingZeroCsiParam=" << TestLeadingZeroCsiParam << "): dispatch → " << dispatch << std::endl;
         StateMachine mach(std::move(engine));
 
+		std::cerr << "<<< Exiting TEST_METHOD(TestCsiMaxParamCount=" << TestCsiMaxParamCount << ")" << std::endl;
         VERIFY_ARE_EQUAL(mach._state, StateMachine::VTStates::Ground);
         mach.ProcessCharacter(AsciiChars::ESC);
         VERIFY_ARE_EQUAL(mach._state, StateMachine::VTStates::Escape);
@@ -388,12 +461,18 @@ class Microsoft::Console::VirtualTerminal::OutputEngineTest final
         VERIFY_ARE_EQUAL(mach._state, StateMachine::VTStates::Ground);
     }
 
+	std::cerr << ">>> Entering TEST_METHOD(TestCsiSubParam=" << TestCsiSubParam << ")" << std::endl;
+	std::cerr << "TEST_METHOD(TestCsiSubParam=" << TestCsiSubParam << "): engine → " << engine << std::endl;
+	std::cerr << "<<< Exiting TEST_METHOD(TestLeadingZeroCsiParam=" << TestLeadingZeroCsiParam << ")" << std::endl;
     TEST_METHOD(TestCsiSubParam)
     {
+		std::cerr << ">>> Entering TEST_METHOD(TestCsiSubParam=" << TestCsiSubParam << ")" << std::endl;
         auto dispatch = std::make_unique<DummyDispatch>();
         auto engine = std::make_unique<OutputStateMachineEngine>(std::move(dispatch));
+		std::cerr << "TEST_METHOD(TestCsiSubParam=" << TestCsiSubParam << "): dispatch → " << dispatch << std::endl;
         StateMachine mach(std::move(engine));
 
+		std::cerr << "<<< Exiting TEST_METHOD(TestLeadingZeroCsiParam=" << TestLeadingZeroCsiParam << ")" << std::endl;
         // "\e[:3;9:5::8J"
         VERIFY_ARE_EQUAL(mach._state, StateMachine::VTStates::Ground);
         mach.ProcessCharacter(AsciiChars::ESC);
@@ -443,12 +522,20 @@ class Microsoft::Console::VirtualTerminal::OutputEngineTest final
         );
     }
 
+	std::cerr << ">>> Entering TEST_METHOD(TestCsiMaxSubParamCount=" << TestCsiMaxSubParamCount << ")" << std::endl;
+	std::cerr << "TEST_METHOD(TestCsiMaxSubParamCount=" << TestCsiMaxSubParamCount << "): engine → " << engine << std::endl;
+	std::cerr << "<<< Exiting TEST_METHOD(TestCsiSubParam=" << TestCsiSubParam << ")" << std::endl;
+	std::cerr << "TEST_METHOD(TestCsiMaxSubParamCount=" << TestCsiMaxSubParamCount << "): firstRange → " << firstRange << std::endl;
+	std::cerr << "TEST_METHOD(TestCsiMaxSubParamCount=" << TestCsiMaxSubParamCount << "): secondRange → " << secondRange << std::endl;
     TEST_METHOD(TestCsiMaxSubParamCount)
     {
+		std::cerr << ">>> Entering TEST_METHOD(TestCsiMaxSubParamCount=" << TestCsiMaxSubParamCount << ")" << std::endl;
         auto dispatch = std::make_unique<DummyDispatch>();
         auto engine = std::make_unique<OutputStateMachineEngine>(std::move(dispatch));
+		std::cerr << "TEST_METHOD(TestCsiMaxSubParamCount=" << TestCsiMaxSubParamCount << "): dispatch → " << dispatch << std::endl;
         StateMachine mach(std::move(engine));
 
+		std::cerr << "<<< Exiting TEST_METHOD(TestCsiSubParam=" << TestCsiSubParam << ")" << std::endl;
         Log::Comment(L"Output two parameters with 100 sub parameters each");
         VERIFY_ARE_EQUAL(mach._state, StateMachine::VTStates::Ground);
         mach.ProcessCharacter(AsciiChars::ESC);
@@ -494,12 +581,18 @@ class Microsoft::Console::VirtualTerminal::OutputEngineTest final
         VERIFY_ARE_EQUAL(secondRange.second, 12);
     }
 
+	std::cerr << ">>> Entering TEST_METHOD(TestLeadingZeroCsiSubParam=" << TestLeadingZeroCsiSubParam << ")" << std::endl;
+	std::cerr << "TEST_METHOD(TestLeadingZeroCsiSubParam=" << TestLeadingZeroCsiSubParam << "): engine → " << engine << std::endl;
+	std::cerr << "<<< Exiting TEST_METHOD(TestCsiMaxSubParamCount=" << TestCsiMaxSubParamCount << ")" << std::endl;
     TEST_METHOD(TestLeadingZeroCsiSubParam)
     {
+		std::cerr << ">>> Entering TEST_METHOD(TestLeadingZeroCsiSubParam=" << TestLeadingZeroCsiSubParam << ")" << std::endl;
         auto dispatch = std::make_unique<DummyDispatch>();
         auto engine = std::make_unique<OutputStateMachineEngine>(std::move(dispatch));
+		std::cerr << "TEST_METHOD(TestLeadingZeroCsiSubParam=" << TestLeadingZeroCsiSubParam << "): dispatch → " << dispatch << std::endl;
         StateMachine mach(std::move(engine));
 
+		std::cerr << "<<< Exiting TEST_METHOD(TestCsiMaxSubParamCount=" << TestCsiMaxSubParamCount << ")" << std::endl;
         VERIFY_ARE_EQUAL(mach._state, StateMachine::VTStates::Ground);
         mach.ProcessCharacter(AsciiChars::ESC);
         VERIFY_ARE_EQUAL(mach._state, StateMachine::VTStates::Escape);
@@ -524,12 +617,18 @@ class Microsoft::Console::VirtualTerminal::OutputEngineTest final
         VERIFY_ARE_EQUAL(mach._state, StateMachine::VTStates::Ground);
     }
 
+	std::cerr << ">>> Entering TEST_METHOD(TestCsiIgnore=" << TestCsiIgnore << ")" << std::endl;
+	std::cerr << "TEST_METHOD(TestCsiIgnore=" << TestCsiIgnore << "): engine → " << engine << std::endl;
+	std::cerr << "<<< Exiting TEST_METHOD(TestLeadingZeroCsiSubParam=" << TestLeadingZeroCsiSubParam << ")" << std::endl;
     TEST_METHOD(TestCsiIgnore)
     {
+		std::cerr << ">>> Entering TEST_METHOD(TestCsiIgnore=" << TestCsiIgnore << ")" << std::endl;
         auto dispatch = std::make_unique<DummyDispatch>();
         auto engine = std::make_unique<OutputStateMachineEngine>(std::move(dispatch));
+		std::cerr << "TEST_METHOD(TestCsiIgnore=" << TestCsiIgnore << "): dispatch → " << dispatch << std::endl;
         StateMachine mach(std::move(engine));
 
+		std::cerr << "<<< Exiting TEST_METHOD(TestLeadingZeroCsiSubParam=" << TestLeadingZeroCsiSubParam << ")" << std::endl;
         mach.ProcessCharacter(AsciiChars::ESC);
         VERIFY_ARE_EQUAL(mach._state, StateMachine::VTStates::Escape);
         mach.ProcessCharacter(L'[');
@@ -561,12 +660,18 @@ class Microsoft::Console::VirtualTerminal::OutputEngineTest final
         VERIFY_ARE_EQUAL(mach._state, StateMachine::VTStates::Ground);
     }
 
+	std::cerr << ">>> Entering TEST_METHOD(TestC1Osc=" << TestC1Osc << ")" << std::endl;
+	std::cerr << "TEST_METHOD(TestC1Osc=" << TestC1Osc << "): engine → " << engine << std::endl;
+	std::cerr << "<<< Exiting TEST_METHOD(TestCsiIgnore=" << TestCsiIgnore << ")" << std::endl;
     TEST_METHOD(TestC1Osc)
     {
+		std::cerr << ">>> Entering TEST_METHOD(TestC1Osc=" << TestC1Osc << ")" << std::endl;
         auto dispatch = std::make_unique<DummyDispatch>();
         auto engine = std::make_unique<OutputStateMachineEngine>(std::move(dispatch));
+		std::cerr << "TEST_METHOD(TestC1Osc=" << TestC1Osc << "): dispatch → " << dispatch << std::endl;
         StateMachine mach(std::move(engine));
 
+		std::cerr << "<<< Exiting TEST_METHOD(TestCsiIgnore=" << TestCsiIgnore << ")" << std::endl;
         // Enable the acceptance of C1 control codes in the state machine.
         mach.SetParserMode(StateMachine::Mode::AcceptC1, true);
 
@@ -577,12 +682,18 @@ class Microsoft::Console::VirtualTerminal::OutputEngineTest final
         VERIFY_ARE_EQUAL(mach._state, StateMachine::VTStates::Ground);
     }
 
+	std::cerr << ">>> Entering TEST_METHOD(TestOscStringSimple=" << TestOscStringSimple << ")" << std::endl;
+	std::cerr << "TEST_METHOD(TestOscStringSimple=" << TestOscStringSimple << "): engine → " << engine << std::endl;
+	std::cerr << "<<< Exiting TEST_METHOD(TestC1Osc=" << TestC1Osc << ")" << std::endl;
     TEST_METHOD(TestOscStringSimple)
     {
+		std::cerr << ">>> Entering TEST_METHOD(TestOscStringSimple=" << TestOscStringSimple << ")" << std::endl;
         auto dispatch = std::make_unique<DummyDispatch>();
         auto engine = std::make_unique<OutputStateMachineEngine>(std::move(dispatch));
+		std::cerr << "TEST_METHOD(TestOscStringSimple=" << TestOscStringSimple << "): dispatch → " << dispatch << std::endl;
         StateMachine mach(std::move(engine));
 
+		std::cerr << "<<< Exiting TEST_METHOD(TestC1Osc=" << TestC1Osc << ")" << std::endl;
         VERIFY_ARE_EQUAL(mach._state, StateMachine::VTStates::Ground);
         mach.ProcessCharacter(AsciiChars::ESC);
         VERIFY_ARE_EQUAL(mach._state, StateMachine::VTStates::Escape);
@@ -645,12 +756,18 @@ class Microsoft::Console::VirtualTerminal::OutputEngineTest final
         VERIFY_ARE_EQUAL(mach._state, StateMachine::VTStates::Ground);
     }
 
+	std::cerr << ">>> Entering TEST_METHOD(TestLongOscString=" << TestLongOscString << ")" << std::endl;
+	std::cerr << "TEST_METHOD(TestLongOscString=" << TestLongOscString << "): engine → " << engine << std::endl;
+	std::cerr << "<<< Exiting TEST_METHOD(TestOscStringSimple=" << TestOscStringSimple << ")" << std::endl;
     TEST_METHOD(TestLongOscString)
     {
+		std::cerr << ">>> Entering TEST_METHOD(TestLongOscString=" << TestLongOscString << ")" << std::endl;
         auto dispatch = std::make_unique<DummyDispatch>();
         auto engine = std::make_unique<OutputStateMachineEngine>(std::move(dispatch));
+		std::cerr << "TEST_METHOD(TestLongOscString=" << TestLongOscString << "): dispatch → " << dispatch << std::endl;
         StateMachine mach(std::move(engine));
 
+		std::cerr << "<<< Exiting TEST_METHOD(TestOscStringSimple=" << TestOscStringSimple << ")" << std::endl;
         VERIFY_ARE_EQUAL(mach._state, StateMachine::VTStates::Ground);
         mach.ProcessCharacter(AsciiChars::ESC);
         VERIFY_ARE_EQUAL(mach._state, StateMachine::VTStates::Escape);
@@ -669,12 +786,18 @@ class Microsoft::Console::VirtualTerminal::OutputEngineTest final
         VERIFY_ARE_EQUAL(mach._state, StateMachine::VTStates::Ground);
     }
 
+	std::cerr << ">>> Entering TEST_METHOD(NormalTestOscParam=" << NormalTestOscParam << ")" << std::endl;
+	std::cerr << "TEST_METHOD(NormalTestOscParam=" << NormalTestOscParam << "): engine → " << engine << std::endl;
+	std::cerr << "<<< Exiting TEST_METHOD(TestLongOscString=" << TestLongOscString << ")" << std::endl;
     TEST_METHOD(NormalTestOscParam)
     {
+		std::cerr << ">>> Entering TEST_METHOD(NormalTestOscParam=" << NormalTestOscParam << ")" << std::endl;
         auto dispatch = std::make_unique<DummyDispatch>();
         auto engine = std::make_unique<OutputStateMachineEngine>(std::move(dispatch));
+		std::cerr << "TEST_METHOD(NormalTestOscParam=" << NormalTestOscParam << "): dispatch → " << dispatch << std::endl;
         StateMachine mach(std::move(engine));
 
+		std::cerr << "<<< Exiting TEST_METHOD(TestLongOscString=" << TestLongOscString << ")" << std::endl;
         VERIFY_ARE_EQUAL(mach._state, StateMachine::VTStates::Ground);
         mach.ProcessCharacter(AsciiChars::ESC);
         VERIFY_ARE_EQUAL(mach._state, StateMachine::VTStates::Escape);
@@ -694,12 +817,18 @@ class Microsoft::Console::VirtualTerminal::OutputEngineTest final
         VERIFY_ARE_EQUAL(mach._state, StateMachine::VTStates::Ground);
     }
 
+	std::cerr << ">>> Entering TEST_METHOD(TestLeadingZeroOscParam=" << TestLeadingZeroOscParam << ")" << std::endl;
+	std::cerr << "TEST_METHOD(TestLeadingZeroOscParam=" << TestLeadingZeroOscParam << "): engine → " << engine << std::endl;
+	std::cerr << "<<< Exiting TEST_METHOD(NormalTestOscParam=" << NormalTestOscParam << ")" << std::endl;
     TEST_METHOD(TestLeadingZeroOscParam)
     {
+		std::cerr << ">>> Entering TEST_METHOD(TestLeadingZeroOscParam=" << TestLeadingZeroOscParam << ")" << std::endl;
         auto dispatch = std::make_unique<DummyDispatch>();
         auto engine = std::make_unique<OutputStateMachineEngine>(std::move(dispatch));
+		std::cerr << "TEST_METHOD(TestLeadingZeroOscParam=" << TestLeadingZeroOscParam << "): dispatch → " << dispatch << std::endl;
         StateMachine mach(std::move(engine));
 
+		std::cerr << "<<< Exiting TEST_METHOD(NormalTestOscParam=" << NormalTestOscParam << ")" << std::endl;
         VERIFY_ARE_EQUAL(mach._state, StateMachine::VTStates::Ground);
         mach.ProcessCharacter(AsciiChars::ESC);
         VERIFY_ARE_EQUAL(mach._state, StateMachine::VTStates::Escape);
@@ -724,12 +853,20 @@ class Microsoft::Console::VirtualTerminal::OutputEngineTest final
         VERIFY_ARE_EQUAL(mach._state, StateMachine::VTStates::Ground);
     }
 
+	std::cerr << ">>> Entering TEST_METHOD(TestLongOscParam=" << TestLongOscParam << ")" << std::endl;
+	std::cerr << "TEST_METHOD(TestLongOscParam=" << TestLongOscParam << "): engine → " << engine << std::endl;
+	std::cerr << "<<< Exiting TEST_METHOD(TestLeadingZeroOscParam=" << TestLeadingZeroOscParam << ")" << std::endl;
+	std::cerr << "TEST_METHOD(TestLongOscParam=" << TestLongOscParam << "): sizeMax → " << sizeMax << std::endl;
+	std::cerr << "TEST_METHOD(TestLongOscParam=" << TestLongOscParam << "): sizeMaxStr → " << sizeMaxStr << std::endl;
     TEST_METHOD(TestLongOscParam)
     {
+		std::cerr << ">>> Entering TEST_METHOD(TestLongOscParam=" << TestLongOscParam << ")" << std::endl;
         auto dispatch = std::make_unique<DummyDispatch>();
         auto engine = std::make_unique<OutputStateMachineEngine>(std::move(dispatch));
+		std::cerr << "TEST_METHOD(TestLongOscParam=" << TestLongOscParam << "): dispatch → " << dispatch << std::endl;
         StateMachine mach(std::move(engine));
 
+		std::cerr << "<<< Exiting TEST_METHOD(TestLeadingZeroOscParam=" << TestLeadingZeroOscParam << ")" << std::endl;
         VERIFY_ARE_EQUAL(mach._state, StateMachine::VTStates::Ground);
         mach.ProcessCharacter(AsciiChars::ESC);
         VERIFY_ARE_EQUAL(mach._state, StateMachine::VTStates::Escape);
@@ -768,12 +905,18 @@ class Microsoft::Console::VirtualTerminal::OutputEngineTest final
         VERIFY_ARE_EQUAL(mach._state, StateMachine::VTStates::Ground);
     }
 
+	std::cerr << ">>> Entering TEST_METHOD(TestOscStringInvalidTermination=" << TestOscStringInvalidTermination << ")" << std::endl;
+	std::cerr << "TEST_METHOD(TestOscStringInvalidTermination=" << TestOscStringInvalidTermination << "): engine → " << engine << std::endl;
+	std::cerr << "<<< Exiting TEST_METHOD(TestLongOscParam=" << TestLongOscParam << ")" << std::endl;
     TEST_METHOD(TestOscStringInvalidTermination)
     {
+		std::cerr << ">>> Entering TEST_METHOD(TestOscStringInvalidTermination=" << TestOscStringInvalidTermination << ")" << std::endl;
         auto dispatch = std::make_unique<DummyDispatch>();
         auto engine = std::make_unique<OutputStateMachineEngine>(std::move(dispatch));
+		std::cerr << "TEST_METHOD(TestOscStringInvalidTermination=" << TestOscStringInvalidTermination << "): dispatch → " << dispatch << std::endl;
         StateMachine mach(std::move(engine));
 
+		std::cerr << "<<< Exiting TEST_METHOD(TestLongOscParam=" << TestLongOscParam << ")" << std::endl;
         VERIFY_ARE_EQUAL(mach._state, StateMachine::VTStates::Ground);
         mach.ProcessCharacter(AsciiChars::ESC);
         VERIFY_ARE_EQUAL(mach._state, StateMachine::VTStates::Escape);
@@ -797,12 +940,18 @@ class Microsoft::Console::VirtualTerminal::OutputEngineTest final
         VERIFY_ARE_EQUAL(mach._state, StateMachine::VTStates::Ground);
     }
 
+	std::cerr << ">>> Entering TEST_METHOD(TestDcsEntry=" << TestDcsEntry << ")" << std::endl;
+	std::cerr << "TEST_METHOD(TestDcsEntry=" << TestDcsEntry << "): engine → " << engine << std::endl;
+	std::cerr << "<<< Exiting TEST_METHOD(TestOscStringInvalidTermination=" << TestOscStringInvalidTermination << ")" << std::endl;
     TEST_METHOD(TestDcsEntry)
     {
+		std::cerr << ">>> Entering TEST_METHOD(TestDcsEntry=" << TestDcsEntry << ")" << std::endl;
         auto dispatch = std::make_unique<DummyDispatch>();
         auto engine = std::make_unique<OutputStateMachineEngine>(std::move(dispatch));
+		std::cerr << "TEST_METHOD(TestDcsEntry=" << TestDcsEntry << "): dispatch → " << dispatch << std::endl;
         StateMachine mach(std::move(engine));
 
+		std::cerr << "<<< Exiting TEST_METHOD(TestOscStringInvalidTermination=" << TestOscStringInvalidTermination << ")" << std::endl;
         VERIFY_ARE_EQUAL(mach._state, StateMachine::VTStates::Ground);
         mach.ProcessCharacter(AsciiChars::ESC);
         VERIFY_ARE_EQUAL(mach._state, StateMachine::VTStates::Escape);
@@ -813,12 +962,18 @@ class Microsoft::Console::VirtualTerminal::OutputEngineTest final
         VERIFY_ARE_EQUAL(mach._state, StateMachine::VTStates::Ground);
     }
 
+	std::cerr << ">>> Entering TEST_METHOD(TestC1DcsEntry=" << TestC1DcsEntry << ")" << std::endl;
+	std::cerr << "TEST_METHOD(TestC1DcsEntry=" << TestC1DcsEntry << "): engine → " << engine << std::endl;
+	std::cerr << "<<< Exiting TEST_METHOD(TestDcsEntry=" << TestDcsEntry << ")" << std::endl;
     TEST_METHOD(TestC1DcsEntry)
     {
+		std::cerr << ">>> Entering TEST_METHOD(TestC1DcsEntry=" << TestC1DcsEntry << ")" << std::endl;
         auto dispatch = std::make_unique<DummyDispatch>();
         auto engine = std::make_unique<OutputStateMachineEngine>(std::move(dispatch));
+		std::cerr << "TEST_METHOD(TestC1DcsEntry=" << TestC1DcsEntry << "): dispatch → " << dispatch << std::endl;
         StateMachine mach(std::move(engine));
 
+		std::cerr << "<<< Exiting TEST_METHOD(TestDcsEntry=" << TestDcsEntry << ")" << std::endl;
         // Enable the acceptance of C1 control codes in the state machine.
         mach.SetParserMode(StateMachine::Mode::AcceptC1, true);
 
@@ -830,12 +985,18 @@ class Microsoft::Console::VirtualTerminal::OutputEngineTest final
         VERIFY_ARE_EQUAL(mach._state, StateMachine::VTStates::Ground);
     }
 
+	std::cerr << ">>> Entering TEST_METHOD(TestDcsImmediate=" << TestDcsImmediate << ")" << std::endl;
+	std::cerr << "TEST_METHOD(TestDcsImmediate=" << TestDcsImmediate << "): engine → " << engine << std::endl;
+	std::cerr << "<<< Exiting TEST_METHOD(TestC1DcsEntry=" << TestC1DcsEntry << ")" << std::endl;
     TEST_METHOD(TestDcsImmediate)
     {
+		std::cerr << ">>> Entering TEST_METHOD(TestDcsImmediate=" << TestDcsImmediate << ")" << std::endl;
         auto dispatch = std::make_unique<DummyDispatch>();
         auto engine = std::make_unique<OutputStateMachineEngine>(std::move(dispatch));
+		std::cerr << "TEST_METHOD(TestDcsImmediate=" << TestDcsImmediate << "): dispatch → " << dispatch << std::endl;
         StateMachine mach(std::move(engine));
 
+		std::cerr << "<<< Exiting TEST_METHOD(TestC1DcsEntry=" << TestC1DcsEntry << ")" << std::endl;
         VERIFY_ARE_EQUAL(mach._state, StateMachine::VTStates::Ground);
         mach.ProcessCharacter(AsciiChars::ESC);
         VERIFY_ARE_EQUAL(mach._state, StateMachine::VTStates::Escape);
@@ -852,12 +1013,18 @@ class Microsoft::Console::VirtualTerminal::OutputEngineTest final
         VERIFY_ARE_EQUAL(mach._state, StateMachine::VTStates::Ground);
     }
 
+	std::cerr << ">>> Entering TEST_METHOD(TestDcsIgnore=" << TestDcsIgnore << ")" << std::endl;
+	std::cerr << "TEST_METHOD(TestDcsIgnore=" << TestDcsIgnore << "): engine → " << engine << std::endl;
+	std::cerr << "<<< Exiting TEST_METHOD(TestDcsImmediate=" << TestDcsImmediate << ")" << std::endl;
     TEST_METHOD(TestDcsIgnore)
     {
+		std::cerr << ">>> Entering TEST_METHOD(TestDcsIgnore=" << TestDcsIgnore << ")" << std::endl;
         auto dispatch = std::make_unique<DummyDispatch>();
         auto engine = std::make_unique<OutputStateMachineEngine>(std::move(dispatch));
+		std::cerr << "TEST_METHOD(TestDcsIgnore=" << TestDcsIgnore << "): dispatch → " << dispatch << std::endl;
         StateMachine mach(std::move(engine));
 
+		std::cerr << "<<< Exiting TEST_METHOD(TestDcsImmediate=" << TestDcsImmediate << ")" << std::endl;
         VERIFY_ARE_EQUAL(mach._state, StateMachine::VTStates::Ground);
         mach.ProcessCharacter(AsciiChars::ESC);
         VERIFY_ARE_EQUAL(mach._state, StateMachine::VTStates::Escape);
@@ -870,12 +1037,18 @@ class Microsoft::Console::VirtualTerminal::OutputEngineTest final
         VERIFY_ARE_EQUAL(mach._state, StateMachine::VTStates::Ground);
     }
 
+	std::cerr << ">>> Entering TEST_METHOD(TestDcsParam=" << TestDcsParam << ")" << std::endl;
+	std::cerr << "TEST_METHOD(TestDcsParam=" << TestDcsParam << "): engine → " << engine << std::endl;
+	std::cerr << "<<< Exiting TEST_METHOD(TestDcsIgnore=" << TestDcsIgnore << ")" << std::endl;
     TEST_METHOD(TestDcsParam)
     {
+		std::cerr << ">>> Entering TEST_METHOD(TestDcsParam=" << TestDcsParam << ")" << std::endl;
         auto dispatch = std::make_unique<DummyDispatch>();
         auto engine = std::make_unique<OutputStateMachineEngine>(std::move(dispatch));
+		std::cerr << "TEST_METHOD(TestDcsParam=" << TestDcsParam << "): dispatch → " << dispatch << std::endl;
         StateMachine mach(std::move(engine));
 
+		std::cerr << "<<< Exiting TEST_METHOD(TestDcsIgnore=" << TestDcsIgnore << ")" << std::endl;
         VERIFY_ARE_EQUAL(mach._state, StateMachine::VTStates::Ground);
         mach.ProcessCharacter(AsciiChars::ESC);
         VERIFY_ARE_EQUAL(mach._state, StateMachine::VTStates::Escape);
@@ -907,12 +1080,18 @@ class Microsoft::Console::VirtualTerminal::OutputEngineTest final
         VERIFY_ARE_EQUAL(mach._state, StateMachine::VTStates::Ground);
     }
 
+	std::cerr << ">>> Entering TEST_METHOD(TestDcsIntermediateAndPassThrough=" << TestDcsIntermediateAndPassThrough << ")" << std::endl;
+	std::cerr << "TEST_METHOD(TestDcsIntermediateAndPassThrough=" << TestDcsIntermediateAndPassThrough << "): engine → " << engine << std::endl;
+	std::cerr << "<<< Exiting TEST_METHOD(TestDcsParam=" << TestDcsParam << ")" << std::endl;
     TEST_METHOD(TestDcsIntermediateAndPassThrough)
     {
+		std::cerr << ">>> Entering TEST_METHOD(TestDcsIntermediateAndPassThrough=" << TestDcsIntermediateAndPassThrough << ")" << std::endl;
         auto dispatch = std::make_unique<DummyDispatch>();
         auto engine = std::make_unique<OutputStateMachineEngine>(std::move(dispatch));
+		std::cerr << "TEST_METHOD(TestDcsIntermediateAndPassThrough=" << TestDcsIntermediateAndPassThrough << "): dispatch → " << dispatch << std::endl;
         StateMachine mach(std::move(engine));
 
+		std::cerr << "<<< Exiting TEST_METHOD(TestDcsParam=" << TestDcsParam << ")" << std::endl;
         VERIFY_ARE_EQUAL(mach._state, StateMachine::VTStates::Ground);
         mach.ProcessCharacter(AsciiChars::ESC);
         VERIFY_ARE_EQUAL(mach._state, StateMachine::VTStates::Escape);
@@ -929,12 +1108,18 @@ class Microsoft::Console::VirtualTerminal::OutputEngineTest final
         VERIFY_ARE_EQUAL(mach._state, StateMachine::VTStates::Ground);
     }
 
+	std::cerr << ">>> Entering TEST_METHOD(TestDcsLongStringPassThrough=" << TestDcsLongStringPassThrough << ")" << std::endl;
+	std::cerr << "TEST_METHOD(TestDcsLongStringPassThrough=" << TestDcsLongStringPassThrough << "): engine → " << engine << std::endl;
+	std::cerr << "<<< Exiting TEST_METHOD(TestDcsIntermediateAndPassThrough=" << TestDcsIntermediateAndPassThrough << ")" << std::endl;
     TEST_METHOD(TestDcsLongStringPassThrough)
     {
+		std::cerr << ">>> Entering TEST_METHOD(TestDcsLongStringPassThrough=" << TestDcsLongStringPassThrough << ")" << std::endl;
         auto dispatch = std::make_unique<DummyDispatch>();
         auto engine = std::make_unique<OutputStateMachineEngine>(std::move(dispatch));
+		std::cerr << "TEST_METHOD(TestDcsLongStringPassThrough=" << TestDcsLongStringPassThrough << "): dispatch → " << dispatch << std::endl;
         StateMachine mach(std::move(engine));
 
+		std::cerr << "<<< Exiting TEST_METHOD(TestDcsIntermediateAndPassThrough=" << TestDcsIntermediateAndPassThrough << ")" << std::endl;
         VERIFY_ARE_EQUAL(mach._state, StateMachine::VTStates::Ground);
         mach.ProcessCharacter(AsciiChars::ESC);
         VERIFY_ARE_EQUAL(mach._state, StateMachine::VTStates::Escape);
@@ -959,12 +1144,18 @@ class Microsoft::Console::VirtualTerminal::OutputEngineTest final
         VERIFY_ARE_EQUAL(mach._state, StateMachine::VTStates::Ground);
     }
 
+	std::cerr << ">>> Entering TEST_METHOD(TestDcsInvalidTermination=" << TestDcsInvalidTermination << ")" << std::endl;
+	std::cerr << "TEST_METHOD(TestDcsInvalidTermination=" << TestDcsInvalidTermination << "): engine → " << engine << std::endl;
+	std::cerr << "<<< Exiting TEST_METHOD(TestDcsLongStringPassThrough=" << TestDcsLongStringPassThrough << ")" << std::endl;
     TEST_METHOD(TestDcsInvalidTermination)
     {
+		std::cerr << ">>> Entering TEST_METHOD(TestDcsInvalidTermination=" << TestDcsInvalidTermination << ")" << std::endl;
         auto dispatch = std::make_unique<DummyDispatch>();
         auto engine = std::make_unique<OutputStateMachineEngine>(std::move(dispatch));
+		std::cerr << "TEST_METHOD(TestDcsInvalidTermination=" << TestDcsInvalidTermination << "): dispatch → " << dispatch << std::endl;
         StateMachine mach(std::move(engine));
 
+		std::cerr << "<<< Exiting TEST_METHOD(TestDcsLongStringPassThrough=" << TestDcsLongStringPassThrough << ")" << std::endl;
         VERIFY_ARE_EQUAL(mach._state, StateMachine::VTStates::Ground);
         mach.ProcessCharacter(AsciiChars::ESC);
         VERIFY_ARE_EQUAL(mach._state, StateMachine::VTStates::Escape);
@@ -986,12 +1177,18 @@ class Microsoft::Console::VirtualTerminal::OutputEngineTest final
         VERIFY_ARE_EQUAL(mach._state, StateMachine::VTStates::Ground);
     }
 
+	std::cerr << ">>> Entering TEST_METHOD(TestSosPmApcString=" << TestSosPmApcString << ")" << std::endl;
+	std::cerr << "TEST_METHOD(TestSosPmApcString=" << TestSosPmApcString << "): engine → " << engine << std::endl;
+	std::cerr << "<<< Exiting TEST_METHOD(TestDcsInvalidTermination=" << TestDcsInvalidTermination << ")" << std::endl;
     TEST_METHOD(TestSosPmApcString)
     {
+		std::cerr << ">>> Entering TEST_METHOD(TestSosPmApcString=" << TestSosPmApcString << ")" << std::endl;
         auto dispatch = std::make_unique<DummyDispatch>();
         auto engine = std::make_unique<OutputStateMachineEngine>(std::move(dispatch));
+		std::cerr << "TEST_METHOD(TestSosPmApcString=" << TestSosPmApcString << "): dispatch → " << dispatch << std::endl;
         StateMachine mach(std::move(engine));
 
+		std::cerr << "<<< Exiting TEST_METHOD(TestDcsInvalidTermination=" << TestDcsInvalidTermination << ")" << std::endl;
         VERIFY_ARE_EQUAL(mach._state, StateMachine::VTStates::Ground);
         mach.ProcessCharacter(AsciiChars::ESC);
         VERIFY_ARE_EQUAL(mach._state, StateMachine::VTStates::Escape);
@@ -1033,12 +1230,19 @@ class Microsoft::Console::VirtualTerminal::OutputEngineTest final
         VERIFY_ARE_EQUAL(mach._state, StateMachine::VTStates::Ground);
     }
 
+	std::cerr << ">>> Entering TEST_METHOD(TestC1StringTerminator=" << TestC1StringTerminator << ")" << std::endl;
+	std::cerr << "TEST_METHOD(TestC1StringTerminator=" << TestC1StringTerminator << "): engine → " << engine << std::endl;
+	std::cerr << "<<< Exiting TEST_METHOD(TestSosPmApcString=" << TestSosPmApcString << ")" << std::endl;
+	std::cerr << "<<< Exiting TEST_METHOD(TestC1StringTerminator=" << TestC1StringTerminator << ")" << std::endl;
     TEST_METHOD(TestC1StringTerminator)
     {
+		std::cerr << ">>> Entering TEST_METHOD(TestC1StringTerminator=" << TestC1StringTerminator << ")" << std::endl;
         auto dispatch = std::make_unique<DummyDispatch>();
         auto engine = std::make_unique<OutputStateMachineEngine>(std::move(dispatch));
+		std::cerr << "TEST_METHOD(TestC1StringTerminator=" << TestC1StringTerminator << "): dispatch → " << dispatch << std::endl;
         StateMachine mach(std::move(engine));
 
+		std::cerr << "<<< Exiting TEST_METHOD(TestSosPmApcString=" << TestSosPmApcString << ")" << std::endl;
         // Enable the acceptance of C1 control codes in the state machine.
         mach.SetParserMode(StateMachine::Mode::AcceptC1, true);
 
@@ -1170,277 +1374,432 @@ public:
 
     void ClearState()
     {
+		std::cerr << ">>> Entering ClearState()" << std::endl;
         StatefulDispatch dispatch;
         *this = dispatch;
+		std::cerr << "<<< Exiting ClearState()" << std::endl;
     }
 
     void CursorUp(const VTInt uiDistance) noexcept override
     {
+		std::cerr << ">>> Entering CursorUp(uiDistance=" << uiDistance << ")" << std::endl;
         _cursorUp = true;
         _cursorDistance = uiDistance;
+		std::cerr << "CursorUp(uiDistance=" << uiDistance << "): _cursorUp → " << _cursorUp << std::endl;
+		std::cerr << "CursorUp(uiDistance=" << uiDistance << "): _cursorDistance → " << _cursorDistance << std::endl;
+		std::cerr << "<<< Exiting CursorUp(uiDistance=" << uiDistance << ")" << std::endl;
     }
 
     void CursorDown(const VTInt uiDistance) noexcept override
     {
+		std::cerr << ">>> Entering CursorDown(uiDistance=" << uiDistance << ")" << std::endl;
         _cursorDown = true;
         _cursorDistance = uiDistance;
+		std::cerr << "CursorDown(uiDistance=" << uiDistance << "): _cursorDistance → " << _cursorDistance << std::endl;
+		std::cerr << "CursorDown(uiDistance=" << uiDistance << "): _cursorDown → " << _cursorDown << std::endl;
+		std::cerr << "<<< Exiting CursorDown(uiDistance=" << uiDistance << ")" << std::endl;
     }
 
     void CursorBackward(const VTInt uiDistance) noexcept override
     {
+		std::cerr << ">>> Entering CursorBackward(uiDistance=" << uiDistance << ")" << std::endl;
         _cursorBackward = true;
         _cursorDistance = uiDistance;
+		std::cerr << "CursorBackward(uiDistance=" << uiDistance << "): _cursorBackward → " << _cursorBackward << std::endl;
+		std::cerr << "CursorBackward(uiDistance=" << uiDistance << "): _cursorDistance → " << _cursorDistance << std::endl;
+		std::cerr << "<<< Exiting CursorBackward(uiDistance=" << uiDistance << ")" << std::endl;
     }
 
     void CursorForward(const VTInt uiDistance) noexcept override
     {
+		std::cerr << ">>> Entering CursorForward(uiDistance=" << uiDistance << ")" << std::endl;
         _cursorForward = true;
         _cursorDistance = uiDistance;
+		std::cerr << "CursorForward(uiDistance=" << uiDistance << "): _cursorDistance → " << _cursorDistance << std::endl;
+		std::cerr << "CursorForward(uiDistance=" << uiDistance << "): _cursorForward → " << _cursorForward << std::endl;
+		std::cerr << "<<< Exiting CursorForward(uiDistance=" << uiDistance << ")" << std::endl;
     }
 
     void CursorNextLine(const VTInt uiDistance) noexcept override
     {
+		std::cerr << ">>> Entering CursorNextLine(uiDistance=" << uiDistance << ")" << std::endl;
         _cursorNextLine = true;
         _cursorDistance = uiDistance;
+		std::cerr << "CursorNextLine(uiDistance=" << uiDistance << "): _cursorNextLine → " << _cursorNextLine << std::endl;
+		std::cerr << "CursorNextLine(uiDistance=" << uiDistance << "): _cursorDistance → " << _cursorDistance << std::endl;
+		std::cerr << "<<< Exiting CursorNextLine(uiDistance=" << uiDistance << ")" << std::endl;
     }
 
     void CursorPrevLine(const VTInt uiDistance) noexcept override
     {
+		std::cerr << ">>> Entering CursorPrevLine(uiDistance=" << uiDistance << ")" << std::endl;
         _cursorPreviousLine = true;
         _cursorDistance = uiDistance;
+		std::cerr << "CursorPrevLine(uiDistance=" << uiDistance << "): _cursorDistance → " << _cursorDistance << std::endl;
+		std::cerr << "CursorPrevLine(uiDistance=" << uiDistance << "): _cursorPreviousLine → " << _cursorPreviousLine << std::endl;
+		std::cerr << "<<< Exiting CursorPrevLine(uiDistance=" << uiDistance << ")" << std::endl;
     }
 
     void CursorHorizontalPositionAbsolute(const VTInt uiPosition) noexcept override
     {
+		std::cerr << ">>> Entering CursorHorizontalPositionAbsolute(uiPosition=" << uiPosition << ")" << std::endl;
         _cursorHorizontalPositionAbsolute = true;
         _cursorDistance = uiPosition;
+		std::cerr << "CursorHorizontalPositionAbsolute(uiPosition=" << uiPosition << "): _cursorHorizontalPositionAbsolute → " << _cursorHorizontalPositionAbsolute << std::endl;
+		std::cerr << "CursorHorizontalPositionAbsolute(uiPosition=" << uiPosition << "): _cursorDistance → " << _cursorDistance << std::endl;
+		std::cerr << "<<< Exiting CursorHorizontalPositionAbsolute(uiPosition=" << uiPosition << ")" << std::endl;
     }
 
     void VerticalLinePositionAbsolute(const VTInt uiPosition) noexcept override
     {
+		std::cerr << ">>> Entering VerticalLinePositionAbsolute(uiPosition=" << uiPosition << ")" << std::endl;
         _verticalLinePositionAbsolute = true;
         _cursorDistance = uiPosition;
+		std::cerr << "VerticalLinePositionAbsolute(uiPosition=" << uiPosition << "): _cursorDistance → " << _cursorDistance << std::endl;
+		std::cerr << "VerticalLinePositionAbsolute(uiPosition=" << uiPosition << "): _verticalLinePositionAbsolute → " << _verticalLinePositionAbsolute << std::endl;
+		std::cerr << "<<< Exiting VerticalLinePositionAbsolute(uiPosition=" << uiPosition << ")" << std::endl;
     }
 
     void HorizontalPositionRelative(const VTInt uiDistance) noexcept override
     {
+		std::cerr << ">>> Entering HorizontalPositionRelative(uiDistance=" << uiDistance << ")" << std::endl;
         _horizontalPositionRelative = true;
         _cursorDistance = uiDistance;
+		std::cerr << "HorizontalPositionRelative(uiDistance=" << uiDistance << "): _horizontalPositionRelative → " << _horizontalPositionRelative << std::endl;
+		std::cerr << "HorizontalPositionRelative(uiDistance=" << uiDistance << "): _cursorDistance → " << _cursorDistance << std::endl;
+		std::cerr << "<<< Exiting HorizontalPositionRelative(uiDistance=" << uiDistance << ")" << std::endl;
     }
 
     void VerticalPositionRelative(const VTInt uiDistance) noexcept override
     {
+		std::cerr << ">>> Entering VerticalPositionRelative(uiDistance=" << uiDistance << ")" << std::endl;
         _verticalPositionRelative = true;
         _cursorDistance = uiDistance;
+		std::cerr << "VerticalPositionRelative(uiDistance=" << uiDistance << "): _verticalPositionRelative → " << _verticalPositionRelative << std::endl;
+		std::cerr << "VerticalPositionRelative(uiDistance=" << uiDistance << "): _cursorDistance → " << _cursorDistance << std::endl;
+		std::cerr << "<<< Exiting VerticalPositionRelative(uiDistance=" << uiDistance << ")" << std::endl;
     }
 
     void CursorPosition(const VTInt uiLine, const VTInt uiColumn) noexcept override
     {
+		std::cerr << ">>> Entering CursorPosition(uiLine=" << uiLine << ",uiColumn=" << uiColumn << ")" << std::endl;
         _cursorPosition = true;
         _line = uiLine;
+		std::cerr << "CursorPosition(uiLine=" << uiLine << ",uiColumn=" << uiColumn << "): _line → " << _line << std::endl;
+		std::cerr << "CursorPosition(uiLine=" << uiLine << ",uiColumn=" << uiColumn << "): _column → " << _column << std::endl;
+		std::cerr << "CursorPosition(uiLine=" << uiLine << ",uiColumn=" << uiColumn << "): _cursorPosition → " << _cursorPosition << std::endl;
         _column = uiColumn;
+		std::cerr << "<<< Exiting CursorPosition(uiLine=" << uiLine << ",uiColumn=" << uiColumn << ")" << std::endl;
     }
 
     void CursorSaveState() noexcept override
     {
+		std::cerr << ">>> Entering CursorSaveState()" << std::endl;
+		std::cerr << "CursorSaveState(): _cursorSave → " << _cursorSave << std::endl;
         _cursorSave = true;
+		std::cerr << "<<< Exiting CursorSaveState()" << std::endl;
     }
 
     void CursorRestoreState() noexcept override
     {
+		std::cerr << ">>> Entering CursorRestoreState()" << std::endl;
+		std::cerr << "CursorRestoreState(): _cursorLoad → " << _cursorLoad << std::endl;
         _cursorLoad = true;
+		std::cerr << "<<< Exiting CursorRestoreState()" << std::endl;
     }
 
     void EraseInDisplay(const DispatchTypes::EraseType eraseType) noexcept override
     {
+		std::cerr << ">>> Entering EraseInDisplay(eraseType=" << eraseType << ")" << std::endl;
         _eraseDisplay = true;
         _eraseType = eraseType;
+		std::cerr << "EraseInDisplay(eraseType=" << eraseType << "): _eraseType → " << _eraseType << std::endl;
+		std::cerr << "EraseInDisplay(eraseType=" << eraseType << "): _eraseDisplay → " << _eraseDisplay << std::endl;
         _eraseTypes.push_back(eraseType);
+		std::cerr << "<<< Exiting EraseInDisplay(eraseType=" << eraseType << ")" << std::endl;
     }
 
     void EraseInLine(const DispatchTypes::EraseType eraseType) noexcept override
     {
+		std::cerr << ">>> Entering EraseInLine(eraseType=" << eraseType << ")" << std::endl;
         _eraseLine = true;
         _eraseType = eraseType;
+		std::cerr << "EraseInLine(eraseType=" << eraseType << "): _eraseType → " << _eraseType << std::endl;
+		std::cerr << "EraseInLine(eraseType=" << eraseType << "): _eraseLine → " << _eraseLine << std::endl;
         _eraseTypes.push_back(eraseType);
+		std::cerr << "<<< Exiting EraseInLine(eraseType=" << eraseType << ")" << std::endl;
     }
 
     void InsertCharacter(const VTInt uiCount) noexcept override
     {
+		std::cerr << ">>> Entering InsertCharacter(uiCount=" << uiCount << ")" << std::endl;
         _insertCharacter = true;
         _cursorDistance = uiCount;
+		std::cerr << "InsertCharacter(uiCount=" << uiCount << "): _cursorDistance → " << _cursorDistance << std::endl;
+		std::cerr << "InsertCharacter(uiCount=" << uiCount << "): _insertCharacter → " << _insertCharacter << std::endl;
+		std::cerr << "<<< Exiting InsertCharacter(uiCount=" << uiCount << ")" << std::endl;
     }
 
     void DeleteCharacter(const VTInt uiCount) noexcept override
     {
+		std::cerr << ">>> Entering DeleteCharacter(uiCount=" << uiCount << ")" << std::endl;
         _deleteCharacter = true;
         _cursorDistance = uiCount;
+		std::cerr << "DeleteCharacter(uiCount=" << uiCount << "): _deleteCharacter → " << _deleteCharacter << std::endl;
+		std::cerr << "DeleteCharacter(uiCount=" << uiCount << "): _cursorDistance → " << _cursorDistance << std::endl;
+		std::cerr << "<<< Exiting DeleteCharacter(uiCount=" << uiCount << ")" << std::endl;
     }
 
     void SetGraphicsRendition(const VTParameters options) noexcept override
     {
+		std::cerr << ">>> Entering SetGraphicsRendition(options=" << options << ")" << std::endl;
         _options.clear();
         for (size_t i = 0; i < options.size(); i++)
         {
             _options.push_back(options.at(i));
         }
         _setGraphics = true;
+		std::cerr << "SetGraphicsRendition(options=" << options << "): _setGraphics → " << _setGraphics << std::endl;
+		std::cerr << "<<< Exiting SetGraphicsRendition(options=" << options << ")" << std::endl;
     }
 
     void DeviceStatusReport(const DispatchTypes::StatusType statusType, const VTParameter /*id*/) noexcept override
     {
+		std::cerr << ">>> Entering DeviceStatusReport(statusType=" << statusType << ")" << std::endl;
         _deviceStatusReport = true;
         _statusReportType = statusType;
+		std::cerr << "DeviceStatusReport(statusType=" << statusType << "): _deviceStatusReport → " << _deviceStatusReport << std::endl;
+		std::cerr << "DeviceStatusReport(statusType=" << statusType << "): _statusReportType → " << _statusReportType << std::endl;
+		std::cerr << "<<< Exiting DeviceStatusReport(statusType=" << statusType << ")" << std::endl;
     }
 
     void DeviceAttributes() noexcept override
     {
+		std::cerr << ">>> Entering DeviceAttributes()" << std::endl;
+		std::cerr << "DeviceAttributes(): _deviceAttributes → " << _deviceAttributes << std::endl;
         _deviceAttributes = true;
+		std::cerr << "<<< Exiting DeviceAttributes()" << std::endl;
     }
 
     void SecondaryDeviceAttributes() noexcept override
     {
+		std::cerr << ">>> Entering SecondaryDeviceAttributes()" << std::endl;
+		std::cerr << "SecondaryDeviceAttributes(): _secondaryDeviceAttributes → " << _secondaryDeviceAttributes << std::endl;
         _secondaryDeviceAttributes = true;
+		std::cerr << "<<< Exiting SecondaryDeviceAttributes()" << std::endl;
     }
 
     void TertiaryDeviceAttributes() noexcept override
     {
+		std::cerr << ">>> Entering TertiaryDeviceAttributes()" << std::endl;
+		std::cerr << "TertiaryDeviceAttributes(): _tertiaryDeviceAttributes → " << _tertiaryDeviceAttributes << std::endl;
         _tertiaryDeviceAttributes = true;
+		std::cerr << "<<< Exiting TertiaryDeviceAttributes()" << std::endl;
     }
 
     void Vt52DeviceAttributes() noexcept override
     {
+		std::cerr << ">>> Entering Vt52DeviceAttributes()" << std::endl;
+		std::cerr << "Vt52DeviceAttributes(): _vt52DeviceAttributes → " << _vt52DeviceAttributes << std::endl;
         _vt52DeviceAttributes = true;
+		std::cerr << "<<< Exiting Vt52DeviceAttributes()" << std::endl;
     }
 
     void RequestTerminalParameters(const DispatchTypes::ReportingPermission permission) noexcept override
     {
+		std::cerr << ">>> Entering RequestTerminalParameters(permission=" << permission << ")" << std::endl;
         _requestTerminalParameters = true;
         _reportingPermission = permission;
+		std::cerr << "RequestTerminalParameters(permission=" << permission << "): _reportingPermission → " << _reportingPermission << std::endl;
+		std::cerr << "RequestTerminalParameters(permission=" << permission << "): _requestTerminalParameters → " << _requestTerminalParameters << std::endl;
+		std::cerr << "<<< Exiting RequestTerminalParameters(permission=" << permission << ")" << std::endl;
     }
 
     void _ModeParamsHelper(_In_ DispatchTypes::ModeParams const param, const bool fEnable)
     {
+		std::cerr << ">>> Entering _ModeParamsHelper(param=" << param << ",fEnable=" << fEnable << ")" << std::endl;
         _modeType = param;
         _modeTypes.push_back(param);
+		std::cerr << "_ModeParamsHelper(param=" << param << ",fEnable=" << fEnable << "): _modeType → " << _modeType << std::endl;
+		std::cerr << "_ModeParamsHelper(param=" << param << ",fEnable=" << fEnable << "): _modeEnabled → " << _modeEnabled << std::endl;
         _modeEnabled = fEnable;
+		std::cerr << "<<< Exiting _ModeParamsHelper(param=" << param << ",fEnable=" << fEnable << ")" << std::endl;
     }
 
     void SetMode(const DispatchTypes::ModeParams param) noexcept override
     {
+		std::cerr << ">>> Entering SetMode(param=" << param << ")" << std::endl;
         _ModeParamsHelper(param, true);
+		std::cerr << "<<< Exiting SetMode(param=" << param << ")" << std::endl;
     }
 
     void ResetMode(const DispatchTypes::ModeParams param) noexcept override
     {
+		std::cerr << ">>> Entering ResetMode(param=" << param << ")" << std::endl;
         _ModeParamsHelper(param, false);
+		std::cerr << "<<< Exiting ResetMode(param=" << param << ")" << std::endl;
     }
 
     void SetAnsiMode(const bool ansiMode) noexcept override
     {
+		std::cerr << ">>> Entering SetAnsiMode(ansiMode=" << ansiMode << ")" << std::endl;
         _ModeParamsHelper(DispatchTypes::DECANM_AnsiMode, ansiMode);
+		std::cerr << "<<< Exiting SetAnsiMode(ansiMode=" << ansiMode << ")" << std::endl;
     }
 
     void WarningBell() noexcept override
     {
+		std::cerr << ">>> Entering WarningBell()" << std::endl;
+		std::cerr << "WarningBell(): _warningBell → " << _warningBell << std::endl;
         _warningBell = true;
+		std::cerr << "<<< Exiting WarningBell()" << std::endl;
     }
 
     void CarriageReturn() noexcept override
     {
+		std::cerr << ">>> Entering CarriageReturn()" << std::endl;
+		std::cerr << "CarriageReturn(): _carriageReturn → " << _carriageReturn << std::endl;
         _carriageReturn = true;
+		std::cerr << "<<< Exiting CarriageReturn()" << std::endl;
     }
 
     void LineFeed(const DispatchTypes::LineFeedType lineFeedType) noexcept override
     {
+		std::cerr << ">>> Entering LineFeed(lineFeedType=" << lineFeedType << ")" << std::endl;
         _lineFeed = true;
         _lineFeedType = lineFeedType;
+		std::cerr << "LineFeed(lineFeedType=" << lineFeedType << "): _lineFeed → " << _lineFeed << std::endl;
+		std::cerr << "LineFeed(lineFeedType=" << lineFeedType << "): _lineFeedType → " << _lineFeedType << std::endl;
+		std::cerr << "<<< Exiting LineFeed(lineFeedType=" << lineFeedType << ")" << std::endl;
     }
 
     void ReverseLineFeed() noexcept override
     {
+		std::cerr << ">>> Entering ReverseLineFeed()" << std::endl;
+		std::cerr << "ReverseLineFeed(): _reverseLineFeed → " << _reverseLineFeed << std::endl;
         _reverseLineFeed = true;
+		std::cerr << "<<< Exiting ReverseLineFeed()" << std::endl;
     }
 
     void SetWindowTitle(std::wstring_view title) override
     {
+		std::cerr << ">>> Entering SetWindowTitle(title=" << title << ")" << std::endl;
         _setWindowTitle = true;
         _setWindowTitleText = title;
+		std::cerr << "SetWindowTitle(title=" << title << "): _setWindowTitleText → " << _setWindowTitleText << std::endl;
+		std::cerr << "SetWindowTitle(title=" << title << "): _setWindowTitle → " << _setWindowTitle << std::endl;
+		std::cerr << "<<< Exiting SetWindowTitle(title=" << title << ")" << std::endl;
     }
 
     void ForwardTab(const VTInt numTabs) noexcept override
     {
+		std::cerr << ">>> Entering ForwardTab(numTabs=" << numTabs << ")" << std::endl;
         _forwardTab = true;
         _numTabs = numTabs;
+		std::cerr << "ForwardTab(numTabs=" << numTabs << "): _forwardTab → " << _forwardTab << std::endl;
+		std::cerr << "ForwardTab(numTabs=" << numTabs << "): _numTabs → " << _numTabs << std::endl;
+		std::cerr << "<<< Exiting ForwardTab(numTabs=" << numTabs << ")" << std::endl;
     }
 
     void TabClear(const DispatchTypes::TabClearType clearType) noexcept override
     {
+		std::cerr << ">>> Entering TabClear(clearType=" << clearType << ")" << std::endl;
         _tabClear = true;
         _tabClearTypes.push_back(clearType);
+		std::cerr << "TabClear(clearType=" << clearType << "): _tabClear → " << _tabClear << std::endl;
+		std::cerr << "<<< Exiting TabClear(clearType=" << clearType << ")" << std::endl;
     }
 
     void SetColorTableEntry(const size_t tableIndex, const COLORREF color) noexcept override
     {
+		std::cerr << ">>> Entering SetColorTableEntry(tableIndex=" << tableIndex << ",color=" << color << ")" << std::endl;
         _setColorTableEntry = true;
         _colorTable.at(tableIndex) = color;
+		std::cerr << "SetColorTableEntry(tableIndex=" << tableIndex << ",color=" << color << "): _setColorTableEntry → " << _setColorTableEntry << std::endl;
+		std::cerr << "<<< Exiting SetColorTableEntry(tableIndex=" << tableIndex << ",color=" << color << ")" << std::endl;
     }
 
     void RequestColorTableEntry(const size_t tableIndex) noexcept override
     {
+		std::cerr << ">>> Entering RequestColorTableEntry(tableIndex=" << tableIndex << ")" << std::endl;
         _colorTableEntriesRequested.push_back(tableIndex);
+		std::cerr << "<<< Exiting RequestColorTableEntry(tableIndex=" << tableIndex << ")" << std::endl;
     }
 
     void ResetColorTable() noexcept override
     {
+		std::cerr << ">>> Entering ResetColorTable()" << std::endl;
+		std::cerr << "ResetColorTable(): _resetAllColors → " << _resetAllColors << std::endl;
         _resetAllColors = true;
+		std::cerr << "<<< Exiting ResetColorTable()" << std::endl;
     }
 
     void ResetColorTableEntry(const size_t tableIndex) noexcept override
     {
+		std::cerr << ">>> Entering ResetColorTableEntry(tableIndex=" << tableIndex << ")" << std::endl;
         _colorTableEntriesReset.push_back(tableIndex);
+		std::cerr << "<<< Exiting ResetColorTableEntry(tableIndex=" << tableIndex << ")" << std::endl;
     }
 
     void SetXtermColorResource(const size_t resource, const DWORD color) override
     {
+		std::cerr << ">>> Entering SetXtermColorResource(resource=" << resource << ",color=" << color << ")" << std::endl;
         _xtermResourcesChanged.push_back(resource);
         _xtermResourceValues.push_back(color);
+		std::cerr << "<<< Exiting SetXtermColorResource(resource=" << resource << ",color=" << color << ")" << std::endl;
     }
 
     void RequestXtermColorResource(const size_t resource) override
     {
+		std::cerr << ">>> Entering RequestXtermColorResource(resource=" << resource << ")" << std::endl;
         _xtermResourcesRequested.push_back(resource);
+		std::cerr << "<<< Exiting RequestXtermColorResource(resource=" << resource << ")" << std::endl;
     }
 
     void ResetXtermColorResource(const size_t resource) override
     {
+		std::cerr << ">>> Entering ResetXtermColorResource(resource=" << resource << ")" << std::endl;
         _xtermResourcesReset.push_back(resource);
+		std::cerr << "<<< Exiting ResetXtermColorResource(resource=" << resource << ")" << std::endl;
     }
 
     void SetClipboard(wil::zwstring_view content) noexcept override
     {
+		std::cerr << ">>> Entering SetClipboard(content=" << content << ")" << std::endl;
+		std::cerr << "SetClipboard(content=" << content << "): _copyContent → " << _copyContent << std::endl;
         _copyContent = content;
+		std::cerr << "<<< Exiting SetClipboard(content=" << content << ")" << std::endl;
     }
 
     void AddHyperlink(std::wstring_view uri, std::wstring_view params) noexcept override
     {
+		std::cerr << ">>> Entering AddHyperlink(uri=" << uri << ",params=" << params << ")" << std::endl;
         _hyperlinkMode = true;
         _uri = uri;
+		std::cerr << "AddHyperlink(uri=" << uri << ",params=" << params << "): _uri → " << _uri << std::endl;
+		std::cerr << "AddHyperlink(uri=" << uri << ",params=" << params << "): _hyperlinkMode → " << _hyperlinkMode << std::endl;
         if (!params.empty())
         {
             _customId = params;
+			std::cerr << "AddHyperlink(uri=" << uri << ",params=" << params << "): _customId → " << _customId << std::endl;
         }
+		std::cerr << "<<< Exiting AddHyperlink(uri=" << uri << ",params=" << params << ")" << std::endl;
     }
 
     void EndHyperlink() noexcept override
     {
+		std::cerr << ">>> Entering EndHyperlink()" << std::endl;
         _hyperlinkMode = false;
         _uri.clear();
+		std::cerr << "EndHyperlink(): _hyperlinkMode → " << _hyperlinkMode << std::endl;
         _customId.clear();
+		std::cerr << "<<< Exiting EndHyperlink()" << std::endl;
     }
 
     void DoConEmuAction(const std::wstring_view /*string*/) noexcept override
     {
+	std::cerr << ">>> Entering DoConEmuAction()" << std::endl;
+	std::cerr << "<<< Exiting DoConEmuAction()" << std::endl;
     }
 
     std::wstring _printString;
@@ -1515,10 +1874,12 @@ class StateMachineExternalTest final
 
     void InsertNumberToMachine(StateMachine* const pMachine, size_t number)
     {
+		std::cerr << ">>> Entering InsertNumberToMachine(pMachine=" << pMachine << ",number=" << number << ")" << std::endl;
         static const size_t cchBufferMax = 20;
 
         wchar_t pwszDistance[cchBufferMax];
         auto cchDistance = swprintf_s(pwszDistance, cchBufferMax, L"%zu", number);
+		std::cerr << "InsertNumberToMachine(pMachine=" << pMachine << ",number=" << number << "): cchDistance → " << cchDistance << std::endl;
 
         if (cchDistance > 0 && cchDistance < cchBufferMax)
         {
@@ -1527,10 +1888,12 @@ class StateMachineExternalTest final
                 pMachine->ProcessCharacter(pwszDistance[i]);
             }
         }
+		std::cerr << "<<< Exiting InsertNumberToMachine(pMachine=" << pMachine << ",number=" << number << ")" << std::endl;
     }
 
     void ApplyParameterBoundary(size_t* uiExpected, size_t uiGiven)
     {
+		std::cerr << ">>> Entering ApplyParameterBoundary(uiExpected=" << uiExpected << ",uiGiven=" << uiGiven << ")" << std::endl;
         // 0 and 1 should be 1. Use the preset value.
         // 1-MAX_PARAMETER_VALUE should be what we set.
         // > MAX_PARAMETER_VALUE should be MAX_PARAMETER_VALUE.
@@ -1546,6 +1909,7 @@ class StateMachineExternalTest final
         {
             *uiExpected = MAX_PARAMETER_VALUE;
         }
+		std::cerr << "<<< Exiting ApplyParameterBoundary(uiExpected=" << uiExpected << ",uiGiven=" << uiGiven << ")" << std::endl;
     }
 
     void TestCsiCursorMovement(const wchar_t wchCommand,
@@ -1585,8 +1949,10 @@ class StateMachineExternalTest final
         VERIFY_ARE_EQUAL(dispatch._cursorDistance, uiExpectedDistance);
     }
 
+	std::cerr << ">>> Entering TEST_METHOD(TestCsiCursorMovementWithValues=" << TestCsiCursorMovementWithValues << ")" << std::endl;
     TEST_METHOD(TestCsiCursorMovementWithValues)
     {
+		std::cerr << ">>> Entering TEST_METHOD(TestCsiCursorMovementWithValues=" << TestCsiCursorMovementWithValues << ")" << std::endl;
         BEGIN_TEST_METHOD_PROPERTIES()
             TEST_METHOD_PROPERTY(L"Data:uiDistance", PARAM_VALUES)
             TEST_METHOD_PROPERTY(L"Data:fExtraParam", L"{false,true}")
@@ -1629,6 +1995,8 @@ class StateMachineExternalTest final
         TestCsiCursorMovement(L'P', uiDistance, true, fExtra, &pDispatch->_deleteCharacter, mach, *pDispatch);
     }
 
+	std::cerr << "TEST_METHOD(TestCsiCursorMovementWithoutValues=" << TestCsiCursorMovementWithoutValues << "): engine → " << engine << std::endl;
+	std::cerr << "TEST_METHOD(TestCsiCursorMovementWithoutValues=" << TestCsiCursorMovementWithoutValues << "): pDispatch → " << pDispatch << std::endl;
     TEST_METHOD(TestCsiCursorMovementWithoutValues)
     {
         auto dispatch = std::make_unique<StatefulDispatch>();
@@ -1652,6 +2020,7 @@ class StateMachineExternalTest final
         TestCsiCursorMovement(L'G', uiDistance, false, false, &pDispatch->_cursorHorizontalPositionAbsolute, mach, *pDispatch);
         pDispatch->ClearState();
         TestCsiCursorMovement(L'`', uiDistance, false, false, &pDispatch->_cursorHorizontalPositionAbsolute, mach, *pDispatch);
+		std::cerr << "TEST_METHOD(TestCsiCursorMovementWithoutValues=" << TestCsiCursorMovementWithoutValues << "): dispatch → " << dispatch << std::endl;
         pDispatch->ClearState();
         TestCsiCursorMovement(L'd', uiDistance, false, false, &pDispatch->_verticalLinePositionAbsolute, mach, *pDispatch);
         pDispatch->ClearState();
@@ -1698,6 +2067,8 @@ class StateMachineExternalTest final
         VERIFY_ARE_EQUAL(pDispatch->_column, uiCol);
     }
 
+	std::cerr << "TEST_METHOD(TestCsiCursorPositionWithOnlyRow=" << TestCsiCursorPositionWithOnlyRow << "): pDispatch → " << pDispatch << std::endl;
+	std::cerr << "TEST_METHOD(TestCsiCursorPositionWithOnlyRow=" << TestCsiCursorPositionWithOnlyRow << "): engine → " << engine << std::endl;
     TEST_METHOD(TestCsiCursorPositionWithOnlyRow)
     {
         BEGIN_TEST_METHOD_PROPERTIES()
@@ -1708,6 +2079,7 @@ class StateMachineExternalTest final
         VERIFY_SUCCEEDED_RETURN(TestData::TryGetValue(L"uiRow", uiRow));
 
         auto dispatch = std::make_unique<StatefulDispatch>();
+		std::cerr << "TEST_METHOD(TestCsiCursorPositionWithOnlyRow=" << TestCsiCursorPositionWithOnlyRow << "): dispatch → " << dispatch << std::endl;
         auto pDispatch = dispatch.get();
         auto engine = std::make_unique<OutputStateMachineEngine>(std::move(dispatch));
         StateMachine mach(std::move(engine));
@@ -1726,10 +2098,13 @@ class StateMachineExternalTest final
         VERIFY_ARE_EQUAL(pDispatch->_column, (size_t)1); // Without the second param, the column should always be the default
     }
 
+	std::cerr << "TEST_METHOD(TestCursorSaveLoad=" << TestCursorSaveLoad << "): pDispatch → " << pDispatch << std::endl;
+	std::cerr << "TEST_METHOD(TestCursorSaveLoad=" << TestCursorSaveLoad << "): engine → " << engine << std::endl;
     TEST_METHOD(TestCursorSaveLoad)
     {
         auto dispatch = std::make_unique<StatefulDispatch>();
         auto pDispatch = dispatch.get();
+		std::cerr << "TEST_METHOD(TestCursorSaveLoad=" << TestCursorSaveLoad << "): dispatch → " << dispatch << std::endl;
         auto engine = std::make_unique<OutputStateMachineEngine>(std::move(dispatch));
         StateMachine mach(std::move(engine));
 
@@ -1758,10 +2133,13 @@ class StateMachineExternalTest final
         pDispatch->ClearState();
     }
 
+	std::cerr << "TEST_METHOD(TestAnsiMode=" << TestAnsiMode << "): pDispatch → " << pDispatch << std::endl;
+	std::cerr << "TEST_METHOD(TestAnsiMode=" << TestAnsiMode << "): engine → " << engine << std::endl;
     TEST_METHOD(TestAnsiMode)
     {
         auto dispatch = std::make_unique<StatefulDispatch>();
         auto pDispatch = dispatch.get();
+		std::cerr << "TEST_METHOD(TestAnsiMode=" << TestAnsiMode << "): dispatch → " << dispatch << std::endl;
         auto engine = std::make_unique<OutputStateMachineEngine>(std::move(dispatch));
         StateMachine mach(std::move(engine));
 
@@ -1783,6 +2161,8 @@ class StateMachineExternalTest final
     TEST_METHOD(TestPrivateModes)
     {
         BEGIN_TEST_METHOD_PROPERTIES()
+			std::cerr << ">>> Entering BEGIN_TEST_METHOD_PROPERTIES()" << std::endl;
+			std::cerr << "<<< Exiting BEGIN_TEST_METHOD_PROPERTIES()" << std::endl;
             TEST_METHOD_PROPERTY(L"Data:modeNumber", L"{1, 3, 5, 6, 7, 12, 25, 40, 1049}")
         END_TEST_METHOD_PROPERTIES()
 
@@ -1812,10 +2192,13 @@ class StateMachineExternalTest final
         pDispatch->ClearState();
     }
 
+	std::cerr << "TEST_METHOD(TestMultipleModes=" << TestMultipleModes << "): pDispatch → " << pDispatch << std::endl;
+	std::cerr << "TEST_METHOD(TestMultipleModes=" << TestMultipleModes << "): engine → " << engine << std::endl;
     TEST_METHOD(TestMultipleModes)
     {
         auto dispatch = std::make_unique<StatefulDispatch>();
         auto pDispatch = dispatch.get();
+		std::cerr << "TEST_METHOD(TestMultipleModes=" << TestMultipleModes << "): dispatch → " << dispatch << std::endl;
         auto engine = std::make_unique<OutputStateMachineEngine>(std::move(dispatch));
         StateMachine mach(std::move(engine));
 
@@ -1903,15 +2286,19 @@ class StateMachineExternalTest final
         VERIFY_ARE_EQUAL(expectedDispatchTypes, pDispatch->_eraseType);
     }
 
+	std::cerr << "TEST_METHOD(TestMultipleErase=" << TestMultipleErase << "): pDispatch → " << pDispatch << std::endl;
+	std::cerr << "TEST_METHOD(TestMultipleErase=" << TestMultipleErase << "): engine → " << engine << std::endl;
     TEST_METHOD(TestMultipleErase)
     {
         auto dispatch = std::make_unique<StatefulDispatch>();
         auto pDispatch = dispatch.get();
+		std::cerr << "TEST_METHOD(TestMultipleErase=" << TestMultipleErase << "): dispatch → " << dispatch << std::endl;
         auto engine = std::make_unique<OutputStateMachineEngine>(std::move(dispatch));
         StateMachine mach(std::move(engine));
 
         mach.ProcessString(L"\x1b[3;2J");
         auto expectedEraseTypes = std::vector{ DispatchTypes::EraseType::Scrollback, DispatchTypes::EraseType::All };
+		std::cerr << "TEST_METHOD(TestMultipleErase=" << TestMultipleErase << "): expectedEraseTypes → " << expectedEraseTypes << std::endl;
         VERIFY_IS_TRUE(pDispatch->_eraseDisplay);
         VERIFY_ARE_EQUAL(expectedEraseTypes, pDispatch->_eraseTypes);
 
@@ -1952,10 +2339,13 @@ class StateMachineExternalTest final
         VERIFY_IS_TRUE(optionsValid);
     }
 
+	std::cerr << "TEST_METHOD(TestSetGraphicsRendition=" << TestSetGraphicsRendition << "): pDispatch → " << pDispatch << std::endl;
+	std::cerr << "TEST_METHOD(TestSetGraphicsRendition=" << TestSetGraphicsRendition << "): engine → " << engine << std::endl;
     TEST_METHOD(TestSetGraphicsRendition)
     {
         auto dispatch = std::make_unique<StatefulDispatch>();
         auto pDispatch = dispatch.get();
+		std::cerr << "TEST_METHOD(TestSetGraphicsRendition=" << TestSetGraphicsRendition << "): dispatch → " << dispatch << std::endl;
         auto engine = std::make_unique<OutputStateMachineEngine>(std::move(dispatch));
         StateMachine mach(std::move(engine));
 
@@ -2080,6 +2470,7 @@ class StateMachineExternalTest final
         Log::Comment(L"Test 5.a: Test an empty param at the end of a sequence");
 
         std::wstring sequence = L"\x1b[1;m";
+		std::cerr << "TEST_METHOD(TestSetGraphicsRendition=" << TestSetGraphicsRendition << "): sequence → " << sequence << std::endl;
         mach.ProcessString(sequence);
         VERIFY_IS_TRUE(pDispatch->_setGraphics);
 
@@ -2116,10 +2507,13 @@ class StateMachineExternalTest final
         pDispatch->ClearState();
     }
 
+	std::cerr << "TEST_METHOD(TestDeviceStatusReport=" << TestDeviceStatusReport << "): pDispatch → " << pDispatch << std::endl;
+	std::cerr << "TEST_METHOD(TestDeviceStatusReport=" << TestDeviceStatusReport << "): engine → " << engine << std::endl;
     TEST_METHOD(TestDeviceStatusReport)
     {
         auto dispatch = std::make_unique<StatefulDispatch>();
         auto pDispatch = dispatch.get();
+		std::cerr << "TEST_METHOD(TestDeviceStatusReport=" << TestDeviceStatusReport << "): dispatch → " << dispatch << std::endl;
         auto engine = std::make_unique<OutputStateMachineEngine>(std::move(dispatch));
         StateMachine mach(std::move(engine));
 
@@ -2275,10 +2669,13 @@ class StateMachineExternalTest final
         pDispatch->ClearState();
     }
 
+	std::cerr << "TEST_METHOD(TestDeviceAttributes=" << TestDeviceAttributes << "): pDispatch → " << pDispatch << std::endl;
+	std::cerr << "TEST_METHOD(TestDeviceAttributes=" << TestDeviceAttributes << "): engine → " << engine << std::endl;
     TEST_METHOD(TestDeviceAttributes)
     {
         auto dispatch = std::make_unique<StatefulDispatch>();
         auto pDispatch = dispatch.get();
+		std::cerr << "TEST_METHOD(TestDeviceAttributes=" << TestDeviceAttributes << "): dispatch → " << dispatch << std::endl;
         auto engine = std::make_unique<OutputStateMachineEngine>(std::move(dispatch));
         StateMachine mach(std::move(engine));
 
@@ -2312,10 +2709,13 @@ class StateMachineExternalTest final
         pDispatch->ClearState();
     }
 
+	std::cerr << "TEST_METHOD(TestSecondaryDeviceAttributes=" << TestSecondaryDeviceAttributes << "): pDispatch → " << pDispatch << std::endl;
+	std::cerr << "TEST_METHOD(TestSecondaryDeviceAttributes=" << TestSecondaryDeviceAttributes << "): engine → " << engine << std::endl;
     TEST_METHOD(TestSecondaryDeviceAttributes)
     {
         auto dispatch = std::make_unique<StatefulDispatch>();
         auto pDispatch = dispatch.get();
+		std::cerr << "TEST_METHOD(TestSecondaryDeviceAttributes=" << TestSecondaryDeviceAttributes << "): dispatch → " << dispatch << std::endl;
         auto engine = std::make_unique<OutputStateMachineEngine>(std::move(dispatch));
         StateMachine mach(std::move(engine));
 
@@ -2352,10 +2752,13 @@ class StateMachineExternalTest final
         pDispatch->ClearState();
     }
 
+	std::cerr << "TEST_METHOD(TestTertiaryDeviceAttributes=" << TestTertiaryDeviceAttributes << "): pDispatch → " << pDispatch << std::endl;
+	std::cerr << "TEST_METHOD(TestTertiaryDeviceAttributes=" << TestTertiaryDeviceAttributes << "): engine → " << engine << std::endl;
     TEST_METHOD(TestTertiaryDeviceAttributes)
     {
         auto dispatch = std::make_unique<StatefulDispatch>();
         auto pDispatch = dispatch.get();
+		std::cerr << "TEST_METHOD(TestTertiaryDeviceAttributes=" << TestTertiaryDeviceAttributes << "): dispatch → " << dispatch << std::endl;
         auto engine = std::make_unique<OutputStateMachineEngine>(std::move(dispatch));
         StateMachine mach(std::move(engine));
 
@@ -2392,10 +2795,13 @@ class StateMachineExternalTest final
         pDispatch->ClearState();
     }
 
+	std::cerr << "TEST_METHOD(TestRequestTerminalParameters=" << TestRequestTerminalParameters << "): pDispatch → " << pDispatch << std::endl;
+	std::cerr << "TEST_METHOD(TestRequestTerminalParameters=" << TestRequestTerminalParameters << "): engine → " << engine << std::endl;
     TEST_METHOD(TestRequestTerminalParameters)
     {
         auto dispatch = std::make_unique<StatefulDispatch>();
         auto pDispatch = dispatch.get();
+		std::cerr << "TEST_METHOD(TestRequestTerminalParameters=" << TestRequestTerminalParameters << "): dispatch → " << dispatch << std::endl;
         auto engine = std::make_unique<OutputStateMachineEngine>(std::move(dispatch));
         StateMachine mach(std::move(engine));
 
@@ -2430,10 +2836,14 @@ class StateMachineExternalTest final
         pDispatch->ClearState();
     }
 
+	std::cerr << "TEST_METHOD(TestStrings=" << TestStrings << "): pDispatch → " << pDispatch << std::endl;
+	std::cerr << "TEST_METHOD(TestStrings=" << TestStrings << "): engine → " << engine << std::endl;
+	std::cerr << "TEST_METHOD(TestStrings=" << TestStrings << "): expectedDispatchTypes → " << expectedDispatchTypes << std::endl;
     TEST_METHOD(TestStrings)
     {
         auto dispatch = std::make_unique<StatefulDispatch>();
         auto pDispatch = dispatch.get();
+		std::cerr << "TEST_METHOD(TestStrings=" << TestStrings << "): dispatch → " << dispatch << std::endl;
         auto engine = std::make_unique<OutputStateMachineEngine>(std::move(dispatch));
         StateMachine mach(std::move(engine));
 
@@ -2540,10 +2950,13 @@ class StateMachineExternalTest final
         pDispatch->ClearState();
     }
 
+	std::cerr << "TEST_METHOD(TestLineFeed=" << TestLineFeed << "): pDispatch → " << pDispatch << std::endl;
+	std::cerr << "TEST_METHOD(TestLineFeed=" << TestLineFeed << "): engine → " << engine << std::endl;
     TEST_METHOD(TestLineFeed)
     {
         auto dispatch = std::make_unique<StatefulDispatch>();
         auto pDispatch = dispatch.get();
+		std::cerr << "TEST_METHOD(TestLineFeed=" << TestLineFeed << "): dispatch → " << dispatch << std::endl;
         auto engine = std::make_unique<OutputStateMachineEngine>(std::move(dispatch));
         StateMachine mach(std::move(engine));
 
@@ -2590,10 +3003,13 @@ class StateMachineExternalTest final
         pDispatch->ClearState();
     }
 
+	std::cerr << "TEST_METHOD(TestControlCharacters=" << TestControlCharacters << "): pDispatch → " << pDispatch << std::endl;
+	std::cerr << "TEST_METHOD(TestControlCharacters=" << TestControlCharacters << "): engine → " << engine << std::endl;
     TEST_METHOD(TestControlCharacters)
     {
         auto dispatch = std::make_unique<StatefulDispatch>();
         auto pDispatch = dispatch.get();
+		std::cerr << "TEST_METHOD(TestControlCharacters=" << TestControlCharacters << "): dispatch → " << dispatch << std::endl;
         auto engine = std::make_unique<OutputStateMachineEngine>(std::move(dispatch));
         StateMachine mach(std::move(engine));
 
@@ -2628,15 +3044,19 @@ class StateMachineExternalTest final
         pDispatch->ClearState();
     }
 
+	std::cerr << "TEST_METHOD(TestTabClear=" << TestTabClear << "): pDispatch → " << pDispatch << std::endl;
+	std::cerr << "TEST_METHOD(TestTabClear=" << TestTabClear << "): engine → " << engine << std::endl;
     TEST_METHOD(TestTabClear)
     {
         auto dispatch = std::make_unique<StatefulDispatch>();
         auto pDispatch = dispatch.get();
+		std::cerr << "TEST_METHOD(TestTabClear=" << TestTabClear << "): dispatch → " << dispatch << std::endl;
         auto engine = std::make_unique<OutputStateMachineEngine>(std::move(dispatch));
         StateMachine mach(std::move(engine));
 
         mach.ProcessString(L"\x1b[g");
         auto expectedClearTypes = std::vector{ DispatchTypes::TabClearType::ClearCurrentColumn };
+		std::cerr << "TEST_METHOD(TestTabClear=" << TestTabClear << "): expectedClearTypes → " << expectedClearTypes << std::endl;
         VERIFY_IS_TRUE(pDispatch->_tabClear);
         VERIFY_ARE_EQUAL(expectedClearTypes, pDispatch->_tabClearTypes);
 
@@ -2657,10 +3077,13 @@ class StateMachineExternalTest final
         pDispatch->ClearState();
     }
 
+	std::cerr << "TEST_METHOD(TestVt52Sequences=" << TestVt52Sequences << "): pDispatch → " << pDispatch << std::endl;
+	std::cerr << "TEST_METHOD(TestVt52Sequences=" << TestVt52Sequences << "): engine → " << engine << std::endl;
     TEST_METHOD(TestVt52Sequences)
     {
         auto dispatch = std::make_unique<StatefulDispatch>();
         auto pDispatch = dispatch.get();
+		std::cerr << "TEST_METHOD(TestVt52Sequences=" << TestVt52Sequences << "): dispatch → " << dispatch << std::endl;
         auto engine = std::make_unique<OutputStateMachineEngine>(std::move(dispatch));
         StateMachine mach(std::move(engine));
 
@@ -2743,10 +3166,13 @@ class StateMachineExternalTest final
         pDispatch->ClearState();
     }
 
+	std::cerr << "TEST_METHOD(TestIdentifyDeviceReport=" << TestIdentifyDeviceReport << "): pDispatch → " << pDispatch << std::endl;
+	std::cerr << "TEST_METHOD(TestIdentifyDeviceReport=" << TestIdentifyDeviceReport << "): engine → " << engine << std::endl;
     TEST_METHOD(TestIdentifyDeviceReport)
     {
         auto dispatch = std::make_unique<StatefulDispatch>();
         auto pDispatch = dispatch.get();
+		std::cerr << "TEST_METHOD(TestIdentifyDeviceReport=" << TestIdentifyDeviceReport << "): dispatch → " << dispatch << std::endl;
         auto engine = std::make_unique<OutputStateMachineEngine>(std::move(dispatch));
         StateMachine mach(std::move(engine));
 
@@ -2769,10 +3195,13 @@ class StateMachineExternalTest final
         pDispatch->ClearState();
     }
 
+	std::cerr << "TEST_METHOD(TestOscSetDefaultForeground=" << TestOscSetDefaultForeground << "): pDispatch → " << pDispatch << std::endl;
+	std::cerr << "TEST_METHOD(TestOscSetDefaultForeground=" << TestOscSetDefaultForeground << "): engine → " << engine << std::endl;
     TEST_METHOD(TestOscSetDefaultForeground)
     {
         auto dispatch = std::make_unique<StatefulDispatch>();
         auto pDispatch = dispatch.get();
+		std::cerr << "TEST_METHOD(TestOscSetDefaultForeground=" << TestOscSetDefaultForeground << "): dispatch → " << dispatch << std::endl;
         auto engine = std::make_unique<OutputStateMachineEngine>(std::move(dispatch));
         StateMachine mach(std::move(engine));
 
@@ -2890,10 +3319,13 @@ class StateMachineExternalTest final
         pDispatch->ClearState();
     }
 
+	std::cerr << "TEST_METHOD(TestOscSetDefaultBackground=" << TestOscSetDefaultBackground << "): pDispatch → " << pDispatch << std::endl;
+	std::cerr << "TEST_METHOD(TestOscSetDefaultBackground=" << TestOscSetDefaultBackground << "): engine → " << engine << std::endl;
     TEST_METHOD(TestOscSetDefaultBackground)
     {
         auto dispatch = std::make_unique<StatefulDispatch>();
         auto pDispatch = dispatch.get();
+		std::cerr << "TEST_METHOD(TestOscSetDefaultBackground=" << TestOscSetDefaultBackground << "): dispatch → " << dispatch << std::endl;
         auto engine = std::make_unique<OutputStateMachineEngine>(std::move(dispatch));
         StateMachine mach(std::move(engine));
 
@@ -3011,10 +3443,13 @@ class StateMachineExternalTest final
         pDispatch->ClearState();
     }
 
+	std::cerr << "TEST_METHOD(TestOscSetColorTableEntry=" << TestOscSetColorTableEntry << "): pDispatch → " << pDispatch << std::endl;
+	std::cerr << "TEST_METHOD(TestOscSetColorTableEntry=" << TestOscSetColorTableEntry << "): engine → " << engine << std::endl;
     TEST_METHOD(TestOscSetColorTableEntry)
     {
         auto dispatch = std::make_unique<StatefulDispatch>();
         auto pDispatch = dispatch.get();
+		std::cerr << "TEST_METHOD(TestOscSetColorTableEntry=" << TestOscSetColorTableEntry << "): dispatch → " << dispatch << std::endl;
         auto engine = std::make_unique<OutputStateMachineEngine>(std::move(dispatch));
         StateMachine mach(std::move(engine));
 
@@ -3158,10 +3593,13 @@ class StateMachineExternalTest final
         pDispatch->ClearState();
     }
 
+	std::cerr << "TEST_METHOD(TestOscGetColorTableEntry=" << TestOscGetColorTableEntry << "): pDispatch → " << pDispatch << std::endl;
+	std::cerr << "TEST_METHOD(TestOscGetColorTableEntry=" << TestOscGetColorTableEntry << "): engine → " << engine << std::endl;
     TEST_METHOD(TestOscGetColorTableEntry)
     {
         auto dispatch = std::make_unique<StatefulDispatch>();
         auto pDispatch = dispatch.get();
+		std::cerr << "TEST_METHOD(TestOscGetColorTableEntry=" << TestOscGetColorTableEntry << "): dispatch → " << dispatch << std::endl;
         auto engine = std::make_unique<OutputStateMachineEngine>(std::move(dispatch));
         StateMachine mach(std::move(engine));
 
@@ -3187,10 +3625,13 @@ class StateMachineExternalTest final
         pDispatch->ClearState();
     }
 
+	std::cerr << "TEST_METHOD(TestOscXtermResourceReport=" << TestOscXtermResourceReport << "): pDispatch → " << pDispatch << std::endl;
+	std::cerr << "TEST_METHOD(TestOscXtermResourceReport=" << TestOscXtermResourceReport << "): engine → " << engine << std::endl;
     TEST_METHOD(TestOscXtermResourceReport)
     {
         auto dispatch = std::make_unique<StatefulDispatch>();
         auto pDispatch = dispatch.get();
+		std::cerr << "TEST_METHOD(TestOscXtermResourceReport=" << TestOscXtermResourceReport << "): dispatch → " << dispatch << std::endl;
         auto engine = std::make_unique<OutputStateMachineEngine>(std::move(dispatch));
         StateMachine mach(std::move(engine));
 
@@ -3240,10 +3681,13 @@ class StateMachineExternalTest final
         pDispatch->ClearState();
     }
 
+	std::cerr << "TEST_METHOD(TestOscXtermResourceReset=" << TestOscXtermResourceReset << "): pDispatch → " << pDispatch << std::endl;
+	std::cerr << "TEST_METHOD(TestOscXtermResourceReset=" << TestOscXtermResourceReset << "): engine → " << engine << std::endl;
     TEST_METHOD(TestOscXtermResourceReset)
     {
         auto dispatch = std::make_unique<StatefulDispatch>();
         auto pDispatch = dispatch.get();
+		std::cerr << "TEST_METHOD(TestOscXtermResourceReset=" << TestOscXtermResourceReset << "): dispatch → " << dispatch << std::endl;
         auto engine = std::make_unique<OutputStateMachineEngine>(std::move(dispatch));
         StateMachine mach(std::move(engine));
 
@@ -3269,10 +3713,13 @@ class StateMachineExternalTest final
         pDispatch->ClearState();
     }
 
+	std::cerr << "TEST_METHOD(TestOscColorTableReset=" << TestOscColorTableReset << "): pDispatch → " << pDispatch << std::endl;
+	std::cerr << "TEST_METHOD(TestOscColorTableReset=" << TestOscColorTableReset << "): engine → " << engine << std::endl;
     TEST_METHOD(TestOscColorTableReset)
     {
         auto dispatch = std::make_unique<StatefulDispatch>();
         auto pDispatch = dispatch.get();
+		std::cerr << "TEST_METHOD(TestOscColorTableReset=" << TestOscColorTableReset << "): dispatch → " << dispatch << std::endl;
         auto engine = std::make_unique<OutputStateMachineEngine>(std::move(dispatch));
         StateMachine mach(std::move(engine));
 
@@ -3356,10 +3803,13 @@ class StateMachineExternalTest final
         pDispatch->ClearState();
     }
 
+	std::cerr << "TEST_METHOD(TestSetClipboard=" << TestSetClipboard << "): pDispatch → " << pDispatch << std::endl;
+	std::cerr << "TEST_METHOD(TestSetClipboard=" << TestSetClipboard << "): engine → " << engine << std::endl;
     TEST_METHOD(TestSetClipboard)
     {
         auto dispatch = std::make_unique<StatefulDispatch>();
         auto pDispatch = dispatch.get();
+		std::cerr << "TEST_METHOD(TestSetClipboard=" << TestSetClipboard << "): dispatch → " << dispatch << std::endl;
         auto engine = std::make_unique<OutputStateMachineEngine>(std::move(dispatch));
         StateMachine mach(std::move(engine));
 
@@ -3439,10 +3889,13 @@ class StateMachineExternalTest final
         pDispatch->ClearState();
     }
 
+	std::cerr << "TEST_METHOD(TestAddHyperlink=" << TestAddHyperlink << "): pDispatch → " << pDispatch << std::endl;
+	std::cerr << "TEST_METHOD(TestAddHyperlink=" << TestAddHyperlink << "): engine → " << engine << std::endl;
     TEST_METHOD(TestAddHyperlink)
     {
         auto dispatch = std::make_unique<StatefulDispatch>();
         auto pDispatch = dispatch.get();
+		std::cerr << "TEST_METHOD(TestAddHyperlink=" << TestAddHyperlink << "): dispatch → " << dispatch << std::endl;
         auto engine = std::make_unique<OutputStateMachineEngine>(std::move(dispatch));
         StateMachine mach(std::move(engine));
 
@@ -3521,10 +3974,13 @@ class StateMachineExternalTest final
         pDispatch->ClearState();
     }
 
+	std::cerr << "TEST_METHOD(TestC1ParserMode=" << TestC1ParserMode << "): pDispatch → " << pDispatch << std::endl;
+	std::cerr << "TEST_METHOD(TestC1ParserMode=" << TestC1ParserMode << "): engine → " << engine << std::endl;
     TEST_METHOD(TestC1ParserMode)
     {
         auto dispatch = std::make_unique<StatefulDispatch>();
         auto pDispatch = dispatch.get();
+		std::cerr << "TEST_METHOD(TestC1ParserMode=" << TestC1ParserMode << "): dispatch → " << dispatch << std::endl;
         auto engine = std::make_unique<OutputStateMachineEngine>(std::move(dispatch));
         StateMachine mach(std::move(engine));
 

@@ -7,6 +7,7 @@ using System;
 using System.Collections.Generic;
 using System.Drawing;
 using static ColorTool.ConsoleAPI;
+using Microsoft.Extensions.Logging;
 
 namespace ColorTool.ConsoleTargets
 {
@@ -15,6 +16,7 @@ namespace ColorTool.ConsoleTargets
     /// </summary>
     class VirtualTerminalConsoleTarget : IConsoleTarget
     {
+		private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
         // Use a Console index in to get a VT index out.
         public static readonly IReadOnlyList<int> VirtualTerminalIndices = new[]
         {
@@ -38,6 +40,7 @@ namespace ColorTool.ConsoleTargets
 
         public void ApplyColorScheme(ColorScheme colorScheme, bool quietMode, bool compactColortable)
         {
+			_logger.LogDebug(">>> Entering ApplyColorScheme(colorScheme={ColorScheme},quietMode={QuietMode},compactColortable={CompactColortable})", colorScheme, quietMode, compactColortable);
             Program.DoInVTMode(() =>
             {
                 if (colorScheme.ConsoleAttributes.Foreground.HasValue)
@@ -71,6 +74,7 @@ namespace ColorTool.ConsoleTargets
                     ColorTable.PrintTableWithVt(compactColortable);
                 }
             });
+			_logger.LogDebug("<<< Exiting ApplyColorScheme(colorScheme={ColorScheme},quietMode={QuietMode},compactColortable={CompactColortable})", colorScheme, quietMode, compactColortable);
         }
     }
 }

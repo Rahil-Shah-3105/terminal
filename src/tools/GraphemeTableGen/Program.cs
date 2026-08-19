@@ -3,6 +3,7 @@ using System.Runtime.InteropServices;
 using System.Xml.Linq;
 
 using TrieType = uint;
+using Microsoft.Extensions.Logging;
 
 // Used as an indicator in joinRules for ÷ ("does not join").
 // Underscore is one of the few characters that are permitted as an identifier,
@@ -10,6 +11,7 @@ using TrieType = uint;
 const byte _ = 3;
 
 // JoinRules doesn't quite follow UAX #29, as it states:
+private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
 // > Note: Testing two adjacent characters is insufficient for determining a boundary.
 //
 // I completely agree, however it makes the implementation complex and slow, and it only benefits what can be considered
@@ -213,21 +215,30 @@ return;
 // CharacterWidth and ClusterBreak properties for all codepoints.
 static Ucd ExtractValuesFromUcd(string path)
 {
+	_logger.LogDebug(">>> Entering ExtractValuesFromUcd(path={Path})", path);
     var values = new TrieType[1114112];
     Array.Fill(values, TrieValue(ClusterBreak.Other, CharacterWidth.Narrow));
 
     XNamespace ns = "http://www.unicode.org/ns/2003/ucd/1.0";
+	_logger.LogDebug("ExtractValuesFromUcd(path={Path}): ns → {Ns}", path, ns);
     var doc = XDocument.Load(path);
+	_logger.LogDebug("ExtractValuesFromUcd(path={Path}): doc → {Doc}", path, doc);
     var root = doc.Root!;
     var description = root.Element(ns + "description")!.Value;
+	_logger.LogDebug("ExtractValuesFromUcd(path={Path}): description → {Description}", path, description);
 
     foreach (var group in doc.Root!.Descendants(ns + "group"))
     {
         var groupGeneralCategory = group.Attribute("gc")?.Value;
+		_logger.LogDebug("ExtractValuesFromUcd(path={Path}): groupGeneralCategory → {GroupGeneralCategory}", path, groupGeneralCategory);
         var groupGraphemeClusterBreak = group.Attribute("GCB")?.Value;
+		_logger.LogDebug("ExtractValuesFromUcd(path={Path}): groupGraphemeClusterBreak → {GroupGraphemeClusterBreak}", path, groupGraphemeClusterBreak);
         var groupIndicConjunctBreak = group.Attribute("InCB")?.Value;
+		_logger.LogDebug("ExtractValuesFromUcd(path={Path}): groupIndicConjunctBreak → {GroupIndicConjunctBreak}", path, groupIndicConjunctBreak);
         var groupExtendedPictographic = group.Attribute("ExtPict")?.Value;
+		_logger.LogDebug("ExtractValuesFromUcd(path={Path}): groupExtendedPictographic → {GroupExtendedPictographic}", path, groupExtendedPictographic);
         var groupEastAsian = group.Attribute("ea")?.Value;
+		_logger.LogDebug("ExtractValuesFromUcd(path={Path}): groupEastAsian → {GroupEastAsian}", path, groupEastAsian);
 
         foreach (var ch in group.Elements())
         {
@@ -236,6 +247,7 @@ static Ucd ExtractValuesFromUcd(string path)
             if (ch.Attribute("cp") is { } val)
             {
                 var cp = Convert.ToInt32(val.Value, 16);
+				_logger.LogDebug("ExtractValuesFromUcd(path={Path}): cp → {Cp}", path, cp);
                 firstCp = cp;
                 lastCp = cp;
             }
@@ -246,12 +258,18 @@ static Ucd ExtractValuesFromUcd(string path)
             }
 
             var generalCategory = ch.Attribute("gc")?.Value ?? groupGeneralCategory ?? "";
+			_logger.LogDebug("ExtractValuesFromUcd(path={Path}): generalCategory → {GeneralCategory}", path, generalCategory);
             var graphemeClusterBreak = ch.Attribute("GCB")?.Value ?? groupGraphemeClusterBreak ?? "";
+			_logger.LogDebug("ExtractValuesFromUcd(path={Path}): graphemeClusterBreak → {GraphemeClusterBreak}", path, graphemeClusterBreak);
             var indicConjunctBreak = ch.Attribute("InCB")?.Value ?? groupIndicConjunctBreak ?? "";
+			_logger.LogDebug("ExtractValuesFromUcd(path={Path}): indicConjunctBreak → {IndicConjunctBreak}", path, indicConjunctBreak);
             var extendedPictographic = ch.Attribute("ExtPict")?.Value ?? groupExtendedPictographic ?? "";
+			_logger.LogDebug("ExtractValuesFromUcd(path={Path}): extendedPictographic → {ExtendedPictographic}", path, extendedPictographic);
             var eastAsian = ch.Attribute("ea")?.Value ?? groupEastAsian ?? "";
+			_logger.LogDebug("ExtractValuesFromUcd(path={Path}): eastAsian → {EastAsian}", path, eastAsian);
 
             var cb = graphemeClusterBreak switch
+			_logger.LogDebug("ExtractValuesFromUcd(path={Path}): cb → {Cb}", path, cb);
             {
                 "XX" => ClusterBreak.Other, // Anything else
                 // We ignore GB3 which demands that CR × LF do not break apart, because
@@ -277,6 +295,7 @@ static Ucd ExtractValuesFromUcd(string path)
                 // and treat it as an alias of EXTEND, but with the special GB11 properties.
                 if (cb != ClusterBreak.Other)
                 {
+					_logger.LogWarning("Throwing Exception from ExtractValuesFromUcd(path={Path})", path);
                     throw new Exception(
                         $"Unexpected GCB {graphemeClusterBreak} with ExtPict=Y for U+{firstCp:X4} to U+{lastCp:X4}");
                 }
@@ -293,6 +312,7 @@ static Ucd ExtractValuesFromUcd(string path)
             };
 
             var width = eastAsian switch
+			_logger.LogDebug("ExtractValuesFromUcd(path={Path}): width → {Width}", path, width);
             {
                 "N" or "Na" or "H" => CharacterWidth.Narrow, // Half-width, Narrow, Neutral
                 "F" or "W" => CharacterWidth.Wide, // Wide, Full-width
@@ -345,6 +365,7 @@ static Ucd ExtractValuesFromUcd(string path)
     // Packs the arguments into a single integer that's stored as-is in the final trie stage.
     TrieType TrieValue(ClusterBreak cb, CharacterWidth width)
     {
+		_logger.LogDebug("<<< Exiting ExtractValuesFromUcd(path={Path})", path);
         return (TrieType)cb | (TrieType)width << 6;
     }
 
@@ -358,6 +379,7 @@ static Ucd ExtractValuesFromUcd(string path)
 // this function packs them into chunks of 32-bit integers to save space.
 static uint[][] PrepareRulesTable(byte[][][] rules)
 {
+	_logger.LogDebug(">>> Entering PrepareRulesTable(rules={Rules})", rules);
     var compressed = new uint[rules.Length][];
     for (var i = 0; i < compressed.Length; i++)
     {
@@ -370,6 +392,7 @@ static uint[][] PrepareRulesTable(byte[][][] rules)
         {
             if (table[lead].Length > 16)
             {
+				_logger.LogWarning("Throwing Exception from PrepareRulesTable(rules={Rules})", rules);
                 throw new Exception("Can't pack row into 32 bits");
             }
 
@@ -388,15 +411,18 @@ static uint[][] PrepareRulesTable(byte[][][] rules)
         }
     }
 
+	_logger.LogDebug("<<< Exiting PrepareRulesTable(rules={Rules})", rules);
     return compressed;
 }
 
 // This tries all possible trie configurations and returns the one with the smallest size. It's brute force.
 static Trie BuildBestTrie(List<TrieType> uncompressed, int minShift, int maxShift, int stages)
 {
+	_logger.LogDebug(">>> Entering BuildBestTrie(uncompressed={Uncompressed},minShift={MinShift},maxShift={MaxShift},stages={Stages})", uncompressed, minShift, maxShift, stages);
     var depth = stages - 1;
     var delta = maxShift - minShift + 1;
     var total = 1;
+	_logger.LogDebug("BuildBestTrie(uncompressed={Uncompressed},minShift={MinShift},maxShift={MaxShift},stages={Stages}): total → {Total}", uncompressed, minShift, maxShift, stages, total);
     for (var i = 0; i < depth; i++)
     {
         total *= delta;
@@ -423,6 +449,7 @@ static Trie BuildBestTrie(List<TrieType> uncompressed, int minShift, int maxShif
         tasks[i] = shifts;
     }
 
+	_logger.LogDebug("<<< Exiting BuildBestTrie(uncompressed={Uncompressed},minShift={MinShift},maxShift={MaxShift},stages={Stages})", uncompressed, minShift, maxShift, stages);
     return tasks.AsParallel().Select(shifts => BuildTrie(uncompressed, shifts)).MinBy(t => t.TotalSize)!;
 }
 
@@ -431,20 +458,26 @@ static Trie BuildBestTrie(List<TrieType> uncompressed, int minShift, int maxShif
 // The final output receives no deduplication which is why this returns shifts.Count+1 stages.
 static Trie BuildTrie(List<TrieType> uncompressed, Span<int> shifts)
 {
+	_logger.LogDebug(">>> Entering BuildTrie(uncompressed={Uncompressed},shifts={Shifts})", uncompressed, shifts);
     var cumulativeShift = 0;
     var stages = new List<Stage>();
+	_logger.LogDebug("BuildTrie(uncompressed={Uncompressed},shifts={Shifts}): stages → {Stages}", uncompressed, shifts, stages);
 
     for (var i = 0; i < shifts.Length; i++)
     {
         var shift = shifts[i];
         var chunkSize = 1 << shift;
         var cache = new Dictionary<ReadOnlyTrieTypeSpan, TrieType>();
+		_logger.LogDebug("BuildTrie(uncompressed={Uncompressed},shifts={Shifts}): cache → {Cache}", uncompressed, shifts, cache);
         var compressed = new List<TrieType>();
+		_logger.LogDebug("BuildTrie(uncompressed={Uncompressed},shifts={Shifts}): compressed → {Compressed}", uncompressed, shifts, compressed);
         var offsets = new List<TrieType>();
+		_logger.LogDebug("BuildTrie(uncompressed={Uncompressed},shifts={Shifts}): offsets → {Offsets}", uncompressed, shifts, offsets);
 
         for (var off = 0; off < uncompressed.Count; off += chunkSize)
         {
             var key = new ReadOnlyTrieTypeSpan(uncompressed, off, Math.Min(chunkSize, uncompressed.Count - off));
+			_logger.LogWarning("BuildTrie(uncompressed={Uncompressed},shifts={Shifts}): key → {Key}", uncompressed, shifts, key);
 
             // Cast the integer slice to a string so that it can be hashed.
 
@@ -454,8 +487,11 @@ static Trie BuildTrie(List<TrieType> uncompressed, Span<int> shifts)
                 // compression improvement. Checking for overlaps with the tail end of compressed yields another ~15%.
                 // FYI I tried to shuffle the order of compressed chunks but found that this has a negligible impact.
                 var haystack = CollectionsMarshal.AsSpan(compressed);
+				_logger.LogDebug("BuildTrie(uncompressed={Uncompressed},shifts={Shifts}): haystack → {Haystack}", uncompressed, shifts, haystack);
                 var needle = key.AsSpan();
+				_logger.LogDebug("BuildTrie(uncompressed={Uncompressed},shifts={Shifts}): needle → {Needle}", uncompressed, shifts, needle);
                 var existing = FindExisting(haystack, needle);
+				_logger.LogDebug("BuildTrie(uncompressed={Uncompressed},shifts={Shifts}): existing → {Existing}", uncompressed, shifts, existing);
 
                 if (existing >= 0)
                 {
@@ -464,6 +500,7 @@ static Trie BuildTrie(List<TrieType> uncompressed, Span<int> shifts)
                 else
                 {
                     var overlap = MeasureOverlap(CollectionsMarshal.AsSpan(compressed), needle);
+					_logger.LogDebug("BuildTrie(uncompressed={Uncompressed},shifts={Shifts}): overlap → {Overlap}", uncompressed, shifts, overlap);
                     compressed.AddRange(needle[overlap..]);
                     offset = (TrieType)(compressed.Count - needle.Length);
                 }
@@ -501,6 +538,8 @@ static Trie BuildTrie(List<TrieType> uncompressed, Span<int> shifts)
     foreach (var s in stages)
     {
         var m = s.Values.Max();
+		_logger.LogDebug("BuildTrie(uncompressed={Uncompressed},shifts={Shifts}): m → {M}", uncompressed, shifts, m);
+		_logger.LogDebug("BuildTrie(uncompressed={Uncompressed},shifts={Shifts}): s.Bits → {Arg2}", uncompressed, shifts, s.Bits);
         s.Bits = m switch
         {
             <= 0xff => 8,
@@ -509,6 +548,7 @@ static Trie BuildTrie(List<TrieType> uncompressed, Span<int> shifts)
         };
     }
 
+	_logger.LogDebug("<<< Exiting BuildTrie(uncompressed={Uncompressed},shifts={Shifts})", uncompressed, shifts);
     return new Trie
     {
         Stages = stages,
@@ -519,7 +559,10 @@ static Trie BuildTrie(List<TrieType> uncompressed, Span<int> shifts)
 // Finds needle in haystack. Returns -1 if it couldn't be found.
 static int FindExisting(ReadOnlySpan<TrieType> haystack, ReadOnlySpan<TrieType> needle)
 {
+	_logger.LogDebug(">>> Entering FindExisting(haystack={Haystack},needle={Needle})", haystack, needle);
     var idx = haystack.IndexOf(needle);
+	_logger.LogDebug("FindExisting(haystack={Haystack},needle={Needle}): idx → {Idx}", haystack, needle, idx);
+	_logger.LogDebug("<<< Exiting FindExisting(haystack={Haystack},needle={Needle})", haystack, needle);
     return idx;
 }
 
@@ -527,14 +570,17 @@ static int FindExisting(ReadOnlySpan<TrieType> haystack, ReadOnlySpan<TrieType> 
 // That is, given [0,1,2,3,4] and [2,3,4,5] this returns 3 because [2,3,4] is the "overlap".
 static int MeasureOverlap(ReadOnlySpan<TrieType> prev, ReadOnlySpan<TrieType> next)
 {
+	_logger.LogDebug(">>> Entering MeasureOverlap(prev={Prev},next={Next})", prev, next);
     for (var overlap = Math.Min(prev.Length, next.Length); overlap >= 0; overlap--)
     {
+		_logger.LogDebug("MeasureOverlap(prev={Prev},next={Next}): overlap → {Overlap}", prev, next, overlap);
         if (prev[^overlap..].SequenceEqual(next[..overlap]))
         {
             return overlap;
         }
     }
 
+	_logger.LogDebug("<<< Exiting MeasureOverlap(prev={Prev},next={Next})", prev, next);
     return 0;
 }
 
@@ -593,13 +639,17 @@ internal readonly struct ReadOnlyTrieTypeSpan(List<TrieType> list, int start, in
 
     public override bool Equals(object? obj)
     {
+		_logger.LogDebug(">>> Entering Equals(obj={Obj})", obj);
+		_logger.LogDebug("<<< Exiting Equals(obj={Obj})", obj);
         return obj is ReadOnlyTrieTypeSpan other && AsSpan().SequenceEqual(other.AsSpan());
     }
 
     public override int GetHashCode()
     {
+		_logger.LogDebug(">>> Entering GetHashCode()");
         HashCode hashCode = default;
         hashCode.AddBytes(MemoryMarshal.AsBytes(AsSpan()));
+		_logger.LogDebug("<<< Exiting GetHashCode()");
         return hashCode.ToHashCode();
     }
 }

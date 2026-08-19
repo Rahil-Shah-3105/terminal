@@ -1,3 +1,4 @@
+#include <stdio.h>
 /*++
 Copyright (c) Microsoft Corporation
 Licensed under the MIT license.
@@ -54,6 +55,8 @@ namespace winrt::Microsoft::Terminal::Settings::Editor::implementation
 
         hstring ToString()
         {
+			fprintf(stderr, ">>> Entering ToString()\n");
+            fprintf(stderr, "<<< Exiting ToString()\n");
             return EnumName();
         }
 

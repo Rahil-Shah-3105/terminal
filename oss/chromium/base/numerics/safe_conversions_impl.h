@@ -1,3 +1,4 @@
+#include <stdio.h>
 // Copyright 2014 The Chromium Authors. All rights reserved.
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
@@ -50,7 +51,9 @@ struct PositionOfSignBit {
 template <typename T,
           typename std::enable_if<std::is_signed<T>::value>::type* = nullptr>
 constexpr bool IsValueNegative(T value) {
+fprintf(stderr, ">>> Entering IsValueNegative(value=%d)\n", value);
   static_assert(std::is_arithmetic<T>::value, "Argument must be numeric.");
+fprintf(stderr, "<<< Exiting IsValueNegative(value=%d)\n", value);
   return value < 0;
 }
 
@@ -58,6 +61,7 @@ template <typename T,
           typename std::enable_if<!std::is_signed<T>::value>::type* = nullptr>
 constexpr bool IsValueNegative(T) {
   static_assert(std::is_arithmetic<T>::value, "Argument must be numeric.");
+fprintf(stderr, "<<< Exiting IsValueNegative(T=%d)\n", T);
   return false;
 }
 
@@ -91,6 +95,8 @@ constexpr bool CanDetectCompileTimeConstant() {
 }
 template <typename T>
 constexpr bool IsCompileTimeConstant(const T v) {
+fprintf(stderr, ">>> Entering IsCompileTimeConstant(v=%d)\n", v);
+  fprintf(stderr, "<<< Exiting IsCompileTimeConstant(v=%d)\n", v);
   return __builtin_constant_p(v);
 }
 #else
@@ -104,8 +110,10 @@ constexpr bool IsCompileTimeConstant(const T) {
 #endif
 template <typename T>
 constexpr bool MustTreatAsConstexpr(const T v) {
+fprintf(stderr, ">>> Entering MustTreatAsConstexpr(v=%d)\n", v);
   // Either we can't detect a compile-time constant, and must always use the
   // constexpr path, or we know we have a compile-time constant.
+fprintf(stderr, "<<< Exiting MustTreatAsConstexpr(v=%d)\n", v);
   return !CanDetectCompileTimeConstant() || IsCompileTimeConstant(v);
 }
 
@@ -115,6 +123,7 @@ constexpr bool MustTreatAsConstexpr(const T v) {
 struct CheckOnFailure {
   template <typename T>
   static T HandleFailure() {
+fprintf(stderr, ">>> Entering HandleFailure()\n");
 #if defined(_MSC_VER)
     __debugbreak();
 #elif defined(__GNUC__) || defined(__clang__)
@@ -122,6 +131,7 @@ struct CheckOnFailure {
 #else
     ((void)(*(volatile char*)0 = 0));
 #endif
+	fprintf(stderr, "<<< Exiting HandleFailure()\n");
     return T();
   }
 };
@@ -253,8 +263,10 @@ struct NarrowingRange {
   // Masks out the integer bits that are beyond the precision of the
   // intermediate type used for comparison.
   static constexpr T Adjust(T value) {
+	fprintf(stderr, ">>> Entering Adjust(value=%d)\n", value);
     static_assert(std::is_same<T, Dst>::value, "");
     static_assert(kShift < DstLimits::digits, "");
+	fprintf(stderr, "<<< Exiting Adjust(value=%d)\n", value);
     return static_cast<T>(
         ConditionalNegate(SafeUnsignedAbs(value) & ~((T(1) << kShift) - T(1)),
                           IsValueNegative(value)));
@@ -398,9 +410,11 @@ template <typename Dst,
           template <typename> class Bounds = std::numeric_limits,
           typename Src>
 constexpr RangeCheck DstRangeRelationToSrcRange(Src value) {
+fprintf(stderr, ">>> Entering DstRangeRelationToSrcRange(value=%d)\n", value);
   static_assert(std::is_arithmetic<Src>::value, "Argument must be numeric.");
   static_assert(std::is_arithmetic<Dst>::value, "Result must be numeric.");
   static_assert(Bounds<Dst>::lowest() < Bounds<Dst>::max(), "");
+fprintf(stderr, "<<< Exiting DstRangeRelationToSrcRange(value=%d)\n", value);
   return DstRangeRelationToSrcRangeImpl<Dst, Src, Bounds>::Check(value);
 }
 
@@ -797,10 +811,12 @@ struct IsNotEqual {
 // Binary arithmetic operations.
 template <template <typename, typename> class C, typename L, typename R>
 constexpr bool SafeCompare(const L lhs, const R rhs) {
+fprintf(stderr, ">>> Entering SafeCompare(lhs=%d,rhs=%d)\n", lhs, rhs);
   static_assert(std::is_arithmetic<L>::value && std::is_arithmetic<R>::value,
                 "Types must be numeric.");
   using Promotion = BigEnoughPromotion<L, R>;
   using BigType = typename Promotion::type;
+fprintf(stderr, "<<< Exiting SafeCompare(lhs=%d,rhs=%d)\n", lhs, rhs);
   return Promotion::is_contained
              // Force to a larger type for speed if both are contained.
              ? C<BigType, BigType>::Test(
@@ -812,18 +828,24 @@ constexpr bool SafeCompare(const L lhs, const R rhs) {
 
 template <typename Dst, typename Src>
 constexpr bool IsMaxInRangeForNumericType() {
+fprintf(stderr, ">>> Entering IsMaxInRangeForNumericType()\n");
+  fprintf(stderr, "<<< Exiting IsMaxInRangeForNumericType()\n");
   return IsGreaterOrEqual<Dst, Src>::Test(std::numeric_limits<Dst>::max(),
                                           std::numeric_limits<Src>::max());
 }
 
 template <typename Dst, typename Src>
 constexpr bool IsMinInRangeForNumericType() {
+fprintf(stderr, ">>> Entering IsMinInRangeForNumericType()\n");
+  fprintf(stderr, "<<< Exiting IsMinInRangeForNumericType()\n");
   return IsLessOrEqual<Dst, Src>::Test(std::numeric_limits<Dst>::lowest(),
                                        std::numeric_limits<Src>::lowest());
 }
 
 template <typename Dst, typename Src>
 constexpr Dst CommonMax() {
+fprintf(stderr, ">>> Entering CommonMax()\n");
+  fprintf(stderr, "<<< Exiting CommonMax()\n");
   return !IsMaxInRangeForNumericType<Dst, Src>()
              ? Dst(std::numeric_limits<Dst>::max())
              : Dst(std::numeric_limits<Src>::max());
@@ -831,6 +853,8 @@ constexpr Dst CommonMax() {
 
 template <typename Dst, typename Src>
 constexpr Dst CommonMin() {
+fprintf(stderr, ">>> Entering CommonMin()\n");
+  fprintf(stderr, "<<< Exiting CommonMin()\n");
   return !IsMinInRangeForNumericType<Dst, Src>()
              ? Dst(std::numeric_limits<Dst>::lowest())
              : Dst(std::numeric_limits<Src>::lowest());
@@ -841,6 +865,8 @@ constexpr Dst CommonMin() {
 // returned value is the minimum.
 template <typename Dst, typename Src = Dst>
 constexpr Dst CommonMaxOrMin(bool is_min) {
+fprintf(stderr, ">>> Entering CommonMaxOrMin(is_min=%d)\n", is_min);
+  fprintf(stderr, "<<< Exiting CommonMaxOrMin(is_min=%d)\n", is_min);
   return is_min ? CommonMin<Dst, Src>() : CommonMax<Dst, Src>();
 }
 

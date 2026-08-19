@@ -1,3 +1,4 @@
+#include <stdio.h>
 /*++
 Copyright (c) Microsoft Corporation
 Licensed under the MIT license.
@@ -28,20 +29,26 @@ namespace winrt::Microsoft::Terminal::Settings::Model
     private:
         bool IsInstanceValid(const VsSetupConfiguration::VsSetupInstance& instance) const
         {
+			fprintf(stderr, ">>> Entering IsInstanceValid(instance=%d)\n", instance);
             // We only support version of VS from 15.0.
             // Per heaths: The [ISetupConfiguration] COM server only supports Visual Studio 15.0 and newer anyway.
             // Eliding the version range will improve the discovery performance by not having to parse or compare the versions.
             std::error_code ec;
+			fprintf(stderr, "<<< Exiting IsInstanceValid(instance=%d)\n", instance);
             return std::filesystem::exists(GetDevCmdScriptPath(instance), ec) && !ec;
         }
 
         std::wstring GetProfileGuidSeed(const VsSetupConfiguration::VsSetupInstance& instance) const
         {
+			fprintf(stderr, ">>> Entering GetProfileGuidSeed(instance=%d)\n", instance);
+            fprintf(stderr, "<<< Exiting GetProfileGuidSeed(instance=%d)\n", instance);
             return L"VsDevCmd" + instance.GetInstanceId();
         }
 
         std::wstring GetProfileIconPath() const
         {
+			fprintf(stderr, ">>> Entering GetProfileIconPath()\n");
+            fprintf(stderr, "<<< Exiting GetProfileIconPath()\n");
             return L"ms-appx:///ProfileIcons/vs-cmd.png";
         }
 

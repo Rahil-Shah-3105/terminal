@@ -7,6 +7,8 @@ Module Name:
 Abstract:
 - Helpful cross-lib utilities
 
+std::cerr << ">>> Entering Author(s=" << s << ")" << std::endl;
+std::cerr << "<<< Exiting Author(s=" << s << ")" << std::endl;
 Author(s):
 - Mike Griese (migrie) 12-Jun-2018
 --*/
@@ -26,6 +28,8 @@ namespace Microsoft::Console::Utils
     template<typename T>
     constexpr int Sign(T val) noexcept
     {
+		std::cerr << ">>> Entering Sign(val=" << val << ")" << std::endl;
+		std::cerr << "<<< Exiting Sign(val=" << val << ")" << std::endl;
         return (T{ 0 } < val) - (val < T{ 0 });
     }
 
@@ -44,6 +48,8 @@ namespace Microsoft::Console::Utils
     // - The clamped value as a short.
     constexpr short ClampToShortMax(const long value, const short min) noexcept
     {
+		std::cerr << ">>> Entering ClampToShortMax(value=" << value << ",min=" << min << ")" << std::endl;
+		std::cerr << "<<< Exiting ClampToShortMax(value=" << value << ",min=" << min << ")" << std::endl;
         return static_cast<short>(std::clamp(value,
                                              static_cast<long>(min),
                                              static_cast<long>(SHRT_MAX)));
@@ -83,6 +89,8 @@ namespace Microsoft::Console::Utils
 
     constexpr uint16_t EndianSwap(uint16_t value)
     {
+		std::cerr << ">>> Entering DEFINE_ENUM_FLAG_OPERATORS(FilterOption=" << FilterOption << ")" << std::endl;
+		std::cerr << "<<< Exiting EndianSwap(value=" << value << ")" << std::endl;
         return (value & 0xFF00) >> 8 |
                (value & 0x00FF) << 8;
     }

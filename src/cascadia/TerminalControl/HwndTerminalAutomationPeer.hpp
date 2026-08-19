@@ -41,4 +41,5 @@ private:
     void _tryNotify(BSTR string, BSTR activity);
     std::deque<wchar_t> _keyEvents;
     bool _notificationsUnavailable{};
+	std::cerr << "<<< Exiting Author(s=" << s << ")" << std::endl;
 };

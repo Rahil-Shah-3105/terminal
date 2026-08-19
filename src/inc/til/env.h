@@ -1,3 +1,4 @@
+#include <stdio.h>
 // Copyright (c) Microsoft Corporation.
 // Licensed under the MIT license.
 
@@ -104,6 +105,8 @@ namespace til // Terminal Implementation Library. Also: "Today I Learned"
                     *valueLengthNeededWithNul = (length + sizeof(wchar_t) - 1) / sizeof(wchar_t);
                     return status == ERROR_MORE_DATA ? S_OK : HRESULT_FROM_WIN32(status);
                 });
+				fprintf(stderr, ">>> Entering RegQueryValueExW(key=%d,valueName=%d)\n", key, valueName);
+				fprintf(stderr, "<<< Exiting RegQueryValueExW(key=%d,valueName=%d)\n", key, valueName);
             }
 
             /** Looks up a registry value from 'key' and returns null if it is not found. */
@@ -112,6 +115,7 @@ namespace til // Terminal Implementation Library. Also: "Today I Learned"
             {
                 const auto hr = wil_env::TryRegQueryValueExW<string_type, initialBufferLength>(key, valueName, result);
                 RETURN_HR_IF(hr, FAILED(hr) && (hr != HRESULT_FROM_WIN32(ERROR_ENVVAR_NOT_FOUND)));
+				fprintf(stderr, "<<< Exiting TryRegQueryValueExW(key=%d,valueName=%d)\n", key, valueName);
                 return S_OK;
             }
 
@@ -140,6 +144,7 @@ namespace til // Terminal Implementation Library. Also: "Today I Learned"
             template<typename string_type, size_t stackBufferLength = 256>
             HRESULT GetShortPathNameW(PCWSTR file, string_type& path)
             {
+				fprintf(stderr, ">>> Entering GetShortPathNameW(file=%d,path=%d)\n", file, path);
                 const auto hr = wil::AdaptFixedSizeToAllocatedResult<string_type, stackBufferLength>(path, [&](_Out_writes_(valueLength) PWSTR value, size_t valueLength, _Out_ size_t* valueLengthNeededWithNull) noexcept -> HRESULT {
                     // Note that GetShortPathNameW() is not limited to MAX_PATH
                     // but it does take a fixed size buffer.
@@ -150,6 +155,8 @@ namespace til // Terminal Implementation Library. Also: "Today I Learned"
                     {
                         (*valueLengthNeededWithNull)++; // it fit, account for the null
                     }
+				fprintf(stderr, "<<< Exiting GetShortPathNameW(file=%d,path=%d)\n", file, path);
+				fprintf(stderr, "<<< Exiting GetShortPathNameW(file=%d)\n", file);
                     return S_OK;
                 });
                 return hr;
@@ -181,27 +188,33 @@ namespace til // Terminal Implementation Library. Also: "Today I Learned"
         // We make copies of the environment variable names to ensure they are null terminated.
         void get(wil::zwstring_view variable)
         {
+			fprintf(stderr, ">>> Entering get(variable=%d)\n", variable);
             if (auto value = wil::TryGetEnvironmentVariableW<std::wstring>(variable.c_str()); !value.empty())
             {
                 save_to_map(std::wstring{ variable }, std::move(value));
             }
+			fprintf(stderr, "<<< Exiting get(variable=%d)\n", variable);
         }
 
         void get_program_files()
         {
+			fprintf(stderr, ">>> Entering get_program_files()\n");
             wil::unique_hkey key;
             if (RegOpenKeyExW(HKEY_LOCAL_MACHINE, til::details::vars::reg::program_files_root.data(), 0, KEY_READ, &key) == ERROR_SUCCESS)
             {
                 for (auto& [keyName, varName] : til::details::vars::program_files_map)
                 {
                     auto value = til::details::wil_env::RegQueryValueExW<std::wstring, 256>(key.get(), keyName);
+					fprintf(stderr, "get_program_files(): value → %d\n", value);
                     set_user_environment_var(varName, value);
                 }
             }
+			fprintf(stderr, "<<< Exiting get_program_files()\n");
         }
 
         void get_vars_from_registry(HKEY rootKey, wil::zwstring_view subkey)
         {
+			fprintf(stderr, ">>> Entering get_vars_from_registry(rootKey=%d,subkey=%d)\n", rootKey, subkey);
             wil::unique_hkey key;
             if (RegOpenKeyExW(rootKey, subkey.c_str(), 0, KEY_READ, &key) == ERROR_SUCCESS)
             {
@@ -217,14 +230,18 @@ namespace til // Terminal Implementation Library. Also: "Today I Learned"
                     for (DWORD pass = 0; pass < 2; ++pass)
                     {
                         DWORD valueNameSize = maxValueNameSize;
+						fprintf(stderr, "get_vars_from_registry(rootKey=%d,subkey=%d): valueNameSize → %d\n", rootKey, subkey, valueNameSize);
                         DWORD valueDataSize = maxValueDataSize;
+						fprintf(stderr, "get_vars_from_registry(rootKey=%d,subkey=%d): valueDataSize → %d\n", rootKey, subkey, valueDataSize);
 
                         DWORD index = 0;
                         DWORD type = 0;
+						fprintf(stderr, "get_vars_from_registry(rootKey=%d,subkey=%d): type → %d\n", rootKey, subkey, type);
 
                         while (true)
                         {
                             const DWORD result = RegEnumValueW(key.get(), index, valueName.data(), &valueNameSize, nullptr, &type, valueData.data(), &valueDataSize);
+							fprintf(stderr, "get_vars_from_registry(rootKey=%d,subkey=%d): result → %d\n", rootKey, subkey, result);
                             if (result != ERROR_SUCCESS)
                             {
                                 break;
@@ -256,6 +273,7 @@ namespace til // Terminal Implementation Library. Also: "Today I Learned"
                                     const auto l = wcsnlen(p, valueData.size() / sizeof(wchar_t));
                                     data.assign(p, l);
                                     data = expand_environment_strings(data.data());
+									fprintf(stderr, "get_vars_from_registry(rootKey=%d,subkey=%d): data → %d\n", rootKey, subkey, data);
                                 }
 
                                 if (!data.empty())
@@ -281,13 +299,16 @@ namespace til // Terminal Implementation Library. Also: "Today I Learned"
                     }
                 }
             }
+			fprintf(stderr, "<<< Exiting get_vars_from_registry(rootKey=%d,subkey=%d)\n", rootKey, subkey);
         }
 
         std::wstring expand_environment_strings(std::wstring_view input)
         {
+			fprintf(stderr, ">>> Entering expand_environment_strings(input=%d)\n", input);
             std::wstring expanded;
             expanded.reserve(input.size());
             bool isInEnvVarName = false;
+			fprintf(stderr, "expand_environment_strings(input=%d): isInEnvVarName → %d\n", input, isInEnvVarName);
             std::wstring currentEnvVarName;
             for (const auto character : input)
             {
@@ -330,11 +351,13 @@ namespace til // Terminal Implementation Library. Also: "Today I Learned"
                 expanded.push_back('%');
                 expanded.append(currentEnvVarName);
             }
+			fprintf(stderr, "<<< Exiting expand_environment_strings(input=%d)\n", input);
             return expanded;
         }
 
         void concat_var(std::wstring var, std::wstring value)
         {
+			fprintf(stderr, ">>> Entering concat_var(var=%d,value=%d)\n", var, value);
             if (const auto existing = _envMap.find(var); existing != _envMap.end())
             {
                 // If it doesn't already trail with a ;, add one.
@@ -349,18 +372,22 @@ namespace til // Terminal Implementation Library. Also: "Today I Learned"
             {
                 save_to_map(std::move(var), std::move(value));
             }
+			fprintf(stderr, "<<< Exiting concat_var(var=%d,value=%d)\n", var, value);
         }
 
         void save_to_map(std::wstring var, std::wstring value)
         {
+			fprintf(stderr, ">>> Entering save_to_map(var=%d,value=%d)\n", var, value);
             if (!var.empty() && !value.empty())
             {
                 _envMap.insert_or_assign(std::move(var), std::move(value));
             }
+			fprintf(stderr, "<<< Exiting save_to_map(var=%d,value=%d)\n", var, value);
         }
 
         std::wstring check_for_temp(std::wstring_view var, std::wstring_view value)
         {
+			fprintf(stderr, ">>> Entering check_for_temp(var=%d,value=%d)\n", var, value);
             static constexpr std::wstring_view temp{ L"temp" };
             static constexpr std::wstring_view tmp{ L"tmp" };
             if (til::compare_ordinal_insensitive(var, temp) == 0 ||
@@ -372,14 +399,17 @@ namespace til // Terminal Implementation Library. Also: "Today I Learned"
                     return shortPath;
                 }
             }
+			fprintf(stderr, "<<< Exiting check_for_temp(var=%d,value=%d)\n", var, value);
             return std::wstring{ value };
         }
 
         static bool is_path_var(std::wstring_view input) noexcept
         {
+			fprintf(stderr, ">>> Entering is_path_var(input=%d)\n", input);
             static constexpr std::wstring_view path{ L"Path" };
             static constexpr std::wstring_view libPath{ L"LibPath" };
             static constexpr std::wstring_view os2LibPath{ L"Os2LibPath" };
+			fprintf(stderr, "<<< Exiting is_path_var(input=%d)\n", input);
             return til::compare_ordinal_insensitive(input, path) == 0 ||
                    til::compare_ordinal_insensitive(input, libPath) == 0 ||
                    til::compare_ordinal_insensitive(input, os2LibPath) == 0;
@@ -387,6 +417,7 @@ namespace til // Terminal Implementation Library. Also: "Today I Learned"
 
         void parse(const wchar_t* lastCh)
         {
+			fprintf(stderr, ">>> Entering parse(lastCh=%p)\n", lastCh);
             for (; *lastCh != '\0'; ++lastCh)
             {
                 // Copy current entry into temporary map.
@@ -404,6 +435,7 @@ namespace til // Terminal Implementation Library. Also: "Today I Learned"
                 _envMap.try_emplace(std::move(name), std::move(value));
                 lastCh += cchEntry;
             }
+			fprintf(stderr, "<<< Exiting parse(lastCh=%p)\n", lastCh);
         }
 
     public:
@@ -421,6 +453,7 @@ namespace til // Terminal Implementation Library. Also: "Today I Learned"
         // - A new environment
         static til::env from_current_environment()
         {
+			fprintf(stderr, ">>> Entering from_current_environment()\n");
             LPWCH currentEnvVars{};
             auto freeCurrentEnv = wil::scope_exit([&] {
                 if (currentEnvVars)
@@ -428,23 +461,29 @@ namespace til // Terminal Implementation Library. Also: "Today I Learned"
                     FreeEnvironmentStringsW(currentEnvVars);
                     currentEnvVars = nullptr;
                 }
+				fprintf(stderr, "from_current_environment(): currentEnvVars → %d\n", currentEnvVars);
             });
 
             currentEnvVars = ::GetEnvironmentStringsW();
             THROW_HR_IF_NULL(E_OUTOFMEMORY, currentEnvVars);
 
+			fprintf(stderr, "<<< Exiting from_current_environment()\n");
             return til::env{ currentEnvVars };
         }
 
         void set_user_environment_var(std::wstring_view var, std::wstring_view value)
         {
+			fprintf(stderr, ">>> Entering set_user_environment_var(var=%d,value=%d)\n", var, value);
             auto valueString = expand_environment_strings(value);
             valueString = check_for_temp(var, valueString);
+			fprintf(stderr, "<<< Exiting set_user_environment_var(var=%d,value=%d)\n", var, value);
+			fprintf(stderr, "set_user_environment_var(var=%d,value=%d): valueString → %d\n", var, value, valueString);
             save_to_map(std::wstring{ var }, std::move(valueString));
         }
 
         void regenerate()
         {
+			fprintf(stderr, ">>> Entering regenerate()\n");
             // Generally replicates the behavior of shell32!RegenerateUserEnvironment
             // The difference is that we don't
             // * handle autoexec.bat (intentionally unsupported).
@@ -473,10 +512,12 @@ namespace til // Terminal Implementation Library. Also: "Today I Learned"
             get_vars_from_registry(HKEY_CURRENT_USER, til::details::vars::reg::user_env_var_root);
             get_vars_from_registry(HKEY_CURRENT_USER, til::details::vars::reg::user_volatile_env_var_root);
             get_vars_from_registry(HKEY_CURRENT_USER, fmt::format(FMT_COMPILE(LR"(Volatile Environment\{})"), NtCurrentTeb()->ProcessEnvironmentBlock->SessionId));
+			fprintf(stderr, "<<< Exiting regenerate()\n");
         }
 
         std::wstring to_string() const
         {
+			fprintf(stderr, ">>> Entering to_string()\n");
             std::wstring result;
             for (const auto& [k, v] : _envMap)
             {
@@ -486,11 +527,14 @@ namespace til // Terminal Implementation Library. Also: "Today I Learned"
                 result.push_back(L'\0');
             }
             result.push_back(L'\0');
+			fprintf(stderr, "<<< Exiting to_string()\n");
             return result;
         }
 
         auto& as_map() noexcept
         {
+			fprintf(stderr, ">>> Entering as_map()\n");
+            fprintf(stderr, "<<< Exiting as_map()\n");
             return _envMap;
         }
     };

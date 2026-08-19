@@ -66,4 +66,5 @@ namespace Microsoft::Console::Interactivity::Win32
         friend class ::UiaTextRangeTests;
 #endif
     };
+	std::cerr << "<<< Exiting Author(s=" << s << ")" << std::endl;
 }

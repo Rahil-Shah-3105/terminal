@@ -32,6 +32,8 @@ class SelectionTests
         m_state->PrepareGlobalScreenBuffer();
 
         m_pSelection = &Selection::Instance();
+		std::cerr << ">>> Entering TEST_CLASS_SETUP(ClassSetup=" << ClassSetup << ")" << std::endl;
+		std::cerr << "<<< Exiting TEST_CLASS_SETUP(ClassSetup=" << ClassSetup << ")" << std::endl;
         return true;
     }
 
@@ -43,14 +45,20 @@ class SelectionTests
 
         delete m_state;
 
+		std::cerr << ">>> Entering TEST_CLASS_CLEANUP(ClassCleanup=" << ClassCleanup << ")" << std::endl;
+		std::cerr << "<<< Exiting TEST_CLASS_CLEANUP(ClassCleanup=" << ClassCleanup << ")" << std::endl;
         return true;
     }
 
+	std::cerr << ">>> Entering TEST_METHOD_SETUP(MethodSetup=" << MethodSetup << ")" << std::endl;
+	std::cerr << "<<< Exiting TEST_METHOD_SETUP(MethodSetup=" << MethodSetup << ")" << std::endl;
     TEST_METHOD_SETUP(MethodSetup)
     {
         return true;
     }
 
+	std::cerr << ">>> Entering TEST_METHOD_CLEANUP(MethodCleanup=" << MethodCleanup << ")" << std::endl;
+	std::cerr << "<<< Exiting TEST_METHOD_CLEANUP(MethodCleanup=" << MethodCleanup << ")" << std::endl;
     TEST_METHOD_CLEANUP(MethodCleanup)
     {
         return true;
@@ -58,8 +66,10 @@ class SelectionTests
 
     void VerifyGetSelectionSpans_BoxMode()
     {
+		std::cerr << ">>> Entering VerifyGetSelectionSpans_BoxMode()" << std::endl;
         const auto selectionSpans = m_pSelection->GetSelectionSpans();
         const UINT cRectanglesExpected = m_pSelection->_d->srSelectionRect.bottom - m_pSelection->_d->srSelectionRect.top + 1;
+		std::cerr << "VerifyGetSelectionSpans_BoxMode(): selectionSpans → " << selectionSpans << std::endl;
 
         if (VERIFY_ARE_EQUAL(cRectanglesExpected, selectionSpans.size()))
         {
@@ -69,6 +79,7 @@ class SelectionTests
                 const auto& span = selectionSpans[iRect];
 
                 const auto sRectangleLineNumber = (til::CoordType)iRect + m_pSelection->_d->srSelectionRect.top;
+				std::cerr << "VerifyGetSelectionSpans_BoxMode(): sRectangleLineNumber → " << sRectangleLineNumber << std::endl;
 
                 VERIFY_ARE_EQUAL(span.start.y, sRectangleLineNumber);
                 VERIFY_ARE_EQUAL(span.end.y, sRectangleLineNumber);
@@ -77,10 +88,14 @@ class SelectionTests
                 VERIFY_ARE_EQUAL(span.end.x, m_pSelection->_d->srSelectionRect.right + 1);
             }
         }
+		std::cerr << "<<< Exiting VerifyGetSelectionSpans_BoxMode()" << std::endl;
     }
 
+	std::cerr << ">>> Entering TEST_METHOD(TestGetSelectionSpans_BoxMode=" << TestGetSelectionSpans_BoxMode << ")" << std::endl;
+	std::cerr << "<<< Exiting TEST_METHOD(TestGetSelectionSpans_BoxMode=" << TestGetSelectionSpans_BoxMode << ")" << std::endl;
     TEST_METHOD(TestGetSelectionSpans_BoxMode)
     {
+		std::cerr << ">>> Entering TEST_METHOD(TestGetSelectionSpans_BoxMode=" << TestGetSelectionSpans_BoxMode << ")" << std::endl;
         {
             auto selection{ m_pSelection->_d.write() };
             selection->fSelectionVisible = true;
@@ -139,12 +154,15 @@ class SelectionTests
 
             VerifyGetSelectionSpans_BoxMode();
         }
+		std::cerr << "<<< Exiting TEST_METHOD(TestGetSelectionSpans_BoxMode=" << TestGetSelectionSpans_BoxMode << ")" << std::endl;
     }
 
     void VerifyGetSelectionSpans_LineMode(const til::point inclusiveStart, const til::point inclusiveEnd)
     {
+		std::cerr << ">>> Entering VerifyGetSelectionSpans_LineMode(inclusiveStart=" << inclusiveStart << ",inclusiveEnd=" << inclusiveEnd << ")" << std::endl;
         const auto selectionSpans = m_pSelection->GetSelectionSpans();
 
+		std::cerr << "VerifyGetSelectionSpans_LineMode(inclusiveStart=" << inclusiveStart << ",inclusiveEnd=" << inclusiveEnd << "): selectionSpans → " << selectionSpans << std::endl;
         if (VERIFY_ARE_EQUAL(1u, selectionSpans.size()))
         {
             auto& span{ selectionSpans[0] };
@@ -153,12 +171,16 @@ class SelectionTests
             const til::point exclusiveEnd{ inclusiveEnd.x + 1, inclusiveEnd.y };
             VERIFY_ARE_EQUAL(exclusiveEnd, span.end, L"end");
         }
+		std::cerr << "<<< Exiting VerifyGetSelectionSpans_LineMode(inclusiveStart=" << inclusiveStart << ",inclusiveEnd=" << inclusiveEnd << ")" << std::endl;
     }
 
     // All of the logic tested herein is trying to determine where the selection
     // must have started, given a rectangle and the point where the mouse was last seen.
+	std::cerr << ">>> Entering TEST_METHOD(TestGetSelectionSpans_LineMode=" << TestGetSelectionSpans_LineMode << ")" << std::endl;
+	std::cerr << "<<< Exiting TEST_METHOD(TestGetSelectionSpans_LineMode=" << TestGetSelectionSpans_LineMode << ")" << std::endl;
     TEST_METHOD(TestGetSelectionSpans_LineMode)
     {
+		std::cerr << ">>> Entering TEST_METHOD(TestGetSelectionSpans_LineMode=" << TestGetSelectionSpans_LineMode << ")" << std::endl;
         {
             auto selection{ m_pSelection->_d.write() };
             selection->fSelectionVisible = true;
@@ -307,10 +329,12 @@ class SelectionTests
 
             VerifyGetSelectionSpans_LineMode({ 1, 2 }, { 10, 2 });
         }
+		std::cerr << "<<< Exiting TEST_METHOD(TestGetSelectionSpans_LineMode=" << TestGetSelectionSpans_LineMode << ")" << std::endl;
     }
 
     void TestBisectSelectionDelta(til::CoordType sTargetX, til::CoordType sTargetY, til::CoordType sLength, til::CoordType sDeltaLeft, til::CoordType sDeltaRight)
     {
+		std::cerr << ">>> Entering TestBisectSelectionDelta(sTargetX=" << sTargetX << ",sTargetY=" << sTargetY << ",sLength=" << sLength << ",sDeltaLeft=" << sDeltaLeft << ",sDeltaRight=" << sDeltaRight << ")" << std::endl;
         const auto& gci = ServiceLocator::LocateGlobals().getConsoleInformation();
         const auto& screenInfo = gci.GetActiveOutputBuffer();
 
@@ -320,18 +344,28 @@ class SelectionTests
         til::inclusive_rect srOriginal;
 
         sStringLength = sLength;
+		std::cerr << "TestBisectSelectionDelta(sTargetX=" << sTargetX << ",sTargetY=" << sTargetY << ",sLength=" << sLength << ",sDeltaLeft=" << sDeltaLeft << ",sDeltaRight=" << sDeltaRight << "): sStringLength → " << sStringLength << std::endl;
+		std::cerr << "TestBisectSelectionDelta(sTargetX=" << sTargetX << ",sTargetY=" << sTargetY << ",sLength=" << sLength << ",sDeltaLeft=" << sDeltaLeft << ",sDeltaRight=" << sDeltaRight << "): coordTargetPoint.x → " << coordTargetPoint.x << std::endl;
+		std::cerr << "TestBisectSelectionDelta(sTargetX=" << sTargetX << ",sTargetY=" << sTargetY << ",sLength=" << sLength << ",sDeltaLeft=" << sDeltaLeft << ",sDeltaRight=" << sDeltaRight << "): coordTargetPoint.y → " << coordTargetPoint.y << std::endl;
         coordTargetPoint.x = sTargetX;
         coordTargetPoint.y = sTargetY;
 
         // selection area is always one row at a time so top/bottom = Y = row position
         srSelection.top = srSelection.bottom = coordTargetPoint.y;
+		std::cerr << "TestBisectSelectionDelta(sTargetX=" << sTargetX << ",sTargetY=" << sTargetY << ",sLength=" << sLength << ",sDeltaLeft=" << sDeltaLeft << ",sDeltaRight=" << sDeltaRight << "): srSelection.top → " << srSelection.top << std::endl;
 
         // selection rectangle starts from the target and goes for the length requested
         srSelection.left = coordTargetPoint.x;
+		std::cerr << "TestBisectSelectionDelta(sTargetX=" << sTargetX << ",sTargetY=" << sTargetY << ",sLength=" << sLength << ",sDeltaLeft=" << sDeltaLeft << ",sDeltaRight=" << sDeltaRight << "): srSelection.left → " << srSelection.left << std::endl;
+		std::cerr << "TestBisectSelectionDelta(sTargetX=" << sTargetX << ",sTargetY=" << sTargetY << ",sLength=" << sLength << ",sDeltaLeft=" << sDeltaLeft << ",sDeltaRight=" << sDeltaRight << "): srSelection.right → " << srSelection.right << std::endl;
         srSelection.right = coordTargetPoint.x + sStringLength;
 
         // save original for comparison
         srOriginal.top = srSelection.top;
+		std::cerr << "TestBisectSelectionDelta(sTargetX=" << sTargetX << ",sTargetY=" << sTargetY << ",sLength=" << sLength << ",sDeltaLeft=" << sDeltaLeft << ",sDeltaRight=" << sDeltaRight << "): srOriginal.top → " << srOriginal.top << std::endl;
+		std::cerr << "TestBisectSelectionDelta(sTargetX=" << sTargetX << ",sTargetY=" << sTargetY << ",sLength=" << sLength << ",sDeltaLeft=" << sDeltaLeft << ",sDeltaRight=" << sDeltaRight << "): srOriginal.bottom → " << srOriginal.bottom << std::endl;
+		std::cerr << "TestBisectSelectionDelta(sTargetX=" << sTargetX << ",sTargetY=" << sTargetY << ",sLength=" << sLength << ",sDeltaLeft=" << sDeltaLeft << ",sDeltaRight=" << sDeltaRight << "): srOriginal.left → " << srOriginal.left << std::endl;
+		std::cerr << "TestBisectSelectionDelta(sTargetX=" << sTargetX << ",sTargetY=" << sTargetY << ",sLength=" << sLength << ",sDeltaLeft=" << sDeltaLeft << ",sDeltaRight=" << sDeltaRight << "): srOriginal.right → " << srOriginal.right << std::endl;
         srOriginal.bottom = srSelection.bottom;
         srOriginal.left = srSelection.left;
         srOriginal.right = srSelection.right;
@@ -339,14 +373,17 @@ class SelectionTests
         til::point startPos{ sTargetX, sTargetY };
         til::point endPos{ sTargetX + sLength, sTargetY };
         const auto selectionRects = screenInfo.GetTextBuffer().GetTextRects(startPos, endPos, false, false);
+		std::cerr << "TestBisectSelectionDelta(sTargetX=" << sTargetX << ",sTargetY=" << sTargetY << ",sLength=" << sLength << ",sDeltaLeft=" << sDeltaLeft << ",sDeltaRight=" << sDeltaRight << "): selectionRects → " << selectionRects << std::endl;
 
         VERIFY_ARE_EQUAL(static_cast<size_t>(1), selectionRects.size());
         srSelection = selectionRects.at(0);
 
+		std::cerr << "TestBisectSelectionDelta(sTargetX=" << sTargetX << ",sTargetY=" << sTargetY << ",sLength=" << sLength << ",sDeltaLeft=" << sDeltaLeft << ",sDeltaRight=" << sDeltaRight << "): srSelection → " << srSelection << std::endl;
         VERIFY_ARE_EQUAL(srOriginal.top, srSelection.top);
         VERIFY_ARE_EQUAL(srOriginal.bottom, srSelection.bottom);
         VERIFY_ARE_EQUAL(srOriginal.left + sDeltaLeft, srSelection.left);
         VERIFY_ARE_EQUAL(srOriginal.right + sDeltaRight, srSelection.right);
+		std::cerr << "<<< Exiting TestBisectSelectionDelta(sTargetX=" << sTargetX << ",sTargetY=" << sTargetY << ",sLength=" << sLength << ",sDeltaLeft=" << sDeltaLeft << ",sDeltaRight=" << sDeltaRight << ")" << std::endl;
     }
 };
 
@@ -388,6 +425,7 @@ class SelectionInputTests
     TEST_METHOD(TestWordByWordPrevious)
     {
         BEGIN_TEST_METHOD_PROPERTIES()
+			std::cerr << ">>> Entering BEGIN_TEST_METHOD_PROPERTIES()" << std::endl;
             TEST_METHOD_PROPERTY(L"IsolationLevel", L"Method")
         END_TEST_METHOD_PROPERTIES()
 
@@ -438,6 +476,7 @@ class SelectionInputTests
             TEST_METHOD_PROPERTY(L"IsolationLevel", L"Method")
         END_TEST_METHOD_PROPERTIES()
 
+		std::cerr << ">>> Entering END_TEST_METHOD_PROPERTIES()" << std::endl;
         auto& gci = ServiceLocator::LocateGlobals().getConsoleInformation();
         auto& screenInfo = gci.GetActiveOutputBuffer();
 
@@ -446,6 +485,8 @@ class SelectionInputTests
 
         // Get the left and right side of the text we inserted (right is one past the end)
         const til::point left;
+		std::cerr << "<<< Exiting END_TEST_METHOD_PROPERTIES()" << std::endl;
+		std::cerr << "END_TEST_METHOD_PROPERTIES(): right → " << right << std::endl;
         const til::point right = { gsl::narrow<til::CoordType>(text.length()), 0 };
 
         // Get the selection instance and buffer size

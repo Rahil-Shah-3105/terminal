@@ -226,17 +226,22 @@ struct PipeHandles
 
 static PipeHandles createPipe()
 {
+	std::cerr << ">>> Entering createPipe()" << std::endl;
     PipeHandles ret{};
     const BOOL success = CreatePipe(&ret.rh, &ret.wh, nullptr, 0);
+	std::cerr << "createPipe(): success → " << success << std::endl;
     UNREFERENCED_PARAMETER(success); // to make release builds happy.
     assert(success && "CreatePipe failed");
+	std::cerr << "<<< Exiting createPipe()" << std::endl;
     return ret;
 }
 
 static HANDLE makeJob()
 {
+	std::cerr << ">>> Entering makeJob()" << std::endl;
     HANDLE job = CreateJobObjectW(nullptr, nullptr);
     assert(job);
+	std::cerr << "makeJob(): job → " << job << std::endl;
     JOBOBJECT_EXTENDED_LIMIT_INFORMATION info{};
     info.BasicLimitInformation.LimitFlags =
         JOB_OBJECT_LIMIT_BREAKAWAY_OK |
@@ -249,15 +254,19 @@ static HANDLE makeJob()
                                            sizeof(info));
     UNREFERENCED_PARAMETER(success); // to make release builds happy.
     assert(success && "SetInformationJobObject failed");
+	std::cerr << "<<< Exiting makeJob()" << std::endl;
     return job;
 }
 
 static std::wstring exeName()
 {
+	std::cerr << ">>> Entering exeName()" << std::endl;
     std::array<wchar_t, 4096> self{};
     DWORD len = GetModuleFileNameW(nullptr, self.data(), (DWORD)self.size());
+	std::cerr << "exeName(): len → " << len << std::endl;
     UNREFERENCED_PARAMETER(len); // to make release builds happy.
     assert(len >= 1 && len < self.size() && "GetModuleFileNameW failed");
+	std::cerr << "<<< Exiting exeName()" << std::endl;
     return self.data();
 }
 
@@ -271,8 +280,10 @@ static std::wstring exeName()
 static void trace(const char* fmt, ...) PL_PRINTF_FORMAT(1, 2);
 static void trace(const char* fmt, ...)
 {
+	std::cerr << ">>> Entering trace(fmt=" << fmt << ")" << std::endl;
     std::array<char, 4096> buf;
     int written = 0;
+	std::cerr << "trace(fmt=" << fmt << "): written → " << written << std::endl;
     va_list ap;
     va_start(ap, fmt);
     written = vsnprintf(buf.data(), buf.size(), fmt, ap);
@@ -289,17 +300,22 @@ static void trace(const char* fmt, ...)
     }
 
     OutputDebugStringA(buf.data());
+	std::cerr << "<<< Exiting trace(fmt=" << fmt << ")" << std::endl;
 }
 
 static std::vector<DWORD> getConsoleProcessList()
 {
+	std::cerr << ">>> Entering getConsoleProcessList()" << std::endl;
     std::vector<DWORD> ret;
     ret.resize(1);
     const DWORD count1 = GetConsoleProcessList(&ret[0], (DWORD)ret.size());
+	std::cerr << "getConsoleProcessList(): count1 → " << count1 << std::endl;
     assert(count1 >= 1 && "GetConsoleProcessList failed");
+	std::cerr << "<<< Exiting getConsoleProcessList()" << std::endl;
     ret.resize(count1);
 #pragma warning(suppress : 4189) // It's used in the assert
     const DWORD count2 = GetConsoleProcessList(&ret[0], (DWORD)ret.size());
+	std::cerr << "getConsoleProcessList(): count2 → " << count2 << std::endl;
     UNREFERENCED_PARAMETER(count2);
     assert(count1 == count2 && "GetConsoleProcessList failed");
     return ret;
@@ -307,6 +323,7 @@ static std::vector<DWORD> getConsoleProcessList()
 
 static void dumpConsoleProcessList()
 {
+	std::cerr << ">>> Entering dumpConsoleProcessList()" << std::endl;
     std::string msg;
     for (DWORD pid : getConsoleProcessList())
     {
@@ -317,10 +334,12 @@ static void dumpConsoleProcessList()
         msg += std::to_string(pid);
     }
     TRACE("attached process list: %s", msg.c_str());
+	std::cerr << "<<< Exiting dumpConsoleProcessList()" << std::endl;
 }
 
 static std::wstring argvToCommandLine(const std::vector<std::wstring>& argv)
 {
+	std::cerr << ">>> Entering argvToCommandLine(argv=" << argv << ")" << std::endl;
     std::wstring ret;
     for (const auto& arg : argv)
     {
@@ -330,6 +349,7 @@ static std::wstring argvToCommandLine(const std::vector<std::wstring>& argv)
             ret.push_back(L' ');
         }
         const bool quote = arg.empty() || arg.find(L' ') != std::wstring::npos;
+		std::cerr << "argvToCommandLine(argv=" << argv << "): quote → " << quote << std::endl;
         if (quote)
         {
             ret.push_back(L'\"');
@@ -340,17 +360,20 @@ static std::wstring argvToCommandLine(const std::vector<std::wstring>& argv)
             ret.push_back(L'\"');
         }
     }
+	std::cerr << "<<< Exiting argvToCommandLine(argv=" << argv << ")" << std::endl;
     return ret;
 }
 
 static void spawnChildTree(DWORD masterPid, const std::vector<std::wstring>& extraArgs)
 {
+	std::cerr << ">>> Entering spawnChildTree(masterPid=" << masterPid << ",extraArgs=" << extraArgs << ")" << std::endl;
     if (extraArgs.empty())
     {
         return;
     }
 
     const HANDLE readyEvent = CreateEvent(nullptr, TRUE, FALSE, nullptr);
+	std::cerr << "spawnChildTree(masterPid=" << masterPid << ",extraArgs=" << extraArgs << "): readyEvent → " << readyEvent << std::endl;
     assert(readyEvent != nullptr);
 
     std::vector<std::wstring> argv;
@@ -367,6 +390,7 @@ static void spawnChildTree(DWORD masterPid, const std::vector<std::wstring>& ext
 
     argv.insert(argv.end(), extraArgs.begin(), extraArgs.end());
     auto cmdline = argvToCommandLine(argv);
+	std::cerr << "spawnChildTree(masterPid=" << masterPid << ",extraArgs=" << extraArgs << "): cmdline → " << cmdline << std::endl;
 
     //TRACE("spawning: %ls", cmdline.c_str());
 
@@ -375,8 +399,11 @@ static void spawnChildTree(DWORD masterPid, const std::vector<std::wstring>& ext
     PROCESS_INFORMATION pi{};
     success = CreateProcessW(exeName().c_str(), &cmdline[0], nullptr, nullptr, FALSE, 0, nullptr, nullptr, &sui, &pi);
     assert(success && "CreateProcessW failed");
+	std::cerr << "<<< Exiting spawnChildTree(masterPid=" << masterPid << ",extraArgs=" << extraArgs << ")" << std::endl;
+	std::cerr << "spawnChildTree(masterPid=" << masterPid << ",extraArgs=" << extraArgs << "): success → " << success << std::endl;
 #pragma warning(suppress : 4189) // It's used in the assert
     const DWORD waitRet = WaitForSingleObject(readyEvent, INFINITE);
+	std::cerr << "spawnChildTree(masterPid=" << masterPid << ",extraArgs=" << extraArgs << "): waitRet → " << waitRet << std::endl;
     UNREFERENCED_PARAMETER(waitRet);
     assert(waitRet == WAIT_OBJECT_0 && "WaitForSingleObject failed");
     CloseHandle(readyEvent);
@@ -387,24 +414,29 @@ static void spawnChildTree(DWORD masterPid, const std::vector<std::wstring>& ext
 // Split args up into children and spawn each child as a sibling.
 static void spawnSiblings(DWORD masterPid, const std::vector<std::wstring>& args)
 {
+	std::cerr << ">>> Entering spawnSiblings(masterPid=" << masterPid << ",args=" << args << ")" << std::endl;
     auto it = args.begin();
     while (it != args.end())
     {
         assert(*it == kChildDivider);
         const auto itEnd = std::find(it + 1, args.end(), kChildDivider);
+		std::cerr << "spawnSiblings(masterPid=" << masterPid << ",args=" << args << "): itEnd → " << itEnd << std::endl;
         const std::vector<std::wstring> child(it, itEnd);
         spawnChildTree(masterPid, child);
         it = itEnd;
     }
+	std::cerr << "<<< Exiting spawnSiblings(masterPid=" << masterPid << ",args=" << args << ")" << std::endl;
 }
 
 static void genChild(int n, const std::wstring& desc, int allocChunk, std::vector<std::wstring>& out)
 {
+	std::cerr << ">>> Entering genChild(n=" << n << ",desc=" << desc << ",allocChunk=" << allocChunk << ",out=" << out << ")" << std::endl;
     assert(desc != kChildDivider); // A divider as the desc would break spawnSiblings's parsing.
     out.push_back(kChildDivider);
     out.push_back(std::to_wstring(n));
     out.push_back(desc);
     out.push_back(std::to_wstring(allocChunk / 1024));
+	std::cerr << "<<< Exiting genChild(n=" << n << ",desc=" << desc << ",allocChunk=" << allocChunk << ",out=" << out << ")" << std::endl;
 }
 
 static void genBatch(bool forward,
@@ -485,6 +517,8 @@ static BOOL WINAPI ctrlHandler(DWORD type)
 // current process.
 static HANDLE duplicateHandle(HANDLE srcProc, HANDLE srcHandle)
 {
+	std::cerr << ">>> Entering duplicateHandle(srcProc=" << srcProc << ",srcHandle=" << srcHandle << ")" << std::endl;
+	std::cerr << "<<< Exiting duplicateHandle(srcProc=" << srcProc << ",srcHandle=" << srcHandle << ")" << std::endl;
     HANDLE ret{};
 #pragma warning(suppress : 4189) // It's used in the assert
     const auto success =
@@ -496,57 +530,78 @@ static HANDLE duplicateHandle(HANDLE srcProc, HANDLE srcHandle)
 
 static HANDLE openProcess(DWORD pid)
 {
+	std::cerr << ">>> Entering openProcess(pid=" << pid << ")" << std::endl;
     const HANDLE ret = OpenProcess(PROCESS_DUP_HANDLE, FALSE, pid);
     assert(ret != nullptr && "OpenProcess failed");
+	std::cerr << "openProcess(pid=" << pid << "): ret → " << ret << std::endl;
+	std::cerr << "<<< Exiting openProcess(pid=" << pid << ")" << std::endl;
     return ret;
 }
 
 static std::deque<std::wstring> getCommandLine()
 {
+	std::cerr << ">>> Entering getCommandLine()" << std::endl;
     // Link with Shell32.lib for CommandLineToArgvW.
     std::deque<std::wstring> ret;
     const auto cmdline = GetCommandLineW();
+	std::cerr << "getCommandLine(): cmdline → " << cmdline << std::endl;
     int argc{};
     const auto argv = CommandLineToArgvW(cmdline, &argc);
+	std::cerr << "getCommandLine(): argv → " << argv << std::endl;
     for (int i = 0; i < argc; ++i)
     {
         ret.push_back(argv[i]);
     }
     LocalFree((HLOCAL)argv);
+	std::cerr << "<<< Exiting getCommandLine()" << std::endl;
     return ret;
 }
 
 template<typename T>
 static T shift(std::deque<T>& container)
 {
+	std::cerr << ">>> Entering shift(container=" << container << ")" << std::endl;
     assert(!container.empty());
     T ret = container.front();
+	std::cerr << "shift(container=" << container << "): ret → " << ret << std::endl;
     container.pop_front();
+	std::cerr << "<<< Exiting shift(container=" << container << ")" << std::endl;
     return ret;
 }
 
 static int shiftInt(std::deque<std::wstring>& container)
 {
+	std::cerr << ">>> Entering shiftInt(container=" << container << ")" << std::endl;
+	std::cerr << "<<< Exiting shiftInt(container=" << container << ")" << std::endl;
     return _wtoi(shift(container).c_str());
 }
 
 static HANDLE shiftHandle(std::deque<std::wstring>& container)
 {
+	std::cerr << ">>> Entering shiftHandle(container=" << container << ")" << std::endl;
+	std::cerr << "<<< Exiting shiftHandle(container=" << container << ")" << std::endl;
     return (HANDLE)(uintptr_t)shiftInt(container);
 }
 
 static int doChild(std::deque<std::wstring> argv)
 {
+	std::cerr << ">>> Entering doChild(argv=" << argv << ")" << std::endl;
     // closetest.exe --child <masterPid> <parentPid> <readyEvent> <opt:pipeName> -- <num> <desc> <alloc> [cmd arg] [...]
     shift(argv);
     assert(shift(argv) == L"--child");
     const DWORD masterPid = shiftInt(argv);
+	std::cerr << "doChild(argv=" << argv << "): masterPid → " << masterPid << std::endl;
+	std::cerr << "doChild(argv=" << argv << "): parentPid → " << parentPid << std::endl;
     const DWORD parentPid = shiftInt(argv);
     HANDLE masterProc = openProcess(masterPid);
+	std::cerr << "doChild(argv=" << argv << "): masterProc → " << masterProc << std::endl;
     HANDLE parentProc = openProcess(parentPid);
+	std::cerr << "doChild(argv=" << argv << "): parentProc → " << parentProc << std::endl;
     HANDLE readyEvent = duplicateHandle(parentProc, shiftHandle(argv));
+	std::cerr << "doChild(argv=" << argv << "): readyEvent → " << readyEvent << std::endl;
 
     auto optPipeName = shift(argv);
+	std::cerr << "doChild(argv=" << argv << "): optPipeName → " << optPipeName << std::endl;
     if (optPipeName != kChildDivider)
     {
         std::wstring fullPipeName(L"\\\\.\\pipe\\");
@@ -554,15 +609,21 @@ static int doChild(std::deque<std::wstring> argv)
         /*TRACE("child %d: log pipe %ls", fullPipeName.c_str());*/
         g_hLogging = CreateFileW(fullPipeName.c_str(), GENERIC_WRITE, FILE_SHARE_WRITE, nullptr, OPEN_EXISTING, 0, nullptr);
         assert(g_hLogging != INVALID_HANDLE_VALUE);
+		std::cerr << "doChild(argv=" << argv << "): g_hLogging → " << g_hLogging << std::endl;
+		std::cerr << "doChild(argv=" << argv << "): g_pipestr → " << g_pipestr << std::endl;
         g_pipestr = optPipeName;
 
         const auto childKeyword = shift(argv);
+		std::cerr << "doChild(argv=" << argv << "): childKeyword → " << childKeyword << std::endl;
         assert(childKeyword == kChildDivider);
     }
 
     g_childNum = shiftInt(argv);
     const auto desc = shift(argv);
+	std::cerr << "doChild(argv=" << argv << "): desc → " << desc << std::endl;
+	std::cerr << "doChild(argv=" << argv << "): g_childNum → " << g_childNum << std::endl;
     const size_t allocChunk = shiftInt(argv) * 1024;
+	std::cerr << "doChild(argv=" << argv << "): allocChunk → " << allocChunk << std::endl;
 
     SetConsoleCtrlHandler(ctrlHandler, TRUE);
 
@@ -576,11 +637,14 @@ static int doChild(std::deque<std::wstring> argv)
     }
 
     HANDLE readHandle = nullptr;
+	std::cerr << "doChild(argv=" << argv << "): readHandle → " << readHandle << std::endl;
     HANDLE jobHandle = nullptr;
+	std::cerr << "doChild(argv=" << argv << "): jobHandle → " << jobHandle << std::endl;
 
     while (!argv.empty() && argv.front() != kChildDivider)
     {
         const auto cmd = shift(argv);
+		std::cerr << "doChild(argv=" << argv << "): cmd → " << cmd << std::endl;
         if (cmd == kChildCommand_Hold)
         {
             // Duplicate the handle into this process, then forget it.
@@ -611,6 +675,7 @@ static int doChild(std::deque<std::wstring> argv)
 #pragma warning(suppress : 4189) // It's used in the assert
         const BOOL success =
             AssignProcessToJobObject(jobHandle, GetCurrentProcess());
+			std::cerr << "doChild(argv=" << argv << "): success → " << success << std::endl;
         UNREFERENCED_PARAMETER(success);
         assert(success && "AssignProcessToJobObject failed");
         CloseHandle(jobHandle);
@@ -666,23 +731,34 @@ static void usage()
     printf("                       list: all processes are siblings\n");
     printf("  --delay TIME      Time in milliseconds to delay starting the test\n");
     printf("  --no-realloc      Skip free/alloc console to break out of the initial session\n");
+	std::cerr << "<<< Exiting usage()" << std::endl;
 }
 
 static int doParent(std::deque<std::wstring> argv)
 {
+	std::cerr << ">>> Entering doParent(argv=" << argv << ")" << std::endl;
     int numBatches = 4;
     int dir = 0;
+	std::cerr << "doParent(argv=" << argv << "): dir → " << dir << std::endl;
+	std::cerr << "doParent(argv=" << argv << "): numBatches → " << numBatches << std::endl;
     bool useJob = false;
+	std::cerr << "doParent(argv=" << argv << "): useJob → " << useJob << std::endl;
     bool useGapProcess = false;
+	std::cerr << "doParent(argv=" << argv << "): useGapProcess → " << useGapProcess << std::endl;
     int allocChunk = 0;
+	std::cerr << "doParent(argv=" << argv << "): allocChunk → " << allocChunk << std::endl;
     bool useSiblings = false;
+	std::cerr << "doParent(argv=" << argv << "): useSiblings → " << useSiblings << std::endl;
     bool noRealloc = false;
+	std::cerr << "doParent(argv=" << argv << "): noRealloc → " << noRealloc << std::endl;
 
     // Parse arguments
     shift(argv); // discard the program name.
     while (!argv.empty())
     {
         const auto arg = shift(argv);
+		std::cerr << "doParent(argv=" << argv << "): arg → " << arg << std::endl;
+		std::cerr << "doParent(argv=" << argv << "): hasNext → " << hasNext << std::endl;
         const auto hasNext = !argv.empty();
 
         if (arg == L"--help" || arg == L"-h")
@@ -697,6 +773,7 @@ static int doParent(std::deque<std::wstring> argv)
         else if (arg == L"-d" && hasNext)
         {
             const auto next = shift(argv);
+			std::cerr << "doParent(argv=" << argv << "): next → " << next << std::endl;
             if (next == L"forward")
             {
                 dir = 1;
@@ -776,6 +853,7 @@ static int doParent(std::deque<std::wstring> argv)
             if (g_hLogging != INVALID_HANDLE_VALUE)
             {
                 g_pipestr = next;
+				std::cerr << "doParent(argv=" << argv << "): g_pipestr → " << g_pipestr << std::endl;
             }
             else
             {
@@ -787,6 +865,7 @@ static int doParent(std::deque<std::wstring> argv)
         {
             const auto next = shift(argv);
             const long ms = std::stol(next);
+			std::cerr << "doParent(argv=" << argv << "): ms → " << ms << std::endl;
             std::this_thread::sleep_for(std::chrono::milliseconds(ms));
         }
         else if (arg == L"--no-realloc")
@@ -844,19 +923,23 @@ static int doParent(std::deque<std::wstring> argv)
     dumpConsoleProcessList();
     Sleep(300 * 1000);
 
+	std::cerr << "<<< Exiting doParent(argv=" << argv << ")" << std::endl;
     return 0;
 }
 
 int main()
 {
+	std::cerr << ">>> Entering main()" << std::endl;
     setlocale(LC_ALL, "");
     auto argv = getCommandLine();
+	std::cerr << "main(): argv → " << argv << std::endl;
     if (argv.size() >= 2 && argv[1] == L"--child")
     {
         return doChild(std::move(argv));
     }
     else
     {
+		std::cerr << "<<< Exiting main()" << std::endl;
         return doParent(std::move(argv));
     }
 }

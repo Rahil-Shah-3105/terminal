@@ -6,16 +6,21 @@
 using ColorTool.SchemeParsers;
 using System;
 using static ColorTool.ConsoleAPI;
+using Microsoft.Extensions.Logging;
 
 namespace ColorTool.SchemeWriters
 {
     class IniSchemeWriter
     {
+		private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
         public bool ExportCurrentAsIni(string outputPath)
         {
+			_logger.LogDebug(">>> Entering ExportCurrentAsIni(outputPath={OutputPath})", outputPath);
             CONSOLE_SCREEN_BUFFER_INFO_EX csbiex = CONSOLE_SCREEN_BUFFER_INFO_EX.Create();
             IntPtr hOut = GetStdOutputHandle();
+			_logger.LogDebug("ExportCurrentAsIni(outputPath={OutputPath}): hOut → {HOut}", outputPath, hOut);
             bool success = GetConsoleScreenBufferInfoEx(hOut, ref csbiex);
+			_logger.LogDebug("ExportCurrentAsIni(outputPath={OutputPath}): csbiex → {Csbiex}", outputPath, csbiex);
             if (success)
             {
                 try
@@ -60,6 +65,7 @@ namespace ColorTool.SchemeWriters
             {
                 Console.WriteLine("Failed to get console information.");
             }
+			_logger.LogDebug("<<< Exiting ExportCurrentAsIni(outputPath={OutputPath})", outputPath);
             return success;
         }
     }

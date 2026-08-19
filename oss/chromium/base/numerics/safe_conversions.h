@@ -1,3 +1,4 @@
+#include <stdio.h>
 // Copyright 2014 The Chromium Authors. All rights reserved.
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
@@ -31,7 +32,10 @@ template <typename Dst, typename Src>
 struct SaturateFastAsmOp {
   static const bool is_supported = false;
   static constexpr Dst Do(Src) {
+	fprintf(stderr, ">>> Entering Do(Src=%d)\n", Src);
     // Force a compile failure if instantiated.
+	fprintf(stderr, "<<< Exiting Do(Src=%d)\n", Src);
+	fprintf(stderr, "<<< Exiting Do(value=%d)\n", value);
     return CheckOnFailure::template HandleFailure<Dst>();
   }
 };
@@ -89,7 +93,9 @@ struct IsValueInRangeFastOp<
 // for the destination type.
 template <typename Dst, typename Src>
 constexpr bool IsValueInRangeForNumericType(Src value) {
+fprintf(stderr, ">>> Entering IsValueInRangeForNumericType(value=%d)\n", value);
   using SrcType = typename internal::UnderlyingType<Src>::type;
+fprintf(stderr, "<<< Exiting IsValueInRangeForNumericType(value=%d)\n", value);
   return internal::IsValueInRangeFastOp<Dst, SrcType>::is_supported
              ? internal::IsValueInRangeFastOp<Dst, SrcType>::Do(
                    static_cast<SrcType>(value))
@@ -105,9 +111,11 @@ template <typename Dst,
           class CheckHandler = internal::CheckOnFailure,
           typename Src>
 constexpr Dst checked_cast(Src value) {
+fprintf(stderr, ">>> Entering checked_cast(value=%d)\n", value);
   // This throws a compile-time error on evaluating the constexpr if it can be
   // determined at compile-time as failing, otherwise it will CHECK at runtime.
   using SrcType = typename internal::UnderlyingType<Src>::type;
+fprintf(stderr, "<<< Exiting checked_cast(value=%d)\n", value);
   return BASE_NUMERICS_LIKELY((IsValueInRangeForNumericType<Dst>(value)))
              ? static_cast<Dst>(static_cast<SrcType>(value))
              : CheckHandler::template HandleFailure<Dst>();
@@ -119,18 +127,24 @@ constexpr Dst checked_cast(Src value) {
 template <typename T>
 struct SaturationDefaultLimits : public std::numeric_limits<T> {
   static constexpr T NaN() {
+	fprintf(stderr, ">>> Entering NaN()\n");
+    fprintf(stderr, "<<< Exiting NaN()\n");
     return std::numeric_limits<T>::has_quiet_NaN
                ? std::numeric_limits<T>::quiet_NaN()
                : T();
   }
   using std::numeric_limits<T>::max;
   static constexpr T Overflow() {
+	fprintf(stderr, ">>> Entering Overflow()\n");
+    fprintf(stderr, "<<< Exiting Overflow()\n");
     return std::numeric_limits<T>::has_infinity
                ? std::numeric_limits<T>::infinity()
                : std::numeric_limits<T>::max();
   }
   using std::numeric_limits<T>::lowest;
   static constexpr T Underflow() {
+	fprintf(stderr, ">>> Entering Underflow()\n");
+    fprintf(stderr, "<<< Exiting Underflow()\n");
     return std::numeric_limits<T>::has_infinity
                ? std::numeric_limits<T>::infinity() * -1
                : std::numeric_limits<T>::lowest();
@@ -139,8 +153,10 @@ struct SaturationDefaultLimits : public std::numeric_limits<T> {
 
 template <typename Dst, template <typename> class S, typename Src>
 constexpr Dst saturated_cast_impl(Src value, RangeCheck constraint) {
+fprintf(stderr, ">>> Entering saturated_cast_impl(value=%d,constraint=%d)\n", value, constraint);
   // For some reason clang generates much better code when the branch is
   // structured exactly this way, rather than a sequence of checks.
+fprintf(stderr, "<<< Exiting saturated_cast_impl(value=%d,constraint=%d)\n", value, constraint);
   return !constraint.IsOverflowFlagSet()
              ? (!constraint.IsUnderflowFlagSet() ? static_cast<Dst>(value)
                                                  : S<Dst>::Underflow())
@@ -202,7 +218,9 @@ template <typename Dst,
           template <typename> class SaturationHandler = SaturationDefaultLimits,
           typename Src>
 constexpr Dst saturated_cast(Src value) {
+fprintf(stderr, ">>> Entering saturated_cast(value=%d)\n", value);
   using SrcType = typename UnderlyingType<Src>::type;
+fprintf(stderr, "<<< Exiting saturated_cast(value=%d)\n", value);
   return !IsCompileTimeConstant(value) &&
                  SaturateFastOp<Dst, SrcType>::is_supported &&
                  std::is_same<SaturationHandler<Dst>,
@@ -219,6 +237,7 @@ constexpr Dst saturated_cast(Src value) {
 // to contain any value in the source type. It performs no runtime checking.
 template <typename Dst, typename Src>
 constexpr Dst strict_cast(Src value) {
+fprintf(stderr, ">>> Entering strict_cast(value=%d)\n", value);
   using SrcType = typename UnderlyingType<Src>::type;
   static_assert(UnderlyingType<Src>::is_numeric, "Argument must be numeric.");
   static_assert(std::is_arithmetic<Dst>::value, "Result must be numeric.");
@@ -234,6 +253,7 @@ constexpr Dst strict_cast(Src value) {
                 "The source type is out of range for the destination type. "
                 "Please see strict_cast<> comments for more information.");
 
+fprintf(stderr, "<<< Exiting strict_cast(value=%d)\n", value);
   return static_cast<Dst>(static_cast<SrcType>(value));
 }
 
@@ -297,6 +317,8 @@ class StrictNumeric {
             typename std::enable_if<
                 IsNumericRangeContained<Dst, T>::value>::type* = nullptr>
   constexpr operator Dst() const {
+	fprintf(stderr, ">>> Entering Dst()\n");
+    fprintf(stderr, "<<< Exiting Dst()\n");
     return static_cast<typename ArithmeticOrUnderlyingEnum<Dst>::type>(value_);
   }
 

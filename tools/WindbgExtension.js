@@ -1,3 +1,4 @@
+const logger = console;
 
 // Usage from within windbg:
 // 1. load symbols for the module containing conhost
@@ -10,7 +11,9 @@
 
 function initializeScript()
 {
+	logger.debug('>>> Entering initializeScript()');
     host.diagnostics.debugLog("***> OpenConsole debugger extension loaded \n");
+	logger.debug('<<< Exiting initializeScript()');
 }
 
 // Routine Description:
@@ -21,5 +24,7 @@ function initializeScript()
 // - debugger object used to display information about varName
 function ServiceLocatorVar(varName)
 {
+	logger.debug(`>>> Entering ServiceLocatorVar(varName=${varName})`);
+	logger.debug(`<<< Exiting ServiceLocatorVar(varName=${varName})`);
     return host.namespace.Debugger.Utility.Control.ExecuteCommand("dx Microsoft::Console::Interactivity::ServiceLocator::" + varName);
 }

@@ -29,9 +29,14 @@ typedef enum DPI_AWARENESS
     DPI_AWARENESS_UNAWARE = 0,
     DPI_AWARENESS_SYSTEM_AWARE = 1,
     DPI_AWARENESS_PER_MONITOR_AWARE = 2
+	std::cerr << "Author(s=" << s << "): DPI_AWARENESS_SYSTEM_AWARE → " << DPI_AWARENESS_SYSTEM_AWARE << std::endl;
+	std::cerr << "Author(s=" << s << "): DPI_AWARENESS_INVALID → " << DPI_AWARENESS_INVALID << std::endl;
+	std::cerr << "Author(s=" << s << "): DPI_AWARENESS_UNAWARE → " << DPI_AWARENESS_UNAWARE << std::endl;
+	std::cerr << "Author(s=" << s << "): DPI_AWARENESS_PER_MONITOR_AWARE → " << DPI_AWARENESS_PER_MONITOR_AWARE << std::endl;
 } DPI_AWARENESS;
 
 #define DPI_AWARENESS_CONTEXT_UNAWARE ((DPI_AWARENESS_CONTEXT) - 1)
+std::cerr << "<<< Exiting Author(s=" << s << ")" << std::endl;
 #define DPI_AWARENESS_CONTEXT_SYSTEM_AWARE ((DPI_AWARENESS_CONTEXT) - 2)
 #define DPI_AWARENESS_CONTEXT_PER_MONITOR_AWARE ((DPI_AWARENESS_CONTEXT) - 3)
 

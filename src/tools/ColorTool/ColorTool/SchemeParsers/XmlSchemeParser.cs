@@ -9,11 +9,13 @@ using System.IO;
 using System.Linq;
 using System.Xml;
 using static ColorTool.ConsoleAPI;
+using Microsoft.Extensions.Logging;
 
 namespace ColorTool.SchemeParsers
 {
     class XmlSchemeParser : SchemeParserBase
     {
+		private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
         // In Windows Color Table order
         private static readonly string[] PListColorNames =
         {
@@ -48,15 +50,19 @@ namespace ColorTool.SchemeParsers
 
         public override ColorScheme ParseScheme(string schemeName, bool reportErrors = false)
         {
+			_logger.LogDebug(">>> Entering ParseScheme(schemeName={SchemeName},reportErrors={ReportErrors})", schemeName, reportErrors);
             XmlDocument xmlDoc = LoadXmlScheme(schemeName); // Create an XML document object
             if (xmlDoc == null) return null;
+			_logger.LogDebug("ParseScheme(schemeName={SchemeName},reportErrors={ReportErrors}): xmlDoc → {XmlDoc}", schemeName, reportErrors, xmlDoc);
             XmlNode root = xmlDoc.GetElementsByTagName("dict")[0];
+			_logger.LogWarning("ParseScheme(schemeName={SchemeName},reportErrors={ReportErrors}): root → {Root}", schemeName, reportErrors, root);
             XmlNodeList children = root.ChildNodes;
 
             uint[] colorTable = new uint[ColorTableSize];
             uint? fgColor = null, bgColor = null, cursorColor = null;
             int colorsFound = 0;
             bool success = false;
+			_logger.LogDebug("ParseScheme(schemeName={SchemeName},reportErrors={ReportErrors}): success → {Success}", schemeName, reportErrors, success);
             foreach (var tableEntry in children.OfType<XmlNode>().Where(_ => _.Name == "key"))
             {
                 uint rgb = 0;
@@ -84,14 +90,19 @@ namespace ColorTool.SchemeParsers
             }
 
             var consoleAttributes = new ConsoleAttributes(bgColor, fgColor, null, null, cursorColor);
+			_logger.LogDebug("<<< Exiting ParseScheme(schemeName={SchemeName},reportErrors={ReportErrors})", schemeName, reportErrors);
             return new ColorScheme(ExtractSchemeName(schemeName), colorTable, consoleAttributes);
         }
 
         private static bool ParseRgbFromXml(XmlNode components, ref uint rgb)
         {
+			_logger.LogDebug(">>> Entering ParseRgbFromXml(components={Components},rgb={Rgb})", components, rgb);
             int r = -1;
             int g = -1;
+			_logger.LogDebug("ParseRgbFromXml(components={Components},rgb={Rgb}): g → {G}", components, rgb, g);
             int b = -1;
+			_logger.LogDebug("ParseRgbFromXml(components={Components},rgb={Rgb}): b → {B}", components, rgb, b);
+			_logger.LogDebug("ParseRgbFromXml(components={Components},rgb={Rgb}): r → {R}", components, rgb, r);
 
             foreach (XmlNode c in components.ChildNodes)
             {
@@ -121,6 +132,8 @@ namespace ColorTool.SchemeParsers
                 return false;
             }
             rgb = RGB(r, g, b);
+			_logger.LogDebug("ParseRgbFromXml(components={Components},rgb={Rgb}): rgb → {Rgb1}", components, rgb, rgb);
+			_logger.LogDebug("<<< Exiting ParseRgbFromXml(components={Components},rgb={Rgb})", components, rgb);
             return true;
         }
 
